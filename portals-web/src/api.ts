@@ -11,7 +11,7 @@ const KEY_BASE = "gods_api_base";
 const KEY_TOKEN = "gods_token";
 
 export function getBase(): string {
-  return localStorage.getItem(KEY_BASE) || "http://localhost:8000";
+ return localStorage.getItem(KEY_BASE) || import.meta.env.VITE_API_BASE || "http://localhost:8000";
 }
 export function setBase(b: string) { localStorage.setItem(KEY_BASE, b.replace(/\/$/, "")); }
 export function getToken() { return localStorage.getItem(KEY_TOKEN); }
