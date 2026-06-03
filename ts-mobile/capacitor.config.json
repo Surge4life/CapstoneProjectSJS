@@ -1,0 +1,7 @@
+{
+  "appId": "za.gods.ts",
+  "appName": "TS Industries · G.O.D.S",
+  "webDir": "www",
+  "server": { "androidScheme": "https", "cleartext": true, "allowNavigation": ["*"] },
+  "android": { "allowMixedContent": true }
+}

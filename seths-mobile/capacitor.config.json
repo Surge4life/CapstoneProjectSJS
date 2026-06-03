@@ -1,0 +1,7 @@
+{
+  "appId": "za.gods.seths",
+  "appName": "SETHS · G.O.D.S",
+  "webDir": "www",
+  "server": { "androidScheme": "https", "cleartext": true, "allowNavigation": ["*"] },
+  "android": { "allowMixedContent": true }
+}

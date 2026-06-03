@@ -1,0 +1,7 @@
+{
+  "appId": "za.gods.madiba",
+  "appName": "MADIBA · G.O.D.S",
+  "webDir": "www",
+  "server": { "androidScheme": "https", "cleartext": true, "allowNavigation": ["*"] },
+  "android": { "allowMixedContent": true }
+}

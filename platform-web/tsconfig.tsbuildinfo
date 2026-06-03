@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/lib/api.ts","./src/lib/types.ts","./src/pages/AdminDash.tsx","./src/pages/AuditConsole.tsx","./src/pages/Login.tsx","./src/pages/MADIBAConsole.tsx","./src/pages/SETHSConsole.tsx","./src/pages/TSConsole.tsx","./src/pages/UDOCConsole.tsx"],"version":"5.9.3"}

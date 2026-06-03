@@ -1,0 +1,13 @@
+{
+  "appId": "za.gods.portals",
+  "appName": "G.O.D.S Portals",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

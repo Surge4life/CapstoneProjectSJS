@@ -1,0 +1,2247 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "GODS Platform Core",
+  "description": "Sovereign AI governance backend for the G.O.D.S ecosystem.",
+  "version": "1.0.0"
+ },
+ "paths": {
+  "/": {
+   "get": {
+    "tags": [
+     "root"
+    ],
+    "summary": "Root",
+    "operationId": "root__get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/health": {
+   "get": {
+    "tags": [
+     "health"
+    ],
+    "summary": "Health",
+    "operationId": "health_health_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/health/ready": {
+   "get": {
+    "tags": [
+     "health"
+    ],
+    "summary": "Ready",
+    "operationId": "ready_health_ready_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/auth/register": {
+   "post": {
+    "tags": [
+     "auth"
+    ],
+    "summary": "Register",
+    "operationId": "register_auth_register_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RegisterReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/auth/login": {
+   "post": {
+    "tags": [
+     "auth"
+    ],
+    "summary": "Login",
+    "operationId": "login_auth_login_post",
+    "requestBody": {
+     "content": {
+      "application/x-www-form-urlencoded": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_login_auth_login_post"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/auth/me": {
+   "get": {
+    "tags": [
+     "auth"
+    ],
+    "summary": "Me",
+    "operationId": "me_auth_me_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/registry/models": {
+   "get": {
+    "tags": [
+     "UDOC registry"
+    ],
+    "summary": "List Models",
+    "operationId": "list_models_registry_models_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "UDOC registry"
+    ],
+    "summary": "Register Model",
+    "operationId": "register_model_registry_models_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ModelReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/registry/models/{model_id}/status": {
+   "post": {
+    "tags": [
+     "UDOC registry"
+    ],
+    "summary": "Set Status",
+    "operationId": "set_status_registry_models__model_id__status_post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "model_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Model Id"
+      }
+     },
+     {
+      "name": "new_status",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "New Status"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/decisions": {
+   "get": {
+    "tags": [
+     "UDOC decisions"
+    ],
+    "summary": "List Decisions",
+    "operationId": "list_decisions_decisions_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "UDOC decisions"
+    ],
+    "summary": "Decide",
+    "operationId": "decide_decisions_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/audit/chain/verify": {
+   "get": {
+    "tags": [
+     "UDOC audit"
+    ],
+    "summary": "Chain Verify",
+    "operationId": "chain_verify_audit_chain_verify_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/audit/chain/merkle-root": {
+   "get": {
+    "tags": [
+     "UDOC audit"
+    ],
+    "summary": "Get Merkle",
+    "operationId": "get_merkle_audit_chain_merkle_root_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/audit/records": {
+   "get": {
+    "tags": [
+     "UDOC audit"
+    ],
+    "summary": "Records",
+    "operationId": "records_audit_records_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/oversight/cases": {
+   "get": {
+    "tags": [
+     "UDOC oversight"
+    ],
+    "summary": "List Cases",
+    "operationId": "list_cases_oversight_cases_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   },
+   "post": {
+    "tags": [
+     "UDOC oversight"
+    ],
+    "summary": "Open Case",
+    "operationId": "open_case_oversight_cases_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CaseReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/oversight/cases/{case_ref}/resolve": {
+   "post": {
+    "tags": [
+     "UDOC oversight"
+    ],
+    "summary": "Resolve",
+    "operationId": "resolve_oversight_cases__case_ref__resolve_post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "case_ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Case Ref"
+      }
+     },
+     {
+      "name": "resolution",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Resolution"
+      }
+     },
+     {
+      "name": "override",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "boolean",
+       "default": false,
+       "title": "Override"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/seths/enrol": {
+   "post": {
+    "tags": [
+     "SETHS"
+    ],
+    "summary": "Enrol",
+    "operationId": "enrol_seths_enrol_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/EnrolReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/seths/{ref}/advance": {
+   "post": {
+    "tags": [
+     "SETHS"
+    ],
+    "summary": "Advance",
+    "operationId": "advance_seths__ref__advance_post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Ref"
+      }
+     },
+     {
+      "name": "monthly_value",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "number",
+       "default": 12000.0,
+       "title": "Monthly Value"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/seths/metrics": {
+   "get": {
+    "tags": [
+     "SETHS"
+    ],
+    "summary": "Metrics",
+    "operationId": "metrics_seths_metrics_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/ts/projects": {
+   "get": {
+    "tags": [
+     "TS Industries"
+    ],
+    "summary": "Projects",
+    "operationId": "projects_ts_projects_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "TS Industries"
+    ],
+    "summary": "Deploy",
+    "operationId": "deploy_ts_projects_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/ts/metrics": {
+   "get": {
+    "tags": [
+     "TS Industries"
+    ],
+    "summary": "Metrics",
+    "operationId": "metrics_ts_metrics_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/madiba/allocate": {
+   "post": {
+    "tags": [
+     "MADIBA"
+    ],
+    "summary": "Allocate",
+    "operationId": "allocate_madiba_allocate_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AllocateReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/madiba/metrics": {
+   "get": {
+    "tags": [
+     "MADIBA"
+    ],
+    "summary": "Metrics",
+    "operationId": "metrics_madiba_metrics_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/compliance/frameworks": {
+   "get": {
+    "tags": [
+     "UDOC compliance"
+    ],
+    "summary": "Frameworks",
+    "operationId": "frameworks_compliance_frameworks_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/compliance/sweep": {
+   "get": {
+    "tags": [
+     "UDOC compliance"
+    ],
+    "summary": "Sweep",
+    "operationId": "sweep_compliance_sweep_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/bias/scan": {
+   "get": {
+    "tags": [
+     "UDOC bias"
+    ],
+    "summary": "Scan",
+    "operationId": "scan_bias_scan_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/sovereignty/posture": {
+   "get": {
+    "tags": [
+     "UDOC sovereignty"
+    ],
+    "summary": "Posture",
+    "operationId": "posture_sovereignty_posture_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/intelligence/loop-snapshot": {
+   "get": {
+    "tags": [
+     "intelligence"
+    ],
+    "summary": "Loop Snapshot",
+    "operationId": "loop_snapshot_intelligence_loop_snapshot_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/admin/status": {
+   "get": {
+    "tags": [
+     "GODS Admin"
+    ],
+    "summary": "Status",
+    "operationId": "status_admin_status_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/analytics/{division}/kpis": {
+   "get": {
+    "tags": [
+     "UDOC analytics"
+    ],
+    "summary": "Kpis",
+    "operationId": "kpis_analytics__division__kpis_get",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "division",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Division"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/analytics/{division}/totals": {
+   "get": {
+    "tags": [
+     "UDOC analytics"
+    ],
+    "summary": "Totals",
+    "operationId": "totals_analytics__division__totals_get",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "division",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Division"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/analytics/{division}/timeseries": {
+   "get": {
+    "tags": [
+     "UDOC analytics"
+    ],
+    "summary": "Timeseries",
+    "operationId": "timeseries_analytics__division__timeseries_get",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "division",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Division"
+      }
+     },
+     {
+      "name": "metric",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Metric"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/analytics/{division}/records": {
+   "get": {
+    "tags": [
+     "UDOC analytics"
+    ],
+    "summary": "Records",
+    "operationId": "records_analytics__division__records_get",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "division",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Division"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 50,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/student/register": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Student"
+    ],
+    "summary": "Register",
+    "operationId": "register_portal_student_register_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/StudentReg"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/student/{student_ref}": {
+   "get": {
+    "tags": [
+     "Portal \u00b7 Student"
+    ],
+    "summary": "Profile",
+    "operationId": "profile_portal_student__student_ref__get",
+    "parameters": [
+     {
+      "name": "student_ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Student Ref"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/student/{student_ref}/progress": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Student"
+    ],
+    "summary": "Update Progress",
+    "operationId": "update_progress_portal_student__student_ref__progress_post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "student_ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Student Ref"
+      }
+     },
+     {
+      "name": "pct",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "number",
+       "title": "Pct"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/student/opportunities/open": {
+   "get": {
+    "tags": [
+     "Portal \u00b7 Student"
+    ],
+    "summary": "Open Opportunities",
+    "operationId": "open_opportunities_portal_student_opportunities_open_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/student/{student_ref}/apply/{opportunity_id}": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Student"
+    ],
+    "summary": "Apply",
+    "operationId": "apply_portal_student__student_ref__apply__opportunity_id__post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "student_ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Student Ref"
+      }
+     },
+     {
+      "name": "opportunity_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Opportunity Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employer/register": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Employer"
+    ],
+    "summary": "Register",
+    "operationId": "register_portal_employer_register_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/EmployerReg"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employer/opportunities": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Employer"
+    ],
+    "summary": "Post Opportunity",
+    "operationId": "post_opportunity_portal_employer_opportunities_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/OppReq"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ]
+   }
+  },
+  "/portal/employer/{employer_id}/opportunities": {
+   "get": {
+    "tags": [
+     "Portal \u00b7 Employer"
+    ],
+    "summary": "My Opportunities",
+    "operationId": "my_opportunities_portal_employer__employer_id__opportunities_get",
+    "parameters": [
+     {
+      "name": "employer_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Employer Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employer/opportunities/{opportunity_id}/applicants": {
+   "get": {
+    "tags": [
+     "Portal \u00b7 Employer"
+    ],
+    "summary": "Applicants",
+    "operationId": "applicants_portal_employer_opportunities__opportunity_id__applicants_get",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "opportunity_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Opportunity Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employer/applications/{application_id}/offer": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Employer"
+    ],
+    "summary": "Make Offer",
+    "operationId": "make_offer_portal_employer_applications__application_id__offer_post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "application_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Application Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employee/{employee_ref}": {
+   "get": {
+    "tags": [
+     "Portal \u00b7 Employee"
+    ],
+    "summary": "Profile",
+    "operationId": "profile_portal_employee__employee_ref__get",
+    "parameters": [
+     {
+      "name": "employee_ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Employee Ref"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employee/{employee_ref}/timesheet": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Employee"
+    ],
+    "summary": "Submit Timesheet",
+    "operationId": "submit_timesheet_portal_employee__employee_ref__timesheet_post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "employee_ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Employee Ref"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/TimesheetReq"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employee/timesheet/{timesheet_id}/approve": {
+   "post": {
+    "tags": [
+     "Portal \u00b7 Employee"
+    ],
+    "summary": "Approve",
+    "operationId": "approve_portal_employee_timesheet__timesheet_id__approve_post",
+    "security": [
+     {
+      "OAuth2PasswordBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "timesheet_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Timesheet Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/portal/employee/{employee_ref}/payslip": {
+   "get": {
+    "tags": [
+     "Portal \u00b7 Employee"
+    ],
+    "summary": "Payslip",
+    "operationId": "payslip_portal_employee__employee_ref__payslip_get",
+    "parameters": [
+     {
+      "name": "employee_ref",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Employee Ref"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "AllocateReq": {
+    "properties": {
+     "month": {
+      "type": "integer",
+      "title": "Month"
+     },
+     "total_inflow": {
+      "type": "number",
+      "title": "Total Inflow"
+     },
+     "dfi_pct": {
+      "type": "number",
+      "title": "Dfi Pct",
+      "default": 0.2
+     },
+     "reserve_pct": {
+      "type": "number",
+      "title": "Reserve Pct",
+      "default": 0.15
+     },
+     "holdings_pct": {
+      "type": "number",
+      "title": "Holdings Pct",
+      "default": 0.1
+     }
+    },
+    "type": "object",
+    "required": [
+     "month",
+     "total_inflow"
+    ],
+    "title": "AllocateReq"
+   },
+   "Body_login_auth_login_post": {
+    "properties": {
+     "grant_type": {
+      "anyOf": [
+       {
+        "type": "string",
+        "pattern": "^password$"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Grant Type"
+     },
+     "username": {
+      "type": "string",
+      "title": "Username"
+     },
+     "password": {
+      "type": "string",
+      "format": "password",
+      "title": "Password"
+     },
+     "scope": {
+      "type": "string",
+      "title": "Scope",
+      "default": ""
+     },
+     "client_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Client Id"
+     },
+     "client_secret": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "format": "password",
+      "title": "Client Secret"
+     }
+    },
+    "type": "object",
+    "required": [
+     "username",
+     "password"
+    ],
+    "title": "Body_login_auth_login_post"
+   },
+   "CaseReq": {
+    "properties": {
+     "model_id": {
+      "type": "string",
+      "title": "Model Id"
+     },
+     "reason": {
+      "type": "string",
+      "title": "Reason"
+     }
+    },
+    "type": "object",
+    "required": [
+     "model_id",
+     "reason"
+    ],
+    "title": "CaseReq"
+   },
+   "DecisionReq": {
+    "properties": {
+     "model_id": {
+      "type": "string",
+      "title": "Model Id"
+     },
+     "risk_tier": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Risk Tier"
+     },
+     "raw_confidence": {
+      "type": "number",
+      "title": "Raw Confidence",
+      "default": 0.9
+     },
+     "compliance": {
+      "type": "number",
+      "title": "Compliance",
+      "default": 1.0
+     },
+     "priv_favorable": {
+      "type": "integer",
+      "title": "Priv Favorable",
+      "default": 480
+     },
+     "priv_total": {
+      "type": "integer",
+      "title": "Priv Total",
+      "default": 1000
+     },
+     "unpriv_favorable": {
+      "type": "integer",
+      "title": "Unpriv Favorable",
+      "default": 470
+     },
+     "unpriv_total": {
+      "type": "integer",
+      "title": "Unpriv Total",
+      "default": 1000
+     },
+     "ecs": {
+      "type": "number",
+      "title": "Ecs",
+      "default": 0.75
+     },
+     "bgp": {
+      "type": "number",
+      "title": "Bgp",
+      "default": 1.0
+     },
+     "traceroute": {
+      "type": "number",
+      "title": "Traceroute",
+      "default": 1.0
+     },
+     "dnssec": {
+      "type": "number",
+      "title": "Dnssec",
+      "default": 1.0
+     },
+     "storage": {
+      "type": "number",
+      "title": "Storage",
+      "default": 1.0
+     }
+    },
+    "type": "object",
+    "required": [
+     "model_id"
+    ],
+    "title": "DecisionReq"
+   },
+   "EmployerReg": {
+    "properties": {
+     "org_name": {
+      "type": "string",
+      "title": "Org Name"
+     },
+     "contact_email": {
+      "type": "string",
+      "format": "email",
+      "title": "Contact Email"
+     },
+     "sector": {
+      "type": "string",
+      "title": "Sector",
+      "default": ""
+     },
+     "bbbee_level": {
+      "type": "integer",
+      "title": "Bbbee Level",
+      "default": 4
+     }
+    },
+    "type": "object",
+    "required": [
+     "org_name",
+     "contact_email"
+    ],
+    "title": "EmployerReg"
+   },
+   "EnrolReq": {
+    "properties": {
+     "qualification": {
+      "type": "string",
+      "title": "Qualification",
+      "default": "Software Developer 118707"
+     },
+     "nqf_level": {
+      "type": "integer",
+      "title": "Nqf Level",
+      "default": 5
+     },
+     "count": {
+      "type": "integer",
+      "title": "Count",
+      "default": 1
+     }
+    },
+    "type": "object",
+    "title": "EnrolReq"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "ModelReq": {
+    "properties": {
+     "model_id": {
+      "type": "string",
+      "title": "Model Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "operator_id": {
+      "type": "string",
+      "title": "Operator Id"
+     },
+     "risk_tier": {
+      "type": "string",
+      "title": "Risk Tier",
+      "default": "NOTABLE"
+     },
+     "use_case": {
+      "type": "string",
+      "title": "Use Case",
+      "default": ""
+     },
+     "jurisdiction": {
+      "type": "string",
+      "title": "Jurisdiction",
+      "default": "ZA"
+     }
+    },
+    "type": "object",
+    "required": [
+     "model_id",
+     "name",
+     "operator_id"
+    ],
+    "title": "ModelReq"
+   },
+   "OppReq": {
+    "properties": {
+     "employer_id": {
+      "type": "integer",
+      "title": "Employer Id"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description",
+      "default": ""
+     },
+     "sector": {
+      "type": "string",
+      "title": "Sector",
+      "default": ""
+     },
+     "positions": {
+      "type": "integer",
+      "title": "Positions",
+      "default": 1
+     },
+     "monthly_stipend": {
+      "type": "number",
+      "title": "Monthly Stipend",
+      "default": 0.0
+     }
+    },
+    "type": "object",
+    "required": [
+     "employer_id",
+     "title"
+    ],
+    "title": "OppReq"
+   },
+   "ProjectReq": {
+    "properties": {
+     "sector": {
+      "type": "string",
+      "title": "Sector"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "workers_deployed": {
+      "type": "integer",
+      "title": "Workers Deployed",
+      "default": 0
+     },
+     "monthly_revenue": {
+      "type": "number",
+      "title": "Monthly Revenue",
+      "default": 0.0
+     },
+     "operating_margin": {
+      "type": "number",
+      "title": "Operating Margin",
+      "default": 0.3
+     }
+    },
+    "type": "object",
+    "required": [
+     "sector",
+     "name"
+    ],
+    "title": "ProjectReq"
+   },
+   "RegisterReq": {
+    "properties": {
+     "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+     },
+     "password": {
+      "type": "string",
+      "title": "Password"
+     },
+     "role": {
+      "type": "string",
+      "title": "Role",
+      "default": "viewer"
+     },
+     "division": {
+      "type": "string",
+      "title": "Division",
+      "default": "GODS"
+     }
+    },
+    "type": "object",
+    "required": [
+     "email",
+     "password"
+    ],
+    "title": "RegisterReq"
+   },
+   "StudentReg": {
+    "properties": {
+     "full_name": {
+      "type": "string",
+      "title": "Full Name"
+     },
+     "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+     },
+     "qualification": {
+      "type": "string",
+      "title": "Qualification",
+      "default": "Software Developer 118707"
+     },
+     "nqf_level": {
+      "type": "integer",
+      "title": "Nqf Level",
+      "default": 5
+     }
+    },
+    "type": "object",
+    "required": [
+     "full_name",
+     "email"
+    ],
+    "title": "StudentReg"
+   },
+   "TimesheetReq": {
+    "properties": {
+     "hours": {
+      "type": "number",
+      "title": "Hours"
+     },
+     "period": {
+      "type": "string",
+      "title": "Period",
+      "default": ""
+     }
+    },
+    "type": "object",
+    "required": [
+     "hours"
+    ],
+    "title": "TimesheetReq"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   }
+  },
+  "securitySchemes": {
+   "OAuth2PasswordBearer": {
+    "type": "oauth2",
+    "flows": {
+     "password": {
+      "scopes": {},
+      "tokenUrl": "auth/login"
+     }
+    }
+   }
+  }
+ }
+}
