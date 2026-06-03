@@ -28,9 +28,12 @@ class Settings(BaseSettings):
 def _resolve_database_url(s: "Settings") -> str:
     # Render (and most PaaS) inject an unprefixed DATABASE_URL. Prefer it when present.
     url = os.environ.get("DATABASE_URL") or s.database_url
-    # SQLAlchemy needs postgresql:// (psycopg), not the legacy postgres:// scheme.
+    # SQLAlchemy must use the psycopg (v3) driver explicitly, else it tries psycopg2 (not installed).
+    # Render gives postgres:// ; normalise to postgresql+psycopg:// for the installed driver.
     if url.startswith("postgres://"):
-        url = url.replace("postgres://", "postgresql://", 1)
+        url = url.replace("postgres://", "postgresql+psycopg://", 1)
+    elif url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+psycopg://", 1)
     return url
 
 
