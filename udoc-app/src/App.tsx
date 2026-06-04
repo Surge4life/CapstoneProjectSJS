@@ -15,7 +15,7 @@ export function App() {
   useEffect(()=>{ checkConn(); }, []);
   function saveBase(){ setBase(base); setBaseState(getBase()); checkConn(); }
 
-  async function login(){ try{ await api.login("admin@gods.za","admin123"); setAuthed(true); }catch(e:any){ setMsg(e.message); } }
+  async function login(){ try{ await api.login("admin@gods.local","admin123"); setAuthed(true); }catch(e:any){ setMsg(e.message); } }
   async function load(){
     if(!clientRef) return;
     try{ setDash(await api.get(`/saas/${clientRef}/dashboard`)); setModels(await api.get(`/saas/${clientRef}/models`)); }

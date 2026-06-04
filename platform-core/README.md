@@ -4,7 +4,7 @@ Sovereign AI governance backend — FastAPI. Real, runnable, tested.
 ## Run
 ```bash
 pip install -r requirements.txt
-python seed.py                       # admin@gods.za / admin123 + model-001
+python seed.py                       # admin@gods.local / admin123 + model-001
 uvicorn app.main:app --reload        # http://localhost:8000/docs
 ```
 

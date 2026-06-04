@@ -1,14 +1,35 @@
-# MADIBA — Native Android (.apk) build
-Capacitor wrapper for the madiba-app PWA. App ID: `za.gods.madiba`.
+# MADIBA — Android .apk build (app id: za.gods.madiba)
 
-## Build the signed .apk (machine with Android Studio + JDK 17+)
+Capacitor project that compiles the **madiba-app** web app into a native Android `.apk`.
+
+## Why it isn't pre-compiled in the package
+A signed `.apk` needs the Android SDK + Android Gradle Plugin + a keystore. The build sandbox
+that produced this package has no SDK and is firewall-blocked from downloading it. Everything
+else is done; the SDK build is the one step that must run on your machine.
+
+## Requirements (on your desktop)
+- Android Studio (gives you the SDK + an emulator) **or** Android command-line tools
+- JDK 17+
+- Node.js 18+
+
+## Build (one script)
 ```bash
 cd madiba-mobile
-npm install
-npm run build:web        # bundle latest madiba-app build into www/
-npx cap add android      # generate native android/ project (needs Android SDK)
-npx cap sync
-npx cap open android     # Android Studio → Build → Generate Signed APK
+./build-apk.sh          # builds web app → generates android/ → applies resources → assembles APK
 ```
-On first launch the app asks for your G.O.D.S backend URL (LAN IP or tunnel) and connects live.
-The PWA (`madiba-app`) is installable today with no toolchain.
+Then to produce a **signed** apk for sideload/Play Store:
+```bash
+npx cap open android    # opens Android Studio → Build > Generate Signed Bundle / APK > APK
+```
+Output (unsigned): `android/app/build/outputs/apk/release/app-release-unsigned.apk`
+
+## What's already prepared for you
+- `www/` — the built web app (works as an installable PWA right now, no toolchain)
+- `capacitor.config.json` — app id za.gods.madiba, cleartext enabled for the connect-screen
+- `android-resources/` — network-security config (lets the app reach your LAN/tunnel backend),
+  strings.xml, and the manifest permissions to merge
+- `build-apk.sh` — the exact end-to-end build
+
+## First launch
+The app shows a connect screen — enter your deployed backend URL (e.g. your Render URL
+`https://gods-platform-core.onrender.com`, or a LAN IP / ngrok tunnel) and it runs live.

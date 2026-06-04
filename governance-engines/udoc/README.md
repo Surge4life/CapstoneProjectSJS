@@ -1,7 +1,7 @@
 # UDOC Orchestration Pipeline — Complete Build
 
 **Unified Digital Oversight & Coordination** · Core Orchestration Engine (AEEF)
-G.O.D.S Holdings (Pty) Ltd · v9.3 → v10.0
+G.O.D.S Holdings (Pty) Ltd (proposed) · v9.3 → v10.0
 
 ## What this is
 The non-bypassable governance flow (Claim 1) that ties the five UDOC

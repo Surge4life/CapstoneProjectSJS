@@ -4,7 +4,7 @@
 // Unified Digital Oversight & Coordination · Core Orchestration Engine (AEEF)
 // Claim 1 (non-bypassable core) · Claim 5 (fail-closed attestation) ·
 // Claim 15 (14-stage FSM) · Claim 12 (FPGA nanosecond interrupt)
-// G.O.D.S Holdings (Pty) Ltd — v9.3 → v10.0
+// G.O.D.S Holdings (Pty) Ltd (proposed) — v9.3 → v10.0
 //
 // Ties the five subsystems into ONE auditable governance flow:
 //   EVA (6D scoring) → Sovereignty (SVS) → FSM (14-stage) →

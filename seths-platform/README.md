@@ -8,7 +8,7 @@ npm install
 npm run dev      # http://localhost:5173 (proxies /api → platform-core :8000)
 npm run build    # production bundle in dist/ (verified clean)
 ```
-Login: admin@gods.za / admin123 (after platform-core seed.py).
+Login: admin@gods.local / admin123 (after platform-core seed.py).
 
 ## What it shows (all live from UDOC analytics)
 - Division KPIs (computed by UDOC analytics_engine from recorded events)

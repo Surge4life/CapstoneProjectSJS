@@ -9,7 +9,7 @@ export function EmployeePortal({ onBack }: { onBack: () => void }) {
   const [hours, setHours] = useState(160);
   const [msg, setMsg] = useState("");
 
-  async function ensureToken() { try { await api.login("admin@gods.za", "admin123"); } catch {} }
+  async function ensureToken() { try { await api.login("admin@gods.local", "admin123"); } catch {} }
   async function load() {
     if (!ref) return;
     try {

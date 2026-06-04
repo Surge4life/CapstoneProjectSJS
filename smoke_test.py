@@ -80,7 +80,7 @@ def main():
 
         # 3) Auth
         stage(3, "Authentication")
-        tok = http("POST", "/auth/login", form={"username": "admin@gods.za", "password": "admin123"})["access_token"]
+        tok = http("POST", "/auth/login", form={"username": "admin@gods.local", "password": "admin123"})["access_token"]
         check("JWT login", bool(tok))
 
         # 4) Governance decision path
@@ -175,8 +175,8 @@ def main():
         prof = http("GET", "/access/profile", token=tok)
         check("admin profile opens all systems", len(prof["systems"]) == 5, f"{len(prof['systems'])} systems")
         # seed a scoped operator and verify enforcement
-        http("POST", "/auth/register", body={"email": "smoke.seths@gods.za", "password": "p", "role": "operator", "division": "SETHS"})
-        d = _up.urlencode({"username": "smoke.seths@gods.za", "password": "p"}).encode()
+        http("POST", "/auth/register", body={"email": "smoke.seths@gods.local", "password": "p", "role": "operator", "division": "SETHS"})
+        d = _up.urlencode({"username": "smoke.seths@gods.local", "password": "p"}).encode()
         stok = _j.load(_u.urlopen(_u.Request(BASE + "/auth/login", data=d, headers={"Content-Type": "application/x-www-form-urlencoded"})))["access_token"]
         sprof = http("GET", "/access/profile", token=stok)
         skeys = [s["key"] for s in sprof["systems"]]

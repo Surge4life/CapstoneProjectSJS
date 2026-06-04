@@ -11,7 +11,7 @@ interface Sys { key: string; title: string; path: string; }
 interface Profile { email: string; role: string; division: string; systems: Sys[]; is_admin: boolean; }
 
 function Login({ onAuth }: { onAuth: () => void }) {
-  const [email, setEmail] = useState("admin@gods.za");
+  const [email, setEmail] = useState("admin@gods.local");
   const [pw, setPw] = useState("admin123");
   const [err, setErr] = useState("");
   async function go(){ try{ await api.login(email,pw); onAuth(); }catch(e:any){ setErr(e.message); } }
@@ -20,7 +20,7 @@ function Login({ onAuth }: { onAuth: () => void }) {
     <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="staff email"/>
     <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="password"/>
     <button className="btn" onClick={go}>Sign in</button>{err&&<div className="err">{err}</div>}
-    <p style={{fontSize:".68rem",color:"var(--rule)",marginTop:14}}>Try: seths.op@gods.za · ts.op@gods.za · auditor@gods.za · viewer@gods.za (pw staff123)</p>
+    <p style={{fontSize:".68rem",color:"var(--rule)",marginTop:14}}>Try: seths.op@gods.local · ts.op@gods.local · auditor@gods.local · viewer@gods.local (pw staff123)</p>
   </div>);
 }
 

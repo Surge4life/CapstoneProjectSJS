@@ -1,0 +1,33 @@
+/* ============================================================================
+   gods.brand.css — CANONICAL brand tokens for the G.O.D.S ecosystem
+   Single source of truth. Import this; never hardcode brand values elsewhere.
+   Status: pre-registration forecast (see /PRE_REGISTRATION_NOTICE.md).
+   © 2026 Sashin J. Singh · G.O.D.S Holdings (Pty) Ltd (proposed)
+   ============================================================================ */
+:root{
+  /* Core */
+  --gods-navy-deep:#040B16; --gods-navy-core:#060E1C; --gods-navy-mid:#0C1A2E;
+  --gods-navy-lift:#122238; --gods-navy-accent:#1A3050; --gods-navy-border:#243A5A;
+  --gods-gold:#C9A84C; --gods-gold-light:#E8C97A; --gods-gold-bright:#F0D68A; --gods-gold-dim:#8B6914;
+  --gods-gold-rule:rgba(201,168,76,.25); --gods-gold-glow:rgba(201,168,76,.12);
+  /* Text */
+  --gods-text:#F5F0E8; --gods-text-body:#D4CEBC; --gods-text-muted:#7A7A8A; --gods-text-dim:#4A4A5A;
+  /* Division accents (system tokens) */
+  --gods-seths:#E87B3A; --gods-madiba:#D4A017; --gods-udoc:#7C5CBF; --gods-ts:#2D9B5A; --gods-hqos:#00E5FF;
+  /* Status */
+  --gods-red:#9E2B25; --gods-amber:#D4A017; --gods-green:#2D9B5A;
+  /* Type */
+  --gods-font-display:"Playfair Display",Georgia,serif;
+  --gods-font-body:"Cormorant","EB Garamond","Times New Roman",serif;
+  --gods-font-ui:"Barlow",system-ui,-apple-system,sans-serif;
+  --gods-font-mono:"IBM Plex Mono","Consolas",monospace;
+  /* Geometry */
+  --gods-radius:4px; --gods-radius-lg:8px; --gods-rule:1px solid var(--gods-gold-rule);
+}
+/* Pre-registration ribbon — drop onto any public surface */
+.gods-prereg-ribbon{
+  background:var(--gods-navy-core); color:var(--gods-gold); font-family:var(--gods-font-mono);
+  font-size:11px; letter-spacing:.12em; text-align:center; padding:5px 10px;
+  border-bottom:1px solid var(--gods-gold-rule);
+}
+.gods-prereg-ribbon b{color:var(--gods-text)}

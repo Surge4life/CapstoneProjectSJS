@@ -10,7 +10,7 @@ export function EmployerPortal({ onBack }: { onBack: () => void }) {
   const [activeOpp, setActiveOpp] = useState<number | null>(null);
   const [msg, setMsg] = useState("");
 
-  async function ensureToken() { try { await api.login("admin@gods.za", "admin123"); } catch {} }
+  async function ensureToken() { try { await api.login("admin@gods.local", "admin123"); } catch {} }
   async function load() {
     if (!eid) return;
     await ensureToken();

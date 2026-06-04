@@ -7,7 +7,7 @@ npm install
 npm run dev      # http://localhost:5173 (proxies /api → http://localhost:8000)
 npm run build    # production bundle in dist/  (verified clean)
 ```
-Login: admin@gods.za / admin123 (after running platform-core seed.py).
+Login: admin@gods.local / admin123 (after running platform-core seed.py).
 
 ## Consoles
 - **GODS Admin** — cross-system status + closed-loop snapshot

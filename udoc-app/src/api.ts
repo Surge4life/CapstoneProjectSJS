@@ -1,6 +1,6 @@
 const KEY_BASE = "gods_api_base";
 const KEY_TOKEN = "gods_token";
-export function getBase(){ return localStorage.getItem(KEY_BASE) || "http://localhost:8000"; }
+export function getBase(){ return localStorage.getItem(KEY_BASE) || "https://gods-platform-core.onrender.com"; }
 export function setBase(b:string){ localStorage.setItem(KEY_BASE, b.replace(/\/$/, "")); }
 export function getToken(){ return localStorage.getItem(KEY_TOKEN); }
 export function setToken(t:string|null){ t?localStorage.setItem(KEY_TOKEN,t):localStorage.removeItem(KEY_TOKEN); }

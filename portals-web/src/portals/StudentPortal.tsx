@@ -11,7 +11,7 @@ export function StudentPortal({ onBack }: { onBack: () => void }) {
 
   async function ensureToken() {
     if (!api.get) return;
-    try { await api.login("admin@gods.za", "admin123"); } catch { /* demo auth */ }
+    try { await api.login("admin@gods.local", "admin123"); } catch { /* demo auth */ }
   }
   async function load() {
     if (!ref) return;

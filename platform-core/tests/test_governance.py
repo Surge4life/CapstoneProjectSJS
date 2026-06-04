@@ -13,13 +13,13 @@ def client():
         os.remove("gods_core.db")
     init_db()
     db = SessionLocal()
-    db.add(User(email="admin@gods.za", password_hash=hash_password("admin123"), role="admin", division="GODS"))
+    db.add(User(email="admin@gods.local", password_hash=hash_password("admin123"), role="admin", division="GODS"))
     db.commit(); db.close()
     return TestClient(app)
 
 @pytest.fixture(scope="module")
 def token(client):
-    return client.post("/auth/login", data={"username": "admin@gods.za", "password": "admin123"}).json()["access_token"]
+    return client.post("/auth/login", data={"username": "admin@gods.local", "password": "admin123"}).json()["access_token"]
 
 def H(t): return {"Authorization": f"Bearer {t}"}
 

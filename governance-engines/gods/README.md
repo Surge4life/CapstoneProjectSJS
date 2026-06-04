@@ -1,6 +1,6 @@
 # G.O.D.S Platform — Four-Division Integrated Economic Engine
 
-**Good Orderly Directional Systems Holdings (Pty) Ltd**
+**Good Orderly Directional Systems Holdings (Pty) Ltd (proposed)**
 12 Pillars · IP Trust · COB · 250-year mandate
 
 ## What this is

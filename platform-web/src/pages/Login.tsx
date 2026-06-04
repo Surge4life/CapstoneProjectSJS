@@ -2,7 +2,7 @@ import { useState } from "react";
 import { api } from "../lib/api";
 
 export function Login({ onAuth }: { onAuth: () => void }) {
-  const [email, setEmail] = useState("admin@gods.za");
+  const [email, setEmail] = useState("admin@gods.local");
   const [pw, setPw] = useState("admin123");
   const [err, setErr] = useState("");
   async function submit() {

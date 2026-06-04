@@ -13,7 +13,7 @@ export function App() {
   const [msg,setMsg]=useState("");
   async function checkConn(){ setConnected(await ping()); } useEffect(()=>{checkConn();},[]);
   function saveBase(){ setBase(base); setBaseState(getBase()); checkConn(); }
-  async function login(){ try{ await api.login("admin@gods.za","admin123"); setAuthed(true);}catch(e:any){setMsg(e.message);} }
+  async function login(){ try{ await api.login("admin@gods.local","admin123"); setAuthed(true);}catch(e:any){setMsg(e.message);} }
   async function load(){ try{ setProjects(await api.get("/ts/submit/projects")); }catch(e:any){ setMsg(e.message); } }
   useEffect(()=>{ if(authed) load(); }, [authed]);
   async function submitProject(){ const r=await api.post("/ts/submit/project",{submitter_name:submitter,submitter_type:stype,sector,title,capex_estimate:capex}); setMsg(`Submitted ${r.submission_ref}`); setTitle(""); load(); }
