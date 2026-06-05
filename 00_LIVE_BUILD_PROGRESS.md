@@ -22,6 +22,14 @@ The cockpit (`platform-core/static/admin.html`, source `GODS_Admin_Live.html`) k
 - The demo's mock loops (fake 1.41M counter, mock stream) are **neutralised on connect**; the clock is preserved. Verified end-to-end with Playwright against the running backend.
 - **Backend:** `seed.py` now creates genuine EVA decisions + Merkle audit chain + an oversight case (chain verify = intact); `GET /admin` serves the cockpit.
 
+## Increment 2 — UDOC client + Internal system (LIVE, build-verified)
+Both React apps were built out, branded (navy/gold), wired to `platform-core`, and verified (tsc + vite build pass; live runtime confirmed with Playwright against the backend):
+
+- **UDOC client (`udoc-app`)** — rebuilt into a branded, tabbed governance console (runtime backend URL + login + pre-registration ribbons): **Dashboard** (Systems Governed, Decisions, Sovereignty, Bias Flags, Audit-chain integrity + live audit stream), **AI Registry** (register a system → `POST /registry/models`; kill-switch suspend/resume → `POST /registry/models/{id}/status?new_status=`), **Decisions** (run EVA decision with healthy/biased/breach scenarios → sealed verdict; recent decisions), **Audit Trail** (records + Merkle root + chain verify), **Compliance** (frameworks + sweep). Verified live: Systems=1, Decisions=14, Sovereignty 100%, Audit chain INTACT (15 records). Production build: 159 KB JS, PWA service worker generated.
+- **Internal system (`platform-internal`)** — already had a strong RBAC launcher/shell + UDOCGov + division consoles (SETHS/TS/MADIBA Ops, all wired with actions). Enhanced the **Holdings Overview** into a live cockpit (Models, Decisions, Open Oversight, Sovereignty, Bias, Audit-chain integrity, learners, projects + closed-loop snapshot + live audit stream), polling every 8s. Verified live end-to-end through the real `/api` proxy. Production build: 187 KB JS.
+
+Run the internal app in production behind a proxy that forwards `/api` → platform-core (see its `vite.config.ts`); the UDOC client takes its backend URL at runtime (defaults to the deployment, override in the connect screen).
+
 ## What remains (next increments, in order)
 1. **Finish G.O.D.S Admin + UDOC governance pages → full parity & live:**
    - Compliance Engine + SA AI Policy GG54477 pillars ← `/compliance/frameworks` + `/compliance/sweep` (per-framework %).

@@ -22,8 +22,8 @@ _STATIC = os.path.join(os.path.dirname(__file__), "..", "static")
 
 @app.middleware("http")
 async def enforce_https(request: Request, call_next):
-    # Render (and most PaaS) terminates TLS and passes X-Forwarded-Proto.
-    # Redirect plain HTTP to HTTPS in production so admin JWTs are never sent in clear.
+    # Render terminates TLS and passes X-Forwarded-Proto. Redirect plain HTTP to
+    # HTTPS in production so admin JWT tokens are never transmitted in clear.
     if (settings.environment == "production"
             and request.headers.get("x-forwarded-proto") == "http"):
         url = request.url.replace(scheme="https")
