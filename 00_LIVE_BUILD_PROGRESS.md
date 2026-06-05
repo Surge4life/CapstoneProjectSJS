@@ -47,3 +47,15 @@ Run the internal app in production behind a proxy that forwards `/api` → platf
 - The live bridge lives in `GODS_Admin_Live.html` (and `platform-core/static/admin.html`). To wire another page: add a `render*()` that fetches the endpoint and fills the page's table/KPIs, then call it from `refreshAll()`. Bind KPIs by label via `setKpi(label,value)`; bind tables by their existing `tbody` id; inject a live panel where the demo has none.
 - Test pattern (one shell): `seed.py` → background uvicorn → seed activity via httpx → Playwright `goto /admin` → click `.gl-hd`, fill `#gl-pass`, click `#gl-connect` → assert via `page.evaluate`.
 - The backend only persists within a single bash invocation here, so always start it and test in the **same** command.
+
+---
+## Increment 4 — Policy-to-Code enforcement engine (OPERATIONAL)
+Upload passed legislation (PDF/DOCX/TXT) → UDOC compiles transparent, editable rules → activate → enforced inside the non-bypassable EVA decision path; all audited (Merkle chain).
+- Backend: `PolicyPack`/`PolicyRule` models; `app/services/policy_engine.py` (extract + compile + enforce); `app/routers/policy.py` (`/policy/upload|packs|rules|activate|archive|active|test`); wired into `decisions.py` (BLOCK / downgrade→REVIEW; response adds `base_decision`/`policy_enforced`/`policy_findings`).
+- Frontend (udoc-app → web + mobile): **Policy-to-Code** tab (upload → rules table → activate → Active/Enforced cards) + **Compliance** tab with the accurate regulatory landscape (EU AI Act IN FORCE·phased; POPIA IN FORCE; Constitution; GG54477 **WITHDRAWN 26 Apr 2026**).
+- Verified end-to-end: sample AI Act DOCX → 6 rules → activate → "social scoring" model BLOCKED (PR-001), benign chatbot APPROVED.
+
+## Increment 5 — Render OTA scaffold + Public/Private sector
+- `render.yaml` (auto-deploy API + UDOC web from GitHub main), backend `GET /version`, in-app update banner + PWA autoUpdate, `udoc-mobile/use-render.sh` + `capacitor.config.render.json`, `UDOC_RENDER_OTA.md`.
+- udoc-app: Public/Private **sector** selection on the launch screen (used as the default policy sector; shown in topbar).
+- ⏭ Needs from founder: the **7 UDOC HTML demos** (to model sector/UI precisely) and the **Render URL** (to bake in defaults).

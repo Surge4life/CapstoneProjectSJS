@@ -1,0 +1,12 @@
+{
+  "appId": "za.gods.udoc",
+  "appName": "UDOC Control · G.O.D.S",
+  "webDir": "www",
+  "server": {
+    "url": "https://gods-udoc-web.onrender.com",
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  },
+  "android": { "allowMixedContent": true }
+}

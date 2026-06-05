@@ -1,139 +1,35 @@
-> **Pre-registration forecast.** G.O.D.S Holdings (Pty) Ltd is a *proposed* entity — not registered. No trust, trademark, or domain is registered; all IP vests in Sashin J. Singh. See `BRAND_AND_ENTITY_CONSTANTS.md` and `PRE_REGISTRATION_NOTICE.md`.
+# MEMORY.md — UDOC live-build continuation anchor
+_Read this + SKILLS.md on resume. Workstream: make UDOC a fully live, investment-grade system; divisions last._
 
-# MEMORY.md — G.O.D.S Ecosystem Project State (handoff for a new chat)
+## Entity / honesty (non-negotiable)
+G.O.D.S Holdings (Pty) Ltd is **proposed / not registered**. No company, trust, trademark, or domain registered; IP vests in **Sashin J. Singh** as author. Demo email domain `@gods.local` (admin@gods.local/admin123; staff staff123). Brand: navy `#060E1C`, gold `#C9A84C`, UDOC purple `#7C5CBF`, hardware cyan `#00C2D4`.
 
-> Paste this (and SKILLS.md) at the start of a new chat in this Project so the assistant has full
-> context. This is the durable memory of what was built, what is LIVE, and what comes next.
+## Regulatory ground truth (June 2026 — verified by web search; keep accurate in UI)
+- **EU AI Act (Reg 2024/1689):** IN FORCE, phased. Prohibited practices (2 Feb 2025) + GPAI (2 Aug 2025) live; high-risk Annex III + transparency from **2 Aug 2026**; embedded-product high-risk to 2 Aug 2027. Digital Omnibus postponement provisionally agreed (May 2026) but **not yet law**. Fines up to €35M / 7%.
+- **South Africa:** **No enacted AI-specific law.** Draft National AI Policy (Notice 3880 of 2026, **Gazette GG 54477**, 10 Apr 2026) **WITHDRAWN 26 Apr 2026** (≈10% fabricated citations). AI governed via **POPIA (Act 4 of 2013, s71)**, **Constitution (1996, ss 9/16/33)**, IP/procurement/sectoral law, King IV/V. ⚠ Older founder materials cite GG54477 as active — represent as **withdrawn**.
 
----
+## System state (all build-verified this session)
+- **Backend `platform-core`** (FastAPI + SQLite default). Runs only within ONE bash invocation here. Run: `cd platform-core && pip install -r requirements.txt && python3 seed.py && python3 -m uvicorn app.main:app --port 8077`. Login `POST /auth/login` form{username,password}→{access_token}; Bearer. `seed.py` creates admin + model-001 + genuine activity (14 EVA decisions, 15-record intact Merkle chain, 1 oversight case). Serves the live HTML cockpit at **`GET /admin`**.
+- **HTML admin cockpit** `GODS_Admin_Live.html` (= `platform-core/static/admin.html`): demo + live bridge (connect/login + API client + poller; `neutraliseDemo()` kills mock loops). Command Centre, AI Registry, COB, Audit wired.
+- **UDOC client `udoc-app`** (React+Vite+TS, PWA; runtime base in `src/api.ts`, default `https://gods-platform-core.onrender.com`). **= the mobile web build.** Login → **split**: **Software** (Dashboard · AI Registry+kill-switch · **EVA Engine** 6-D · **Policy-to-Code** · Audit · Compliance) | **Hardware** (HQ-OS · Sovereign Edge · Sovereignty · Kill-Switch).
+- **UDOC mobile `udoc-mobile`** — Capacitor v6 (appId `za.gods.udoc`, webDir `www`). Built from `udoc-app/dist` → `udoc-mobile/www/`. APK via `udoc-mobile/build-apk.sh`.
+- **Internal `platform-internal`** (React+Vite+TS, react-router; `/api` proxy). RBAC launcher/shell + UDOCGov + division ops + live Holdings Overview.
 
-## WHO & WHAT
-- **Person:** Sashin J. Singh (SJS). GitHub: **Surge4life**, repo **CapstoneProjectSJS** (private).
-  Windows desktop. Username folder: `C:\Users\Sashin Singh`. Based in Johannesburg.
-- **Project:** **G.O.D.S Holdings (Pty) Ltd (proposed)** — a sovereign AI governance ecosystem, built as a
-  Software Developer capstone ("a decade of work expressed as live code"). **9 months to submission.**
-- **Goal of the build:** demonstrate, with REAL working software he built largely himself (to reduce
-  the developer cost of an ~R18M seed raise), a 4-division conglomerate whose interlocking parts are
-  governed by UDOC (the sovereign AI governance core). Patent framing: 4 core patents / "24 patent-
-  protected" governance system.
-- **The four divisions + loop:** SETHS (workforce reintegration, SAQA 118707 NQF5 Software Developer)
-  → TS Industries (production SPVs that absorb placed workers) → UDOC (sovereign AI governance) →
-  MADIBA (capital recycling, >50% per Pillar 2) → back to SETHS. 12 Constitutional Pillars
-  (esp. VIII Human Primacy, II capital recycle).
-- **Branding:** navy `#060E1C` + gold `#C9A84C`. Division accents: SETHS blue `#3FA7D6`,
-  MADIBA purple `#9B6DD6`, TS green `#4CAF7D`, UDOC gold.
+## Increment 4 (this session) — Policy-to-Code engine BUILT & OPERATIONAL
+- Backend: models +PolicyPack/+PolicyRule; `app/services/policy_engine.py` (extract_text PDF/DOCX/TXT + extract_rules transparent heuristics + apply enforcement); `app/routers/policy.py` (`/policy/upload`,`/packs`,`/packs/{id}`,`PATCH /rules/{id}`,`/packs/{id}/activate|archive`,`/active`,`/test`); wired into `decisions.py` (after evaluate → pe.apply → BLOCK/REVIEW; response adds base_decision/policy_enforced/policy_findings; audited). Verified: sample AI Act DOCX → 6 rules → activate → social-scoring model BLOCKED (PR-001), benign chatbot APPROVED.
+- Frontend (udoc-app→web+mobile): api +uploadPolicy/+patch; **Policy-to-Code tab** (upload→rules table→activate→Active/Enforced cards); **Compliance tab** = accurate regulatory landscape + active policy. Verified on mobile build.
 
-## THE HONEST FRAME (carried through every session — keep it)
-Built REAL software, verified in emulation/tests, deployed live. Never fabricated
-"validated-on-silicon" claims. The on-silicon hardware step and the final signed app
-compiles are the only things that must run on the user's machine/hardware. The assistant
-in the chat sandbox CANNOT push to GitHub (no identity, locked network) and CANNOT compile
-.apk/.exe (no Android SDK / no Electron binary — firewall-blocked). The USER does those on
-their machine; the assistant builds everything up to that line and verifies it.
+## Increment 5 (this session) — Render OTA scaffold + sector selection
+- udoc-app: **Public/Private sector** picker on the selection screen (localStorage `udoc_sector`; defaults policy-upload sector; topbar chip). In-app **update banner** (polls `/version`) + PWA autoUpdate; `vite.config.ts` define `__BUILD_ID__`.
+- Render artifacts: `render.yaml`, `/version`, `capacitor.config.render.json`, `use-render.sh`, `UDOC_RENDER_OTA.md`. Build-verified (sector toggle + /version smoke-tested on mobile build). 7-UI sector modeling still pending the founder's list of the 7 demos.
 
----
+## PENDING (priority order)
+1. **Render + GitHub OTA — SCAFFOLDED (only needs the real Render URL):** `render.yaml` (blueprint: gods-platform-core API + gods-udoc-web static PWA, autoDeploy main), backend `GET /version` (Render git env), udoc-app in-app "new version deployed" banner (polls /version) + PWA autoUpdate, `udoc-mobile/capacitor.config.render.json` + `use-render.sh` (sets server.url→live site), `UDOC_RENDER_OTA.md`. TODO once URL known: bake API URL into `udoc-app` getBase() default + internal `VITE_API_BASE`.
+2. **Private/Public sector + 7 UDOC HTML UIs:** site blocks bots — ASK founder for the 7 demos; model the sector/UI split around them (backend already carries `sector`).
+3. Mirror Policy-to-Code into the **HTML admin cockpit** (Policy-as-Code stub) + internal app.
+4. Compliance depth: map UDOC controls → EU AI Act articles / POPIA sections; per-decision evidence export.
+5. **Divisions LAST**, then hardening + deploy + UAT (`GODS_Live_Rollout_and_Test_Schedule.md`).
 
-## WHAT IS LIVE RIGHT NOW (deployed, confirmed working)
-- **Backend:** `https://gods-platform-core.onrender.com` — FastAPI + **Postgres** on Render.
-  - `/health` → `{"status":"ok","environment":"production"}`
-  - `/docs` → full Swagger UI (72 routes)
-  - Auth verified live: `admin@gods.local` / `admin123` → 200 + JWT (role/division from live DB)
-  - **EVA governance engine verified live:** BLOCK (high-risk model, sealed) AND APPROVE
-    (minimal-risk, sealed), both sub-millisecond, written to immutable audit chain.
-- **Static sites on Render:** `gods-platform-internal` (staff console) and `gods-portals` (PWA),
-  both pointed at the backend via `VITE_API_BASE`.
-- **First mobile app BUILT & RUN:** `udoc-mobile` → `app-debug.apk` (3.8MB) installs on Android,
-  connects to the live backend, client-register screen works, 4 dashboards render.
-- **Render deploy detail:** free tier — backend sleeps after 15 min idle (30s–2min cold start);
-  free Postgres expires after 30 days. `seed.py` runs on boot to re-seed admin + demo data.
-
-## KEY DEPLOY FIXES ALREADY APPLIED (so they're not re-debugged)
-1. **psycopg driver:** `app/core/config.py` reads Render's `DATABASE_URL` and rewrites
-   `postgres://` AND `postgresql://` → `postgresql+psycopg://` (psycopg2 is NOT installed; psycopg v3 is).
-2. **Static site backend URL:** `render.yaml` sets `VITE_API_BASE=https://gods-platform-core.onrender.com`
-   for both static sites (build-time env var). Portals `getBase()` falls back to `VITE_API_BASE`.
-3. **JWT secret:** generated by Render (`generateValue: true`), never hardcoded.
-4. **Android build:** Gradle 8.2.1 needs **JDK 17** (not 21) — chose "Use JVM 17" when prompted;
-   SDK Build-Tools 34 + Platform 34 auto-installed. Do NOT run the AGP upgrade assistant.
-
----
-
-## REPOSITORY / SYSTEMS MAP (all in the GODS_ECOSYSTEM package, on GitHub at repo root)
-**Backend & engines**
-- `platform-core/` — FastAPI backend. 72 routes. Models in `app/db/models.py` (~21 tables:
-  users, ai_models, decisions, audit_refs, seths_learners, ts_projects, madiba_cycles,
-  oversight_cases, division_records, students, employers, opportunities, applications, employees,
-  timesheets, documents, saas_clients, madiba_engagements, ts_submissions, ts_partner_apps).
-  Services: governance_bridge (EVA 6-D + sovereignty, HMAC-sealed, fail-closed),
-  audit_writer (hash-chain + Merkle, **serialized with _append_lock** — fixed a concurrency race),
-  analytics_engine, document_store (sha256 + UDOC-recorded), access_control (role/division → systems).
-  `seed.py` seeds admin@gods.local/admin123 + 6 staff roles (operator/auditor/exec/viewer per division).
-- `governance-engines/{eva,udoc,gods}/` — hardened TS engines (sealed verdicts, fail-closed).
-- `hw-bringup/` — boot-to-live + self-test (emulated FPGA/HSM/NIC), verified in emulation.
-
-**Internal (staff, network-locked)**
-- `platform-internal/` — **G.O.D.S internal operating core**: login → `/access/profile` →
-  role-scoped LAUNCHER showing only permitted systems → consoles: Overview, SethsOps, MadibaOps,
-  TSOps, UDOCGov. Server-enforced via `/access/guard/{system}` (hard 403).
-- `platform-web/` — earlier admin SPA.
-- `seths-platform/ madiba-platform/ ts-platform/` — standalone division dashboards (recharts).
-
-**External apps (PWA + Capacitor .apk; connect-screen → backend URL)**
-- `udoc-app/` (+ `udoc-mobile/`, `udoc-desktop/`) — SaaS clients govern their AIs (kill-switch).
-  **Defaults to the live backend.** ✅ .apk already built and run.
-- `seths-app/` (+ mobile/desktop) — students/employers/employees + document upload/download via UDOC.
-- `madiba-app/` (+ mobile/desktop) — investor engagement pipeline + project updates.
-- `ts-app/` (+ mobile/desktop) — project submission/tracking + apply-to-partner.
-- `portals-web/` (+ `portals-mobile/`, `portals-desktop/`) — combined Student/Employer/Employee PWA.
-- **G.O.D.S admin = NO .apk by design** — browser-only, password-protected HTTPS.
-
-**Infra / IP**
-- `infra/` — render.yaml lives at repo ROOT (not here); also terraform/k8s/observability starters,
-  `edge/nginx.conf` (external allow-list, deny-by-default), IDENTITY/SECURITY/TRACEABILITY docs,
-  openapi.json. `IP/` — patent evidence repo structure.
-- `*-desktop/` — 5 Electron projects → Windows `.exe` (load the live site in a native window).
-
-**Top-level docs (read these first in a new chat)**
-- `00_PROGRESS.md` — the spine; 18 phases A–Q logged. **Always update this.**
-- `00_START_HERE_BUILD_APK.md`, `00_BUILD_DESKTOP_APPS.md` — build runbooks.
-- `00_NETWORK_TOPOLOGY.md`, `00_ACCESS_MODEL.md`, `00_APPS_OVERVIEW.md`, `00_DEPLOY_TO_RENDER.md`,
-  `00_ECOSYSTEM_STATUS.md` (assessment-gap responses), `00_ARCHITECTURE.md`.
-
-## VERIFICATION STATUS (last known green)
-- `smoke_test.py`: **34/34** end-to-end stages.
-- `platform-core/tests/test_governance.py`: **8/8**. `tests/stress_chaos.py`: **10/10**
-  (500 concurrent decisions p95 ~0.08ms; the stress suite FOUND+FIXED the audit-chain race).
-- All frontends + apps build clean (vite). Desktop main.js all `node --check` valid.
-
----
-
-## THE NEXT CHAPTER (what the new chat is for)
-**The vision vs the reality:** the original uploaded `.html` UI demos (rich JS/Python-parsed
-mockups) show what the system *could* be — broad, ambitious, lots of features. The CURRENT live
-system is the real, working, deployed *foundation* of that vision (debug-build phase). The next
-9 months = systematically upgrading the real ecosystem to move from "working foundation" toward
-the polished, full-scale, SaaS-client-ready product the demos promise — so UDOC can be licensed,
-installed on client hardware, and applied to a client's AIs immediately.
-
-**Working method going forward (the user wants to drive + learn):**
-- Treat the `.html` demos as the design target. For each demo screen/feature, identify the gap
-  vs the live build, then design + implement the real version (FastAPI endpoints + React UI +
-  data model), wired into the live deployed system.
-- Keep the honest frame: real, tested, deployed — no faked capability.
-- One feature/area at a time; update `00_PROGRESS.md` each session; verify (tests + live).
-- The user prefers to run commands themselves and check against the assistant, not just watch.
-
-**Immediate candidate next steps (pick with the user):**
-1. Per-app real auth (each app logs in as its own user type, not the shared admin token).
-2. Deploy dedicated Render sites for SETHS/MADIBA/TS apps (so each connects to its own UI).
-3. Build the remaining .apk/.exe (same proven steps as udoc-mobile).
-4. Map a specific `.html` demo screen → implement its real backend+UI feature.
-5. Digital-twin / scenario simulator (assessment gap #8) — buildable & verifiable.
-(Live SOC/SIEM (#4) genuinely needs running infra + ops team — keep documented, don't fake.)
-
-## WORKING LOCATIONS (assistant sandbox)
-- Rehydrate: `cd /tmp/gods_eco && unzip -q /mnt/user-data/outputs/GODS_ECOSYSTEM.zip`
-- Master deliverable: `/mnt/user-data/outputs/GODS_ECOSYSTEM.zip`
-- Always: clean `__pycache__`/`*.pyc`/`node_modules`/`dist`/db, rebuild `_packages/`, re-zip,
-  sync `00_*` docs to `/mnt/user-data/outputs/GODS_ECOSYSTEM/`, `present_files`, verify from a
-  clean extraction (run `smoke_test.py`).
+## OPEN QUESTIONS for the founder
+- The **7 UDOC HTML demos**: names + what each shows (to model Private/Public sector).
+- The **Render deployment URL** for platform-core (to wire mobile + OTA).

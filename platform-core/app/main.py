@@ -9,7 +9,7 @@ from app.routers import (health, auth, registry, decisions, audit, oversight,
                          seths, ts, madiba, compliance, bias, sovereignty,
                          intelligence, admin, analytics,
                          portal_student, portal_employer, portal_employee,
-                         documents, saas, madiba_engage, ts_submit, access)
+                         documents, saas, madiba_engage, ts_submit, access, policy)
 
 app = FastAPI(title=settings.app_name, version="1.0.0",
               description="Sovereign AI governance backend for the G.O.D.S ecosystem.")
@@ -23,7 +23,7 @@ _STATIC = os.path.join(os.path.dirname(__file__), "..", "static")
 @app.middleware("http")
 async def enforce_https(request: Request, call_next):
     # Render terminates TLS and passes X-Forwarded-Proto. Redirect plain HTTP to
-    # HTTPS in production so admin JWT tokens are never transmitted in clear.
+    # HTTPS in production so admin JWT tokens are never sent in the clear.
     if (settings.environment == "production"
             and request.headers.get("x-forwarded-proto") == "http"):
         url = request.url.replace(scheme="https")
@@ -50,10 +50,19 @@ def root():
             "governance": "EVA 6-D + UDOC sovereignty, fail-closed for critical"}
 
 
+@app.get("/version", tags=["root"])
+def version():
+    """Build identity — commit/branch come from Render's git env on deploy (GitHub main -> Render)."""
+    return {"service": "platform-core", "environment": settings.environment,
+            "commit": os.environ.get("RENDER_GIT_COMMIT", "dev")[:12],
+            "branch": os.environ.get("RENDER_GIT_BRANCH", "local"),
+            "deployed_at": os.environ.get("RENDER_RELEASE_CREATED_AT", "")}
+
+
 for r in (health.router, auth.router, registry.router, decisions.router, audit.router,
           oversight.router, seths.router, ts.router, madiba.router, compliance.router,
           bias.router, sovereignty.router, intelligence.router, admin.router, analytics.router,
           portal_student.router, portal_employer.router, portal_employee.router,
           documents.router, saas.router, madiba_engage.router, ts_submit.router,
-          access.router):
+          access.router, policy.router):
     app.include_router(r)
