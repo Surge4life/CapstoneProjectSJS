@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api } from "./api";
 export function Login({ onAuth }: { onAuth: () => void }) {
-  const [email, setEmail] = useState("admin@gods.za");
+  const [email, setEmail] = useState("admin@gods.local");
   const [pw, setPw] = useState("admin123");
   const [err, setErr] = useState("");
   async function submit(){ try{ await api.login(email,pw); onAuth(); }catch(e:any){ setErr(e.message||"login failed"); } }

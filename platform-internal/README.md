@@ -15,7 +15,7 @@ Network-locked — served only inside the governance network, talks to platform-
 npm install && npm run dev      # dev: proxies /api → localhost:8000
 npm run build                   # production bundle (verified clean)
 ```
-Login: staff credentials (admin@gods.za / admin123 in dev).
+Login: staff credentials (admin@gods.local / admin123 in dev).
 
 ## Network-locked deployment (per topology)
 In production this console + platform-core bind to the INTERNAL interface only:

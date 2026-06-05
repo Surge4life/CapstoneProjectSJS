@@ -3,7 +3,7 @@
 // UDOC EVA ENGINE — COMPLETE, SELF-CONTAINED BUILD
 // Evaluating Valiant Algorithms · 6-Dimensional Sovereign Risk Scoring
 // Claim 10 (6D scoring + JSD) · Claim 8 (Ethical Cooperation) · Part 7.1 (formulas)
-// G.O.D.S Holdings (Pty) Ltd — v9.3 → v10.0 (gaps completed)
+// G.O.D.S Holdings (Pty) Ltd (proposed) — v9.3 → v10.0 (gaps completed)
 //
 // This file CONSOLIDATES the v9.3 eva-engine and COMPLETES the five computations
 // that were previously pass-through inputs:

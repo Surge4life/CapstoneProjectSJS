@@ -1,89 +1,41 @@
-cd /tmp/gods_eco/GODS_ECOSYSTEM
-echo "============================================================"
-echo "FILE 1 of 3:  render.yaml   (REPLACE ENTIRE FILE)"
-echo "============================================================"
-cat render.yaml
-echo ""
-echo "============================================================"
-echo "FILE 2 of 3:  portals-web/src/api.ts  → change ONLY line 14"
-echo "============================================================"
-echo "Find this line:"
-echo '  return localStorage.getItem(KEY_BASE) || "http://localhost:8000";'
-echo "Replace with:"
-echo '  return localStorage.getItem(KEY_BASE) || import.meta.env.VITE_API_BASE || "http://localhost:8000";'
-Output
-
-============================================================
-FILE 1 of 3:  render.yaml   (REPLACE ENTIRE FILE)
-============================================================
-# G.O.D.S Ecosystem — Render Blueprint (infrastructure-as-code).
-# One-click deploy of the backend + a managed Postgres + the internal console (static).
-# In the Render dashboard: New → Blueprint → connect this repo → Apply.
-#
-# NOTE (free tier): web services sleep after 15 min idle (slow first hit); free Postgres
-# expires after 30 days. Upgrade those two to paid before a real launch.
-
-databases:
-  - name: gods-db
-    databaseName: gods
-    plan: free            # upgrade to 'basic-256mb' or higher before the 30-day expiry
-
+# Render blueprint for the G.O.D.S / UDOC eco-system.
+# Connect this GitHub repo to Render (New > Blueprint). Pushes to `main` auto-deploy both services.
 services:
-  # ── Backend: FastAPI platform-core (the always-on core all apps connect to) ──
+  # ---- UDOC governance API (FastAPI) ----
   - type: web
     name: gods-platform-core
     runtime: python
-    plan: free            # upgrade to 'starter' to remove the 15-min sleep
     rootDir: platform-core
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python seed.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt && python seed.py
+    # --proxy-headers trusts X-Forwarded-Proto from Render's TLS terminator (HTTPS enforcement).
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
     healthCheckPath: /health
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: gods-db
-          property: connectionString
       - key: GODS_ENVIRONMENT
         value: production
-      - key: GODS_JWT_SECRET
-        generateValue: true       # Render generates a strong secret; never hardcode
-      - key: PYTHON_VERSION
-        value: "3.12.4"
+      - key: GODS_JWT_SECRET       # auth signing key; Render generates + stores it
+        generateValue: true
+      - key: GODS_SOV_KEY          # sovereign signing key
+        generateValue: true
+      # RENDER_GIT_COMMIT / RENDER_GIT_BRANCH / RENDER_RELEASE_CREATED_AT injected by Render
+      # and surfaced at GET /version so the mobile app can detect new deploys.
 
-  # ── Internal staff console (network-locked in prod; here as a static site for demo) ──
+  # ---- UDOC web app / PWA (the mobile WebView points here for instant OTA) ----
   - type: web
-    name: gods-platform-internal
+    name: gods-udoc-web
     runtime: static
-    rootDir: platform-internal
-    buildCommand: "npm install && npm run build"
+    rootDir: udoc-app
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
     staticPublishPath: dist
     envVars:
-      - key: VITE_API_BASE
-        value: https://gods-platform-core.onrender.com   # full backend URL (https + host)
+      - key: NODE_VERSION
+        value: "22"
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-
-  # ── External portals PWA (the installable Student/Employer/Employee app) ──
-  - type: web
-    name: gods-portals
-    runtime: static
-    rootDir: portals-web
-    buildCommand: "npm install && npm run build"
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_BASE
-        value: https://gods-platform-core.onrender.com   # default backend (connect screen can override)
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
-============================================================
-FILE 2 of 3:  portals-web/src/api.ts  → change ONLY line 14
-============================================================
-Find this line:
-  return localStorage.getItem(KEY_BASE) || "http://localhost:8000";
-Replace with:
-  return localStorage.getItem(KEY_BASE) || import.meta.env.VITE_API_BASE || "http://localhost:8000";

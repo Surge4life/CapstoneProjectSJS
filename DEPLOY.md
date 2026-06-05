@@ -1,3 +1,5 @@
+> **Pre-registration forecast.** G.O.D.S Holdings (Pty) Ltd is a *proposed* entity — not registered. No trust, trademark, or domain is registered; all IP vests in Sashin J. Singh. See `BRAND_AND_ENTITY_CONSTANTS.md` and `PRE_REGISTRATION_NOTICE.md`.
+
 # G.O.D.S ECOSYSTEM — DEPLOYMENT GUIDE
 
 ## What this is
@@ -16,7 +18,7 @@ uvicorn app.main:app --port 8000          # http://localhost:8000/docs  (35 rout
 
 # Frontend (new shell)
 cd platform-web && npm install && npm run dev    # http://localhost:5173
-# login: admin@gods.za / admin123
+# login: admin@gods.local / admin123
 ```
 Or everything containerised:
 ```bash

@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G.O.D.S™ — Sovereign Administration Mainframe v6.0</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2712%27 fill=%27%23060E1C%27/%3E%3Cpath d=%27M12 8 L52 8 C52 8 53 30 49 43 C45 56 39 62 32 66 C25 62 19 56 15 43 C11 30 12 8 12 8 Z%27 fill=%27%2313243D%27 stroke=%27%23C9A84C%27 stroke-width=%272%27/%3E%3Cpath d=%27M32 14 L34.4 24.6 L32 29 L29.6 24.6 Z%27 fill=%27%23C9A84C%27/%3E%3Cpath d=%27M47 30 L36.4 32.4 L32 30 L36.4 27.6 Z%27 fill=%27%23C9A84C%27/%3E%3Cpath d=%27M32 46 L29.6 35.4 L32 31 L34.4 35.4 Z%27 fill=%27%23C9A84C%27/%3E%3Cpath d=%27M17 30 L27.6 27.6 L32 30 L27.6 32.4 Z%27 fill=%27%23C9A84C%27/%3E%3Ccircle cx=%2732%27 cy=%2730%27 r=%276%27 fill=%27%23060E1C%27 stroke=%27%23C9A84C%27 stroke-width=%271.4%27/%3E%3Ccircle cx=%2732%27 cy=%2730%27 r=%272%27 fill=%27%23C9A84C%27/%3E%3C/svg%3E">
+<meta name="author" content="Sashin J. Singh — G.O.D.S Holdings (Pty) Ltd">
+<meta name="copyright" content="© 2026 Sashin J. Singh · G.O.D.S Holdings (Pty) Ltd (proposed — not yet registered) · pre-registration forecast">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   G.O.D.S HOLDINGS (PTY) LTD — ADMIN PLATFORM v5.0
+   © 2026 All Rights Reserved · IP held in G.O.D.S IP Trust
+   CONFIDENTIAL — INSTITUTIONAL & SOVEREIGN DISTRIBUTION ONLY
+═══════════════════════════════════════════════════════ */
+
+:root {
+  --navy:    #060E1C;
+  --navy2:   #0B1829;
+  --navy3:   #112238;
+  --navy4:   #182F4A;
+  --gold:    #C9A84C;
+  --gold2:   #E8CC7C;
+  --gold3:   #8B6914;
+  --gold4:   rgba(201,168,76,0.08);
+  --text:    #D4CEBC;
+  --text2:   #9A9488;
+  --muted:   #5A6080;
+  --white:   #F5F0E8;
+  --border:  rgba(201,168,76,0.18);
+  --border2: rgba(201,168,76,0.07);
+  --green:   #2ECC71; --green2: rgba(46,204,113,0.10);
+  --red:     #E74C3C; --red2:   rgba(231,76,60,0.10);
+  --amber:   #F39C12; --amber2: rgba(243,156,18,0.10);
+  --blue:    #3498DB; --blue2:  rgba(52,152,219,0.10);
+  --cyan:    #00D4D4; --cyan2:  rgba(0,212,212,0.10);
+  --purple:  #9B59B6;
+  --fc: 'Barlow Condensed', sans-serif;
+  --fb: 'Barlow', sans-serif;
+  --fs: 'Cormorant Garamond', serif;
+  --fm: 'IBM Plex Mono', monospace;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{
+  background:var(--navy);
+  color:var(--text);
+  font-family:var(--fb);
+  font-size:12.5px;
+  font-weight:300;
+  line-height:1.6;
+}
+
+/* ── WATERMARK ── */
+body::after{
+  content:'G.O.D.S HOLDINGS (PTY) LTD ™ (PROPOSED) · GOOD ORDERLY DIRECTIONAL SYSTEMS · CONFIDENTIAL — FOUNDER WORKING DOCUMENT · PRE-REGISTRATION FORECAST · © 2026 SASHIN J. SINGH · NO MARKS YET REGISTERED';
+  position:fixed;
+  bottom:0; left:0; right:0;
+  text-align:center;
+  font-family:var(--fm);
+  font-size:8px;
+  letter-spacing:2px;
+  color:rgba(201,168,76,0.15);
+  padding:3px 0;
+  pointer-events:none;
+  z-index:9999;
+  border-top:1px solid rgba(201,168,76,0.06);
+}
+
+
+/* ═══ G.O.D.S BRAND LAYER (v6) ═══ */
+.gods-seal-wm{position:fixed;inset:0;z-index:0;pointer-events:none;display:flex;
+  align-items:center;justify-content:center;opacity:1;}
+.gods-seal-wm svg{width:min(60vw,700px);height:auto;opacity:0.06;}
+.layout,.topbar,#toast-container,.modal-overlay{position:relative;z-index:1;}
+.logo-emblem{background:none!important;clip-path:none!important;width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;}
+.logo-emblem-svg{filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));}
+/* classification ribbon */
+.gods-classbar{position:fixed;top:52px;left:0;right:0;z-index:150;height:22px;
+  background:linear-gradient(90deg,rgba(158,43,37,.16),rgba(6,14,28,.96) 40%);
+  border-bottom:1px solid rgba(201,168,76,.16);display:flex;align-items:center;
+  gap:14px;padding:0 16px;backdrop-filter:blur(14px);font-family:var(--fm);}
+.gods-classbar .tag{background:#9E2B25;color:#F5F0E8;font-size:9px;font-weight:700;
+  letter-spacing:2px;padding:2px 9px;border-radius:3px;}
+.gods-classbar .note{color:var(--gold);font-size:9px;letter-spacing:1.4px;}
+.gods-classbar .trust{margin-left:auto;color:var(--text2);font-size:8.5px;letter-spacing:1.6px;}
+.topbar{top:0;} .gods-classbar+*{}
+.layout{margin-top:22px;}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.25);border-radius:2px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(201,168,76,0.45);}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+@keyframes shimmer{0%{background-position:-200% 0;}100%{background-position:200% 0;}}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes goldPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.3);}50%{box-shadow:0 0 0 6px rgba(201,168,76,0);}}
+
+/* ═══════════════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════════════ */
+.topbar{
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  height:52px;
+  background:rgba(6,14,28,0.97);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 16px;
+  backdrop-filter:blur(20px);
+}
+
+/* Logo block */
+.logo-wrap{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.logo-emblem{
+  width:36px;height:36px;
+  background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  flex-shrink:0;
+}
+.logo-emblem span{font-family:var(--fc);font-size:13px;font-weight:800;color:var(--navy);letter-spacing:-0.5px;}
+.logo-text{line-height:1;}
+.logo-main{
+  font-family:var(--fs);font-size:20px;font-weight:700;
+  color:var(--gold);letter-spacing:4px;
+}
+.logo-main sup{font-size:9px;color:var(--gold3);letter-spacing:0;vertical-align:super;}
+.logo-sub{
+  font-family:var(--fc);font-size:7.5px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--muted);margin-top:1px;
+}
+
+/* Top status strip */
+.top-status{display:flex;align-items:center;gap:16px;flex:1;justify-content:center;}
+.ts-item{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--fm);font-size:8.5px;color:var(--muted);
+  padding:3px 8px;
+  border:1px solid var(--border2);
+  border-radius:2px;
+}
+.ts-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.ts-dot.green{background:var(--green);animation:pulse 2s infinite;}
+.ts-dot.amber{background:var(--amber);animation:pulse 1.5s infinite;}
+.ts-dot.red{background:var(--red);}
+.ts-val{color:var(--text2);}
+
+/* Top right controls */
+.top-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.tb-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;
+  font-family:var(--fc);font-size:9.5px;font-weight:500;letter-spacing:1px;
+  border:1px solid var(--border);
+  border-radius:2px;
+  background:transparent;color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.tb-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold4);}
+.tb-btn.alert{border-color:rgba(231,76,60,0.4);color:var(--red);}
+.tb-btn.alert:hover{background:var(--red2);}
+.tb-badge{
+  background:var(--red);color:#fff;
+  font-family:var(--fm);font-size:7px;
+  width:14px;height:14px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.user-chip{
+  display:flex;align-items:center;gap:7px;
+  padding:4px 10px;
+  border:1px solid var(--border);
+  border-radius:2px;
+}
+.ua{
+  width:28px;height:28px;
+  background:rgba(201,168,76,0.12);
+  border:1px solid rgba(201,168,76,0.3);
+  border-radius:2px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fc);font-size:10px;font-weight:700;color:var(--gold);
+}
+.uname{font-family:var(--fc);font-size:10px;color:var(--text2);}
+.urole{font-family:var(--fm);font-size:7.5px;color:var(--gold3);margin-top:1px;}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════ */
+.layout{
+  position:fixed; top:52px; left:0; right:0; bottom:0;
+  display:flex;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:218px;flex-shrink:0;
+  background:rgba(6,14,28,0.95);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+.sidebar::before{
+  content:'';
+  position:absolute;top:0;right:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,transparent,var(--gold),transparent);
+  opacity:0.3;pointer-events:none;
+}
+.sb-scroll{flex:1;overflow-y:auto;padding:8px 0;}
+.sb-section{
+  padding:10px 10px 2px;
+  font-family:var(--fc);font-size:7px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:6px;
+  border-top:1px solid var(--border2);margin-top:4px;
+}
+.sb-section:first-child{border-top:none;margin-top:0;}
+.sb-section::after{content:'';flex:1;height:1px;background:var(--border2);}
+.sb-item{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 10px;
+  font-family:var(--fc);font-size:11.5px;font-weight:500;
+  color:var(--text2);
+  border-left:2px solid transparent;
+  cursor:pointer;transition:all 0.12s;
+  border-radius:0 2px 2px 0;
+  position:relative;
+}
+.sb-item:hover{color:var(--text);background:var(--gold4);border-left-color:var(--gold3);}
+.sb-item.active{
+  color:var(--gold);background:rgba(201,168,76,0.06);
+  border-left-color:var(--gold);font-weight:600;
+}
+.sb-ic{font-size:9px;width:13px;text-align:center;flex-shrink:0;}
+.sb-badge{
+  margin-left:auto;
+  font-family:var(--fm);font-size:7px;
+  padding:1px 5px;border-radius:1px;
+}
+.bd-r{background:var(--red2);color:var(--red);}
+.bd-a{background:var(--amber2);color:var(--amber);}
+.bd-g{background:var(--green2);color:var(--green);}
+.bd-b{background:var(--blue2);color:var(--blue);}
+.bd-gold{background:rgba(201,168,76,0.15);color:var(--gold);}
+
+/* Sidebar footer */
+.sb-foot{
+  padding:10px;
+  border-top:1px solid var(--border2);
+  background:rgba(0,0,0,0.2);
+}
+.sb-foot-row{
+  display:flex;justify-content:space-between;
+  font-family:var(--fm);font-size:7.5px;margin-bottom:2px;
+}
+.sf-k{color:var(--muted);}
+.sf-v{color:var(--text2);}
+.sf-v.ok{color:var(--green);}
+.sf-v.warn{color:var(--amber);}
+.sf-v.gold{color:var(--gold);}
+.sf-copy{
+  font-family:var(--fm);font-size:7px;color:rgba(201,168,76,0.25);
+  text-align:center;margin-top:6px;letter-spacing:0.8px;
+}
+
+/* ── MAIN AREA ── */
+.main{
+  flex:1;overflow-y:auto;
+  background:var(--navy);
+  padding:20px 24px 32px;
+}
+
+/* ── PAGE ── */
+.page{display:none;animation:fadeUp 0.2s ease;}
+.page.active{display:block;}
+
+/* ═══════════════════════════════════════════════════
+   PAGE COMPONENTS
+═══════════════════════════════════════════════════ */
+.pg-hdr{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:18px;padding-bottom:14px;
+  border-bottom:1px solid var(--border2);
+}
+.pg-title-wrap{}
+.pg-eyebrow{
+  font-family:var(--fc);font-size:8px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--gold3);margin-bottom:4px;
+}
+.pg-title{font-family:var(--fs);font-size:26px;font-weight:700;color:var(--white);line-height:1;}
+.pg-title sup{font-size:11px;color:var(--gold3);vertical-align:super;}
+.pg-sub{font-size:11px;color:var(--muted);margin-top:4px;max-width:700px;line-height:1.5;}
+.pg-acts{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+
+/* Buttons */
+.btn{
+  font-family:var(--fc);font-size:9.5px;font-weight:600;letter-spacing:1px;
+  padding:6px 14px;border:none;border-radius:1px;
+  cursor:pointer;transition:all 0.15s;text-transform:uppercase;
+}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-gold:hover{background:var(--gold2);}
+.btn-outline{
+  background:transparent;color:var(--text2);
+  border:1px solid var(--border);padding:5px 13px;
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-red{background:var(--red2);color:var(--red);border:1px solid rgba(231,76,60,0.3);}
+.btn-red:hover{background:rgba(231,76,60,0.2);}
+.btn-green{background:var(--green2);color:var(--green);border:1px solid rgba(46,204,113,0.3);}
+.btn-sm{padding:3px 9px;font-size:8.5px;}
+
+/* Banners */
+.banner{
+  padding:9px 13px;border-radius:2px;margin-bottom:14px;
+  font-size:11px;display:flex;gap:9px;border-left:3px solid;
+}
+.bn-gold{border-left-color:var(--gold);background:rgba(201,168,76,0.05);}
+.bn-red{border-left-color:var(--red);background:var(--red2);}
+.bn-amber{border-left-color:var(--amber);background:var(--amber2);}
+.bn-green{border-left-color:var(--green);background:var(--green2);}
+.bn-blue{border-left-color:var(--blue);background:var(--blue2);}
+.bn-icon{font-size:12px;flex-shrink:0;margin-top:1px;}
+.bn-body{flex:1;line-height:1.5;}
+.bn-body strong{display:block;font-family:var(--fc);font-size:10px;margin-bottom:1px;letter-spacing:0.5px;}
+
+/* KPI Grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:16px;}
+.kpi{
+  background:var(--navy2);
+  border:1px solid var(--border);
+  border-radius:2px;padding:12px;
+  border-top:2px solid var(--gold);
+  position:relative;overflow:hidden;
+}
+.kpi::after{
+  content:'';position:absolute;top:0;right:0;
+  width:40px;height:40px;
+  background:radial-gradient(circle at top right,rgba(201,168,76,0.06),transparent 70%);
+}
+.kpi.red{border-top-color:var(--red);}
+.kpi.green{border-top-color:var(--green);}
+.kpi.amber{border-top-color:var(--amber);}
+.kpi.blue{border-top-color:var(--blue);}
+.kpi.cyan{border-top-color:var(--cyan);}
+.kpi.purple{border-top-color:var(--purple);}
+.kpi-l{font-family:var(--fc);font-size:7.5px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;}
+.kpi-v{font-family:var(--fs);font-size:26px;font-weight:700;color:var(--white);line-height:1;}
+.kpi-s{font-family:var(--fm);font-size:8px;margin-top:4px;color:var(--muted);}
+.kup{color:var(--green);}
+.kdown{color:var(--red);}
+
+/* Panel */
+.panel{
+  background:var(--navy2);border:1px solid var(--border);
+  border-radius:2px;padding:14px;margin-bottom:12px;
+}
+.panel-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;padding-bottom:8px;
+  border-bottom:1px solid var(--border2);
+}
+.panel-title{
+  font-family:var(--fc);font-size:8.5px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--gold);font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+.panel-badge{
+  font-size:7px;padding:1px 5px;border-radius:1px;
+  background:rgba(201,168,76,0.12);color:var(--gold);
+  font-family:var(--fm);
+}
+.panel-act{
+  font-family:var(--fc);font-size:9px;color:var(--cyan);
+  cursor:pointer;background:none;border:none;
+  opacity:0.8;
+}
+.panel-act:hover{opacity:1;}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.tbl thead tr{border-bottom:1px solid var(--border);}
+.tbl th{
+  padding:6px 8px;text-align:left;
+  font-family:var(--fc);font-size:7.5px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap;
+}
+.tbl td{
+  padding:7px 8px;border-bottom:1px solid var(--border2);
+  color:var(--text);vertical-align:middle;
+}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tbody tr:hover td{background:rgba(201,168,76,0.02);}
+.mono{font-family:var(--fm);font-size:9.5px;}
+
+/* Badges */
+.badge{
+  display:inline-block;
+  padding:2px 7px;border-radius:1px;
+  font-family:var(--fc);font-size:8.5px;font-weight:600;white-space:nowrap;
+}
+.b-red{background:var(--red2);color:var(--red);}
+.b-green{background:var(--green2);color:var(--green);}
+.b-amber{background:var(--amber2);color:var(--amber);}
+.b-blue{background:var(--blue2);color:var(--blue);}
+.b-cyan{background:var(--cyan2);color:var(--cyan);}
+.b-gold{background:rgba(201,168,76,0.12);color:var(--gold);}
+.b-purple{background:rgba(155,89,182,0.15);color:var(--purple);}
+.b-muted{background:rgba(255,255,255,0.05);color:var(--muted);}
+
+/* Progress bar */
+.prog{height:4px;background:var(--navy3);border-radius:2px;overflow:hidden;margin-top:3px;}
+.pf{height:100%;border-radius:2px;transition:width 0.8s ease;}
+.pf-gold{background:var(--gold);}
+.pf-green{background:var(--green);}
+.pf-red{background:var(--red);}
+.pf-amber{background:var(--amber);}
+
+/* Grid layouts */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+
+/* Info pairs */
+.ip{display:flex;gap:8px;margin-bottom:5px;font-size:11px;align-items:baseline;}
+.ip-k{color:var(--muted);font-size:10px;width:160px;flex-shrink:0;}
+.ip-v{font-weight:400;flex:1;}
+
+/* Audit log entry */
+.al-line{
+  display:flex;gap:8px;align-items:flex-start;
+  padding:5px 0;border-bottom:1px solid var(--border2);
+  font-family:var(--fm);font-size:9.5px;
+}
+.al-line:last-child{border-bottom:none;}
+.al-time{color:var(--muted);flex-shrink:0;width:52px;}
+.al-tag{flex-shrink:0;width:70px;}
+.al-msg{flex:1;color:var(--text);}
+
+/* Constitutional pillar cards */
+.pillar-card{
+  background:var(--navy2);border:1px solid var(--border);
+  border-radius:2px;padding:12px;
+  position:relative;overflow:hidden;
+  transition:background 0.15s;
+}
+.pillar-card:hover{background:var(--navy3);}
+.pillar-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--gold);opacity:0;transition:opacity 0.15s;
+}
+.pillar-card:hover::before{opacity:1;}
+.pc-num{
+  font-family:var(--fs);font-size:36px;font-weight:300;
+  color:rgba(201,168,76,0.15);line-height:1;margin-bottom:6px;
+  transition:color 0.15s;
+}
+.pillar-card:hover .pc-num{color:rgba(201,168,76,0.4);}
+.pc-title{
+  font-family:var(--fc);font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:6px;
+}
+.pc-text{font-size:10.5px;color:var(--muted);line-height:1.55;}
+.pc-status{
+  margin-top:8px;padding-top:8px;border-top:1px solid var(--border2);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.pc-score{font-family:var(--fc);font-size:16px;font-weight:700;}
+
+/* Watermark overlay for sensitive panels */
+.classified-panel{position:relative;}
+.classified-panel::after{
+  content:'CONFIDENTIAL · PRE-REGISTRATION FORECAST';
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(-30deg);
+  font-family:var(--fc);font-size:11px;letter-spacing:3px;
+  color:rgba(201,168,76,0.04);pointer-events:none;
+  white-space:nowrap;font-weight:700;
+  text-transform:uppercase;
+}
+
+/* Modal */
+.modal{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.75);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(3px);
+}
+.modal.open{display:flex;}
+.modal-box{
+  background:var(--navy2);
+  border:1px solid var(--border);
+  border-radius:3px;
+  width:500px;max-width:92%;max-height:85vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+.modal-hdr{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--navy2);z-index:1;
+  border-radius:3px 3px 0 0;
+}
+.modal-title{font-family:var(--fs);font-size:18px;font-weight:600;color:var(--white);}
+.modal-close{
+  cursor:pointer;color:var(--muted);background:none;border:none;
+  font-size:16px;padding:2px 6px;transition:color 0.1s;
+}
+.modal-close:hover{color:var(--red);}
+.modal-body{padding:16px 18px;}
+.modal-foot{
+  padding:12px 18px;border-top:1px solid var(--border);
+  display:flex;gap:7px;justify-content:flex-end;
+}
+.form-row{margin-bottom:10px;}
+.form-lbl{
+  display:block;font-family:var(--fc);font-size:8px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);margin-bottom:3px;
+}
+.form-inp,.form-sel,.form-ta{
+  width:100%;background:var(--navy3);
+  border:1px solid var(--border);border-radius:1px;
+  padding:7px 9px;color:var(--text);
+  font-family:var(--fb);font-size:11.5px;outline:none;
+  transition:border-color 0.15s;
+}
+.form-inp:focus,.form-sel:focus,.form-ta:focus{border-color:var(--gold);}
+.form-ta{resize:vertical;min-height:65px;}
+
+/* Toast */
+#toast-container{
+  position:fixed;bottom:24px;right:20px;z-index:9999;
+  display:flex;flex-direction:column;gap:6px;width:320px;
+}
+.toast{
+  background:var(--navy3);
+  border-left:3px solid;
+  padding:10px 14px;border-radius:2px;
+  font-family:var(--fc);font-size:10.5px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  animation:fadeUp 0.3s ease;transition:opacity 0.3s;
+}
+.toast-success{border-color:var(--green);}
+.toast-error{border-color:var(--red);}
+.toast-warning{border-color:var(--amber);}
+.toast-info{border-color:var(--cyan);}
+.toast strong{font-weight:700;display:block;margin-bottom:2px;}
+
+/* ── COMMAND CENTRE SPECIAL ELEMENTS ── */
+.division-status-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:rgba(201,168,76,0.1);border:1px solid var(--border);
+  margin-bottom:12px;border-radius:2px;overflow:hidden;
+}
+.div-stat{
+  background:var(--navy2);padding:14px;
+  transition:background 0.15s;cursor:default;
+}
+.div-stat:hover{background:var(--navy3);}
+.ds-icon{font-size:18px;margin-bottom:6px;}
+.ds-name{font-family:var(--fc);font-size:10px;font-weight:700;color:var(--white);letter-spacing:0.5px;}
+.ds-sub{font-family:var(--fc);font-size:7.5px;letter-spacing:1px;color:var(--muted);margin-bottom:6px;}
+.ds-metric{font-family:var(--fs);font-size:20px;font-weight:700;line-height:1;}
+.ds-label{font-family:var(--fm);font-size:7.5px;color:var(--muted);margin-top:2px;}
+
+/* HQ-OS Quantum Layer */
+.quantum-bar{
+  background:var(--navy2);border:1px solid var(--border);
+  border-radius:2px;padding:12px 16px;margin-bottom:12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-left:3px solid var(--cyan);
+}
+.qb-left{display:flex;align-items:center;gap:12px;}
+.qb-logo{
+  width:36px;height:36px;
+  background:rgba(0,212,212,0.08);
+  border:1px solid rgba(0,212,212,0.25);
+  border-radius:2px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fc);font-size:8px;font-weight:700;color:var(--cyan);
+  letter-spacing:0.5px;text-align:center;line-height:1.2;
+}
+.qb-info{}
+.qb-title{font-family:var(--fc);font-size:11px;font-weight:700;color:var(--white);}
+.qb-sub{font-family:var(--fm);font-size:8px;color:var(--muted);}
+.qb-phases{display:flex;gap:4px;}
+.qb-phase{
+  padding:3px 8px;font-family:var(--fc);font-size:8px;font-weight:600;
+  border-radius:1px;letter-spacing:0.5px;
+}
+.qp-active{background:var(--green2);color:var(--green);border:1px solid rgba(46,204,113,0.3);}
+.qp-pending{background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border2);}
+.qp-future{background:rgba(0,212,212,0.06);color:rgba(0,212,212,0.4);border:1px solid rgba(0,212,212,0.1);}
+
+/* UDOC System Registry rows */
+.sys-row-critical td:first-child{border-left:2px solid var(--red);}
+.sys-row-ok td:first-child{border-left:2px solid var(--green);}
+.sys-row-warn td:first-child{border-left:2px solid var(--amber);}
+
+/* Constitutional risk meter */
+.legit-meter{
+  background:var(--navy3);border-radius:2px;
+  height:8px;overflow:hidden;margin:8px 0;
+}
+.legit-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold),var(--green));
+  border-radius:2px;transition:width 1s ease;
+}
+
+/* Timeline */
+.timeline{padding:0;margin:0;list-style:none;}
+.tl-item{display:flex;gap:10px;margin-bottom:12px;}
+.tl-dot{
+  width:24px;height:24px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:2px;
+}
+.tl-done{background:rgba(46,204,113,0.15);border:2px solid var(--green);}
+.tl-active{background:rgba(243,156,18,0.15);border:2px solid var(--amber);}
+.tl-pending{background:rgba(255,255,255,0.05);border:2px solid var(--muted);}
+.tl-t{font-size:12px;font-weight:500;color:var(--white);}
+.tl-s{font-size:10px;color:var(--muted);}
+
+/* ── PARTICLE BACKGROUND FOR COMMAND ── */
+.cmd-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse at 20% 50%,rgba(201,168,76,0.03) 0%,transparent 60%),
+    radial-gradient(ellipse at 80% 20%,rgba(0,212,212,0.03) 0%,transparent 60%);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ G.O.D.S SEAL WATERMARK ═══ -->
+<div class="gods-seal-wm" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#C9A84C" stroke-width="3"/>
+  <circle cx="200" cy="200" r="130" fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+  <path d="M 250.91 149.09 L 221.64 191.09 L 200.00 200.00 L 208.91 178.36 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 250.91 250.91 L 208.91 221.64 L 200.00 200.00 L 221.64 208.91 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 149.09 250.91 L 178.36 208.91 L 200.00 200.00 L 191.09 221.64 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 149.09 149.09 L 191.09 178.36 L 200.00 200.00 L 178.36 191.09 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 200.00 80.00 L 216.00 164.00 L 200.00 200.00 L 184.00 164.00 Z" fill="#C9A84C"/><path d="M 320.00 200.00 L 236.00 216.00 L 200.00 200.00 L 236.00 184.00 Z" fill="#C9A84C"/><path d="M 200.00 320.00 L 184.00 236.00 L 200.00 200.00 L 216.00 236.00 Z" fill="#C9A84C"/><path d="M 80.00 200.00 L 164.00 184.00 L 200.00 200.00 L 164.00 216.00 Z" fill="#C9A84C"/>
+  <circle cx="200" cy="200" r="46" fill="none" stroke="#C9A84C" stroke-width="4"/>
+  <circle cx="200" cy="200" r="14" fill="#C9A84C"/>
+</svg></div>
+
+<!-- ═══ CLASSIFICATION RIBBON ═══ -->
+<div class="gods-classbar" role="note" aria-label="Document classification">
+  <span class="tag">RESTRICTED</span>
+  <span class="note">SOVEREIGN CONTROL PLANE · PRE-REGISTRATION FORECAST BUILD · FOUNDER WORKING DEMONSTRATION</span>
+  <span class="trust">NO COMPANY / TRUST / TRADEMARK / DOMAIN YET REGISTERED · IP-PREPARATION WORK</span>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-emblem"><svg class="logo-emblem-svg" viewBox="0 0 64 64" width="40" height="40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="G.O.D.S"><defs><linearGradient id="tbEShield" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A3A5C"/><stop offset="1" stop-color="#060E1C"/></linearGradient></defs><path d="M 12 8 L 52 8 C 52 8 53 30 49 43 C 45 56 39 62 32 66 C 25 62 19 56 15 43 C 11 30 12 8 12 8 Z" fill="url(#tbEShield)" stroke="#C9A84C" stroke-width="2" stroke-linejoin="round"/><path d="M32 13 L34.6 24.9 L32 30 L29.4 24.9 Z" fill="#C9A84C"/><path d="M49 30 L37.1 32.6 L32 30 L37.1 27.4 Z" fill="#C9A84C"/><path d="M32 47 L29.4 35.1 L32 30 L34.6 35.1 Z" fill="#C9A84C"/><path d="M15 30 L26.9 27.4 L32 30 L26.9 32.6 Z" fill="#C9A84C"/><path d="M39.07 22.93 L35.18 28.94 L32 30 L33.06 26.82 Z" fill="#8B6914"/><path d="M39.07 37.07 L33.06 33.18 L32 30 L35.18 31.06 Z" fill="#8B6914"/><path d="M24.93 37.07 L28.82 31.06 L32 30 L30.94 33.18 Z" fill="#8B6914"/><path d="M24.93 22.93 L30.94 26.82 L32 30 L28.82 28.94 Z" fill="#8B6914"/><circle cx="32" cy="30" r="6.4" fill="#060E1C" stroke="#C9A84C" stroke-width="1.4"/><circle cx="32" cy="30" r="2.2" fill="#C9A84C"/></svg></div>
+    <div class="logo-text">
+      <div class="logo-main">G.O.D.S<sup>™</sup></div>
+      <div class="logo-sub">Sovereign Administration Mainframe · v6.0</div>
+    </div>
+  </div>
+
+  <div class="top-status">
+    <div class="ts-item"><div class="ts-dot green"></div><span>SOVEREIGNTY</span><span class="ts-val">ZA VERIFIED</span></div>
+    <div class="ts-item"><div class="ts-dot green"></div><span>NODES</span><span class="ts-val">3/3</span></div>
+    <div class="ts-item"><div class="ts-dot green"></div><span>HQ-OS</span><span class="ts-val">QUANTUM-READY</span></div>
+    <div class="ts-item"><div class="ts-dot amber"></div><span>COB</span><span class="ts-val">RECRUITING 0/5</span></div>
+    <div class="ts-item"><div class="ts-dot red"></div><span>ALERTS</span><span class="ts-val">4 ACTIVE</span></div>
+    <div class="ts-item"><div class="ts-dot green"></div><span>API</span><span class="ts-val" id="api-lat">9ms</span></div>
+    <div class="ts-item"><span id="clock" style="color:var(--gold);font-family:var(--fm);font-size:9px">--:--:--</span></div>
+  </div>
+
+  <div class="top-right">
+    <button class="tb-btn alert" onclick="openModal('m-alerts')">
+      🔔 ALERTS <div class="tb-badge">4</div>
+    </button>
+    <button class="tb-btn" onclick="toast('Launching Quantum status report...','info')">⚛ HQ-OS</button>
+    <div class="user-chip">
+      <div class="ua">SJS</div>
+      <div>
+        <div class="uname">Sashin J. Singh</div>
+        <div class="urole">FOUNDER · SUPER ADMIN · CRO</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ LAYOUT ═══ -->
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <div class="sb-scroll">
+
+      <div class="sb-section">Platform</div>
+      <div class="sb-item active" onclick="nav('cmd',this)"><span class="sb-ic">◈</span>Command Centre</div>
+      <div class="sb-item" onclick="nav('pillars',this)"><span class="sb-ic">⚖</span>12 Constitutional Pillars</div>
+      <div class="sb-item" onclick="nav('cob',this)"><span class="sb-ic">🏛</span>COB — Oversight Board<span class="sb-badge bd-a">0/5</span></div>
+      <div class="sb-item" onclick="nav('audit-trail',this)"><span class="sb-ic">📜</span>Constitutional Audit</div>
+      <div class="sb-item" onclick="nav('breach',this)"><span class="sb-ic">🚨</span>Breach Register<span class="sb-badge bd-r">1</span></div>
+      <div class="sb-item" onclick="nav('sys-health',this)"><span class="sb-ic">♡</span>System Health</div>
+
+      <div class="sb-section">UDOC Governance</div>
+      <div class="sb-item" onclick="nav('udoc-dash',this)"><span class="sb-ic">◈</span>UDOC Dashboard</div>
+      <div class="sb-item" onclick="nav('ai-registry',this)"><span class="sb-ic">◉</span>AI Registry<span class="sb-badge bd-r">2</span></div>
+      <div class="sb-item" onclick="nav('udoc-audit',this)"><span class="sb-ic">🔐</span>Audit Trail</div>
+      <div class="sb-item" onclick="nav('compliance',this)"><span class="sb-ic">✓</span>Compliance Engine<span class="sb-badge bd-a">3</span></div>
+      <div class="sb-item" onclick="nav('bias',this)"><span class="sb-ic">⊘</span>Bias Monitor<span class="sb-badge bd-r">2</span></div>
+      <div class="sb-item" onclick="nav('sovereignty',this)"><span class="sb-ic">🛡</span>Sovereignty</div>
+
+      <div class="sb-section">UDOC Phase 1.5</div>
+      <div class="sb-item" onclick="nav('hqos',this)"><span class="sb-ic">⚛</span>HQ-OS Quantum Layer</div>
+      <div class="sb-item" onclick="nav('evidence',this)"><span class="sb-ic">⬢</span>Evidence Bundles<span class="sb-badge bd-gold">18</span></div>
+      <div class="sb-item" onclick="nav('policy-code',this)"><span class="sb-ic">⌬</span>Policy as Code</div>
+      <div class="sb-item" onclick="nav('incident',this)"><span class="sb-ic">✸</span>Incident Command<span class="sb-badge bd-r">1</span></div>
+      <div class="sb-item" onclick="nav('const-risk',this)"><span class="sb-ic">⚖</span>Constitutional Risk</div>
+      <div class="sb-item" onclick="nav('model-lc',this)"><span class="sb-ic">◔</span>Model Lifecycle</div>
+      <div class="sb-item" onclick="nav('regulator',this)"><span class="sb-ic">⚑</span>Regulator Portal</div>
+      <div class="sb-item" onclick="nav('hw-trust',this)"><span class="sb-ic">⬣</span>Hardware Trust</div>
+
+      <div class="sb-section">S.E.T.H.S™</div>
+      <div class="sb-item" onclick="nav('seths-dash',this)"><span class="sb-ic">◈</span>S.E.T.H.S Dashboard</div>
+      <div class="sb-item" onclick="nav('participants',this)"><span class="sb-ic">◎</span>Participants<span class="sb-badge bd-g">50</span></div>
+      <div class="sb-item" onclick="nav('seths-intake',this)"><span class="sb-ic">+</span>New Intake</div>
+      <div class="sb-item" onclick="nav('employers',this)"><span class="sb-ic">⊞</span>Employer Network</div>
+      <div class="sb-item" onclick="nav('placements',this)"><span class="sb-ic">🤝</span>Placements</div>
+      <div class="sb-item" onclick="nav('seths-popia',this)"><span class="sb-ic">🔒</span>POPIA Compliance</div>
+      <div class="sb-item" onclick="nav('impact',this)"><span class="sb-ic">▲</span>Outcomes & Impact</div>
+
+      <div class="sb-section">T.S Industries</div>
+      <div class="sb-item" onclick="nav('ts-dash',this)"><span class="sb-ic">◈</span>T.S Dashboard</div>
+      <div class="sb-item" onclick="nav('ts-projects',this)"><span class="sb-ic">◫</span>Project Registry</div>
+      <div class="sb-item" onclick="nav('spv',this)"><span class="sb-ic">🏛</span>SPV Management</div>
+      <div class="sb-item" onclick="nav('ts-sectors',this)"><span class="sb-ic">◉</span>7 Sector Subsidiaries</div>
+      <div class="sb-item" onclick="nav('ts-env',this)"><span class="sb-ic">🌍</span>Environmental Impact</div>
+
+      <div class="sb-section">M.A.D.I.B.A™</div>
+      <div class="sb-item" onclick="nav('madiba-dash',this)"><span class="sb-ic">◈</span>M.A.D.I.B.A Dashboard</div>
+      <div class="sb-item" onclick="nav('investors',this)"><span class="sb-ic">💼</span>Investor CRM</div>
+      <div class="sb-item" onclick="nav('pipeline',this)"><span class="sb-ic">→</span>Capital Pipeline</div>
+      <div class="sb-item" onclick="nav('spv-madiba',this)"><span class="sb-ic">◆</span>SPV Register</div>
+      <div class="sb-item" onclick="nav('kyc',this)"><span class="sb-ic">✓</span>KYC/AML — FICA</div>
+      <div class="sb-item" onclick="nav('madiba-impact',this)"><span class="sb-ic">🌍</span>Impact Dashboard</div>
+
+      <div class="sb-section">Administration</div>
+      <div class="sb-item" onclick="nav('entities',this)"><span class="sb-ic">🏦</span>Entity Registry</div>
+      <div class="sb-item" onclick="nav('trademarks',this)"><span class="sb-ic">®</span>Trademark Registry</div>
+      <div class="sb-item" onclick="nav('users',this)"><span class="sb-ic">👥</span>Users & Access</div>
+      <div class="sb-item" onclick="nav('sys-config',this)"><span class="sb-ic">⚙</span>System Config</div>
+      <div class="sb-item" onclick="nav('checklist',this)"><span class="sb-ic">🚀</span>Startup Checklist</div>
+
+    </div><!-- /sb-scroll -->
+
+    <div class="sb-foot">
+      <div class="sb-foot-row"><span class="sf-k">ENV</span><span class="sf-v ok">PRODUCTION</span></div>
+      <div class="sb-foot-row"><span class="sf-k">BUILD</span><span class="sf-v gold">v5.0.0</span></div>
+      <div class="sb-foot-row"><span class="sf-k">NODE</span><span class="sf-v">ZA-JHB-01</span></div>
+      <div class="sb-foot-row"><span class="sf-k">HSM</span><span class="sf-v ok">2 ACTIVE · FIPS 140-3</span></div>
+      <div class="sb-foot-row"><span class="sf-k">COB</span><span class="sf-v warn">RECRUITING</span></div>
+      <div class="sf-copy">© 2026 G.O.D.S Holdings (Pty) Ltd · IP Trust Protected</div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main">
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: COMMAND CENTRE
+    ══════════════════════════════════════════════ -->
+    <div id="page-cmd" class="page active">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">G.O.D.S Holdings (Pty) Ltd · Constitutional Mandate Active</div>
+          <div class="pg-title">Command Centre<sup>™</sup></div>
+          <div class="pg-sub">All four divisions · 12 Constitutional Pillars enforced · HQ-OS Quantum-Ready · ZA Sovereignty verified every 6 hours · UDOC governing 14 AI systems</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-outline" onclick="openModal('m-alerts')">🔔 Alerts (4)</button>
+          <button class="btn btn-gold" onclick="openModal('m-reg-sys')">+ Register AI System</button>
+        </div>
+      </div>
+
+      <div class="banner bn-amber">
+        <div class="bn-icon">⚠</div>
+        <div class="bn-body">
+          <strong>CONSTITUTIONAL MANDATE ACTIVE — 12 PILLARS GOVERNING ALL OPERATIONS</strong>
+          Pillar VIII: Human Primacy enforced in UDOC — 3 HIGH RISK decisions paused. Pillar VII: Founder Override <strong>DISABLED</strong>. COB recruitment underway — 0/5 seats filled. INC-2026-003 Phase 2 CONTAIN active. SAHRC notified.
+        </div>
+      </div>
+
+      <!-- HQ-OS Quantum Status Bar -->
+      <div class="quantum-bar">
+        <div class="qb-left">
+          <div class="qb-logo">HQ<br>OS</div>
+          <div class="qb-info">
+            <div class="qb-title">HQ-OS · Hybrid Classical + Quantum Operating System</div>
+            <div class="qb-sub">NIST PQC Active · CRYSTALS-Kyber-1024 + CRYSTALS-Dilithium-5 · QCI Middleware Dormant · Quantum-Ready Classical Baseline</div>
+          </div>
+        </div>
+        <div class="qb-phases">
+          <div class="qb-phase qp-active">Phase 1: PQC Active</div>
+          <div class="qb-phase qp-pending">Phase 2: Cloud QPU</div>
+          <div class="qb-phase qp-future">Phase 3: On-Prem QPU</div>
+          <div class="qb-phase qp-future">Phase 4: AQGN</div>
+          <div class="qb-phase qp-future">Phase 5: Global</div>
+        </div>
+      </div>
+
+      <!-- Division Status -->
+      <div class="division-status-grid">
+        <div class="div-stat">
+          <div class="ds-icon">◈</div>
+          <div class="ds-name">S.E.T.H.S™</div>
+          <div class="ds-sub">Human Capital Engine</div>
+          <div class="ds-metric" style="color:var(--green)">78%</div>
+          <div class="ds-label">Placement Rate · 50 Participants</div>
+        </div>
+        <div class="div-stat">
+          <div class="ds-icon">🏗</div>
+          <div class="ds-name">T.S Industries</div>
+          <div class="ds-sub">Production & Infrastructure</div>
+          <div class="ds-metric" style="color:var(--amber)">R45M</div>
+          <div class="ds-label">Pipeline · 3 Active Projects</div>
+        </div>
+        <div class="div-stat">
+          <div class="ds-icon">◉</div>
+          <div class="ds-name">UDOC™</div>
+          <div class="ds-sub">AI Governance Platform</div>
+          <div class="ds-metric" style="color:var(--red)">86%</div>
+          <div class="ds-label">Compliance Avg · 14 Systems</div>
+        </div>
+        <div class="div-stat">
+          <div class="ds-icon">💼</div>
+          <div class="ds-name">M.A.D.I.B.A™</div>
+          <div class="ds-sub">Capital & Sovereign Interface</div>
+          <div class="ds-metric" style="color:var(--gold)">R4.5M</div>
+          <div class="ds-label">of R18M Seed · 25%</div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-l">AI Systems</div><div class="kpi-v">14</div><div class="kpi-s kup">↑2 this week</div></div>
+        <div class="kpi red"><div class="kpi-l">Non-Compliant</div><div class="kpi-v">4</div><div class="kpi-s kdown">Urgent action</div></div>
+        <div class="kpi green"><div class="kpi-l">Decisions Today</div><div class="kpi-v" data-live="dec">1.41M</div><div class="kpi-s" style="color:var(--cyan)">▲ Live updating</div></div>
+        <div class="kpi cyan"><div class="kpi-l">Sovereignty</div><div class="kpi-v">100%</div><div class="kpi-s">ZA verified 06:00</div></div>
+        <div class="kpi amber"><div class="kpi-l">Bias Flags</div><div class="kpi-v">2</div><div class="kpi-s kdown">SAHRC notified</div></div>
+        <div class="kpi"><div class="kpi-l">SA Policy Score</div><div class="kpi-v">80%</div><div class="kpi-s kup">↑4% this quarter</div></div>
+        <div class="kpi green"><div class="kpi-l">SETHS Placed</div><div class="kpi-v">39</div><div class="kpi-s">of 50 cohort</div></div>
+        <div class="kpi"><div class="kpi-l">Constitutional</div><div class="kpi-v">11/12</div><div class="kpi-s">Pillars passing</div></div>
+      </div>
+
+      <div class="g2">
+        <!-- Live Audit Stream -->
+        <div class="panel">
+          <div class="panel-hdr">
+            <div class="panel-title">Live Audit Stream <span style="color:var(--green);font-size:8px;animation:pulse 2s infinite">● LIVE</span></div>
+            <button class="panel-act" onclick="nav('udoc-audit',null)">Full Trail →</button>
+          </div>
+          <div id="cmd-audit-stream"></div>
+        </div>
+
+        <!-- SA Policy Pillars -->
+        <div class="panel">
+          <div class="panel-hdr">
+            <div class="panel-title">SA AI Policy GG54477 — 6 Strategic Pillars</div>
+            <span class="panel-badge">DRAFT · Comment closes 10 Jun 2026</span>
+          </div>
+          <div id="cmd-pillars-mini"></div>
+        </div>
+      </div>
+
+      <!-- AI Registry Quick View -->
+      <div class="panel">
+        <div class="panel-hdr">
+          <div class="panel-title">AI System Registry Overview — 14 Systems</div>
+          <button class="panel-act" onclick="nav('ai-registry',null)">Full Registry →</button>
+        </div>
+        <table class="tbl"><thead><tr>
+          <th>System ID</th><th>Name</th><th>Risk Tier</th><th>Status</th><th>Compliance</th><th>HITL</th><th>SPD Max</th><th>Ethics Cert</th>
+        </tr></thead><tbody id="cmd-reg-mini"></tbody></table>
+      </div>
+
+      <!-- Constitutional Legitimacy -->
+      <div class="g2">
+        <div class="panel classified-panel">
+          <div class="panel-hdr"><div class="panel-title">Constitutional Legitimacy Index</div><span class="panel-badge">COB CERTIFIED</span></div>
+          <div style="text-align:center;padding:8px 0;">
+            <div style="font-family:var(--fs);font-size:52px;font-weight:700;color:var(--gold);line-height:1">87.4<span style="font-size:28px">%</span></div>
+            <div style="font-family:var(--fc);font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:4px">WEIGHTED AVERAGE ACROSS 12 PILLARS</div>
+          </div>
+          <div class="legit-meter"><div class="legit-fill" style="width:87.4%"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:8px">Pillar VIII at 67% (2 flags). Pillar IV at 91%. All other Pillars above 80% threshold. Next COB review: <strong style="color:var(--amber)">Apr 30, 2026</strong>.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Capital Raise Progress</div></div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Seed Round (R18M target)</span><span style="font-family:var(--fs);font-size:16px;font-weight:700;color:var(--gold)">R4.5M</span></div>
+            <div class="prog"><div class="pf pf-gold" style="width:25%"></div></div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Series A (R180M target)</span><span style="color:var(--muted);font-family:var(--fm);font-size:10px">PENDING — Month 18</span></div>
+            <div class="prog"><div class="pf" style="width:0;background:var(--blue)"></div></div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Infrastructure Fund (R2B target)</span><span style="color:var(--muted);font-family:var(--fm);font-size:10px">PLANNING — Phase 3</span></div>
+            <div class="prog"><div class="pf" style="width:0;background:var(--purple)"></div></div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);border-top:1px solid var(--border2);padding-top:8px;margin-top:6px">Active investor discussions: <strong style="color:var(--amber)">6</strong> · DFI engagement: SEFA (DD), IDC (warm) · Series A trigger: Month 18 proof milestones</div>
+        </div>
+      </div>
+    </div><!-- /cmd -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: CONSTITUTIONAL PILLARS
+    ══════════════════════════════════════════════ -->
+    <div id="page-pillars" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">G.O.D.S Constitutional Architecture · 250-Year Mandate</div>
+          <div class="pg-title">12 Constitutional Pillars</div>
+          <div class="pg-sub">Structural constraints — not aspirational statements. Every material decision evaluated against them. Cannot be overridden by commercial pressure, executive authority, or shareholder vote. Supermajority COB approval required for any modification.</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-outline btn-sm" onclick="toast('Pillar audit report generated. COB certified.','success')">COB Audit Report</button>
+          <button class="btn btn-gold btn-sm" onclick="openModal('m-log-breach')">Log Breach</button>
+        </div>
+      </div>
+
+      <div class="banner bn-gold">
+        <div class="bn-icon">⚖</div>
+        <div class="bn-body">
+          <strong>CONSTITUTIONAL AUTHORITY · PROPOSED — NO TRUST YET CONSTITUTED</strong>
+          These 12 Pillars cannot be amended by any single actor including the Founder. Amendments require COB supermajority (4/5) + 90-day stakeholder consultation. All systems enforce these constraints at code level. <strong>founder_override = false</strong> in all system configurations.
+        </div>
+      </div>
+
+      <div id="pillars-grid" class="g4"></div>
+
+      <!-- Enforcement mechanisms -->
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-hdr"><div class="panel-title">Enforcement Mechanisms</div></div>
+        <div class="g2">
+          <div>
+            <div style="font-family:var(--fc);font-size:11px;font-weight:600;color:var(--white);margin-bottom:8px">Technical Enforcement</div>
+            <div style="font-size:11px;color:var(--text);line-height:1.8">
+              <div>→ UDOC audit trail logs every decision against applicable Pillar</div>
+              <div>→ HQ-OS constitutional compliance headers on every API response</div>
+              <div>→ Human override technically enforced — cannot be bypassed</div>
+              <div>→ Dual-custody HSM — no single operator controls both access and audit</div>
+              <div>→ Immutable Cassandra WORM nodes — 10-year retention</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:var(--fc);font-size:11px;font-weight:600;color:var(--white);margin-bottom:8px">Governance Enforcement</div>
+            <div style="font-size:11px;color:var(--text);line-height:1.8">
+              <div>→ COB binding halt orders on any Pillar violation</div>
+              <div>→ Annual COB compliance certification — public disclosure</div>
+              <div>→ IP Trust Class A veto on constitutional amendment</div>
+              <div>→ Founder removal mechanism: COB unanimous vote</div>
+              <div>→ All commercial agreements >R10M require COB approval</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pillars -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: COB — OVERSIGHT BOARD
+    ══════════════════════════════════════════════ -->
+    <div id="page-cob" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">Constitutional Architecture · Independent Governance</div>
+          <div class="pg-title">Constitutional Oversight Board</div>
+          <div class="pg-sub">5 independent seats · Binding veto authority · Annual compliance certification · Founder removal power · Zero G.O.D.S. commercial interest permitted. Board must include legal expert, technology ethicist, community representative, civil society representative, and independent financial expert.</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-gold" onclick="openModal('m-cob-recruit')">+ Recruit Member</button>
+        </div>
+      </div>
+
+      <div class="banner bn-amber">
+        <div class="bn-icon">🏛</div>
+        <div class="bn-body">
+          <strong>COB RECRUITMENT ACTIVE — 0/5 SEATS FILLED — IMMEDIATE ACTION REQUIRED</strong>
+          No external capital may be formally accepted until COB is operational. COB recruitment must be completed before G.O.D.S. Holdings can execute on major government contracts. Target: 3 founding members by Month 2, full board by Month 6. All members must be fully independent — no G.O.D.S. employees, founders, or related parties eligible.
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Board Seats — Recruitment Status</div></div>
+          <table class="tbl"><thead><tr><th>Seat</th><th>Expertise Required</th><th>Status</th><th>Action</th></tr></thead><tbody>
+            <tr><td>Seat 1</td><td>Legal Expert (AI/tech law, qualified attorney)</td><td><span class="badge b-red">VACANT</span></td><td><button class="btn btn-outline btn-sm" onclick="openModal('m-cob-recruit')">Recruit</button></td></tr>
+            <tr><td>Seat 2</td><td>Technology Ethicist (PhD/equiv, AI ethics)</td><td><span class="badge b-red">VACANT</span></td><td><button class="btn btn-outline btn-sm" onclick="openModal('m-cob-recruit')">Recruit</button></td></tr>
+            <tr><td>Seat 3</td><td>Community Representative (historically disadvantaged)</td><td><span class="badge b-red">VACANT</span></td><td><button class="btn btn-outline btn-sm" onclick="openModal('m-cob-recruit')">Recruit</button></td></tr>
+            <tr><td>Seat 4</td><td>Civil Society Representative (NGO, human rights)</td><td><span class="badge b-red">VACANT</span></td><td><button class="btn btn-outline btn-sm" onclick="openModal('m-cob-recruit')">Recruit</button></td></tr>
+            <tr><td>Seat 5</td><td>Independent Financial Expert (CA(SA) or CFA)</td><td><span class="badge b-red">VACANT</span></td><td><button class="btn btn-outline btn-sm" onclick="openModal('m-cob-recruit')">Recruit</button></td></tr>
+          </tbody></table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">COB Powers & Authorities</div></div>
+          <ul style="font-size:11px;color:var(--text);line-height:2;list-style:none;padding:0">
+            <li><span style="color:var(--gold)">→</span> Binding Halt Orders on any Constitutional Pillar violation</li>
+            <li><span style="color:var(--gold)">→</span> Annual Compliance Certificate — publicly disclosed</li>
+            <li><span style="color:var(--gold)">→</span> Founder review and removal (unanimous vote)</li>
+            <li><span style="color:var(--gold)">→</span> Constitutional Amendment veto (supermajority 4/5)</li>
+            <li><span style="color:var(--gold)">→</span> Permanent audit rights across all G.O.D.S. divisions</li>
+            <li><span style="color:var(--gold)">→</span> Approval of all commercial agreements >R10M</li>
+            <li><span style="color:var(--gold)">→</span> IP Trust trustee nomination rights</li>
+            <li><span style="color:var(--gold)">→</span> Emergency session authority (48-hour notice)</li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- /cob -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: HQ-OS QUANTUM LAYER
+    ══════════════════════════════════════════════ -->
+    <div id="page-hqos" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">UDOC · HQ-OS · Hybrid Classical + Quantum Operating System</div>
+          <div class="pg-title">HQ-OS Quantum Architecture</div>
+          <div class="pg-sub">Four-layer hybrid system: Applications Layer → QCI Middleware → Hybrid OS Kernel → Hardware Layer. NIST PQC standards active Phase 1. Cloud QPU API integration Phase 2. On-premises 100+ qubit QPU Phase 3. African Quantum Governance Network Phase 4.</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-outline btn-sm" onclick="toast('HQ-OS status report generated · PQC compliance verified','success')">Status Report</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi cyan"><div class="kpi-l">Architecture Mode</div><div class="kpi-v" style="font-size:18px">QR-Classical</div><div class="kpi-s">Quantum-Ready Baseline</div></div>
+        <div class="kpi green"><div class="kpi-l">PQC Status</div><div class="kpi-v">Active</div><div class="kpi-s">NIST FIPS 203/204/205</div></div>
+        <div class="kpi green"><div class="kpi-l">Kyber-1024</div><div class="kpi-v">Live</div><div class="kpi-s">Key encapsulation</div></div>
+        <div class="kpi green"><div class="kpi-l">Dilithium-5</div><div class="kpi-v">Live</div><div class="kpi-s">Digital signatures</div></div>
+        <div class="kpi amber"><div class="kpi-l">QCI Middleware</div><div class="kpi-v">Dormant</div><div class="kpi-s">Activates with QPU</div></div>
+        <div class="kpi amber"><div class="kpi-l">QKD Status</div><div class="kpi-v">Phase 2</div><div class="kpi-s">BB84 · Metro pilot</div></div>
+      </div>
+
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">5-Phase Rollout Status</div></div>
+          <ul class="timeline">
+            <li class="tl-item"><div class="tl-dot tl-done">✓</div><div><div class="tl-t">Phase 1 — Quantum-Ready Classical Baseline</div><div class="tl-s">Months 1–12 · PQC migration complete · NIST certification · Classical AI governance live</div></div></li>
+            <li class="tl-item"><div class="tl-dot tl-active">⚡</div><div><div class="tl-t">Phase 2 — Quantum Cloud Integration</div><div class="tl-s">Months 10–24 · IBM Quantum API or IonQ Cloud · Quantum bias detection pilot · First govt sovereign deployment</div></div></li>
+            <li class="tl-item"><div class="tl-dot tl-pending">⏳</div><div><div class="tl-t">Phase 3 — On-Premises QPU</div><div class="tl-s">Months 22–42 · 100+ qubit system · Full quantum sovereignty · Zero foreign QPU dependency</div></div></li>
+            <li class="tl-item"><div class="tl-dot tl-pending">⏳</div><div><div class="tl-t">Phase 4 — SADC Quantum Network (AQGN)</div><div class="tl-s">Months 38–60 · QKD backbone · 3+ sovereign nodes · Continental governance standard</div></div></li>
+            <li class="tl-item"><div class="tl-dot tl-pending">⏳</div><div><div class="tl-t">Phase 5 — Full Quantum Sovereign Infrastructure</div><div class="tl-s">Months 55–84 · 1,000+ logical qubits · Global architecture licensing</div></div></li>
+          </ul>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Classical vs Quantum Performance</div></div>
+          <table class="tbl"><thead><tr><th>Metric</th><th>Classical</th><th>HQ-OS Quantum</th><th>Advantage</th></tr></thead><tbody>
+            <tr><td>Crypto Verification</td><td>~10K rec/sec</td><td>~10M+ rec/sec</td><td><span class="badge b-gold">1,000×+</span></td></tr>
+            <tr><td>Optimisation</td><td>Heuristic approx</td><td>Near-optimal QPU</td><td><span class="badge b-gold">Qualitative</span></td></tr>
+            <tr><td>Bias Detection Dims</td><td>~100 variables</td><td>Exponential qubit space</td><td><span class="badge b-gold">Exponential</span></td></tr>
+            <tr><td>Encryption Strength</td><td>AES-256 (classical)</td><td>QKD + PQC hybrid</td><td><span class="badge b-gold">Theoretically ∞</span></td></tr>
+            <tr><td>Compliance Verification</td><td>Hours (manual)</td><td>Real-time quantum</td><td><span class="badge b-gold">Near-instant</span></td></tr>
+            <tr><td>Audit Processing</td><td>Sequential log analysis</td><td>Superposition parallel</td><td><span class="badge b-gold">Exponential speedup</span></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Post-Quantum Cryptographic Migration — NIST PQC Standards</div><span class="panel-badge">Phase 1 Complete</span></div>
+        <table class="tbl"><thead><tr><th>Classical Algorithm</th><th>Current Status</th><th>Quantum Threat</th><th>HQ-OS Replacement</th><th>Status</th></tr></thead><tbody>
+          <tr><td><strong>RSA-2048</strong></td><td>Widely deployed PKI</td><td>Shor's — breakable ~2030–35</td><td>CRYSTALS-Kyber-1024 (FIPS 203)</td><td><span class="badge b-green">MIGRATED</span></td></tr>
+          <tr><td><strong>ECDSA / ECDH</strong></td><td>Digital signatures</td><td>Breakable by sufficient quantum</td><td>CRYSTALS-Dilithium-5 (FIPS 204)</td><td><span class="badge b-green">MIGRATED</span></td></tr>
+          <tr><td><strong>AES-256</strong></td><td>Symmetric encryption</td><td>Grover's — viable at 256-bit</td><td>AES-256 retained + QKD for max sensitivity</td><td><span class="badge b-green">RETAINED + QKD</span></td></tr>
+          <tr><td><strong>SHA-256</strong></td><td>Audit trail hashing</td><td>Grover's reduces collision resistance</td><td>SHA-3-512 + SPHINCS+ for archive signing</td><td><span class="badge b-green">MIGRATED</span></td></tr>
+        </tbody></table>
+      </div>
+    </div><!-- /hqos -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: AI REGISTRY
+    ══════════════════════════════════════════════ -->
+    <div id="page-ai-registry" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">UDOC · Module 1 · SA AI Policy GG54477 Mandatory Registration</div>
+          <div class="pg-title">AI System Registry</div>
+          <div class="pg-sub">14 systems governed · Every AI system must register before any consequential decision. Constitutional Pillar VIII enforced. 2 non-compliant systems require urgent remediation. Risk tiers aligned to SA AI Policy GG54477 and EU AI Act.</div>
+        </div>
+        <div class="pg-acts">
+          <input class="form-inp" style="width:180px;padding:5px 9px;font-size:11px" placeholder="Search systems..." oninput="filterTable('full-reg',this.value)">
+          <button class="btn btn-gold" onclick="openModal('m-reg-sys')">+ Register System</button>
+        </div>
+      </div>
+
+      <div class="banner bn-red">
+        <div class="bn-icon">🚨</div>
+        <div class="bn-body"><strong>2 NON-COMPLIANT SYSTEMS — SYS-001 & SYS-007 MISSING HITL PATHWAYS</strong> Constitutional Pillar VIII breach. COB notified 2026-03-01. 30-day remediation window active. SAHRC enforcement: ENF-2026-001 open. All outputs paused on affected systems.</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr">
+          <div class="panel-title">Registered AI Systems — 14 Systems</div>
+          <button class="panel-act" onclick="toast('Registry CSV exported · Dilithium signed','success')">Export CSV</button>
+        </div>
+        <table class="tbl" id="full-reg"><thead><tr>
+          <th>System ID</th><th>Name</th><th>Architecture</th><th>Owner</th><th>SA Risk Tier</th><th>Ethics Cert</th><th>Compliance</th><th>HITL</th><th>Max SPD</th><th>Lifecycle</th><th>Drift</th><th>Actions</th>
+        </tr></thead><tbody id="full-reg-body"></tbody></table>
+      </div>
+    </div><!-- /ai-registry -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: BIAS MONITOR
+    ══════════════════════════════════════════════ -->
+    <div id="page-bias" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">UDOC · Module 4 · Section 9 RSA Constitution · SA AI Policy Pillar 04</div>
+          <div class="pg-title">Bias Monitor</div>
+          <div class="pg-sub">Statistical Parity Difference (SPD) across 7 protected characteristics · Section 9 RSA Constitution enforcement · SAHRC auto-notification on threshold breach (>5%) · 3 detection methods active</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-outline btn-sm" onclick="toast('Full bias scan initiated across 14 systems · ~8 minutes','info')">Run Full Scan</button>
+          <button class="btn btn-gold btn-sm" onclick="toast('Bias report exported · SAHRC-ready format · Dilithium signed','success')">Export Report</button>
+        </div>
+      </div>
+
+      <div class="banner bn-red">
+        <div class="bn-icon">⊘</div>
+        <div class="bn-body"><strong>2 ACTIVE FLAGS — SECTION 9 RSA CONSTITUTION BREACH — SAHRC NOTIFIED</strong> Gender disparity SYS-003 SPD: 0.072 · Disability disparity SYS-001 SPD: 0.089 — both exceed threshold 0.050. Systems suspended. SAHRC Cases HRC-2026-041 & HRC-2026-042 open. Remediation required within 30 days.</div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi red"><div class="kpi-l">Active Flags</div><div class="kpi-v">2</div><div class="kpi-s kdown">SAHRC notified</div></div>
+        <div class="kpi"><div class="kpi-l">Systems Monitored</div><div class="kpi-v">14</div></div>
+        <div class="kpi green"><div class="kpi-l">Systems Clear</div><div class="kpi-v">11</div><div class="kpi-s kup">All dims below 5%</div></div>
+        <div class="kpi amber"><div class="kpi-l">Approaching Threshold</div><div class="kpi-v">3</div><div class="kpi-s">Monitor closely</div></div>
+        <div class="kpi"><div class="kpi-l">Detection Threshold</div><div class="kpi-v">5%</div><div class="kpi-s">SPD max tolerated</div></div>
+        <div class="kpi"><div class="kpi-l">Last Full Scan</div><div class="kpi-v">06:32</div><div class="kpi-s">Daily @ 06:30</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Protected Characteristic SPD Analysis — Platform Wide</div></div>
+        <div id="bias-meters"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Active Flags Requiring Action</div></div>
+        <div style="margin-bottom:10px;background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.25);border-left:3px solid var(--red);border-radius:2px;padding:12px;">
+          <div style="font-family:var(--fc);font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px">FLAG 01 — SYS-001 — Disability SPD: 0.089 — EXCEEDS THRESHOLD</div>
+          <div class="ip"><div class="ip-k">System</div><div class="ip-v">Welfare Eligibility AI · Dept. Social Development</div></div>
+          <div class="ip"><div class="ip-k">SAHRC Case</div><div class="ip-v" style="color:var(--amber)">HRC-2026-041 · Open</div></div>
+          <div class="ip"><div class="ip-k">Action Required</div><div class="ip-v">Retrain model + implement HITL pathway. Deadline: 30 days.</div></div>
+          <div class="ip"><div class="ip-k">Current Status</div><div class="ip-v"><span class="badge b-red">SUSPENDED — Human decisions only</span></div></div>
+          <div style="margin-top:8px;display:flex;gap:6px"><button class="btn btn-outline btn-sm" onclick="toast('SYS-001 remediation plan submitted to COB','info')">Submit Remediation</button><button class="btn btn-outline btn-sm" onclick="toast('SYS-001 evidence bundle exported for SAHRC','success')">Export Evidence</button></div>
+        </div>
+        <div style="background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.25);border-left:3px solid var(--red);border-radius:2px;padding:12px;">
+          <div style="font-family:var(--fc);font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px">FLAG 02 — SYS-003 — Gender SPD: 0.072 — EXCEEDS THRESHOLD</div>
+          <div class="ip"><div class="ip-k">System</div><div class="ip-v">Resume Screening AI · Public Service Commission</div></div>
+          <div class="ip"><div class="ip-k">SAHRC Case</div><div class="ip-v" style="color:var(--amber)">HRC-2026-042 · Open</div></div>
+          <div class="ip"><div class="ip-k">Action Required</div><div class="ip-v">Gender bias remediation in training data. HRIA update required.</div></div>
+          <div class="ip"><div class="ip-k">Current Status</div><div class="ip-v"><span class="badge b-red">SUSPENDED — Human review all applications</span></div></div>
+          <div style="margin-top:8px;display:flex;gap:6px"><button class="btn btn-outline btn-sm" onclick="toast('SYS-003 remediation submitted','info')">Submit Remediation</button></div>
+        </div>
+      </div>
+    </div><!-- /bias -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: SOVEREIGNTY
+    ══════════════════════════════════════════════ -->
+    <div id="page-sovereignty" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">UDOC · Module 5 · Constitutional Pillar III — Sovereign Respect</div>
+          <div class="pg-title">Sovereignty Architecture</div>
+          <div class="pg-sub">ZA jurisdiction · Zero foreign cloud · US CLOUD Act exposure: ZERO · AES-256-GCM active · PQC Phase 2 migration complete · 3 nodes verified every 6 hours · Government retains master key custody</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-gold btn-sm" onclick="toast('Sovereignty report generated · Signed · Parliamentary-ready','success')">Export Report</button>
+        </div>
+      </div>
+
+      <div class="banner bn-green">
+        <div class="bn-icon">🛡</div>
+        <div class="bn-body"><strong>SOVEREIGNTY VERIFIED — 2026-04-28 06:00:00 SAST — ALL 3 NODES ZA COMPLIANT</strong> Zero unauthorized foreign connections. No AWS/Azure/GCloud. US CLOUD Act exposure: ZERO. AES-256-GCM encryption active. PQC migration Phase 1 complete. Government holds master key via client HSM.</div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi green"><div class="kpi-l">Data Jurisdiction</div><div class="kpi-v">100%</div><div class="kpi-s">South Africa · ZA</div></div>
+        <div class="kpi green"><div class="kpi-l">Foreign Exposure</div><div class="kpi-v">ZERO</div><div class="kpi-s">CLOUD Act: None</div></div>
+        <div class="kpi green"><div class="kpi-l">Nodes Verified</div><div class="kpi-v">3/3</div><div class="kpi-s">All ZA-compliant</div></div>
+        <div class="kpi cyan"><div class="kpi-l">Encryption</div><div class="kpi-v">AES-256</div><div class="kpi-s">GCM mode · Active</div></div>
+        <div class="kpi"><div class="kpi-l">Next Verification</div><div class="kpi-v">12:00</div><div class="kpi-s">6-hour cycle</div></div>
+        <div class="kpi blue"><div class="kpi-l">PQC Migration</div><div class="kpi-v">Phase 1</div><div class="kpi-s">Complete ✓</div></div>
+      </div>
+
+      <div class="g3">
+        <div class="panel"><div class="panel-hdr"><div class="panel-title">ZA-JHB-01 · Primary</div><div><span class="badge b-green">VERIFIED</span></div></div><div class="ip"><div class="ip-k">Location</div><div class="ip-v">Johannesburg, South Africa</div></div><div class="ip"><div class="ip-k">Role</div><div class="ip-v">Primary production node</div></div><div class="ip"><div class="ip-k">HSM</div><div class="ip-v">FIPS 140-3 L3 · Active</div></div><div class="ip"><div class="ip-k">Last check</div><div class="ip-v" style="color:var(--green)">06:00:00 SAST ✓</div></div></div>
+        <div class="panel"><div class="panel-hdr"><div class="panel-title">ZA-CT-02 · DR Site</div><div><span class="badge b-green">VERIFIED</span></div></div><div class="ip"><div class="ip-k">Location</div><div class="ip-v">Cape Town, South Africa</div></div><div class="ip"><div class="ip-k">Role</div><div class="ip-v">Disaster Recovery</div></div><div class="ip"><div class="ip-k">HSM</div><div class="ip-v">FIPS 140-3 L3 · Active</div></div><div class="ip"><div class="ip-k">Last check</div><div class="ip-v" style="color:var(--green)">06:00:00 SAST ✓</div></div></div>
+        <div class="panel"><div class="panel-hdr"><div class="panel-title">ZA-PTB-03 · Gov Node</div><div><span class="badge b-green">VERIFIED</span></div></div><div class="ip"><div class="ip-k">Location</div><div class="ip-v">Pretoria, South Africa</div></div><div class="ip"><div class="ip-k">Role</div><div class="ip-v">Government backbone</div></div><div class="ip"><div class="ip-k">HSM</div><div class="ip-v">FIPS 140-3 L3 · Active</div></div><div class="ip"><div class="ip-k">Last check</div><div class="ip-v" style="color:var(--green)">06:00:00 SAST ✓</div></div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Key Management Architecture — Sovereignty-Grade</div><span class="panel-badge">PRE-REGISTRATION</span></div>
+        <div class="g2">
+          <div>
+            <div class="ip"><div class="ip-k">Master Key Storage</div><div class="ip-v">Client-owned FIPS 140-3 L3 HSM. G.O.D.S engineers ZERO access.</div></div>
+            <div class="ip"><div class="ip-k">Key Hierarchy</div><div class="ip-v">Master Key (HSM) → KEK (annual rotation) → DEK (90-day) → Session Keys</div></div>
+            <div class="ip"><div class="ip-k">Dual Custody</div><div class="ip-v">2-of-3 officers for master key activation — Pillar XI enforced</div></div>
+            <div class="ip"><div class="ip-k">Phase 2 KEM</div><div class="ip-v" style="color:var(--amber)">CRYSTALS-Kyber FIPS 203 — Q3 2026 deployment</div></div>
+            <div class="ip"><div class="ip-k">Phase 2 Signing</div><div class="ip-v" style="color:var(--amber)">CRYSTALS-Dilithium FIPS 204 — Q3 2026 deployment</div></div>
+          </div>
+          <div>
+            <div class="ip"><div class="ip-k">QKD Protocol</div><div class="ip-v">BB84 · Phase 2 metropolitan pilot · Phase 3 full deployment</div></div>
+            <div class="ip"><div class="ip-k">Engineer Access</div><div class="ip-v" style="color:var(--green)">ZERO access to client master keys. Time-limited 4h with signed client auth.</div></div>
+            <div class="ip"><div class="ip-k">Next Ceremony</div><div class="ip-v">Apr 30, 2026 — Annual master key rotation</div></div>
+            <div class="ip"><div class="ip-k">Merkle Cycle</div><div class="ip-v">Every 15 minutes — audit trail integrity</div></div>
+            <div class="ip"><div class="ip-k">CLOUD Act Risk</div><div class="ip-v" style="color:var(--green)">ZERO — all infrastructure ZA-only, no US dependency</div></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /sovereignty -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: S.E.T.H.S DASHBOARD
+    ══════════════════════════════════════════════ -->
+    <div id="page-seths-dash" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">S.E.T.H.S™ · Systematically Engineered To Hinder Speculators · Human Capital Engine</div>
+          <div class="pg-title">S.E.T.H.S Dashboard<sup>™</sup></div>
+          <div class="pg-sub">Cohort 1 · 50 participants · Gauteng Province · Constitutional Pillar I: Human Dignity as operating principle · SA AI Policy Pillar 02: Inclusive Growth · Economic multiplier 4.2× per R1 cost · All participant data POPIA-compliant, UDOC-audited</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-outline btn-sm" onclick="toast('DCDT / DSD government report generated · UDOC certified','success')">Gov Report</button>
+          <button class="btn btn-gold btn-sm" onclick="openModal('m-seths-intake')">+ New Intake</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi green"><div class="kpi-l">Total Participants</div><div class="kpi-v">50</div><div class="kpi-s">Cohort 1 · Gauteng</div></div>
+        <div class="kpi cyan"><div class="kpi-l">Avg Phase Progress</div><div class="kpi-v">2.8</div><div class="kpi-s">of 5 phases</div></div>
+        <div class="kpi green"><div class="kpi-l">Placed (30d)</div><div class="kpi-v">39</div><div class="kpi-s kup">78% placement rate</div></div>
+        <div class="kpi green"><div class="kpi-l">Retention (90d)</div><div class="kpi-v">71%</div><div class="kpi-s kup">Target 70% ✓</div></div>
+        <div class="kpi"><div class="kpi-l">Income Increase</div><div class="kpi-v">3.1×</div><div class="kpi-s kup">Target 3× ✓</div></div>
+        <div class="kpi"><div class="kpi-l">Employer Commitments</div><div class="kpi-v">28</div><div class="kpi-s">placement slots</div></div>
+        <div class="kpi amber"><div class="kpi-l">Needs Attention</div><div class="kpi-v">3</div><div class="kpi-s">case review req.</div></div>
+        <div class="kpi"><div class="kpi-l">Econ Multiplier</div><div class="kpi-v">4.2×</div><div class="kpi-s">per R1 programme cost</div></div>
+      </div>
+
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Stream Distribution — 50 Participants</div></div>
+          <div id="seths-streams"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">5 Operational Pillars</div><span class="panel-badge">PRE-REGISTRATION</span></div>
+          <div style="font-size:11px;line-height:2;color:var(--text)">
+            <div><span style="color:var(--gold);font-family:var(--fc);font-weight:700">I. Honesty</span> — Radical structured honesty applied symmetrically. Employer confidence built through transparent data.</div>
+            <div><span style="color:var(--gold);font-family:var(--fc);font-weight:700">II. Tolerance</span> — Structured tolerance of recovery process. Proportionate documented response — not disqualification.</div>
+            <div><span style="color:var(--gold);font-family:var(--fc);font-weight:700">III. Belief Systems</span> — Freedom of faith without imposition. Culturally scalable across all contexts.</div>
+            <div><span style="color:var(--gold);font-family:var(--fc);font-weight:700">IV. Equality</span> — Equal access, equal accountability, equal measurement. Certification consistency is commercial guarantee.</div>
+            <div><span style="color:var(--gold);font-family:var(--fc);font-weight:700">V. Pride</span> — Restoration of dignity is the most durable behavioural intervention. People protect what they value.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Compounding Loop — S.E.T.H.S → T.S → UDOC → M.A.D.I.B.A</div></div>
+        <div style="display:flex;gap:0;align-items:stretch;border:1px solid var(--border);border-radius:2px;overflow:hidden">
+          <div style="flex:1;padding:12px;background:rgba(38,166,154,0.06);border-right:1px solid var(--border)"><div style="font-family:var(--fc);font-size:10px;font-weight:700;color:#26A69A;margin-bottom:4px">S.E.T.H.S™</div><div style="font-size:10.5px;color:var(--muted)">Rehabilitates & certifies human capital. All assessments audited by SYS-SETHS-001 via UDOC.</div></div>
+          <div style="padding:12px;display:flex;align-items:center;color:var(--gold);font-size:18px">→</div>
+          <div style="flex:1;padding:12px;background:rgba(201,168,76,0.04);border-right:1px solid var(--border)"><div style="font-family:var(--fc);font-size:10px;font-weight:700;color:var(--gold);margin-bottom:4px">UDOC™</div><div style="font-size:10.5px;color:var(--muted)">Bias sweep + audit trail → Cassandra WORM → Merkle-chained governance proof.</div></div>
+          <div style="padding:12px;display:flex;align-items:center;color:var(--gold);font-size:18px">→</div>
+          <div style="flex:1;padding:12px;background:rgba(52,152,219,0.05);border-right:1px solid var(--border)"><div style="font-family:var(--fc);font-size:10px;font-weight:700;color:var(--blue);margin-bottom:4px">M.A.D.I.B.A™</div><div style="font-size:10.5px;color:var(--muted)">Audited outcomes become DFI capital deployment signal. Seed raise backed by proof.</div></div>
+          <div style="padding:12px;display:flex;align-items:center;color:var(--gold);font-size:18px">→</div>
+          <div style="flex:1;padding:12px;background:rgba(155,89,182,0.05)"><div style="font-family:var(--fc);font-size:10px;font-weight:700;color:var(--purple);margin-bottom:4px">T.S Industries</div><div style="font-size:10.5px;color:var(--muted)">Employment absorption creates new cohort demand → loop continues and compounds.</div></div>
+        </div>
+      </div>
+    </div><!-- /seths-dash -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: M.A.D.I.B.A DASHBOARD
+    ══════════════════════════════════════════════ -->
+    <div id="page-madiba-dash" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">M.A.D.I.B.A™ · My African Dream Is Being Achieved · Capital & Sovereign Interface</div>
+          <div class="pg-title">M.A.D.I.B.A Capital<sup>™</sup></div>
+          <div class="pg-sub">Capital architecture · DFI relationships · Fund vehicles · SPV co-ownership · Impact reporting. M.A.D.I.B.A. activates only after proof exists. Seed round: R18M target. FSCA FSP Licence: Month 24. FICA KYC mandatory all investors. Infrastructure Fund target: R2B (Stage One).</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-outline btn-sm" onclick="toast('Q1 2026 investor report generated · Dilithium signed','success')">Investor Report</button>
+          <button class="btn btn-gold btn-sm" onclick="openModal('m-add-investor')">+ Add Investor</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-l">Seed Target</div><div class="kpi-v">R18M</div></div>
+        <div class="kpi amber"><div class="kpi-l">Pipeline Committed</div><div class="kpi-v">R4.5M</div><div class="kpi-s">25% progress</div></div>
+        <div class="kpi"><div class="kpi-l">Remaining to Close</div><div class="kpi-v">R13.5M</div></div>
+        <div class="kpi blue"><div class="kpi-l">Active Discussions</div><div class="kpi-v">6</div></div>
+        <div class="kpi cyan"><div class="kpi-l">Series A Trigger</div><div class="kpi-v">Month 18</div><div class="kpi-s">Proof milestones</div></div>
+        <div class="kpi"><div class="kpi-l">FSCA FSP Target</div><div class="kpi-v">Month 24</div><div class="kpi-s">Category I</div></div>
+        <div class="kpi"><div class="kpi-l">Infra Fund Target</div><div class="kpi-v">R2B</div><div class="kpi-s">Stage One close</div></div>
+        <div class="kpi"><div class="kpi-l">Fund IRR Target</div><div class="kpi-v">8–12%</div><div class="kpi-s">Project level</div></div>
+      </div>
+
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Fundraising Progress</div></div>
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Seed Round (R18M target)</span><span style="font-family:var(--fs);font-size:18px;font-weight:700;color:var(--gold)">R4.5M / R18M</span></div>
+            <div class="prog" style="height:8px"><div class="pf pf-gold" style="width:25%"></div></div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Series A (R180M target)</span><span style="color:var(--muted);font-family:var(--fm);font-size:10px">PENDING — Month 18</span></div>
+            <div class="prog" style="height:6px"><div class="pf" style="width:0;background:var(--blue)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--muted)">Infrastructure Fund I (R2B target)</span><span style="color:var(--muted);font-family:var(--fm);font-size:10px">PLANNING — Phase 3</span></div>
+            <div class="prog" style="height:6px"><div class="pf" style="width:0;background:var(--purple)"></div></div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);border-top:1px solid var(--border2);padding-top:8px;margin-top:12px">
+            <strong style="color:var(--red);font-family:var(--fc);font-size:9px">FSCA WARNING</strong> — DO NOT collect investor funds through a fund vehicle before FSP licence is granted (Month 24). Direct investment into G.O.D.S. Holdings equity is permitted under exemption threshold. FICA KYC mandatory for ALL investors.
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Investor Pipeline — Stage View</div></div>
+          <table class="tbl"><thead><tr><th>Entity</th><th>Type</th><th>Stage</th><th>Amount</th><th>KYC</th><th>Status</th></tr></thead><tbody>
+            <tr><td><strong>SEFA</strong></td><td><span class="badge b-cyan">DFI</span></td><td><span class="badge b-amber">Due Diligence</span></td><td>R5M</td><td><span class="badge b-green">COMPLETE</span></td><td><span class="badge b-amber">IN REVIEW</span></td></tr>
+            <tr><td><strong>IDC Social</strong></td><td><span class="badge b-cyan">DFI</span></td><td><span class="badge b-blue">Warm Lead</span></td><td>R8M</td><td><span class="badge b-amber">PENDING</span></td><td><span class="badge b-blue">WARM</span></td></tr>
+            <tr><td><strong>Impact Angel 1</strong></td><td><span class="badge b-purple">Angel</span></td><td><span class="badge b-green">Committed</span></td><td>R1.5M</td><td><span class="badge b-green">COMPLETE</span></td><td><span class="badge b-green">COMMITTED</span></td></tr>
+            <tr><td><strong>NDA / NDA SEF</strong></td><td><span class="badge b-gold">Grant</span></td><td><span class="badge b-amber">Application</span></td><td>R3M</td><td><span class="badge b-gold">N/A</span></td><td><span class="badge b-amber">SUBMITTED</span></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    </div><!-- /madiba-dash -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: TRADEMARKS
+    ══════════════════════════════════════════════ -->
+    <div id="page-trademarks" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">Administration · IP Architecture · G.O.D.S IP Trust Protected</div>
+          <div class="pg-title">Trademark Registry<sup>®</sup></div>
+          <div class="pg-sub">All marks held in G.O.D.S IP Trust · 6 priority marks · CIPC filing Day 1 · ARIPO for SADC expansion (Phase 2) · EUIPO + USPTO for key marks (Phase 3) · Total Day 1 CIPC cost: R3,540 (6 classes × R590)</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-red btn-sm" onclick="toast('FILE NOW — All 6 priority marks should be filed at CIPC Day 1 alongside CIPC registration. Failure risks third-party registration.','warning')">⚠ FILE IMMEDIATELY</button>
+        </div>
+      </div>
+
+      <div class="banner bn-red">
+        <div class="bn-icon">®</div>
+        <div class="bn-body"><strong>CRITICAL — FILE ALL 6 PRIORITY MARKS AT CIPC ON DAY 1 — R3,540 TOTAL</strong> Filing alongside CIPC registration prevents third-party registration of G.O.D.S. marks. All IP is held in the G.O.D.S. IP Trust and cannot be sold or transferred commercially. International registrations: ARIPO (Phase 2), EUIPO + USPTO (Phase 3).</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">Trademark Portfolio — IP Trust Protected</div><span class="panel-badge">© 2026 G.O.D.S IP Trust</span></div>
+        <table class="tbl"><thead><tr><th>Priority</th><th>Mark</th><th>Symbol</th><th>Nice Class</th><th>Description</th><th>CIPC</th><th>ARIPO</th><th>EUIPO/USPTO</th><th>Status</th></tr></thead><tbody>
+          <tr><td><span class="badge b-red">Priority 1</span></td><td><strong>G.O.D.S™</strong></td><td>TM</td><td>35, 38, 42</td><td>Business services, telecommunications, technology</td><td><span class="badge b-amber">FILE DAY 1</span></td><td><span class="badge b-muted">Phase 2</span></td><td><span class="badge b-muted">Phase 3</span></td><td><span class="badge b-red">PENDING</span></td></tr>
+          <tr><td><span class="badge b-red">Priority 1</span></td><td><strong>S.E.T.H.S™</strong></td><td>TM</td><td>35, 41</td><td>Human capital, training, educational services</td><td><span class="badge b-amber">FILE DAY 1</span></td><td><span class="badge b-muted">Phase 2</span></td><td><span class="badge b-muted">Phase 3</span></td><td><span class="badge b-red">PENDING</span></td></tr>
+          <tr><td><span class="badge b-red">Priority 1</span></td><td><strong>UDOC™</strong></td><td>TM</td><td>35, 38, 42</td><td>AI governance SaaS, compliance software, digital oversight</td><td><span class="badge b-amber">FILE DAY 1</span></td><td><span class="badge b-muted">Phase 2</span></td><td><span class="badge b-muted">Phase 3</span></td><td><span class="badge b-red">PENDING</span></td></tr>
+          <tr><td><span class="badge b-red">Priority 1</span></td><td><strong>M.A.D.I.B.A™</strong></td><td>TM</td><td>35, 36</td><td>Capital management, financial services, investment advisory</td><td><span class="badge b-amber">FILE DAY 1</span></td><td><span class="badge b-muted">Phase 2</span></td><td><span class="badge b-muted">Phase 3</span></td><td><span class="badge b-red">PENDING</span></td></tr>
+          <tr><td><span class="badge b-amber">Priority 2</span></td><td><strong>HQ-OS™</strong></td><td>TM</td><td>42</td><td>Hybrid quantum-classical operating system for AI governance</td><td><span class="badge b-muted">Month 6</span></td><td><span class="badge b-muted">Phase 2</span></td><td><span class="badge b-muted">Phase 3</span></td><td><span class="badge b-muted">SCHEDULED</span></td></tr>
+          <tr><td><span class="badge b-amber">Priority 2</span></td><td><strong>AQGN™</strong></td><td>TM</td><td>38, 42</td><td>African Quantum Governance Network infrastructure</td><td><span class="badge b-muted">Month 12</span></td><td><span class="badge b-muted">Phase 3</span></td><td><span class="badge b-muted">Phase 4</span></td><td><span class="badge b-muted">PLANNED</span></td></tr>
+        </tbody></table>
+      </div>
+
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Patent Portfolio — Priority Filings</div></div>
+          <table class="tbl"><thead><tr><th>Ref</th><th>Innovation</th><th>Target Month</th><th>Status</th></tr></thead><tbody>
+            <tr><td class="mono" style="color:var(--gold)">GODS-P001</td><td>Quantum-Classical Governance Task Classification Algorithm</td><td>Month 6</td><td><span class="badge b-amber">PRIORITY 1</span></td></tr>
+            <tr><td class="mono" style="color:var(--gold)">GODS-P002</td><td>Intersectional Quantum Bias Detection Method</td><td>Month 6</td><td><span class="badge b-amber">PRIORITY 1</span></td></tr>
+            <tr><td class="mono" style="color:var(--gold)">GODS-P003</td><td>Sovereign QKD Governance Integration</td><td>Month 12</td><td><span class="badge b-muted">PRIORITY 2</span></td></tr>
+            <tr><td class="mono" style="color:var(--gold)">GODS-P004</td><td>Constitutional Compliance via Quantum Constraint Satisfaction</td><td>Month 18</td><td><span class="badge b-muted">PRIORITY 2</span></td></tr>
+            <tr><td class="mono" style="color:var(--gold)">GODS-P005</td><td>Workforce-to-Infrastructure Outcome Data Loop</td><td>Month 24</td><td><span class="badge b-muted">PRIORITY 3</span></td></tr>
+          </tbody></table>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">IP Trust — Proposed Deed Summary</div><span class="panel-badge">PROPOSED · NOT YET FILED</span></div>
+          <div class="ip"><div class="ip-k">Trust Type</div><div class="ip-v">Inter vivos trust (proposed) · Trust Property Control Act 57/1988</div></div>
+          <div class="ip"><div class="ip-k">Trustees</div><div class="ip-v">Minimum 3 · Founder + 2 independent · No single trustee acts alone</div></div>
+          <div class="ip"><div class="ip-k">Trust Property</div><div class="ip-v">All IP · Class A shares · Constitutional mandate · Founder doctrine</div></div>
+          <div class="ip"><div class="ip-k">Sale Prohibition</div><div class="ip-v" style="color:var(--red)">ABSOLUTE — Core IP cannot be sold commercially under any circumstances</div></div>
+          <div class="ip"><div class="ip-k">Dissolution</div><div class="ip-v">Unanimous trustee consent + Master of High Court approval required</div></div>
+          <div class="ip"><div class="ip-k">Status</div><div class="ip-v"><span class="badge b-amber">MONTH 1 — File with Master of High Court</span></div></div>
+        </div>
+      </div>
+    </div><!-- /trademarks -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: STARTUP CHECKLIST
+    ══════════════════════════════════════════════ -->
+    <div id="page-checklist" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">Administration · Launch Readiness · 18-Month Critical Path</div>
+          <div class="pg-title">Startup Checklist</div>
+          <div class="pg-sub">Day 1 through Month 18 · Legal · Technical · Capital · Operations · All items tracked against constitutional requirements</div>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi red"><div class="kpi-l">Day 1 Actions</div><div class="kpi-v">0/8</div><div class="kpi-s kdown">Not started</div></div>
+        <div class="kpi red"><div class="kpi-l">Month 1 Actions</div><div class="kpi-v">0/12</div><div class="kpi-s kdown">Not started</div></div>
+        <div class="kpi amber"><div class="kpi-l">Month 3 Actions</div><div class="kpi-v">0/9</div><div class="kpi-s">Future</div></div>
+        <div class="kpi"><div class="kpi-l">Month 6 Milestone</div><div class="kpi-v">SEED</div><div class="kpi-s">Target close</div></div>
+      </div>
+
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Day 1 — Critical Actions</div><span class="badge b-red" style="font-size:8px">ALL CRITICAL</span></div>
+          <div id="checklist-d1"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Month 1 — Foundation Actions</div></div>
+          <div id="checklist-m1"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">12-Month Critical Path — Key Milestones</div></div>
+        <table class="tbl"><thead><tr><th>Month</th><th>Priority</th><th>Action</th><th>Success Criterion</th><th>Constitutional Req.</th></tr></thead><tbody>
+          <tr><td class="mono">1</td><td><span class="badge b-red">CRITICAL</span></td><td>Register IP Trust with Master of the High Court</td><td>Trust deed executed and registered. IP schedule filed.</td><td>IP Trust before any external capital</td></tr>
+          <tr><td class="mono">1</td><td><span class="badge b-red">CRITICAL</span></td><td>Register G.O.D.S. Holdings + subsidiaries at CIPC</td><td>All 5 entities confirmed. Constitutional MOI filed.</td><td>Pillar XI — Anti-Capture</td></tr>
+          <tr><td class="mono">1</td><td><span class="badge b-red">CRITICAL</span></td><td>File 4 priority trademark applications at CIPC</td><td>All marks filed. Application numbers recorded. R3,540 paid.</td><td>IP Trust custody of all marks</td></tr>
+          <tr><td class="mono">2</td><td><span class="badge b-red">CRITICAL</span></td><td>Appoint first 3 COB members</td><td>3 independents accepted. First COB meeting held.</td><td>COB before external capital accepted</td></tr>
+          <tr><td class="mono">2</td><td><span class="badge b-red">CRITICAL</span></td><td>Submit DFI funding applications (SEFA, IDC, NDA)</td><td>All applications submitted. Engagement meetings secured.</td><td>Multi-source seed — Pillar VII Anti-Capture</td></tr>
+          <tr><td class="mono">3</td><td><span class="badge b-red">CRITICAL</span></td><td>Government engagement: DSD, DoL, DPSA, DTPS</td><td>4 meetings completed. MOU negotiation initiated.</td><td>Sovereign Respect — Pillar III</td></tr>
+          <tr><td class="mono">6</td><td><span class="badge b-red">CRITICAL</span></td><td>S.E.T.H.S. pilot cohort begins — 50 participants</td><td>50 participants enrolled in Week 1.</td><td>COB operational before first intake — Pillar I</td></tr>
+          <tr><td class="mono">6</td><td><span class="badge b-amber">HIGH</span></td><td>UDOC Phase 1 launch — first enterprise client live</td><td>Client 1 live. First governance events audited.</td><td>PQC active before government data — Pillar III</td></tr>
+          <tr><td class="mono">12</td><td><span class="badge b-gold">MILESTONE</span></td><td>Year 1 End — External audit + Annual Report</td><td>Clean audit. Annual report published. Data room complete.</td><td>Transparency — Pillar VI</td></tr>
+          <tr><td class="mono">18</td><td><span class="badge b-gold">MILESTONE</span></td><td>Series A trigger — proof milestones met</td><td>100+ placements, 3+ UDOC clients, govt LOI, audited accounts.</td><td>Governance Before Scale — Pillar V</td></tr>
+        </tbody></table>
+      </div>
+    </div><!-- /checklist -->
+
+    <!-- ══════════════════════════════════════════════
+         PAGE: INCIDENT COMMAND
+    ══════════════════════════════════════════════ -->
+    <div id="page-incident" class="page">
+      <div class="pg-hdr">
+        <div class="pg-title-wrap">
+          <div class="pg-eyebrow">UDOC Phase 1.5 · Module 7 · 4-Phase Breach Response</div>
+          <div class="pg-title">Incident Command</div>
+          <div class="pg-sub">4-phase response: Detect (&lt;15min) · Contain (&lt;1h) · Investigate (&lt;24h) · Remediate (&lt;72h) · POPIA breach notification: 72-hour window · COB notification mandatory for all incidents</div>
+        </div>
+        <div class="pg-acts">
+          <button class="btn btn-red" onclick="openModal('m-declare-incident')">🚨 Declare Incident</button>
+          <button class="btn btn-outline btn-sm" onclick="toast('Quarterly drill scheduled for 2026-04-15','info')">Schedule Drill</button>
+        </div>
+      </div>
+
+      <div class="banner bn-red">
+        <div class="bn-icon">🚨</div>
+        <div class="bn-body"><strong>1 ACTIVE INCIDENT — INC-2026-003 — SYS-001 WELFARE AI — PHASE 2 CONTAIN</strong> Disability Status bias SPD 0.089 exceeds threshold. Phase 2 CONTAIN active. POPIA breach notification: 47h remaining. SAHRC notified. IC assigned. COB alert issued.</div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi red"><div class="kpi-l">Active Incidents</div><div class="kpi-v">1</div><div class="kpi-s">INC-2026-003</div></div>
+        <div class="kpi amber"><div class="kpi-l">Phase</div><div class="kpi-v">2 — Contain</div><div class="kpi-s">Underway</div></div>
+        <div class="kpi"><div class="kpi-l">POPIA Window</div><div class="kpi-v" style="color:var(--red)">47h</div><div class="kpi-s kdown">Remaining</div></div>
+        <div class="kpi green"><div class="kpi-l">Resolved (30d)</div><div class="kpi-v">4</div><div class="kpi-s">All within SLA</div></div>
+        <div class="kpi"><div class="kpi-l">Next Drill</div><div class="kpi-v">Apr 15</div><div class="kpi-s">Quarterly</div></div>
+      </div>
+
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">INC-2026-003 — Phase Tracker</div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;overflow:hidden;border-radius:2px">
+            <div style="background:rgba(46,204,113,0.15);padding:12px;text-align:center"><div style="font-family:var(--fc);font-size:8px;color:var(--green)">PHASE 1</div><div style="font-family:var(--fc);font-size:15px;font-weight:700;color:var(--green)">DETECT</div><div style="font-size:9px;color:var(--green)">✓ 08:45 SAST</div></div>
+            <div style="background:rgba(243,156,18,0.15);border:2px solid var(--amber);padding:12px;text-align:center"><div style="font-family:var(--fc);font-size:8px;color:var(--amber)">PHASE 2</div><div style="font-family:var(--fc);font-size:15px;font-weight:700;color:var(--amber)">CONTAIN</div><div style="font-size:9px;color:var(--amber);animation:blink 1s infinite">⚡ ACTIVE</div></div>
+            <div style="background:rgba(106,112,144,0.1);padding:12px;text-align:center;opacity:.5"><div style="font-family:var(--fc);font-size:8px;color:var(--muted)">PHASE 3</div><div style="font-family:var(--fc);font-size:15px;font-weight:700;color:var(--muted)">INVESTIGATE</div><div style="font-size:9px;color:var(--muted)">Pending</div></div>
+            <div style="background:rgba(106,112,144,0.1);padding:12px;text-align:center;opacity:.5"><div style="font-family:var(--fc);font-size:8px;color:var(--muted)">PHASE 4</div><div style="font-family:var(--fc);font-size:15px;font-weight:700;color:var(--muted)">REMEDIATE</div><div style="font-size:9px;color:var(--muted)">Pending</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-hdr"><div class="panel-title">Incident Details</div></div>
+          <div class="ip"><div class="ip-k">Incident ID</div><div class="ip-v mono">INC-2026-003</div></div>
+          <div class="ip"><div class="ip-k">System</div><div class="ip-v">SYS-001 Welfare Eligibility AI · DSD</div></div>
+          <div class="ip"><div class="ip-k">Type</div><div class="ip-v" style="color:var(--red)">Bias — SPD Disability 0.089</div></div>
+          <div class="ip"><div class="ip-k">SA Policy</div><div class="ip-v" style="color:var(--red)">Pillar 04 Violation · s9 RSA Constitution</div></div>
+          <div class="ip"><div class="ip-k">POPIA Window</div><div class="ip-v" style="color:var(--amber)">47h remaining — notification required</div></div>
+          <div class="ip"><div class="ip-k">SAHRC</div><div class="ip-v" style="color:var(--green)">Notified — HRC-2026-041 open</div></div>
+          <div class="ip"><div class="ip-k">COB Alert</div><div class="ip-v" style="color:var(--green)">Issued 2026-04-13 09:15 SAST</div></div>
+          <div class="ip"><div class="ip-k">System Status</div><div class="ip-v" style="color:var(--red)">SUSPENDED — human decisions only</div></div>
+          <div style="margin-top:10px;display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick="toast('POPIA breach notification submitted to Information Regulator','success')">Submit POPIA Notice</button>
+            <button class="btn btn-red btn-sm" onclick="toast('INC-2026-003 escalated to COB for emergency session','error')">Escalate to COB</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /incident -->
+
+    <!-- ══════════════════════════════════════════════
+         PLACEHOLDER PAGES (stub for all other nav items)
+    ══════════════════════════════════════════════ -->
+    <div id="page-audit-trail" class="page"><div class="pg-hdr"><div><div class="pg-title">Constitutional Audit Trail</div><div class="pg-sub">All platform actions logged against applicable constitutional pillar · Immutable · COB-accessible · 7-year retention · 24.7M events · HMAC-SHA256 · Merkle-linked</div></div><div class="pg-acts"><button class="btn btn-outline btn-sm" onclick="toast('Signed audit bundle generated','success')">Export Signed Bundle</button><button class="btn btn-gold btn-sm" onclick="toast('Merkle root published · sha3-256:7d2a8f...','success')">Publish Merkle Root</button></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">Total Events</div><div class="kpi-v">24.7M</div></div><div class="kpi cyan"><div class="kpi-l">Today</div><div class="kpi-v" data-live="dec">1.41M</div></div><div class="kpi amber"><div class="kpi-l">Pending Review</div><div class="kpi-v">1,247</div></div><div class="kpi green"><div class="kpi-l">Chain Integrity</div><div class="kpi-v">100%</div></div><div class="kpi"><div class="kpi-l">Merkle Cycle</div><div class="kpi-v">15min</div></div><div class="kpi"><div class="kpi-l">Retention</div><div class="kpi-v">10yr</div><div class="kpi-s">WORM storage</div></div></div><div class="panel"><div class="panel-hdr"><div class="panel-title">Live Audit Stream</div></div><div id="audit-trail-stream"></div></div></div>
+    <div id="page-breach" class="page"><div class="pg-hdr"><div><div class="pg-title">Breach Register</div><div class="pg-sub">Constitutional Pillar breach incidents · Classification · COB notification · Remediation tracking</div></div><div class="pg-acts"><button class="btn btn-gold" onclick="openModal('m-log-breach')">+ Log Breach</button></div></div><div class="banner bn-red"><div class="bn-icon">🚨</div><div class="bn-body"><strong>1 OPEN BREACH — BR-001: SYS-001 WELFARE AI — PILLAR VIII VIOLATION</strong> No human review pathway documented for disability decisions. COB notified 2026-03-01. Remediation plan submitted 2026-04-08. Deadline: 2026-05-01.</div></div><div class="panel"><div class="panel-hdr"><div class="panel-title">BR-001 — Active Breach</div></div><div class="ip"><div class="ip-k">System</div><div class="ip-v">SYS-001 Welfare Eligibility AI</div></div><div class="ip"><div class="ip-k">Pillar Violated</div><div class="ip-v" style="color:var(--red)">Pillar VIII — Human Primacy in AI</div></div><div class="ip"><div class="ip-k">SA Policy</div><div class="ip-v">GG54477 Pillar 04 · s33 RSA Constitution</div></div><div class="ip"><div class="ip-k">Remediation Due</div><div class="ip-v" style="color:var(--amber)">2026-05-01 — 18 days remaining</div></div><div class="ip"><div class="ip-k">Status</div><div class="ip-v"><span class="badge b-red">OPEN</span></div></div><div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="toast('BR-001 evidence bundle downloaded','info')">Download Evidence</button></div></div></div>
+    <div id="page-sys-health" class="page"><div class="pg-hdr"><div><div class="pg-title">System Health</div><div class="pg-sub">Infrastructure health · Service status · Database metrics · Network performance · Sovereignty verification</div></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">API Uptime (30d)</div><div class="kpi-v">99.9%</div><div class="kpi-s">SLA: 99.9% ✓</div></div><div class="kpi green"><div class="kpi-l">DB Response</div><div class="kpi-v">4.2ms</div><div class="kpi-s">Average</div></div><div class="kpi green"><div class="kpi-l">Kafka Lag</div><div class="kpi-v">0</div><div class="kpi-s">Messages</div></div><div class="kpi green"><div class="kpi-l">Sovereignty</div><div class="kpi-v">✓</div><div class="kpi-s">ZA verified</div></div><div class="kpi"><div class="kpi-l">Governance Workers</div><div class="kpi-v">4–8</div><div class="kpi-s">FastAPI services</div></div><div class="kpi"><div class="kpi-l">Build</div><div class="kpi-v">v5.0.0</div></div></div></div>
+    <div id="page-udoc-dash" class="page"><div class="pg-hdr"><div><div class="pg-title">UDOC Dashboard</div><div class="pg-sub">Sovereign AI governance platform · 14 systems governed · 17.4M decisions audited · ZA jurisdiction enforced · HQ-OS Quantum-Ready baseline active</div></div><div class="pg-acts"><button class="btn btn-outline btn-sm" onclick="toast('Sovereignty report generated','success')">Sovereignty Report</button><button class="btn btn-gold" onclick="openModal('m-reg-sys')">Register System</button></div></div><div class="kpi-grid"><div class="kpi"><div class="kpi-l">Systems Registered</div><div class="kpi-v">14</div></div><div class="kpi red"><div class="kpi-l">Non-Compliant</div><div class="kpi-v">4</div><div class="kpi-s kdown">Urgent</div></div><div class="kpi green"><div class="kpi-l">Decisions Audited</div><div class="kpi-v">17.4M</div><div class="kpi-s">All-time</div></div><div class="kpi amber"><div class="kpi-l">Bias Flags</div><div class="kpi-v">2</div></div><div class="kpi"><div class="kpi-l">Compliance Avg</div><div class="kpi-v">86%</div></div><div class="kpi green"><div class="kpi-l">Sovereignty</div><div class="kpi-v">100%</div><div class="kpi-s">ZA-verified</div></div></div></div>
+    <div id="page-udoc-audit" class="page"><div class="pg-hdr"><div><div class="pg-title">UDOC Audit Trail</div><div class="pg-sub">Tamper-evident · HMAC-SHA256 + CRYSTALS-Dilithium · Merkle tree · 24.7M events · 10-year WORM retention</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="toast('Signed audit bundle exported','success')">Export Bundle</button></div></div><div class="panel"><div class="panel-hdr"><div class="panel-title">Live Audit Stream</div></div><div id="udoc-audit-stream"></div></div></div>
+    <div id="page-compliance" class="page"><div class="pg-hdr"><div><div class="pg-title">Compliance Engine</div><div class="pg-sub">9 regulatory frameworks · SA AI Policy GG54477 · EU AI Act · POPIA · GDPR Art.22 · NIST AI RMF · ISO 42001 · AU AI Strategy</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="toast('Full compliance sweep initiated · ~8min','info')">Run Sweep</button></div></div><div class="kpi-grid"><div class="kpi"><div class="kpi-l">SA AI Policy GG54477</div><div class="kpi-v">80%</div></div><div class="kpi amber"><div class="kpi-l">EU AI Act</div><div class="kpi-v">87%</div></div><div class="kpi green"><div class="kpi-l">POPIA</div><div class="kpi-v">94%</div></div><div class="kpi green"><div class="kpi-l">GDPR Art.22</div><div class="kpi-v">91%</div></div><div class="kpi green"><div class="kpi-l">NIST AI RMF</div><div class="kpi-v">89%</div></div><div class="kpi green"><div class="kpi-l">ISO 42001</div><div class="kpi-v">86%</div></div></div></div>
+    <div id="page-evidence" class="page"><div class="pg-hdr"><div><div class="pg-title">Evidence Bundles</div><div class="pg-sub">Legal-grade evidence packs · Signed exports · Merkle-chained · CRYSTALS-Dilithium signed · Court-admissible ZA + EU</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm">+ Create Bundle</button></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">Total Bundles</div><div class="kpi-v">18</div></div><div class="kpi green"><div class="kpi-l">All Verified</div><div class="kpi-v">18/18</div></div><div class="kpi amber"><div class="kpi-l">Regulatory Packs</div><div class="kpi-v">4</div><div class="kpi-s">Pending review</div></div><div class="kpi"><div class="kpi-l">Legal Holds</div><div class="kpi-v">2</div></div></div></div>
+    <div id="page-policy-code" class="page"><div class="pg-hdr"><div><div class="pg-title">Policy as Code</div><div class="pg-sub">OPA/Rego versioned policies · Tested · Git-native · COB sign-off workflow · Hot-reloadable &lt;5ms evaluation · GG54477 aligned</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="toast('Policy tests run · All passing','success')">Run Tests</button></div></div></div>
+    <div id="page-const-risk" class="page"><div class="pg-hdr"><div><div class="pg-title">Constitutional Risk Engine</div><div class="pg-sub">Real-time scoring against 12 Pillars · Legitimacy index: 87.4% · COB reporting</div></div></div><div style="text-align:center;padding:20px"><div style="font-family:var(--fs);font-size:64px;font-weight:700;color:var(--gold)">87.4<span style="font-size:32px">%</span></div><div style="font-family:var(--fc);font-size:10px;color:var(--muted);letter-spacing:2px">CONSTITUTIONAL LEGITIMACY INDEX</div><div class="legit-meter" style="margin:12px auto;max-width:400px"><div class="legit-fill" style="width:87.4%"></div></div><div style="font-size:11px;color:var(--muted)">2 pillars below threshold. Next COB review: Apr 30, 2026.</div></div></div>
+    <div id="page-model-lc" class="page"><div class="pg-hdr"><div><div class="pg-title">Model Lifecycle Governance</div><div class="pg-sub">DEVELOPMENT → STAGING → PRODUCTION → DEPRECATED → RETIRED · Drift detection · Promotion workflow · COB sign-off</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm">+ Register Model</button></div></div></div>
+    <div id="page-regulator" class="page"><div class="pg-hdr"><div><div class="pg-title">Regulator Portal</div><div class="pg-sub">Read-only authority case rooms · DCDT · Info Regulator · SAHRC · FSCA · All access logged</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm">+ Invite Authority</button></div></div></div>
+    <div id="page-hw-trust" class="page"><div class="pg-hdr"><div><div class="pg-title">Hardware Trust Register</div><div class="pg-sub">HSM custody · Key ceremony scheduling · TPM 2.0 attestation · FIPS 140-3 Level 3 · Tamper detection</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm">Schedule Ceremony</button></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">HSM Units</div><div class="kpi-v">2</div><div class="kpi-s">Dual HA · FIPS L3</div></div><div class="kpi green"><div class="kpi-l">Attestation</div><div class="kpi-v">✓</div><div class="kpi-s">All nodes current</div></div><div class="kpi cyan"><div class="kpi-l">FIPS Status</div><div class="kpi-v">L3</div><div class="kpi-s">140-3 Level 3</div></div><div class="kpi"><div class="kpi-l">Next Ceremony</div><div class="kpi-v">Apr 30</div><div class="kpi-s">Annual rotation</div></div></div></div>
+    <div id="page-participants" class="page"><div class="pg-hdr"><div><div class="pg-title">Participants</div><div class="pg-sub">POPIA compliant · All special PI encrypted · ZA data residency · Section 57 prior authorisation required for criminal history</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-seths-intake')">+ New Intake</button></div></div><div class="banner bn-red"><div class="bn-icon">🔒</div><div class="bn-body"><strong>POPIA SECTION 57 — PRIOR AUTHORISATION REQUIRED</strong> Prior authorisation from the Information Regulator must be obtained before processing criminal history data. Application must be approved before any criminal history is recorded. Failure is a criminal offence under POPIA Act 4 of 2013.</div></div></div>
+    <div id="page-seths-intake" class="page"><div class="pg-hdr"><div><div class="pg-title">New Participant Intake</div><div class="pg-sub">POPIA consent mandatory before any data collection · Section 57 prior authorisation required for criminal history · Voluntary participation only</div></div></div></div>
+    <div id="page-employers" class="page"><div class="pg-hdr"><div><div class="pg-title">Employer Network</div><div class="pg-sub">MOU-bound partners · Placement capacity · 90-day retention monitoring · 7 active partners · 28 placement slots</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-add-employer')">+ Add Partner</button></div></div></div>
+    <div id="page-placements" class="page"><div class="pg-hdr"><div><div class="pg-title">Active Placements</div><div class="pg-sub">Employment tracking · Retention monitoring · 30/90/180/365-day check-ins · Income documentation · UDOC audit integration</div></div></div></div>
+    <div id="page-seths-popia" class="page"><div class="pg-hdr"><div><div class="pg-title">POPIA Compliance</div><div class="pg-sub">Protection of Personal Information Act 4 of 2013 · Special PI management · Section 57 · Consent tracking · Data retention</div></div></div></div>
+    <div id="page-impact" class="page"><div class="pg-hdr"><div><div class="pg-title">Outcomes & Impact</div><div class="pg-sub">Constitutional Pillar XII evidence · Economic multiplier · SDG reporting · Government audit access</div></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">Placements</div><div class="kpi-v">39</div></div><div class="kpi"><div class="kpi-l">Income Increase</div><div class="kpi-v">3.1×</div></div><div class="kpi"><div class="kpi-l">Econ Multiplier</div><div class="kpi-v">4.2×</div></div><div class="kpi green"><div class="kpi-l">Retention (90d)</div><div class="kpi-v">71%</div></div><div class="kpi"><div class="kpi-l">SA Policy Pillar 02</div><div class="kpi-v">88%</div></div><div class="kpi"><div class="kpi-l">Tax Revenue Gen.</div><div class="kpi-v">R420K</div><div class="kpi-s">Per year (39 placed)</div></div></div></div>
+    <div id="page-ts-dash" class="page"><div class="pg-hdr"><div><div class="pg-title">T.S Industries Dashboard</div><div class="pg-sub">7 sector subsidiaries · Infrastructure production · S.E.T.H.S workforce deployment · 3 active projects · R45M pipeline</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-ts-project')">+ New Project</button></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">Active Projects</div><div class="kpi-v">3</div><div class="kpi-s">R45M pipeline</div></div><div class="kpi"><div class="kpi-l">S.E.T.H.S Workers</div><div class="kpi-v">28</div><div class="kpi-s">Deployed</div></div><div class="kpi amber"><div class="kpi-l">SPV Structures</div><div class="kpi-v">2</div><div class="kpi-s">Registered</div></div><div class="kpi cyan"><div class="kpi-l">Solar Output</div><div class="kpi-v">847</div><div class="kpi-s">MWh this month</div></div><div class="kpi green"><div class="kpi-l">CO₂ Avoided</div><div class="kpi-v">762t</div><div class="kpi-s">This year</div></div><div class="kpi"><div class="kpi-l">Monthly Revenue</div><div class="kpi-v">R325K</div><div class="kpi-s">TS-001 + TS-002</div></div></div></div>
+    <div id="page-ts-projects" class="page"><div class="pg-hdr"><div><div class="pg-title">Project Registry</div><div class="pg-sub">Solar · Farming · Water · Housing · Digital · Manufacturing · Logistics</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-ts-project')">+ New Project</button></div></div></div>
+    <div id="page-spv" class="page"><div class="pg-hdr"><div><div class="pg-title">SPV Management</div><div class="pg-sub">Government partnership SPVs · Equity register · Distribution waterfall · CIPC status · PFMA compliance · Standard structure: G.O.D.S 51–60%, Government 30–40%, DFI 10–20%</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-reg-spv')">+ Register SPV</button></div></div></div>
+    <div id="page-ts-sectors" class="page"><div class="pg-hdr"><div><div class="pg-title">7 Sector Subsidiaries</div><div class="pg-sub">TS Energy · TS Construction & Housing · TS AgriTech · TS Water Systems · TS Digital Infrastructure · TS Manufacturing · TS Logistics</div></div></div></div>
+    <div id="page-ts-env" class="page"><div class="pg-hdr"><div><div class="pg-title">Environmental Impact</div><div class="pg-sub">SDG 7 · SDG 9 · SDG 11 · SDG 13 · ESG reporting · Carbon accounting · Constitutional Pillar X — Intergenerational Mandate</div></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">Solar Lifetime (TS-001)</div><div class="kpi-v">180</div><div class="kpi-s">GWh projected</div></div><div class="kpi green"><div class="kpi-l">CO₂ Avoided Lifetime</div><div class="kpi-v">162K</div><div class="kpi-s">Tonnes vs coal</div></div><div class="kpi"><div class="kpi-l">Households Powered</div><div class="kpi-v">2,400</div><div class="kpi-s">Soweto micro-grid</div></div><div class="kpi cyan"><div class="kpi-l">Water Saved (TS-002)</div><div class="kpi-v">95%</div><div class="kpi-s">vs conventional</div></div></div></div>
+    <div id="page-investors" class="page"><div class="pg-hdr"><div><div class="pg-title">Investor CRM</div><div class="pg-sub">DFI · Angel · VC · Sovereign Wealth · Grant — FICA KYC mandatory before any funds accepted. FSCA FSP required before fund vehicle structures.</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-add-investor')">+ Add Investor</button></div></div></div>
+    <div id="page-pipeline" class="page"><div class="pg-hdr"><div><div class="pg-title">Capital Pipeline</div><div class="pg-sub">Stage-by-stage tracking · Probability weighting · Close date forecasting · Anti-Capture Pillar: no single investor >20%</div></div></div></div>
+    <div id="page-spv-madiba" class="page"><div class="pg-hdr"><div><div class="pg-title">SPV Register</div><div class="pg-sub">All G.O.D.S. SPV structures · Equity splits · Distribution records · PFMA compliance · Government majority ownership</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-reg-spv')">+ Register SPV</button></div></div></div>
+    <div id="page-kyc" class="page"><div class="pg-hdr"><div><div class="pg-title">KYC/AML Compliance — FICA</div><div class="pg-sub">FICA Act 38 of 2001 mandatory · PEP screening · Source of funds · Beneficial ownership · Criminal offence if not completed before accepting funds</div></div></div><div class="banner bn-red"><div class="bn-icon">⚖</div><div class="bn-body"><strong>FICA MANDATORY — KYC/AML DUE DILIGENCE REQUIRED BEFORE ACCEPTING ANY INVESTOR FUNDS</strong> Failure to conduct FICA due diligence before accepting funds is a criminal offence under the Financial Intelligence Centre Act 38 of 2001.</div></div></div>
+    <div id="page-madiba-impact" class="page"><div class="pg-hdr"><div><div class="pg-title">Impact Dashboard</div><div class="pg-sub">IRIS+ framework · SDG alignment · ESG reporting · Constitutional Pillar XII evidence · DFI impact reporting templates</div></div></div><div class="kpi-grid"><div class="kpi green"><div class="kpi-l">S.E.T.H.S Placements</div><div class="kpi-v">39</div><div class="kpi-s">SDG 8 · Decent Work</div></div><div class="kpi cyan"><div class="kpi-l">Solar Output</div><div class="kpi-v">847MWh</div><div class="kpi-s">SDG 7 · Clean Energy</div></div><div class="kpi"><div class="kpi-l">Econ Multiplier</div><div class="kpi-v">4.2×</div><div class="kpi-s">SDG 1 · No Poverty</div></div><div class="kpi green"><div class="kpi-l">CO₂ Avoided</div><div class="kpi-v">762t</div><div class="kpi-s">SDG 13 · Climate</div></div></div></div>
+    <div id="page-entities" class="page"><div class="pg-hdr"><div><div class="pg-title">Entity Registry</div><div class="pg-sub">G.O.D.S Holdings + 4 subsidiaries + IP Trust + SPVs · CIPC registration status · Beneficial ownership · Beneficial Ownership Declaration due 10 DAYS after registration</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-add-entity')">+ Add Entity</button></div></div><div class="banner bn-amber"><div class="bn-icon">🏦</div><div class="bn-body"><strong>DAY 1 ACTION — REGISTER ALL 5 ENTITIES AT CIPC + FILE BENEFICIAL OWNERSHIP</strong> G.O.D.S Holdings (Pty) Ltd and all 4 subsidiaries must be registered with CIPC. Beneficial Ownership declaration due within 10 DAYS of registration (criminal offence if missed). IP Trust deed must be lodged with Master of High Court Week 1.</div></div></div>
+    <div id="page-users" class="page"><div class="pg-hdr"><div><div class="pg-title">Users & Access</div><div class="pg-sub">Role-based access control · 8 role levels · Minimum privilege · Constitutional constraints enforced · Pillar XI: no single actor controls both access and audit</div></div><div class="pg-acts"><button class="btn btn-gold btn-sm" onclick="openModal('m-add-user')">+ Add User</button></div></div></div>
+    <div id="page-sys-config" class="page"><div class="pg-hdr"><div><div class="pg-title">System Configuration</div><div class="pg-sub">Sovereignty settings · Encryption · Constitutional constraints · Notification routing · <strong style="color:var(--red)">founder_override = false</strong></div></div></div><div class="g2"><div class="panel"><div class="panel-hdr"><div class="panel-title">Sovereignty Config</div></div><div class="ip"><div class="ip-k">Primary Node</div><div class="ip-v mono" style="color:var(--cyan)">ZA-JHB-01 · Johannesburg</div></div><div class="ip"><div class="ip-k">DR Node</div><div class="ip-v mono" style="color:var(--cyan)">ZA-CT-02 · Cape Town</div></div><div class="ip"><div class="ip-k">Gov Node</div><div class="ip-v mono" style="color:var(--cyan)">ZA-PTB-03 · Pretoria</div></div><div class="ip"><div class="ip-k">Jurisdiction Lock</div><div class="ip-v" style="color:var(--green)">SOUTH AFRICA · ZA only</div></div><div class="ip"><div class="ip-k">Foreign Cloud</div><div class="ip-v" style="color:var(--green)">NONE — architecturally enforced</div></div></div><div class="panel"><div class="panel-hdr"><div class="panel-title">Constitutional Config</div></div><div class="ip"><div class="ip-k">SA Policy</div><div class="ip-v mono" style="color:var(--gold)">GG No.54477 · Apr 2026</div></div><div class="ip"><div class="ip-k">HITL Enforcement</div><div class="ip-v" style="color:var(--green)">STRICT — block non-compliant</div></div><div class="ip"><div class="ip-k">Founder Override</div><div class="ip-v" style="color:var(--red);font-family:var(--fm)">DISABLED · founder_override=false</div></div><div class="ip"><div class="ip-k">Merkle Cycle</div><div class="ip-v">15 minutes — continuous</div></div></div></div></div>
+
+  </main><!-- /main -->
+</div><!-- /layout -->
+
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Alerts -->
+<div class="modal" id="m-alerts">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Active Alerts — 4</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div style="margin-bottom:10px;background:var(--red2);border:1px solid rgba(231,76,60,.3);border-radius:2px;border-left:3px solid var(--red);padding:12px"><div style="font-family:var(--fc);font-weight:700;color:var(--red);font-size:11px">CRITICAL — INC-2026-003 · Welfare AI Bias SPD 0.089</div><div style="font-size:10.5px;margin-top:4px">Phase 2 CONTAIN active · POPIA 47h window · SAHRC notified · COB alerted</div></div>
+      <div style="margin-bottom:10px;background:var(--amber2);border:1px solid rgba(243,156,18,.3);border-radius:2px;border-left:3px solid var(--amber);padding:12px"><div style="font-family:var(--fc);font-weight:700;color:var(--amber);font-size:11px">HIGH — HITL-8830 Overdue 4.2h</div><div style="font-size:10.5px;margin-top:4px">Benefit revocation pending human review · SLA critical · s27 RSA</div></div>
+      <div style="margin-bottom:10px;background:var(--amber2);border:1px solid rgba(243,156,18,.3);border-radius:2px;border-left:3px solid var(--amber);padding:12px"><div style="font-family:var(--fc);font-weight:700;color:var(--amber);font-size:11px">HIGH — SYS-007 Predictive Policing NON-COMPLIANT</div><div style="font-size:10.5px;margin-top:4px">HITL pathway missing · Race SPD 0.044 · s12 RSA concern · Remediation due 01 May</div></div>
+      <div style="background:var(--amber2);border:1px solid rgba(243,156,18,.3);border-radius:2px;border-left:3px solid var(--amber);padding:12px"><div style="font-family:var(--fc);font-weight:700;color:var(--amber);font-size:11px">MEDIUM — COB Seats 0/5 Filled</div><div style="font-size:10.5px;margin-top:4px">No external capital can be formally accepted until COB is operational. Recruitment active.</div></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Dismiss All</button></div>
+  </div>
+</div>
+
+<!-- Register AI System -->
+<div class="modal" id="m-reg-sys">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Register AI System</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="banner bn-amber"><div class="bn-icon">⚠</div><div class="bn-body"><strong>SA AI POLICY GG54477 — MANDATORY REGISTRATION — CONSTITUTIONAL PILLAR VIII</strong> HIGH RISK systems require conformity assessment, HITL documentation, HRIA, and gender impact assessment before registration is finalised.</div></div>
+      <div class="form-row"><label class="form-lbl">System Name *</label><input id="reg-name" class="form-inp" placeholder="e.g. Credit Scoring Model v2.1"/></div>
+      <div class="form-row"><label class="form-lbl">Owning Organisation *</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">SA Risk Tier *</label><select id="reg-tier" class="form-sel"><option value="">Select risk tier...</option><option>PROHIBITED — permanently blocked</option><option>HIGH RISK — conformity + HITL + HRIA + Gender Impact mandatory</option><option>MEDIUM RISK — transparency obligations</option><option>LOW RISK — voluntary code of conduct</option></select></div>
+      <div class="form-row"><label class="form-lbl">Model Architecture</label><input class="form-inp" placeholder="e.g. XGBoost + Logistic Regression"/></div>
+      <div class="form-row"><label class="form-lbl">Human Review Pathway * (HIGH RISK mandatory)</label><textarea class="form-ta" placeholder="Describe the human review pathway, escalation process, and who has override authority..."></textarea></div>
+      <div class="form-row"><label class="form-lbl">POPIA Processing Basis</label><select class="form-sel"><option>Legitimate interest (Section 11)</option><option>Contractual performance</option><option>Legal obligation</option><option>Explicit consent (Section 26 — Special PI)</option></select></div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;font-size:11px;color:var(--text)">
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> HRIA completed or scheduled</label>
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> Gender Impact Assessment completed</label>
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> Processes Special Personal Information (POPIA S.26)</label>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="registerSystem()">Register System</button></div>
+  </div>
+</div>
+
+<!-- COB Recruit -->
+<div class="modal" id="m-cob-recruit">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">COB Member Recruitment</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="banner bn-gold"><div class="bn-icon">⚖</div><div class="bn-body"><strong>INDEPENDENCE MANDATORY</strong> No G.O.D.S. employees, founders, shareholders, family members, or business partners are eligible. 5 seats with specific expertise requirements. 3-year fixed term.</div></div>
+      <div class="form-row"><label class="form-lbl">Full Name</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Email Address</label><input class="form-inp" type="email"/></div>
+      <div class="form-row"><label class="form-lbl">COB Seat</label><select class="form-sel"><option>Seat 1 — Legal Expert (qualified attorney, AI/tech law)</option><option>Seat 2 — Technology Ethicist (PhD/equivalent, AI ethics)</option><option>Seat 3 — Community Representative (historically disadvantaged)</option><option>Seat 4 — Civil Society Representative (active NGO, human rights)</option><option>Seat 5 — Independent Financial Expert (CA(SA) or CFA)</option></select></div>
+      <div class="form-row"><label class="form-lbl">Organisation / Affiliation</label><input class="form-inp"/></div>
+      <div style="margin-top:10px">
+        <div style="font-family:var(--fc);font-size:8px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Independence Declaration — All must be confirmed</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--text)">
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> Not an employee, contractor, or agent of G.O.D.S Holdings</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> No shareholding in any G.O.D.S entity or related party</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> No family relationship with Sashin J. Singh or senior G.O.D.S. personnel</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> Willing to serve 3-year term with renewal subject to stakeholder vote</label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox"> Agrees to COB Charter obligations and confidentiality requirements</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('COB member nomination initiated · Independence verification in progress.','success');closeModal()">Initiate Recruitment</button></div>
+  </div>
+</div>
+
+<!-- Log Breach -->
+<div class="modal" id="m-log-breach">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Log Constitutional Breach</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-lbl">Breach Title</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Affected System / Entity</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Constitutional Pillar Violated</label><select class="form-sel"><option>Pillar I — Human Dignity</option><option>Pillar III — Sovereign Respect</option><option>Pillar VI — Transparency</option><option>Pillar VII — Founder Constraint</option><option>Pillar VIII — Human Primacy in AI</option><option>Pillar XI — Anti-Corruption</option><option>Pillar XII — Evidence-Driven</option></select></div>
+      <div class="form-row"><label class="form-lbl">Severity</label><select class="form-sel"><option>HIGH — Systemic breach</option><option>MEDIUM — Operational breach</option><option>LOW — Technical violation</option></select></div>
+      <div class="form-row"><label class="form-lbl">Description</label><textarea class="form-ta"></textarea></div>
+      <div class="form-row"><label class="form-lbl">Remediation Plan</label><textarea class="form-ta" placeholder="Steps to remediate, responsible parties, timeline..."></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-red" onclick="toast('Constitutional breach logged. COB notified immediately. Dilithium-signed audit record created.','warning');closeModal()">Log Breach</button></div>
+  </div>
+</div>
+
+<!-- Declare Incident -->
+<div class="modal" id="m-declare-incident">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">🚨 Declare Incident</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-lbl">Incident Title *</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Affected System *</label><select class="form-sel"><option>SYS-001 Welfare Eligibility AI</option><option>SYS-007 Predictive Policing AI</option><option>Platform-wide</option></select></div>
+      <div class="form-row"><label class="form-lbl">Type *</label><select class="form-sel"><option>Bias — SPD threshold breach</option><option>Sovereignty breach</option><option>POPIA breach</option><option>Security incident</option><option>Constitutional Pillar breach</option></select></div>
+      <div class="form-row"><label class="form-lbl">Severity *</label><select class="form-sel"><option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option></select></div>
+      <div class="form-row"><label class="form-lbl">Description</label><textarea class="form-ta"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-red" onclick="toast('Incident declared. COB notified. Phase 1 DETECT initiated. Dilithium-signed.','error');closeModal()">Declare Incident</button></div>
+  </div>
+</div>
+
+<!-- Add Investor -->
+<div class="modal" id="m-add-investor">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Add Investor to Pipeline</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="banner bn-red"><div class="bn-icon">⚖</div><div class="bn-body"><strong>FICA KYC MANDATORY</strong> Due diligence required before any funds are accepted. Criminal offence to accept funds without KYC. FSCA FSP licence required before fund vehicle structures (Month 24).</div></div>
+      <div class="form-row"><label class="form-lbl">Entity / Investor Name</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Investor Type</label><select class="form-sel"><option>Development Finance Institution (DFI)</option><option>Government Grant</option><option>Angel Investor</option><option>VC / PE Fund</option><option>Sovereign Wealth Fund</option><option>Impact Investor</option><option>Corporate / Strategic</option></select></div>
+      <div class="form-row"><label class="form-lbl">Target Amount (ZAR)</label><input class="form-inp" type="number" placeholder="e.g. 5000000"/></div>
+      <div class="form-row"><label class="form-lbl">Stage</label><select class="form-sel"><option>Initial Contact</option><option>Warm Lead</option><option>Meeting Scheduled</option><option>Application Submitted</option><option>Due Diligence</option><option>Term Sheet</option><option>Committed</option></select></div>
+      <div class="form-row"><label class="form-lbl">Primary Contact</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Next Meeting Date</label><input class="form-inp" type="date"/></div>
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:11px;margin-top:6px"><input type="checkbox"> FICA KYC Required — Confirmed</label>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('Investor added to pipeline. KYC workflow initiated. Anti-Capture Pillar check: no single investor >20% without COB approval.','success');closeModal()">Add to Pipeline</button></div>
+  </div>
+</div>
+
+<!-- S.E.T.H.S Intake -->
+<div class="modal" id="m-seths-intake">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">New Participant Intake</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="banner bn-red"><div class="bn-icon">🔒</div><div class="bn-body"><strong>CONSENT FIRST — POPIA S.57 — PRIOR AUTHORISATION REQUIRED</strong> Digital consent must be signed before any data entry. Section 57 prior authorisation for criminal history data must be in place.</div></div>
+      <div class="form-row"><label class="form-lbl">Programme Stream *</label><select class="form-sel"><option>A — Construction / Solar</option><option>B — Digital / Technology</option><option>C — Agriculture</option><option>D — Healthcare</option><option>E — Logistics</option></select></div>
+      <div class="form-row"><label class="form-lbl">Province *</label><select class="form-sel"><option>Gauteng</option><option>Western Cape</option><option>KwaZulu-Natal</option><option>Eastern Cape</option></select></div>
+      <div class="form-row"><label class="form-lbl">Referral Source</label><select class="form-sel"><option>Dept. Correctional Services</option><option>Dept. Social Development</option><option>Community referral</option><option>Self-referral</option></select></div>
+      <div class="form-row"><label class="form-lbl">Assigned Case Manager *</label><select class="form-sel"><option>CM-001 — Sipho Dlamini</option><option>CM-002 — Nomvula Nkosi</option><option>CM-003 — Thabo Mokoena</option></select></div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--text);margin-top:8px">
+        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer"><input type="checkbox" style="margin-top:2px"> Age 18–45 years, SA citizen or permanent resident, voluntary participation confirmed</label>
+        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer"><input type="checkbox" style="margin-top:2px"> POPIA consent form signed (digital signature captured)</label>
+        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer"><input type="checkbox" style="margin-top:2px"> Section 57 prior authorisation obtained if criminal history required</label>
+        <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer"><input type="checkbox" style="margin-top:2px"> SDU facility capacity confirmed</label>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('Intake initiated. POPIA compliance verified. UDOC audit event created. Case manager notified.','success');closeModal()">Complete Intake</button></div>
+  </div>
+</div>
+
+<!-- Add Employer -->
+<div class="modal" id="m-add-employer">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Add Employer Partner</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-lbl">Company Name</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Sector</label><select class="form-sel"><option>Construction / Infrastructure</option><option>Solar / Energy</option><option>Agriculture / Food</option><option>Healthcare</option><option>Logistics</option><option>Digital / Technology</option></select></div>
+      <div class="form-row"><label class="form-lbl">Stream Match</label><select class="form-sel"><option>A — Construction/Solar</option><option>B — Digital/Tech</option><option>C — Agriculture</option><option>D — Healthcare</option><option>E — Logistics</option></select></div>
+      <div class="form-row"><label class="form-lbl">Placement Capacity</label><input class="form-inp" type="number"/></div>
+      <div class="form-row"><label class="form-lbl">B-BBEE Level</label><select class="form-sel"><option>Level 1</option><option>Level 2</option><option>Level 3</option><option>Level 4</option><option>Exempted Micro Enterprise</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('Employer partner added. MOU workflow initiated. UDOC audit logged.','success');closeModal()">Add Partner</button></div>
+  </div>
+</div>
+
+<!-- Add User -->
+<div class="modal" id="m-add-user">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Add User</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="banner bn-gold"><div class="bn-icon">🔒</div><div class="bn-body"><strong>MFA MANDATORY — CONSTITUTIONAL PILLAR XI — ANTI-CORRUPTION</strong> All users must have MFA enabled. No single actor may control both access and audit. RBAC enforced at code level.</div></div>
+      <div class="form-row"><label class="form-lbl">Full Name</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Email</label><input class="form-inp" type="email"/></div>
+      <div class="form-row"><label class="form-lbl">Role</label><select class="form-sel"><option>Super Admin</option><option>UDOC Admin</option><option>UDOC Operator</option><option>HITL Reviewer</option><option>COB Member (read-only)</option><option>S.E.T.H.S Programme Head</option><option>Case Manager</option><option>M.A.D.I.B.A Analyst</option></select></div>
+      <div class="form-row"><label class="form-lbl">Division</label><select class="form-sel"><option>G.O.D.S Holdings</option><option>UDOC</option><option>S.E.T.H.S</option><option>T.S Industries</option><option>M.A.D.I.B.A Capital</option><option>COB</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('User created. MFA setup email sent. RBAC applied. UDOC access logged.','success');closeModal()">Create User</button></div>
+  </div>
+</div>
+
+<!-- Add Entity -->
+<div class="modal" id="m-add-entity">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Add Legal Entity</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-lbl">Entity Name</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Entity Type</label><select class="form-sel"><option>Private Company (Pty) Ltd</option><option>IP Trust</option><option>SPV (Pty) Ltd</option></select></div>
+      <div class="form-row"><label class="form-lbl">CIPC Registration Number</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Registration Status</label><select class="form-sel"><option>Pending CIPC registration</option><option>Registration submitted</option><option>Registered — active</option></select></div>
+      <div class="form-row"><label class="form-lbl">Parent Entity</label><select class="form-sel"><option>G.O.D.S Holdings (Pty) Ltd</option><option>IP Trust</option><option>None — holding company</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('Entity added. Remember: Beneficial Ownership declaration due within 10 DAYS of CIPC registration.','success');closeModal()">Add Entity</button></div>
+  </div>
+</div>
+
+<!-- Register SPV -->
+<div class="modal" id="m-reg-spv">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Register SPV</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-lbl">SPV Name</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Linked Project</label><select class="form-sel"><option>TS-001 Soweto Solar</option><option>TS-002 Mitchell's Plain Farm</option><option>TS-003 Tembisa Water</option><option>New project</option></select></div>
+      <div class="form-row"><label class="form-lbl">G.O.D.S Equity %</label><input class="form-inp" type="number" placeholder="e.g. 60"/></div>
+      <div class="form-row"><label class="form-lbl">Government Equity % (minimum 30%)</label><input class="form-inp" type="number" placeholder="e.g. 35"/></div>
+      <div class="form-row"><label class="form-lbl">DFI / Community Equity %</label><input class="form-inp" type="number" placeholder="e.g. 5"/></div>
+      <div style="font-size:10.5px;color:var(--muted);border-top:1px solid var(--border2);padding-top:8px;margin-top:6px">Standard structure: G.O.D.S. 51–60% (operations), Government 30–40% (oversight), DFI 10–20% (capital). Constitutional Pillar III: Sovereign Respect — government retains majority oversight in all structures.</div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('SPV registered. PFMA compliance architecture applied. COB notified. UDOC governance overlay activated.','success');closeModal()">Register SPV</button></div>
+  </div>
+</div>
+
+<!-- T.S Project -->
+<div class="modal" id="m-ts-project">
+  <div class="modal-box">
+    <div class="modal-hdr"><div class="modal-title">Register T.S Project</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-lbl">Project Name</label><input class="form-inp"/></div>
+      <div class="form-row"><label class="form-lbl">Sector</label><select class="form-sel"><option>Solar Energy</option><option>Vertical Farming</option><option>Water Infrastructure</option><option>Affordable Housing</option><option>Digital Infrastructure</option><option>Manufacturing</option><option>Logistics</option></select></div>
+      <div class="form-row"><label class="form-lbl">Contract Value (ZAR)</label><input class="form-inp" type="number"/></div>
+      <div class="form-row"><label class="form-lbl">Province</label><select class="form-sel"><option>Gauteng</option><option>Western Cape</option><option>KwaZulu-Natal</option><option>Eastern Cape</option><option>Limpopo</option></select></div>
+      <div class="form-row"><label class="form-lbl">S.E.T.H.S Workers Required</label><input class="form-inp" type="number" placeholder="e.g. 15"/></div>
+      <div class="form-row"><label class="form-lbl">EIA Status</label><select class="form-sel"><option>Completed — passed</option><option>In progress — EIA firm appointed</option><option>Required — not started</option><option>Exempt (small-scale)</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" onclick="closeModal()">Cancel</button><button class="btn btn-gold" onclick="toast('T.S project registered. S.E.T.H.S workforce pipeline activated. UDOC project governance overlay applied.','success');closeModal()">Register Project</button></div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// G.O.D.S ADMIN PLATFORM v5.0 — JAVASCRIPT ENGINE
+// © 2026 G.O.D.S Holdings (Pty) Ltd · IP Trust Protected
+// ══════════════════════════════════════════════════════════════════
+
+// ── DATA ──────────────────────────────────────────────────────────
+const SYSTEMS=[
+  {id:'SYS-001',name:'Welfare Eligibility AI',arch:'XGBoost Classifier',owner:'Dept. Social Development',risk:'HIGH',status:'SUSPENDED',comp:71,hitl:'MISSING',spd:0.089,spd_g:0.031,ecert:'PROVISIONAL',lc:'PRODUCTION',drift:0.12},
+  {id:'SYS-002',name:'Credit Scoring Model v2.1',arch:'XGBoost + Logistic Reg.',owner:'First National Bank',risk:'HIGH',status:'COMPLIANT',comp:94,hitl:'ACTIVE',spd:0.012,spd_g:0.021,ecert:'GOLD',lc:'PRODUCTION',drift:0.02},
+  {id:'SYS-003',name:'Resume Screening AI',arch:'NLP Pipeline + BERT',owner:'Public Service Commission',risk:'HIGH',status:'SUSPENDED',comp:78,hitl:'ACTIVE',spd:0.028,spd_g:0.072,ecert:'BRONZE',lc:'PRODUCTION',drift:0.08},
+  {id:'SYS-004',name:'Medical Diagnostic AI',arch:'Transformer Vision Model',owner:'Netcare Clinical Group',risk:'HIGH',status:'REVIEW',comp:88,hitl:'ACTIVE',spd:0.015,spd_g:0.009,ecert:'GOLD',lc:'STAGING',drift:0.04},
+  {id:'SYS-005',name:'Tax Audit Selection AI',arch:'Random Forest Ensemble',owner:'SARS',risk:'HIGH',status:'COMPLIANT',comp:92,hitl:'ACTIVE',spd:0.008,spd_g:0.014,ecert:'GOLD',lc:'PRODUCTION',drift:0.01},
+  {id:'SYS-006',name:'Border Biometric Identity',arch:'FaceNet + Iris CNN',owner:'Dept. Home Affairs',risk:'HIGH',status:'COMPLIANT',comp:85,hitl:'ACTIVE',spd:0.019,spd_g:0.007,ecert:'SILVER',lc:'PRODUCTION',drift:0.03},
+  {id:'SYS-007',name:'Predictive Policing AI',arch:'Gradient Boosting + GIS',owner:'SAPS',risk:'HIGH',status:'NON-COMPLIANT',comp:61,hitl:'MISSING',spd:0.044,spd_g:0.041,ecert:'REVOKED',lc:'PRODUCTION',drift:0.19},
+  {id:'SYS-008',name:'Insurance Pricing Engine',arch:'GLM + Neural Net',owner:'Old Mutual Digital',risk:'MEDIUM',status:'COMPLIANT',comp:90,hitl:'OPTIONAL',spd:0.022,spd_g:0.018,ecert:'SILVER',lc:'PRODUCTION',drift:0.03},
+  {id:'SYS-009',name:'Customer Service Chatbot',arch:'GPT-3.5 Fine-tuned',owner:'Eskom Digital',risk:'LOW',status:'COMPLIANT',comp:100,hitl:'N/A',spd:0.004,spd_g:0.003,ecert:'GOLD',lc:'PRODUCTION',drift:0.01},
+  {id:'SYS-010',name:'Social Scoring Prototype',arch:'Graph NN',owner:'BLOCKED',risk:'PROHIBITED',status:'BLOCKED',comp:0,hitl:'BLOCKED',spd:null,spd_g:null,ecert:'NONE',lc:'BLOCKED',drift:null},
+  {id:'SYS-011',name:'Agricultural Yield Prediction',arch:'LSTM Time Series',owner:'Dept. Agriculture',risk:'LOW',status:'COMPLIANT',comp:98,hitl:'N/A',spd:0.006,spd_g:0.011,ecert:'GOLD',lc:'PRODUCTION',drift:0.02},
+  {id:'SYS-012',name:'Credit Fraud Detection',arch:'Isolation Forest + AE',owner:'ABSA Digital Risk',risk:'MEDIUM',status:'REVIEW',comp:74,hitl:'OPTIONAL',spd:0.031,spd_g:0.029,ecert:'PROVISIONAL',lc:'PRODUCTION',drift:0.07},
+  {id:'SYS-013',name:'Water Quality Monitor',arch:'Sensor Fusion CNN',owner:'Dept. Water & Sanitation',risk:'MEDIUM',status:'COMPLIANT',comp:95,hitl:'OPTIONAL',spd:0.002,spd_g:0.003,ecert:'GOLD',lc:'PRODUCTION',drift:0.01},
+  {id:'SYS-014',name:'Welfare Means-Testing AI v2',arch:'Decision Tree Ensemble',owner:'Dept. Social Development',risk:'HIGH',status:'BLOCKED',comp:42,hitl:'MISSING',spd:0.091,spd_g:0.063,ecert:'REVOKED',lc:'STAGING',drift:0.22},
+];
+
+const AUDIT_EVENTS=[
+  {id:'AUD-88432',sys:'Credit Scoring v2.1 (SYS-002)',type:'DECISION',out:'APPROVED',conf:0.94,hash:'3a8f...c92b',ts:'09:58'},
+  {id:'AUD-88431',sys:'Welfare AI v3.2 (SYS-001)',type:'HITL_PAUSE',out:'FLAGGED',conf:0.61,hash:'f4a8...7d21',ts:'09:55'},
+  {id:'AUD-88430',sys:'Resume Screening (SYS-003)',type:'BIAS_SCAN',out:'FLAGGED',conf:null,hash:'9c2a...4e19',ts:'09:50'},
+  {id:'AUD-88429',sys:'Tax Audit AI (SYS-005)',type:'DECISION',out:'APPROVED',conf:0.88,hash:'b2d1...8a34',ts:'09:44'},
+  {id:'AUD-88428',sys:'Predictive Policing (SYS-007)',type:'ESCALATION',out:'BLOCKED',conf:0.61,hash:'e71c...2f88',ts:'09:39'},
+  {id:'AUD-88427',sys:'Border Biometric (SYS-006)',type:'DECISION',out:'APPROVED',conf:0.97,hash:'1a4f...9b11',ts:'09:31'},
+  {id:'AUD-88426',sys:'Medical Diagnostic (SYS-004)',type:'HITL_ROUTE',out:'REVIEW',conf:0.74,hash:'4d8c...a012',ts:'09:25'},
+  {id:'AUD-88425',sys:'Merkle Root Commit',type:'SYSTEM',out:'PUBLISHED',conf:null,hash:'7d2a...b419',ts:'09:15'},
+];
+
+const PILLARS_12=[
+  {n:'I',name:'Human Dignity',text:'All operations must preserve and actively elevate human dignity. Basic needs are not leverage points.',score:91,color:'var(--gold)',pass:true},
+  {n:'II',name:'Contribution Over Extraction',text:'Systems reward meaningful contribution over speculative manipulation. Value creation precedes value extraction.',score:88,color:'var(--green)',pass:true},
+  {n:'III',name:'Sovereign Respect',text:'Alignment with governments is voluntary — never coercive. No division may undermine legitimate sovereign authority.',score:100,color:'var(--cyan)',pass:true},
+  {n:'IV',name:'Ethical Profitability',text:'Profit is required and actively pursued. Never through destabilisation or engineered scarcity.',score:91,color:'var(--blue)',pass:true},
+  {n:'V',name:'Governance Before Scale',text:'No expansion without governance capacity adequate to manage it responsibly. Structure precedes scale.',score:85,color:'var(--green)',pass:true},
+  {n:'VI',name:'Transparency & Accountability',text:'Financial operations and technology systems within G.O.D.S must remain independently auditable at all times.',score:89,color:'var(--gold)',pass:true},
+  {n:'VII',name:'Founder Constraint',text:'The Founder\'s authority is constitutionally limited. No individual shall supersede the institution.',score:100,color:'var(--gold)',pass:true},
+  {n:'VIII',name:'Human Primacy in AI',text:'Technology, including AI and automation, must serve human wellbeing first. Human oversight is preserved for all consequential decisions.',score:67,color:'var(--amber)',pass:false},
+  {n:'IX',name:'Reintegration Over Exclusion',text:'Failure does not permanently disqualify participation. Structured recovery pathways remain operational.',score:94,color:'var(--green)',pass:true},
+  {n:'X',name:'Long-Horizon Discipline',text:'Decisions are evaluated for generational impact. Short-term acceleration must not compromise long-term stability.',score:88,color:'var(--blue)',pass:true},
+  {n:'XI',name:'Anti-Corruption Architecture',text:'Structural safeguards prevent capture by political, financial, or familial interests. Integrity is architectural, not aspirational.',score:94,color:'var(--green)',pass:true},
+  {n:'XII',name:'Evidence-Driven Evolution',text:'G.O.D.S adapts based on measurable outcomes. Ideology shall not override demonstrable reality.',score:91,color:'var(--cyan)',pass:true},
+];
+
+const SPD_DATA=[
+  {char:'Race / Ethnicity',val:0.028,col:'var(--green)'},
+  {char:'Gender',val:0.072,col:'var(--red)'},
+  {char:'Age Group',val:0.041,col:'var(--amber)'},
+  {char:'Disability Status',val:0.089,col:'var(--red)'},
+  {char:'Language / Culture',val:0.019,col:'var(--green)'},
+  {char:'Socioeconomic Status',val:0.044,col:'var(--amber)'},
+  {char:'Urban vs Rural',val:0.048,col:'var(--amber)'},
+];
+
+const STREAMS=[
+  ['A — Construction/Solar',18,20,'var(--amber)'],
+  ['B — Digital / Tech',10,12,'var(--blue)'],
+  ['C — Agriculture',9,12,'var(--green)'],
+  ['D — Healthcare',8,10,'var(--cyan)'],
+  ['E — Logistics',5,8,'var(--purple)'],
+];
+
+const CHECKLIST_D1=[
+  {text:'Register G.O.D.S. IP Trust with Master of the High Court',done:false},
+  {text:'Register G.O.D.S. Holdings (Pty) Ltd at CIPC — Constitutional MOI',done:false},
+  {text:'File all 4 priority trademark applications at CIPC — R3,540 total',done:false},
+  {text:'Open bank accounts with dual-signature provisions (>R50K)',done:false},
+  {text:'File Beneficial Ownership declaration (due 10 days after CIPC registration)',done:false},
+  {text:'Appoint COO and engage Legal Counsel',done:false},
+  {text:'Establish accounting system and appoint IRBA-registered auditor',done:false},
+  {text:'Register all 4 subsidiary entities at CIPC',done:false},
+];
+
+const CHECKLIST_M1=[
+  {text:'Appoint first 3 COB members — fully independent',done:false},
+  {text:'Finalise Phase 1 funding applications: SEFA, IDC, NDA',done:false},
+  {text:'Government engagement meetings: DSD, DoL, DPSA, DTPS',done:false},
+  {text:'Begin UDOC platform development — AI Decision Audit Log module',done:false},
+  {text:'Identify S.E.T.H.S. facility — Gauteng metropolitan area',done:false},
+  {text:'Establish employer partner pipeline — target 10 committed employers',done:false},
+  {text:'File POPIA Section 57 prior authorisation application',done:false},
+  {text:'Engage quantum engineering academic partnerships (CSIR, UP)',done:false},
+  {text:'Draft government MOU templates with legal counsel',done:false},
+  {text:'Complete IP schedule for IP Trust',done:false},
+  {text:'Develop constitutional briefing for investor onboarding',done:false},
+  {text:'Set up Prometheus monitoring and sovereignty verification jobs',done:false},
+];
+
+// ── HELPERS ────────────────────────────────────────────────────────
+function bR(t){return`<span class="badge b-red">${t}</span>`;}
+function bG(t){return`<span class="badge b-green">${t}</span>`;}
+function bA(t){return`<span class="badge b-amber">${t}</span>`;}
+function bB(t){return`<span class="badge b-blue">${t}</span>`;}
+function bM(t){return`<span class="badge b-muted">${t}</span>`;}
+function bGold(t){return`<span class="badge b-gold">${t}</span>`;}
+function bCert(c){
+  if(c==='GOLD') return'<span style="color:var(--gold);font-size:10px">🥇 GOLD</span>';
+  if(c==='SILVER') return'<span style="color:#B0A898;font-size:10px">🥈 SILVER</span>';
+  if(c==='BRONZE') return'<span style="color:#C87020;font-size:10px">🥉 BRONZE</span>';
+  if(c==='PROVISIONAL') return bA('PROVISIONAL');
+  if(c==='REVOKED') return bR('REVOKED');
+  return bM('NONE');
+}
+function riskB(r){const m={HIGH:bA,MEDIUM:bB,LOW:bG,PROHIBITED:bR};return(m[r]||bM)(r);}
+function statusB(s){const m={COMPLIANT:bG,SUSPENDED:bR,REVIEW:bA,'NON-COMPLIANT':bR,BLOCKED:bR,ACTIVE:bG};return(m[s]||bM)(s);}
+function hitlB(h){const m={ACTIVE:bG,MISSING:bR,OPTIONAL:bB,'N/A':bM,BLOCKED:bR};return(m[h]||bM)(h);}
+function cc(v){return v>=90?'var(--green)':v>=75?'var(--amber)':'var(--red)';}
+
+// ── TOAST ──────────────────────────────────────────────────────────
+function toast(msg,type='info',dur=4000){
+  const tc=document.getElementById('toast-container');
+  const t=document.createElement('div');
+  t.className=`toast toast-${type}`;
+  const labels={info:'INFO',success:'SUCCESS',warning:'WARNING',error:'CRITICAL'};
+  t.innerHTML=`<strong style="color:${type==='success'?'var(--green)':type==='error'?'var(--red)':type==='warning'?'var(--amber)':'var(--cyan)'}">${labels[type]}</strong> ${msg}`;
+  tc.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},dur);
+}
+
+// ── MODAL ──────────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id)?.classList.add('open');}
+function closeModal(){document.querySelectorAll('.modal.open').forEach(m=>m.classList.remove('open'));}
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal();}));
+
+// ── NAVIGATION ─────────────────────────────────────────────────────
+function nav(pageId, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById('page-'+pageId);
+  if(pg) pg.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+// ── CLOCK ──────────────────────────────────────────────────────────
+function updateClock(){
+  const t=new Date().toLocaleTimeString('en-ZA',{timeZone:'Africa/Johannesburg',hour12:false})+' SAST';
+  document.getElementById('clock').textContent=t;
+}
+setInterval(updateClock,1000);updateClock();
+
+// ── LIVE METRICS ────────────────────────────────────────────────────
+let dcount=1412884;
+setInterval(()=>{
+  dcount+=Math.floor(Math.random()*120+40);
+  document.querySelectorAll('[data-live="dec"]').forEach(el=>el.textContent=(dcount/1e6).toFixed(2)+'M');
+  document.getElementById('api-lat').textContent=`${Math.floor(Math.random()*8+6)}ms`;
+},3500);
+
+// ── FILTER TABLE ────────────────────────────────────────────────────
+function filterTable(id,q){
+  document.querySelectorAll('#'+id+' tbody tr').forEach(r=>{
+    r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';
+  });
+}
+
+// ── REGISTER SYSTEM ─────────────────────────────────────────────────
+function registerSystem(){
+  const name=document.getElementById('reg-name')?.value;
+  const tier=document.getElementById('reg-tier')?.value;
+  if(!name||!tier){toast('All required fields must be completed','error');return;}
+  toast(`${name} registered in UDOC AI Registry. GG54477 conformity assessment initiated. Dilithium-signed audit record created.`,'success');
+  closeModal();
+}
+
+// ── RENDER FUNCTIONS ─────────────────────────────────────────────────
+
+function renderAuditStream(containerId){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  const outC={APPROVED:'var(--green)',FLAGGED:'var(--amber)',BLOCKED:'var(--red)',ESCALATION:'var(--red)',REVIEW:'var(--blue)',PUBLISHED:'var(--cyan)',HITL_PAUSE:'var(--amber)',HITL_ROUTE:'var(--blue)',BIAS_SCAN:'var(--amber)'};
+  el.innerHTML=AUDIT_EVENTS.map(e=>`
+    <div class="al-line">
+      <div class="al-time">${e.ts}</div>
+      <div class="al-tag"><span style="font-family:var(--fm);font-size:8px;color:${e.type.includes('DECISION')?'var(--blue)':e.type.includes('BIAS')?'var(--amber)':'var(--muted)'}">[${e.type}]</span></div>
+      <div class="al-msg" style="color:${outC[e.out]||'var(--muted)'}; width:65px;flex-shrink:0">${e.out}</div>
+      <div class="al-msg" style="flex:1">${e.sys}</div>
+      <div class="al-msg" style="color:var(--cyan);font-family:var(--fm);font-size:8.5px;flex-shrink:0">${e.hash}</div>
+    </div>`).join('');
+}
+
+function renderCmdPillarsMini(){
+  const el=document.getElementById('cmd-pillars-mini');
+  if(!el)return;
+  const pillars=[
+    {n:'01',name:'Capacity & Talent',v:74,color:'var(--cyan)'},
+    {n:'02',name:'Inclusive Growth',v:88,color:'var(--green)'},
+    {n:'03',name:'Responsible Governance',v:82,color:'var(--amber)'},
+    {n:'04',name:'Ethical & Inclusive AI',v:67,color:'var(--red)'},
+    {n:'05',name:'Data Sovereignty',v:91,color:'var(--blue)'},
+    {n:'06',name:'Human-Centred Deploy.',v:79,color:'var(--gold)'},
+  ];
+  el.innerHTML=pillars.map(p=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <div style="font-family:var(--fm);font-size:8px;color:var(--muted);width:55px">PILLAR ${p.n}</div>
+      <div style="font-size:11px;flex:1">${p.name}</div>
+      <div style="font-family:var(--fc);font-size:15px;font-weight:700;color:${p.color};width:36px;text-align:right">${p.v}%</div>
+      <div style="width:70px;height:4px;background:var(--navy3);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${p.v}%;background:${p.color};border-radius:2px"></div>
+      </div>
+      <div style="font-family:var(--fm);font-size:8px;color:${p.v>=80?'var(--green)':'var(--red)'}">
+        ${p.v>=80?'✓ PASS':'⚠ FAIL'}
+      </div>
+    </div>`).join('');
+}
+
+function renderCmdRegMini(){
+  const tb=document.getElementById('cmd-reg-mini');
+  if(!tb)return;
+  const show=SYSTEMS.slice(0,8);
+  tb.innerHTML=show.map(s=>`<tr class="${s.status==='NON-COMPLIANT'||s.status==='SUSPENDED'?'sys-row-critical':s.status==='COMPLIANT'?'sys-row-ok':'sys-row-warn'}">
+    <td class="mono" style="color:var(--gold)">${s.id}</td>
+    <td style="font-size:11px"><strong>${s.name}</strong></td>
+    <td>${riskB(s.risk)}</td>
+    <td>${statusB(s.status)}</td>
+    <td><span style="color:${cc(s.comp)};font-family:var(--fm)">${s.comp}%</span></td>
+    <td>${hitlB(s.hitl)}</td>
+    <td>${s.spd!==null?`<span style="font-family:var(--fm);color:${Math.max(s.spd,s.spd_g||0)>0.05?'var(--red)':Math.max(s.spd,s.spd_g||0)>0.03?'var(--amber)':'var(--green)'}">${Math.max(s.spd,s.spd_g||0).toFixed(3)}</span>`:'<span class="badge b-muted">N/A</span>'}</td>
+    <td>${bCert(s.ecert)}</td>
+  </tr>`).join('');
+}
+
+function renderFullRegistry(){
+  const tb=document.getElementById('full-reg-body');
+  if(!tb)return;
+  tb.innerHTML=SYSTEMS.map(s=>`<tr class="${s.status==='NON-COMPLIANT'||s.status==='SUSPENDED'?'sys-row-critical':s.status==='COMPLIANT'?'sys-row-ok':'sys-row-warn'}">
+    <td class="mono" style="color:var(--gold)">${s.id}</td>
+    <td style="font-size:11px"><strong>${s.name}</strong></td>
+    <td style="font-size:10px;color:var(--muted)">${s.arch}</td>
+    <td style="font-size:10px">${s.owner}</td>
+    <td>${riskB(s.risk)}</td>
+    <td>${bCert(s.ecert)}</td>
+    <td><span style="color:${cc(s.comp)};font-family:var(--fm)">${s.comp}%</span></td>
+    <td>${hitlB(s.hitl)}</td>
+    <td>${s.spd!==null?`<span style="font-family:var(--fm);font-size:9.5px;color:${Math.max(s.spd,s.spd_g||0)>0.05?'var(--red)':Math.max(s.spd,s.spd_g||0)>0.03?'var(--amber)':'var(--green)'}">${Math.max(s.spd,s.spd_g||0).toFixed(3)}</span>`:'—'}</td>
+    <td><span class="badge ${s.lc==='PRODUCTION'?'b-green':s.lc==='STAGING'?'b-amber':'b-red'}">${s.lc}</span></td>
+    <td>${s.drift!==null?`<span style="font-family:var(--fm);font-size:9.5px;color:${s.drift>0.15?'var(--red)':s.drift>0.08?'var(--amber)':'var(--green)'}">${s.drift}</span>`:'—'}</td>
+    <td><button class="btn btn-outline btn-sm" onclick="toast('${s.id} detail view opened.','info')">View</button></td>
+  </tr>`).join('');
+}
+
+function renderPillarsGrid(){
+  const el=document.getElementById('pillars-grid');
+  if(!el)return;
+  el.innerHTML=PILLARS_12.map(p=>`
+    <div class="pillar-card">
+      <div class="pc-num">${p.n}</div>
+      <div class="pc-title">${p.name}</div>
+      <p class="pc-text">${p.text}</p>
+      <div class="pc-status">
+        <span class="badge ${p.pass?'b-green':'b-red'}">${p.pass?'PASS':'PARTIAL'}</span>
+        <div class="pc-score" style="color:${p.color}">${p.score}%</div>
+      </div>
+      <div style="margin-top:6px"><div class="prog"><div class="pf" style="width:${p.score}%;background:${p.color}"></div></div></div>
+    </div>`).join('');
+}
+
+function renderBiasMeters(){
+  const el=document.getElementById('bias-meters');
+  if(!el)return;
+  el.innerHTML=SPD_DATA.map(s=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="font-size:11px;width:160px;flex-shrink:0">${s.char}</div>
+      <div style="flex:1;height:6px;background:var(--navy3);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(s.val/0.1*100,100)}%;background:${s.col};border-radius:3px"></div>
+      </div>
+      <div style="font-family:var(--fm);font-size:9.5px;color:${s.col};width:40px;text-align:right">${s.val.toFixed(3)}</div>
+      <div style="font-family:var(--fm);font-size:8px;color:var(--muted);width:55px">thr: 0.050</div>
+      ${s.val>0.05?bR('FLAG'):s.val>0.035?bA('WARN'):bG('PASS')}
+    </div>`).join('');
+}
+
+function renderSETHSStreams(){
+  const el=document.getElementById('seths-streams');
+  if(!el)return;
+  el.innerHTML=STREAMS.map(s=>`
+    <div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+        <span>${s[0]}</span>
+        <span style="font-family:var(--fm)">${s[1]}/${s[2]} participants</span>
+      </div>
+      <div class="prog"><div class="pf" style="width:${s[1]/s[2]*100}%;background:${s[3]}"></div></div>
+    </div>`).join('');
+}
+
+function renderChecklist(id,items){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML=items.map((item,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border2)">
+      <div style="width:18px;height:18px;border:1px solid ${item.done?'var(--green)':'var(--red)'};border-radius:1px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;cursor:pointer;background:${item.done?'var(--green2)':'transparent'}" onclick="toggleCheck(${id==='checklist-d1'?'D1':'M1'},${i})">
+        ${item.done?'<span style="color:var(--green);font-size:9px">✓</span>':''}
+      </div>
+      <div style="font-size:11px;color:${item.done?'var(--muted)':'var(--text)'}${item.done?';text-decoration:line-through':''}">${item.text}</div>
+      <span class="badge ${item.done?'b-green':'b-red'}" style="flex-shrink:0;margin-left:auto">${item.done?'DONE':'PENDING'}</span>
+    </div>`).join('');
+}
+
+function toggleCheck(list,i){
+  if(list==='D1') CHECKLIST_D1[i].done=!CHECKLIST_D1[i].done;
+  else CHECKLIST_M1[i].done=!CHECKLIST_M1[i].done;
+  renderChecklist('checklist-d1',CHECKLIST_D1);
+  renderChecklist('checklist-m1',CHECKLIST_M1);
+}
+
+// ── INIT ALL RENDERS ──────────────────────────────────────────────────
+function initRender(){
+  renderAuditStream('cmd-audit-stream');
+  renderAuditStream('audit-trail-stream');
+  renderAuditStream('udoc-audit-stream');
+  renderCmdPillarsMini();
+  renderCmdRegMini();
+  renderFullRegistry();
+  renderPillarsGrid();
+  renderBiasMeters();
+  renderSETHSStreams();
+  renderChecklist('checklist-d1',CHECKLIST_D1);
+  renderChecklist('checklist-m1',CHECKLIST_M1);
+}
+
+initRender();
+
+// ── PERIODIC LIVE AUDIT REFRESH ────────────────────────────────────────
+setInterval(()=>{
+  const tsMap=['cmd-audit-stream','audit-trail-stream','udoc-audit-stream'];
+  tsMap.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el||el.closest('.page.active')===null) return;
+    renderAuditStream(id);
+  });
+},20000);
+
+// ── KEYBOARD SHORTCUT: ESC to close modals ─────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeModal();
+});
+</script>
+<!-- ════════════════════════════════════════════════════════════════════
+     G.O.D.S LIVE BRIDGE — wires this admin cockpit to the live platform-core API.
+     Additive & non-destructive: offline it shows the approved demo; once you
+     Connect & sign in, governance pages bind to real backend data and poll live.
+     © 2026 Sashin J. Singh · G.O.D.S Holdings (Pty) Ltd (proposed) · pre-registration.
+════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  const LS_URL='gods_api_url', SS_TOK='gods_api_tok', SS_EMAIL='gods_api_email';
+  let API=(localStorage.getItem(LS_URL))||(location.origin.startsWith('http')?location.origin:'http://127.0.0.1:8077');
+  let TOK=sessionStorage.getItem(SS_TOK)||'';
+  let EMAIL=sessionStorage.getItem(SS_EMAIL)||'';
+  let pollTimer=null;
+
+  const css=`#gods-live{position:fixed;right:16px;bottom:16px;z-index:100000;font-family:'IBM Plex Mono',Consolas,monospace;background:#0B1829;border:1px solid #243A5A;border-radius:10px;box-shadow:0 10px 34px rgba(0,0,0,.55);color:#D4CEBC;width:306px;overflow:hidden}
+  #gods-live .gl-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;border-bottom:1px solid #1A3050}
+  #gods-live .dot{width:9px;height:9px;border-radius:50%;background:#7A7A8A}
+  #gods-live.live .dot{background:#2D9B5A;box-shadow:0 0 8px #2D9B5A}
+  #gods-live .gl-t{font-size:11px;letter-spacing:.05em;color:#C9A84C;flex:1}
+  #gods-live .gl-cv{font-size:9px;color:#7A7A8A}
+  #gods-live .gl-bd{padding:10px 12px;display:none}
+  #gods-live.open .gl-bd{display:block}
+  #gods-live input{width:100%;box-sizing:border-box;margin:3px 0;padding:6px 8px;background:#060E1C;border:1px solid #243A5A;border-radius:6px;color:#F5F0E8;font:11px 'IBM Plex Mono',monospace}
+  #gods-live button{width:100%;margin-top:6px;padding:7px;background:#C9A84C;color:#060E1C;border:0;border-radius:6px;font-weight:700;font-size:11px;letter-spacing:.04em;cursor:pointer}
+  #gods-live .gl-row{display:flex;gap:6px}#gods-live .gl-row button{margin-top:0}
+  #gods-live .gl-msg{font-size:10px;margin-top:6px;min-height:12px;line-height:1.4}`;
+  const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
+
+  const box=document.createElement('div'); box.id='gods-live';
+  box.innerHTML=`<div class="gl-hd"><span class="dot"></span><span class="gl-t">DEMO · OFFLINE</span><span class="gl-cv">▲ live</span></div>
+  <div class="gl-bd">
+    <div id="gl-login">
+      <input id="gl-url" placeholder="Backend URL"/>
+      <input id="gl-email" placeholder="email"/>
+      <input id="gl-pass" type="password" placeholder="password"/>
+      <button id="gl-connect">Connect &amp; Sign in</button>
+    </div>
+    <div id="gl-on" style="display:none">
+      <div style="font-size:10px;color:#7A7A8A">Connected as</div>
+      <div id="gl-who" style="font-size:11px;color:#F5F0E8;margin-bottom:6px"></div>
+      <div class="gl-row"><button id="gl-refresh">Refresh</button><button id="gl-out" style="background:#243A5A;color:#D4CEBC">Disconnect</button></div>
+    </div>
+    <div class="gl-msg" id="gl-msg"></div>
+  </div>`;
+  document.body.appendChild(box);
+  const $=id=>document.getElementById(id);
+  $('gl-url').value=API; $('gl-email').value=EMAIL||'admin@gods.local';
+  box.querySelector('.gl-hd').onclick=()=>box.classList.toggle('open');
+  function setStatus(live,label){box.classList.toggle('live',live);box.querySelector('.gl-t').textContent=label;$('gl-login').style.display=live?'none':'block';$('gl-on').style.display=live?'block':'none';}
+  function msg(t,ok){$('gl-msg').textContent=t;$('gl-msg').style.color=ok?'#2D9B5A':'#E8C97A';}
+
+  async function req(path,opts={}){
+    const h=Object.assign({'Content-Type':'application/json'},opts.headers||{});
+    if(TOK)h['Authorization']='Bearer '+TOK;
+    const r=await fetch(API.replace(/\/$/,'')+path,Object.assign({},opts,{headers:h}));
+    if(!r.ok)throw new Error(path+' '+r.status);
+    const ct=r.headers.get('content-type')||'';return ct.includes('json')?r.json():r.text();
+  }
+  async function login(email,pass){
+    const body=new URLSearchParams({username:email,password:pass});
+    const r=await fetch(API.replace(/\/$/,'')+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+    if(!r.ok)throw new Error('login '+r.status);
+    const j=await r.json();TOK=j.access_token||j.token;sessionStorage.setItem(SS_TOK,TOK);return TOK;
+  }
+
+  function setKpi(label,val){document.querySelectorAll('.kpi').forEach(k=>{const l=k.querySelector('.kpi-l'),v=k.querySelector('.kpi-v');if(l&&v&&l.textContent.trim().toLowerCase()===label.toLowerCase())v.textContent=val;});}
+  function setLive(key,val){document.querySelectorAll('[data-live="'+key+'"]').forEach(e=>e.textContent=val);}
+  function fmt(n){n=Number(n)||0;return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'k':String(n);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+  function renderStream(id,recs){
+    const el=document.getElementById(id);if(!el)return;
+    if(!recs||!recs.length){el.innerHTML='<div style="font-size:11px;color:#7A7A8A;padding:8px">No audit events yet — submit a decision to populate the Merkle chain.</div>';return;}
+    el.innerHTML=recs.slice(0,14).map(r=>{
+      const t=(r.created_at||r.ts||'').toString().slice(11,19);
+      const ev=r.event_type||r.event||r.action||'EVENT';
+      let det=r.detail!=null?(typeof r.detail==='string'?r.detail:JSON.stringify(r.detail)):(r.model_id||r.classification||'');
+      return `<div style="display:flex;gap:10px;padding:6px 4px;border-bottom:1px solid #1A3050;font-size:11px"><span style="color:#7A7A8A">${esc(t)}</span><span style="color:#C9A84C;min-width:120px">${esc(ev)}</span><span style="color:#D4CEBC;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(det)}</span></div>`;
+    }).join('');
+  }
+  function renderRegistry(models){
+    const b=document.getElementById('full-reg-body');if(!b)return;
+    if(!models||!models.length){b.innerHTML='<tr><td colspan="12" style="color:#7A7A8A;padding:8px">No models registered.</td></tr>';return;}
+    b.innerHTML=models.map(m=>`<tr><td class="mono" style="color:var(--gold)">${esc(m.model_id)}</td><td>${esc(m.name)}</td><td>—</td><td>${esc(m.operator_id)}</td><td>${esc(m.risk_tier)}</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="badge b-${(m.status==='ACTIVE')?'green':'amber'}">${esc(m.status)}</span></td><td>—</td><td><button class="btn btn-outline btn-sm" onclick="toast('Model ${esc(m.model_id)}','info')">View</button></td></tr>`).join('');
+  }
+  function renderOversight(cases){
+    const page=document.getElementById('page-cob');if(!page)return;
+    let panel=document.getElementById('gl-oversight');
+    if(!panel){panel=document.createElement('div');panel.className='panel';panel.id='gl-oversight';panel.style.marginTop='12px';
+      panel.innerHTML='<div class="panel-hdr"><div class="panel-title">Live Oversight Cases — COB queue <span style="color:#2D9B5A;font-size:8px">● LIVE</span></div></div><div id="gl-ov-body"></div>';
+      page.appendChild(panel);}
+    const b=document.getElementById('gl-ov-body');
+    b.innerHTML=(cases&&cases.length)?('<table class="tbl"><thead><tr><th>Case</th><th>Model</th><th>Reason</th><th>State</th></tr></thead><tbody>'+cases.map(c=>`<tr><td class="mono">${esc(c.case_ref)}</td><td>${esc(c.model_id)}</td><td>${esc(c.reason)}</td><td><span class="badge b-amber">${esc(c.state||'OPEN')}</span></td></tr>`).join('')+'</tbody></table>'):'<div style="font-size:11px;color:#7A7A8A;padding:8px">No open oversight cases.</div>';
+  }
+  function setTopbar(status,sov){
+    document.querySelectorAll('.tp-pill,.status-pill,.topbar .pill').forEach(()=>{});
+  }
+
+  let _neutralised=false;
+  function neutraliseDemo(){
+    if(_neutralised)return;_neutralised=true;
+    try{const maxId=setInterval(function(){},9999);for(let i=1;i<=maxId;i++)clearInterval(i);clearInterval(maxId);}catch(e){}
+    try{if(window.updateClock){updateClock();setInterval(window.updateClock,1000);}}catch(e){}
+    try{if(window.renderAuditStream)window.renderAuditStream=function(){};}catch(e){}
+  }
+  async function refreshAll(){
+    if(!TOK)return;
+    neutraliseDemo();
+    try{
+      const [status,sov,bias,models,sweep,audit,cases]=await Promise.all([
+        req('/admin/status').catch(()=>({})),req('/sovereignty/posture').catch(()=>({})),
+        req('/bias/scan').catch(()=>({})),req('/registry/models').catch(()=>[]),
+        req('/compliance/sweep').catch(()=>({})),req('/audit/records').catch(()=>[]),
+        req('/oversight/cases').catch(()=>[])
+      ]);
+      const nModels=status.models!=null?status.models:(models.length||0);
+      const nDec=status.decisions!=null?status.decisions:0;
+      setKpi('AI Systems',nModels); setKpi('Systems Registered',nModels);
+      setKpi('Decisions Today',fmt(nDec)); setLive('dec',fmt(nDec));
+      setKpi('Decisions Audited',fmt((audit||[]).length)); setKpi('Total Events',fmt((audit||[]).length));
+      setKpi('Sovereignty',Math.round((sov.sovereign_rate!=null?sov.sovereign_rate:1)*100)+'%');
+      setKpi('Bias Flags',bias.fairness_flagged!=null?bias.fairness_flagged:0);
+      setKpi('Non-Compliant',(sweep.results||[]).filter(r=>r.compliant===false).length);
+      setKpi('Open Oversight',(cases||[]).length);
+      renderStream('cmd-audit-stream',audit);renderStream('audit-trail-stream',audit);renderStream('udoc-audit-stream',audit);
+      renderRegistry(models); renderOversight(cases); setTopbar(status,sov);
+      msg('● Live · refreshed '+new Date().toLocaleTimeString(),true);
+    }catch(e){msg('Refresh error: '+e.message,false);}
+  }
+
+  $('gl-connect').onclick=async()=>{
+    API=($('gl-url').value.trim())||API;localStorage.setItem(LS_URL,API);
+    EMAIL=$('gl-email').value.trim();sessionStorage.setItem(SS_EMAIL,EMAIL);
+    msg('Connecting…');
+    try{
+      await login(EMAIL,$('gl-pass').value);
+      const me=await req('/auth/me');
+      $('gl-who').textContent=(me.sub||EMAIL)+' · '+(me.role||'');
+      setStatus(true,'LIVE · '+(me.role||'user').toUpperCase());
+      await refreshAll();
+      if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(refreshAll,7000);
+    }catch(e){setStatus(false,'DEMO · OFFLINE');msg('Failed: '+e.message+' (check URL/login)',false);box.classList.add('open');}
+  };
+  $('gl-refresh').onclick=refreshAll;
+  $('gl-out').onclick=()=>{TOK='';sessionStorage.removeItem(SS_TOK);if(pollTimer)clearInterval(pollTimer);setStatus(false,'DEMO · OFFLINE');msg('Disconnected — showing demo data.',true);};
+
+  if(TOK){setStatus(true,'LIVE');refreshAll().then(()=>{pollTimer=setInterval(refreshAll,7000);}).catch(()=>setStatus(false,'DEMO · OFFLINE'));}
+})();
+</script>
+
+</body>
+</html>

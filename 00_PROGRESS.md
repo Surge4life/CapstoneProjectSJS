@@ -1,3 +1,5 @@
+> **Pre-registration forecast.** G.O.D.S Holdings (Pty) Ltd is a *proposed* entity — not registered. No trust, trademark, or domain is registered; all IP vests in Sashin J. Singh. See `BRAND_AND_ENTITY_CONSTANTS.md` and `PRE_REGISTRATION_NOTICE.md`.
+
 # GODS ECOSYSTEM — BUILD PROGRESS & SESSION HANDOFF
 **This is the resume-point file.** Any new session reads this first, then continues from
 the next unchecked item. It replaces redoing work with clean continuation.
@@ -227,3 +229,38 @@ with no toolchain. This is a sandbox/tooling limit, not a design gap.
 - [x] M3. .gitignore (excludes node_modules/dist/db/_packages/.env)
 - [x] M4. 00_DEPLOY_TO_RENDER.md — GitHub-first then one-click Blueprint guide; free-tier caveats documented
 - [x] M5. verified: unit tests 8/8 after config change; DATABASE_URL override + scheme fix confirmed
+
+### Phase N — .apk SDK build prep (complete except on-machine compile)
+- [x] N1. Android resources for all 5 mobile projects: network_security_config (cleartext for LAN/tunnel), strings.xml, manifest permissions
+- [x] N2. build-apk.sh per project: web build → cap add android → sync → apply resources → assembleRelease
+- [x] N3. fresh web builds rebundled into each */www (apps wrap current code)
+- [x] N4. non-SDK build steps dry-run validated (web build, resource copy, config, bash syntax)
+- [x] N5. master 00_BUILD_APKS.md at root: prerequisites + one-command build + signing steps
+- [ ] N6. SDK compile → signed .apk (USER-SIDE: runs on a desktop with Android Studio + JDK17 + Node18)
+
+### Phase O — LIVE on Render (deployed + verified)
+- [x] O1. Backend gods-platform-core LIVE: /health ok, /docs live, environment=production
+- [x] O2. Fixed psycopg driver: postgresql+psycopg:// (psycopg2 not installed) — deploy succeeded
+- [x] O3. Auth verified live: admin login → 200 + JWT (role/division from live Postgres)
+- [x] O4. EVA governance engine verified live: BLOCK (HIGH risk, sealed) + APPROVE (MINIMAL, sealed), sub-ms
+- [x] O5. Both static sites deployed (gods-platform-internal, gods-portals)
+- [x] O6. Fixed VITE_API_BASE → full https URL for both static sites; portals default to env var
+
+### Phase P — Desktop (.exe) applications via Electron
+- [x] P1. Five Electron projects: udoc/seths/madiba/ts/portals-desktop (load live site in native window)
+- [x] P2. main.js per app (window, no menu bar, external links to browser, offline-friendly fallback); all validated with node --check
+- [x] P3. electron-builder config → Windows .exe (NSIS installer + portable); icons generated
+- [x] P4. verified electron-builder installs/runs; Electron runtime downloads on user desktop (firewall-blocked in sandbox)
+- [x] P5. master 00_BUILD_DESKTOP_APPS.md + per-project READMEs; PWA-install path documented as the no-build option
+- [ ] P6. .exe compile (USER-SIDE: npm install && npm run dist on a Windows desktop with Node 18+)
+
+### Phase Q — Full start-to-finish APK build runbook
+- [x] Q1. 00_START_HERE_BUILD_APK.md — nothing-assumed Windows runbook: files → Node → terminal → cap add/sync → Android Studio → APK → install on phone
+- [x] Q2. Cheat-sheet of the 6 common first-build snags with exact fixes (SDK location, Gradle JDK, platform, ANDROID_HOME, cleartext, stuck sync)
+- [x] Q3. UDOC app defaults to live Render backend so the .apk auto-connects
+
+### Phase R — First .apk built + handoff for next chapter
+- [x] R1. udoc-mobile .apk BUILT on user desktop (app-debug.apk 3.8MB), installed on Android, connects live to Render, client-register + 4 dashboards working
+- [x] R2. MEMORY.md — full project state/handoff for a fresh chat (what is live, fixes applied, systems map, next chapter)
+- [x] R3. SKILLS.md — all hard-won technical know-how, gotchas, exact build/deploy/git/apk procedures
+- [ ] R4. NEXT CHAPTER (new chat): systematically upgrade live system toward the .html demo vision → SaaS-client-ready stack

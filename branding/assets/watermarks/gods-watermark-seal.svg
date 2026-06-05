@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" opacity="0.04">
+  <circle cx="200" cy="200" r="150" fill="none" stroke="#C9A84C" stroke-width="3"/>
+  <circle cx="200" cy="200" r="130" fill="none" stroke="#C9A84C" stroke-width="1.5"/>
+  <path d="M 250.91 149.09 L 221.64 191.09 L 200.00 200.00 L 208.91 178.36 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 250.91 250.91 L 208.91 221.64 L 200.00 200.00 L 221.64 208.91 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 149.09 250.91 L 178.36 208.91 L 200.00 200.00 L 191.09 221.64 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 149.09 149.09 L 191.09 178.36 L 200.00 200.00 L 178.36 191.09 Z" fill="none" stroke="#C9A84C" stroke-width="2"/><path d="M 200.00 80.00 L 216.00 164.00 L 200.00 200.00 L 184.00 164.00 Z" fill="#C9A84C"/><path d="M 320.00 200.00 L 236.00 216.00 L 200.00 200.00 L 236.00 184.00 Z" fill="#C9A84C"/><path d="M 200.00 320.00 L 184.00 236.00 L 200.00 200.00 L 216.00 236.00 Z" fill="#C9A84C"/><path d="M 80.00 200.00 L 164.00 184.00 L 200.00 200.00 L 164.00 216.00 Z" fill="#C9A84C"/>
+  <circle cx="200" cy="200" r="46" fill="none" stroke="#C9A84C" stroke-width="4"/>
+  <circle cx="200" cy="200" r="14" fill="#C9A84C"/>
+</svg>

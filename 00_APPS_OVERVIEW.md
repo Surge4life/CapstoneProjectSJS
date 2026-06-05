@@ -1,3 +1,5 @@
+> **Pre-registration forecast.** G.O.D.S Holdings (Pty) Ltd is a *proposed* entity — not registered. No trust, trademark, or domain is registered; all IP vests in Sashin J. Singh. See `BRAND_AND_ENTITY_CONSTANTS.md` and `PRE_REGISTRATION_NOTICE.md`.
+
 # G.O.D.S ECOSYSTEM — APPLICATIONS OVERVIEW
 
 Per the distribution model: four installable apps + one browser-only admin.

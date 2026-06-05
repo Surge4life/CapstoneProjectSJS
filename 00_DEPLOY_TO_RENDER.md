@@ -1,3 +1,5 @@
+> **Pre-registration forecast.** G.O.D.S Holdings (Pty) Ltd is a *proposed* entity — not registered. No trust, trademark, or domain is registered; all IP vests in Sashin J. Singh. See `BRAND_AND_ENTITY_CONSTANTS.md` and `PRE_REGISTRATION_NOTICE.md`.
+
 # Deploy G.O.D.S to Render — step by step
 
 You have a free Render account. The order is: **GitHub first, then Render Blueprint.**
@@ -38,7 +40,7 @@ git push -u origin main
 ## Part 3 — Point the apps at the live backend
 Your apps (UDOC/SETHS/MADIBA/TS + portals) have a **connect screen**. On a device:
 - Paste your live backend URL: `https://gods-platform-core.onrender.com`
-- Connect → sign in (admin@gods.za / admin123) → use it live.
+- Connect → sign in (admin@gods.local / admin123) → use it live.
 The internal console + portals deployed by the blueprint already point at the backend.
 
 ## Free-tier facts to know (so nothing surprises you)

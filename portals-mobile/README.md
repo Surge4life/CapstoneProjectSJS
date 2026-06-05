@@ -1,41 +1,35 @@
-# G.O.D.S Portals — Native Android (.apk) build project
+# GODS Portals — Android .apk build (app id: za.gods.portals)
 
-This is a complete Capacitor project that wraps the portals PWA (`portals-web`) into a
-real, installable, signed Android `.apk`. The web app inside is identical to the PWA and
-already works; this produces the native binary for Play Store / sideload distribution.
+Capacitor project that compiles the **portals-web** web app into a native Android `.apk`.
 
-## Why it isn't pre-compiled here
-A signed `.apk` requires the Android SDK + Android Gradle Plugin + a signing keystore.
-Those can't be installed in the build sandbox (no SDK; Google's Maven is firewall-blocked).
-Everything *except* the final compile is done for you below — it's three commands on any
-machine with Android Studio.
+## Why it isn't pre-compiled in the package
+A signed `.apk` needs the Android SDK + Android Gradle Plugin + a keystore. The build sandbox
+that produced this package has no SDK and is firewall-blocked from downloading it. Everything
+else is done; the SDK build is the one step that must run on your machine.
 
-## Build the .apk (on a machine with Android Studio + JDK 17+)
+## Requirements (on your desktop)
+- Android Studio (gives you the SDK + an emulator) **or** Android command-line tools
+- JDK 17+
+- Node.js 18+
+
+## Build (one script)
 ```bash
 cd portals-mobile
-npm install
-npm run build:web        # copies the latest portals build into www/
-npx cap add android      # generates the native android/ project (needs SDK)
-npx cap sync
-npx cap open android      # opens Android Studio
-# In Android Studio:  Build → Generate Signed Bundle / APK → APK → create/keystore → release
-# Output: android/app/build/outputs/apk/release/app-release.apk
+./build-apk.sh          # builds web app → generates android/ → applies resources → assembles APK
 ```
-
-## Command-line alternative (no IDE), once android/ exists and SDK is on PATH
+Then to produce a **signed** apk for sideload/Play Store:
 ```bash
-cd android
-./gradlew assembleRelease         # unsigned
-# or configure signing in android/app/build.gradle then:
-./gradlew assembleRelease         # signed release .apk
+npx cap open android    # opens Android Studio → Build > Generate Signed Bundle / APK > APK
 ```
+Output (unsigned): `android/app/build/outputs/apk/release/app-release-unsigned.apk`
 
-## What the app does
-On first launch it shows the same connect screen as the PWA: enter your deployed backend
-URL (LAN IP or ngrok/cloudflared tunnel), and the three portals (Student/Employer/Employee)
-work live against your G.O.D.S deployment. Network-state aware via @capacitor/network.
+## What's already prepared for you
+- `www/` — the built web app (works as an installable PWA right now, no toolchain)
+- `capacitor.config.json` — app id za.gods.portals, cleartext enabled for the connect-screen
+- `android-resources/` — network-security config (lets the app reach your LAN/tunnel backend),
+  strings.xml, and the manifest permissions to merge
+- `build-apk.sh` — the exact end-to-end build
 
-## Distribution
-- **Sideload:** share the `.apk`; users enable "install unknown apps" and tap it.
-- **Play Store:** upload the signed `.aab` (Build → Generate Signed Bundle).
-- **Meanwhile:** the PWA in `portals-web` is installable today with zero toolchain.
+## First launch
+The app shows a connect screen — enter your deployed backend URL (e.g. your Render URL
+`https://gods-platform-core.onrender.com`, or a LAN IP / ngrok tunnel) and it runs live.

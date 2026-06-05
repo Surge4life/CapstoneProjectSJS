@@ -1,6 +1,6 @@
 const KEY_BASE = "gods_api_base";
 const KEY_TOKEN = "gods_token";
-export function getBase(){ return localStorage.getItem(KEY_BASE) || "http://localhost:8000"; }
+export function getBase(){ return localStorage.getItem(KEY_BASE) || "https://gods-platform-core.onrender.com"; }
 export function setBase(b:string){ localStorage.setItem(KEY_BASE, b.replace(/\/$/, "")); }
 export function getToken(){ return localStorage.getItem(KEY_TOKEN); }
 export function setToken(t:string|null){ t?localStorage.setItem(KEY_TOKEN,t):localStorage.removeItem(KEY_TOKEN); }
@@ -15,6 +15,7 @@ export async function ping(){ try{ return (await fetch(`${getBase()}/health`)).o
 export const api={
   get:(p:string)=>req(p),
   post:(p:string,b?:any)=>req(p,{method:"POST",body:b?JSON.stringify(b):undefined}),
+  patch:(p:string,b?:any)=>req(p,{method:"PATCH",body:b?JSON.stringify(b):undefined}),
   login: async(email:string,password:string)=>{
     const form=new URLSearchParams({username:email,password});
     const res=await fetch(`${getBase()}/auth/login`,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
@@ -27,6 +28,13 @@ export const api={
     const tok=getToken();
     const res=await fetch(`${getBase()}/documents/upload`,{method:"POST",headers:tok?{"Authorization":`Bearer ${tok}`}:{},body:fd});
     if(!res.ok) throw new Error("upload failed"); return res.json();
+  },
+  uploadPolicy: async(name:string,jurisdiction:string,sector:string,file:File)=>{
+    const fd=new FormData(); fd.append("name",name); fd.append("jurisdiction",jurisdiction);
+    fd.append("sector",sector); fd.append("file",file);
+    const tok=getToken();
+    const res=await fetch(`${getBase()}/policy/upload`,{method:"POST",headers:tok?{"Authorization":`Bearer ${tok}`}:{},body:fd});
+    if(!res.ok) throw new Error((await res.json().catch(()=>({}))).detail||"policy upload failed"); return res.json();
   },
   downloadUrl:(docRef:string)=>`${getBase()}/documents/${docRef}/download`,
 };

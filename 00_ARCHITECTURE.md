@@ -1,3 +1,5 @@
+> **Pre-registration forecast.** G.O.D.S Holdings (Pty) Ltd is a *proposed* entity — not registered. No trust, trademark, or domain is registered; all IP vests in Sashin J. Singh. See `BRAND_AND_ENTITY_CONSTANTS.md` and `PRE_REGISTRATION_NOTICE.md`.
+
 # GODS ECOSYSTEM — ARCHITECTURE
 Maps the UDOC hardware spec (5 planes) → software services → the boot-to-live flow.
 Everything here is built as real software; the hardware boundary is marked explicitly.

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 668 130" role="img" aria-label="G.O.D.S — Good Orderly Directional Systems">
+  <title>G.O.D.S — Good Orderly Directional Systems</title>
+  <g transform="translate(8,16) scale(1.55)">  <title>G.O.D.S</title>
+  
+  <path d="M 12 8 L 52 8 C 52 8 53 30 49 43 C 45 56 39 62 32 66 C 25 62 19 56 15 43 C 11 30 12 8 12 8 Z" fill="url(#eShield)" stroke="#C9A84C" stroke-width="2" stroke-linejoin="round"/>
+  <defs><linearGradient id="eShield" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1A3A5C"/><stop offset="1" stop-color="#060E1C"/></linearGradient></defs>
+  <path d="M 39.07 22.93 L 35.18 28.94 L 32.00 30.00 L 33.06 26.82 Z" fill="#8B6914"/><path d="M 39.07 37.07 L 33.06 33.18 L 32.00 30.00 L 35.18 31.06 Z" fill="#8B6914"/><path d="M 24.93 37.07 L 28.82 31.06 L 32.00 30.00 L 30.94 33.18 Z" fill="#8B6914"/><path d="M 24.93 22.93 L 30.94 26.82 L 32.00 30.00 L 28.82 28.94 Z" fill="#8B6914"/><path d="M 32.00 13.00 L 34.60 24.90 L 32.00 30.00 L 29.40 24.90 Z" fill="#C9A84C"/><path d="M 49.00 30.00 L 37.10 32.60 L 32.00 30.00 L 37.10 27.40 Z" fill="#C9A84C"/><path d="M 32.00 47.00 L 29.40 35.10 L 32.00 30.00 L 34.60 35.10 Z" fill="#C9A84C"/><path d="M 15.00 30.00 L 26.90 27.40 L 32.00 30.00 L 26.90 32.60 Z" fill="#C9A84C"/>
+  <circle cx="32" cy="30" r="6.4" fill="#060E1C" stroke="#C9A84C" stroke-width="1.4"/>
+  <circle cx="32" cy="30" r="2.2" fill="#C9A84C"/>
+</g>
+  <text x="132" y="60" fill="#C9A84C" font-family="'Playfair Display','Cormorant Garamond',Georgia,serif"
+        font-size="50" font-weight="700" letter-spacing="6">G.O.D.S<tspan font-family="'IBM Plex Mono',monospace" font-size="15" dy="-22" fill="#9A9488">TM</tspan></text>
+  <text x="134" y="88" fill="#9A9488" font-family="'Barlow Condensed','DejaVu Sans',sans-serif"
+        font-size="15.5" font-weight="500" letter-spacing="4.6">GOOD ORDERLY DIRECTIONAL SYSTEMS</text>
+  <text x="134" y="108" fill="#9A9488" font-family="'Barlow Condensed','DejaVu Sans',sans-serif"
+        font-size="11" font-weight="400" letter-spacing="3" opacity="0.8">G.O.D.S HOLDINGS (PTY) LTD · JOHANNESBURG</text>
+</svg>

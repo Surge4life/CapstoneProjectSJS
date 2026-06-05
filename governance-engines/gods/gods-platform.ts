@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════════════════════
 // G.O.D.S PLATFORM — FOUR-DIVISION INTEGRATED ECONOMIC ENGINE
-// Good Orderly Directional Systems Holdings (Pty) Ltd
+// Good Orderly Directional Systems Holdings (Pty) Ltd (proposed)
 // The closed capital loop: SETHS → TS → UDOC → MADIBA → (back to) SETHS
 // Constitutional parent · 12 Pillars · IP Trust · COB · 250-year mandate
 //

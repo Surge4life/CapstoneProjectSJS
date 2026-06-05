@@ -13,6 +13,7 @@ from app.core.dependencies import current_user
 from app.core.config import settings
 from app.services.governance_bridge import Evidence, evaluate
 from app.services.audit_writer import append_audit
+from app.services import policy_engine as pe
 from app.services.event_bus import bus
 
 router = APIRouter(prefix="/decisions", tags=["UDOC decisions"])
@@ -47,30 +48,38 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
         ecs=req.ecs, bgp=req.bgp, traceroute=req.traceroute, dnssec=req.dnssec, storage=req.storage,
     )
     v = evaluate(ev)
+    # Policy-to-Code layer: enforce active, human-approved rules compiled from uploaded legislation.
+    pol = pe.apply(db, ev, model, v)
+    final_decision = pol["adjusted_decision"]
+    policy_reasons = [f"POLICY {f['code']} ({f['kind']}): {f['message']}" for f in pol["fired"]]
+    all_reasons = list(v.block_reasons) + policy_reasons
 
-    # Persist decision
-    d = Decision(model_pk=model.id, decision=v.decision, svs=v.svs, risk=v.risk,
+    # Persist decision (policy-adjusted)
+    d = Decision(model_pk=model.id, decision=final_decision, svs=v.svs, risk=v.risk,
                  compliance=v.compliance, sovereign=v.sovereign, seal=v.seal,
-                 latency_ms=v.latency_ms, block_reasons=" | ".join(v.block_reasons))
+                 latency_ms=v.latency_ms, block_reasons=" | ".join(all_reasons))
     db.add(d)
     # If blocked, reflect on model status for critical tiers
-    if v.decision == "BLOCK" and ev.risk_tier in ("HIGH", "UNACCEPTABLE"):
+    if final_decision == "BLOCK" and ev.risk_tier in ("HIGH", "UNACCEPTABLE"):
         model.status = "BLOCKED"
     db.commit(); db.refresh(d)
 
     # Immutable audit + event
-    append_audit(db, "AI_DECISION", {"model_id": req.model_id, "decision": v.decision,
-                 "svs": v.svs, "seal": v.seal[:16]}, classification="GOVERNANCE",
-                 actor_class=user.get("role", "SYSTEM"))
-    bus.emit("decisions", {"model_id": req.model_id, "decision": v.decision, "svs": v.svs})
+    append_audit(db, "AI_DECISION", {"model_id": req.model_id, "decision": final_decision,
+                 "svs": v.svs, "seal": v.seal[:16], "policy_fired": len(pol["fired"])},
+                 classification="GOVERNANCE", actor_class=user.get("role", "SYSTEM"))
+    bus.emit("decisions", {"model_id": req.model_id, "decision": final_decision, "svs": v.svs})
 
     return {
-        "model_id": v.model_id, "decision": v.decision, "svs": v.svs, "risk": v.risk,
+        "model_id": v.model_id, "decision": final_decision, "base_decision": v.decision,
+        "svs": v.svs, "risk": v.risk,
         "compliance": v.compliance, "stability": v.stability, "disparate_impact": v.disparate_impact,
         "spd": v.spd, "ecs": v.ecs, "sovereign": v.sovereign, "sovereign_svs": v.sovereign_svs,
         "seal": v.seal, "latency_ms": v.latency_ms, "budget_ms": settings.governance_overhead_budget_ms,
         "within_budget": v.latency_ms <= settings.governance_overhead_budget_ms,
-        "block_reasons": v.block_reasons,
+        "block_reasons": all_reasons,
+        "policy_enforced": pol["policy_enforced"], "policy_rules_evaluated": pol["rules_evaluated"],
+        "policy_findings": pol["fired"],
     }
 
 @router.get("")

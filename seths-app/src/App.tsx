@@ -14,7 +14,7 @@ export function App() {
 
   async function checkConn(){ setConnected(await ping()); } useEffect(()=>{checkConn();},[]);
   function saveBase(){ setBase(base); setBaseState(getBase()); checkConn(); }
-  async function login(){ try{ await api.login("admin@gods.za","admin123"); setAuthed(true);}catch(e:any){setMsg(e.message);} }
+  async function login(){ try{ await api.login("admin@gods.local","admin123"); setAuthed(true);}catch(e:any){setMsg(e.message);} }
   async function load(){
     if(!sref) return;
     try{ setProfile(await api.get(`/portal/student/${sref}`));

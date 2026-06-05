@@ -54,7 +54,7 @@ def main():
             try:
                 if http("GET", "/health")["status"] == "ok": break
             except Exception: time.sleep(0.5)
-        tok = http("POST", "/auth/login", form={"username": "admin@gods.za", "password": "admin123"})["access_token"]
+        tok = http("POST", "/auth/login", form={"username": "admin@gods.local", "password": "admin123"})["access_token"]
         http("POST", "/registry/models", token=tok,
              body={"model_id": "stress-m", "name": "S", "operator_id": "op", "risk_tier": "NOTABLE"})
 

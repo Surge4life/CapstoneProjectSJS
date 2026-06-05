@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MADIBA</string>
+    <string name="title_activity_main">MADIBA</string>
+    <string name="package_name">za.gods.madiba</string>
+    <string name="custom_url_scheme">za.gods.madiba</string>
+</resources>

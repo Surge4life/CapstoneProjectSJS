@@ -288,3 +288,39 @@ class PartnerApplication(Base):
     bbbee_level: Mapped[int] = mapped_column(Integer, default=4)
     state: Mapped[str] = mapped_column(String(20), default="APPLIED")  # APPLIED|VETTING|APPROVED|REJECTED
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+# ─── Policy-to-Code · UDOC governance protocol layer ───
+class PolicyPack(Base):
+    """A piece of passed/applicable legislation a client uploads, compiled into enforceable rules."""
+    __tablename__ = "policy_packs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    source_filename: Mapped[str] = mapped_column(String(255), default="")
+    jurisdiction: Mapped[str] = mapped_column(String(40), default="ZA")
+    sector: Mapped[str] = mapped_column(String(20), default="GENERAL")  # PUBLIC|PRIVATE|GENERAL
+    status: Mapped[str] = mapped_column(String(20), default="DRAFT")    # DRAFT|ACTIVE|ARCHIVED
+    uploaded_by: Mapped[str] = mapped_column(String(120), default="")
+    sha256: Mapped[str] = mapped_column(String(64), default="")
+    summary: Mapped[str] = mapped_column(Text, default="")
+    rule_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    activated_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+
+
+class PolicyRule(Base):
+    """A single machine-enforceable rule compiled from a PolicyPack (human-reviewable/editable)."""
+    __tablename__ = "policy_rules"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pack_id: Mapped[int] = mapped_column(ForeignKey("policy_packs.id"), index=True)
+    code: Mapped[str] = mapped_column(String(20), default="")  # PR-001
+    kind: Mapped[str] = mapped_column(String(40))  # PROHIBIT|RISK_TIER_CAP|REQUIRE_HITL|MIN_SOVEREIGNTY|MIN_COMPLIANCE|MAX_DISPARATE_IMPACT|DATA_LOCALISATION|KEYWORD_FLAG
+    target: Mapped[str] = mapped_column(Text, default="")
+    operator: Mapped[str] = mapped_column(String(8), default="")  # <, >=, contains
+    threshold: Mapped[float] = mapped_column(Float, nullable=True)
+    severity: Mapped[str] = mapped_column(String(10), default="REVIEW")  # BLOCK|REVIEW|FLAG
+    description: Mapped[str] = mapped_column(Text, default="")
+    source_excerpt: Mapped[str] = mapped_column(Text, default="")
+    confidence: Mapped[float] = mapped_column(Float, default=0.6)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)

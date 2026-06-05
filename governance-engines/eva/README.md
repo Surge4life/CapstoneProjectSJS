@@ -1,7 +1,7 @@
 # UDOC EVA Engine — Complete Build
 
 **Evaluating Valiant Algorithms** · 6-Dimensional Sovereign Risk Scoring
-G.O.D.S Holdings (Pty) Ltd · v9.3 → v10.0 (computational gaps completed)
+G.O.D.S Holdings (Pty) Ltd (proposed) · v9.3 → v10.0 (computational gaps completed)
 
 ## What this is
 A single, self-contained, runnable EVA engine that consolidates the v9.3

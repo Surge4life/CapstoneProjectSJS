@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 34" role="img" aria-label="RESTRICTED classification">
+  <rect width="560" height="34" fill="#060E1C"/>
+  <rect width="8" height="34" fill="#9E2B25"/>
+  <rect x="14" y="7" width="148" height="20" rx="3" fill="#9E2B25"/>
+  <text x="88" y="21" text-anchor="middle" fill="#F5F0E8" font-family="'IBM Plex Mono',monospace" font-size="12" font-weight="700" letter-spacing="2.5">RESTRICTED</text>
+  <text x="178" y="21" fill="#C9A84C" font-family="'Barlow Condensed','DejaVu Sans',sans-serif" font-size="12.5" letter-spacing="1.5">Named recipients only &#183; COB + legal</text>
+  <text x="552" y="21" text-anchor="end" fill="#9A9488" font-family="'IBM Plex Mono',monospace" font-size="9" letter-spacing="2">G.O.D.S — PROPOSED</text>
+</svg>

@@ -10,7 +10,7 @@ export function App() {
   const [msg,setMsg]=useState("");
   async function checkConn(){ setConnected(await ping()); } useEffect(()=>{checkConn();},[]);
   function saveBase(){ setBase(base); setBaseState(getBase()); checkConn(); }
-  async function login(){ try{ await api.login("admin@gods.za","admin123"); setAuthed(true);}catch(e:any){setMsg(e.message);} }
+  async function login(){ try{ await api.login("admin@gods.local","admin123"); setAuthed(true);}catch(e:any){setMsg(e.message);} }
   async function load(){ try{ setPipe(await api.get("/madiba/engage/pipeline")); }catch(e:any){ setMsg(e.message); } }
   useEffect(()=>{ if(authed) load(); }, [authed]);
   async function create(){ await api.post("/madiba/engage",{investor_name:inv,investor_type:itype,instrument:"blended",indicated_amount:amt}); setInv(""); load(); }
