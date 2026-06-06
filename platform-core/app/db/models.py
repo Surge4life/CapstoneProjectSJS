@@ -17,6 +17,8 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(40), default="viewer")  # admin|operator|auditor|client|gov|viewer
     division: Mapped[str] = mapped_column(String(40), default="GODS")  # GODS|SETHS|MADIBA|TS|UDOC
+    tenant_id: Mapped[str] = mapped_column(String(60), default="", index=True)  # "" = platform staff
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
@@ -31,6 +33,7 @@ class AIModel(Base):
     risk_tier: Mapped[str] = mapped_column(String(20), default="NOTABLE")  # MINIMAL..UNACCEPTABLE
     use_case: Mapped[str] = mapped_column(String(200), default="")
     jurisdiction: Mapped[str] = mapped_column(String(20), default="ZA")
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
     status: Mapped[str] = mapped_column(String(20), default="ACTIVE")  # ACTIVE|BLOCKED|SUSPENDED
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     decisions: Mapped[list["Decision"]] = relationship(back_populates="model")
@@ -299,6 +302,7 @@ class PolicyPack(Base):
     source_filename: Mapped[str] = mapped_column(String(255), default="")
     jurisdiction: Mapped[str] = mapped_column(String(40), default="ZA")
     sector: Mapped[str] = mapped_column(String(20), default="GENERAL")  # PUBLIC|PRIVATE|GENERAL
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)  # NULL = platform-wide
     status: Mapped[str] = mapped_column(String(20), default="DRAFT")    # DRAFT|ACTIVE|ARCHIVED
     uploaded_by: Mapped[str] = mapped_column(String(120), default="")
     sha256: Mapped[str] = mapped_column(String(64), default="")
@@ -361,9 +365,42 @@ class EvaCertificate(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     certificate_id: Mapped[str] = mapped_column(String(40), unique=True, index=True)
     model_id: Mapped[str] = mapped_column(String(80), index=True)
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
     decision: Mapped[str] = mapped_column(String(20))
     composite_eva: Mapped[float] = mapped_column(Float, default=0.0)
     dimensions_json: Mapped[str] = mapped_column(Text, default="{}")
     policy_pack: Mapped[str] = mapped_column(String(200), default="")
     seal: Mapped[str] = mapped_column(String(128), default="")
+    content_sha3: Mapped[str] = mapped_column(String(64), default="")
+    policy_version: Mapped[str] = mapped_column(String(120), default="")
+    merkle_leaf: Mapped[str] = mapped_column(String(64), default="")
     issued_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+# ─── SaaS multi-tenancy + commercial layer ───
+class Tenant(Base):
+    """A SaaS client organisation. Data of one tenant is isolated from every other tenant."""
+    __tablename__ = "tenants"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(60), unique=True, index=True)  # slug
+    name: Mapped[str] = mapped_column(String(200))
+    sector: Mapped[str] = mapped_column(String(20), default="GENERAL")   # PUBLIC|PRIVATE|GENERAL
+    tier: Mapped[str] = mapped_column(String(20), default="SANDBOX")     # SANDBOX..SOVEREIGN
+    status: Mapped[str] = mapped_column(String(20), default="TRIAL")     # TRIAL|ACTIVE|SUSPENDED
+    decision_quota: Mapped[int] = mapped_column(Integer, default=200)    # per period; -1 = unlimited
+    usage_decisions: Mapped[int] = mapped_column(Integer, default=0)
+    period_start: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class ApiKey(Base):
+    """Programmatic SaaS access for a tenant. The raw key is shown once; only its hash is stored."""
+    __tablename__ = "api_keys"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_pk: Mapped[int] = mapped_column(ForeignKey("tenants.id"), index=True)
+    name: Mapped[str] = mapped_column(String(120), default="default")
+    prefix: Mapped[str] = mapped_column(String(12), index=True)
+    key_hash: Mapped[str] = mapped_column(String(64), index=True)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_used_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)

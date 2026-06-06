@@ -95,3 +95,19 @@ D. Multi-tenancy + SaaS commercial (tiers/API keys/metering) + EVA Certificate +
 - **Intelligence Stage-2**: pluggable LLM synthesis layer behind COB gate; ingest the data-room (Drive/zips) at scale; embed an Intelligence assistant in the HTML cockpit too.
 - **Sector → 7-demo mapping** (Public: Welfare/SARS/Justice/Health; Private: Corporate).
 - Update the EVA white paper to reflect **GG54477 withdrawn 26 Apr 2026**.
+
+---
+## SESSION ADD — v2 whitepapers/patent alignment + UDOC client-station + corpus loader
+- Read UDOC_Full_Technical_Whitepaper_v2.docx (393 paras: 4 deployment models, five-plane HW stack, BOM/budget, edge appliance classes, perf SLAs, GG54477 §17 [pre-withdrawal], 12 pillars) + UDOC_EVA_Technical_Whitepaper_v9_1.docx (CGS advisory; six dims incl **Confidence**; FPGA coprocessor claims 24/25; TPM mesh claim 37; FIPS 140-3 L3 HSM; HQ-OS claims 31-35; 5-phase deployment sequence; 5-tier licensing). Blueprint images = the 5-plane cutaway + 4 patent diagrams.
+- **EVA alignment applied:** dim Reliability→**Confidence**; EvaCertificate += content_sha3 (SHA-3-256 of inputs) + policy_version + merkle_leaf; certificate now issued for **every** decision; verify uses SHA-3 payload; signature_alg "HMAC-SHA256 (PQC/Dilithium-ref)". CGS already advisory (BLOCK dimensional) — confirmed.
+- **udoc-station/** (NEW): `bringup_selftest.py` (stdlib, 5-plane readiness → signed readiness_report.json; PASS/PARTIAL/DEPENDENCY/FAIL; verdict READY*/NOT-READY), `station.config.json`, `run_test_env.sh` (boots platform-core + runs self-test — VERIFIED **READY-WITH-DEPENDENCIES**), `install.sh` (venv + systemd, `--offline` air-gap), `Dockerfile.station` + `docker-compose.yml`, `README.md`. Honest: HSM/PQC/WORM/QPU = DEPENDENCY with software fallbacks.
+- **tools/ingest_corpus.py** (NEW): ingest a folder OR .zip (the Drive export) into the Intelligence archive via gods_intelligence + extract_text. VERIFIED on the two whitepapers (157,872 chars → grounded ask cites them). User will PR/merge their full Drive zip; loader handles it; DB not shipped (user loads own corpus).
+- **ALIGNMENT_AUDIT.md** (NEW) at repo root — full metric-by-metric table.
+- Intelligence: public **offline** standalone app (their GODS_Intelligence_AI_Offline.html, 32KB, service-worker/corpus/offline) is the PUBLIC variant; our internal server-backed console stays PRIVATE/internal-only. Keep them distinct.
+
+## PENDING (priority order, updated)
+1. **Policy versioning + COB approval workflow + <5ms hot-reload** (the originally-next task; still pending).
+2. Production crypto/hardware integration (liboqs PQC signing; HSM split-custody; Cassandra WORM 10-yr) — hardware-dependent; interfaces + posture checks already in place.
+3. Remaining UDOC **v9.3 admin tab pages** (control/evidence/exchange/incident/lifecycle/api/regulator/replay/schema/constitutional).
+4. Full **Drive corpus** ingest once the user provides the merged zip; test corpus add/remove/update at scale.
+5. Tenancy UI (tenant switcher + tier/usage) in admin + client app; sector→7-demo mapping.

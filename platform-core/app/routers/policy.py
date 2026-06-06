@@ -9,11 +9,11 @@ import hashlib
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.db.models import PolicyPack, PolicyRule, AIModel
-from app.core.dependencies import current_user
+from app.core.dependencies import current_user, principal, scope_pk
 from app.core.config import settings
 from app.services import policy_engine as pe
 from app.services.governance_bridge import Evidence, evaluate
@@ -25,8 +25,8 @@ _WRITE = {"admin", "operator", "gov"}
 
 
 def _require_write(user: dict):
-    if user.get("role") not in _WRITE:
-        raise HTTPException(403, "policy authoring requires operator / gov / admin role")
+    if user.get("role") not in _WRITE and not (user.get("tenant_pk") and user.get("role") != "viewer"):
+        raise HTTPException(403, "policy authoring requires a tenant client or operator / gov / admin role")
 
 
 def _pack_out(p: PolicyPack) -> dict:
@@ -47,7 +47,7 @@ def _rule_out(r: PolicyRule) -> dict:
 @router.post("/upload")
 async def upload(file: UploadFile = File(...), name: str = Form(...),
                  jurisdiction: str = Form("ZA"), sector: str = Form("GENERAL"),
-                 db: Session = Depends(get_db), user: dict = Depends(current_user)):
+                 db: Session = Depends(get_db), user: dict = Depends(principal)):
     _require_write(user)
     data = await file.read()
     if len(data) > 25 * 1024 * 1024:
@@ -55,9 +55,11 @@ async def upload(file: UploadFile = File(...), name: str = Form(...),
     text = pe.extract_text(file.filename or "policy.txt", data)
     rules = pe.extract_rules(text)
     sha = hashlib.sha256(data).hexdigest()
+    _scope = scope_pk(user)
     pack = PolicyPack(name=name, source_filename=file.filename or "", jurisdiction=jurisdiction,
                       sector=sector, status="DRAFT", uploaded_by=user.get("sub", ""),
-                      sha256=sha, summary=pe.summarise(text, rules), rule_count=len(rules))
+                      sha256=sha, summary=pe.summarise(text, rules), rule_count=len(rules),
+                      tenant_pk=(_scope if (_scope and _scope != -1) else None))
     db.add(pack); db.commit(); db.refresh(pack)
     for r in rules:
         db.add(PolicyRule(pack_id=pack.id, **r))
@@ -70,15 +72,24 @@ async def upload(file: UploadFile = File(...), name: str = Form(...),
 
 
 @router.get("/packs")
-def list_packs(db: Session = Depends(get_db), _: dict = Depends(current_user)):
-    rows = db.execute(select(PolicyPack).order_by(PolicyPack.id.desc())).scalars().all()
+def list_packs(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    scope = scope_pk(user)
+    q = select(PolicyPack).order_by(PolicyPack.id.desc())
+    if scope == -1:
+        q = q.where(PolicyPack.tenant_pk.is_(None))
+    elif scope is not None:
+        q = q.where(or_(PolicyPack.tenant_pk == scope, PolicyPack.tenant_pk.is_(None)))
+    rows = db.execute(q).scalars().all()
     return [_pack_out(p) for p in rows]
 
 
 @router.get("/packs/{pack_id}")
-def get_pack(pack_id: int, db: Session = Depends(get_db), _: dict = Depends(current_user)):
+def get_pack(pack_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
     p = db.get(PolicyPack, pack_id)
     if not p:
+        raise HTTPException(404, "pack not found")
+    scope = scope_pk(user)
+    if scope is not None and scope != -1 and p.tenant_pk not in (None, scope):
         raise HTTPException(404, "pack not found")
     rows = db.execute(select(PolicyRule).where(PolicyRule.pack_id == pack_id)).scalars().all()
     return {"pack": _pack_out(p), "rules": [_rule_out(r) for r in rows]}
@@ -94,7 +105,7 @@ class RulePatch(BaseModel):
 
 
 @router.patch("/rules/{rule_id}")
-def patch_rule(rule_id: int, patch: RulePatch, db: Session = Depends(get_db), user: dict = Depends(current_user)):
+def patch_rule(rule_id: int, patch: RulePatch, db: Session = Depends(get_db), user: dict = Depends(principal)):
     _require_write(user)
     r = db.get(PolicyRule, rule_id)
     if not r:
@@ -106,7 +117,7 @@ def patch_rule(rule_id: int, patch: RulePatch, db: Session = Depends(get_db), us
 
 
 @router.post("/packs/{pack_id}/activate")
-def activate(pack_id: int, db: Session = Depends(get_db), user: dict = Depends(current_user)):
+def activate(pack_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
     _require_write(user)
     p = db.get(PolicyPack, pack_id)
     if not p:
@@ -122,7 +133,7 @@ def activate(pack_id: int, db: Session = Depends(get_db), user: dict = Depends(c
 
 
 @router.post("/packs/{pack_id}/archive")
-def archive(pack_id: int, db: Session = Depends(get_db), user: dict = Depends(current_user)):
+def archive(pack_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
     _require_write(user)
     p = db.get(PolicyPack, pack_id)
     if not p:
@@ -134,9 +145,15 @@ def archive(pack_id: int, db: Session = Depends(get_db), user: dict = Depends(cu
 
 
 @router.get("/active")
-def active(db: Session = Depends(get_db), _: dict = Depends(current_user)):
-    packs = db.execute(select(PolicyPack).where(PolicyPack.status == "ACTIVE")).scalars().all()
-    rules = pe.active_rules(db)
+def active(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    scope = scope_pk(user)
+    pq = select(PolicyPack).where(PolicyPack.status == "ACTIVE")
+    if scope == -1:
+        pq = pq.where(PolicyPack.tenant_pk.is_(None))
+    elif scope is not None:
+        pq = pq.where(or_(PolicyPack.tenant_pk == scope, PolicyPack.tenant_pk.is_(None)))
+    packs = db.execute(pq).scalars().all()
+    rules = pe.active_rules(db, tenant_pk=(scope if scope and scope != -1 else None))
     kinds: dict = {}
     for r in rules:
         kinds[r.kind] = kinds.get(r.kind, 0) + 1
@@ -149,7 +166,7 @@ class PolicyTestReq(BaseModel):
 
 
 @router.post("/test")
-def test(req: PolicyTestReq, db: Session = Depends(get_db), _: dict = Depends(current_user)):
+def test(req: PolicyTestReq, db: Session = Depends(get_db), user: dict = Depends(principal)):
     """Dry-run: evaluate a model against active policy WITHOUT persisting a decision."""
     model = db.execute(select(AIModel).where(AIModel.model_id == req.model_id)).scalar_one_or_none()
     if not model:

@@ -55,3 +55,9 @@ Clean first: `rm -rf */node_modules */dist *.db *.log`. Zip: `zip -rq OUT.zip . 
 - Six 0–10 dims live in `governance_bridge.evaluate()` (`dims` + `composite_eva`); outcomes APPROVE/REVIEW/ESCALATE/BLOCK. Certificates issued on APPROVE in `decisions.py`; **bind `issued_at=d.created_at`** so the verify payload matches the seal. Verify via `/decisions/certificates/{id}/verify`.
 ## Embedding an internal console in platform-internal
 - Add `src/consoles/X.tsx`; in `App.tsx` import it, add a launcher card + nav link + `<Route>`. Gate internal-only with `isInternal(profile)` (is_admin||admin/operator/gov). api supports get/post/del. Build with `VITE_API_BASE=<url> npm run build` to runtime-test the static bundle against a backend; serve `dist` + Playwright.
+
+## UDOC client-station + readiness self-test
+- `udoc-station/run_test_env.sh` boots platform-core (uvicorn) and runs `bringup_selftest.py` (stdlib urllib; authenticate ONCE up front, then all checks use the token). Self-test maps to the 5 planes; report DEPENDENCY (not FAIL) for HW-to-install (HSM/PQC/WORM/QPU) so verdict is READY-WITH-DEPENDENCIES. Signed `readiness_report.json`.
+- Corpus: `tools/ingest_corpus.py <dir|zip>` ingests into the Intelligence archive via gods_intelligence + policy_engine.extract_text (run with platform-core deps). Don't unzip multi-hundred-MB uploads in-sandbox; the loader is for the user's deployment host.
+## EVA certificate alignment
+- Certificate fields: content_sha3 (SHA-3-256 of model+inputs+dims), policy_version, merkle_leaf; issued for every decision; verify recomputes the SHA-3 payload and checks the HMAC seal (PQC/Dilithium-ref). CGS is advisory — never drive BLOCK from composite.

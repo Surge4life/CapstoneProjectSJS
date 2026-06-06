@@ -9,7 +9,7 @@ from app.routers import (health, auth, registry, decisions, audit, oversight,
                          seths, ts, madiba, compliance, bias, sovereignty,
                          intelligence, admin, analytics,
                          portal_student, portal_employer, portal_employee,
-                         documents, saas, madiba_engage, ts_submit, access, policy, intel)
+                         documents, saas, madiba_engage, ts_submit, access, policy, intel, tenants)
 
 app = FastAPI(title=settings.app_name, version="1.0.0",
               description="Sovereign AI governance backend for the G.O.D.S ecosystem.")
@@ -52,7 +52,7 @@ def root():
 
 @app.get("/version", tags=["root"])
 def version():
-    """Build identity — commit/branch come from Render's git env on deploy (GitHub main -> Render)."""
+    """Build identity — commit/branch come from Render's git env on deploy."""
     return {"service": "platform-core", "environment": settings.environment,
             "commit": os.environ.get("RENDER_GIT_COMMIT", "dev")[:12],
             "branch": os.environ.get("RENDER_GIT_BRANCH", "local"),
@@ -64,5 +64,5 @@ for r in (health.router, auth.router, registry.router, decisions.router, audit.r
           bias.router, sovereignty.router, intelligence.router, admin.router, analytics.router,
           portal_student.router, portal_employer.router, portal_employee.router,
           documents.router, saas.router, madiba_engage.router, ts_submit.router,
-          access.router, policy.router, intel.router):
+          access.router, policy.router, intel.router, tenants.router):
     app.include_router(r)

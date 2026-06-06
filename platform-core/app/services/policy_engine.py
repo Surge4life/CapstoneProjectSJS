@@ -125,10 +125,13 @@ def summarise(text: str, rules: List[Dict]) -> str:
 
 
 # ─────────────────────────── enforcement ───────────────────────────
-def active_rules(db: Session, jurisdiction: str = None, sector: str = None) -> List[PolicyRule]:
+def active_rules(db: Session, jurisdiction: str = None, sector: str = None, tenant_pk: int = None) -> List[PolicyRule]:
     packs = db.execute(select(PolicyPack).where(PolicyPack.status == "ACTIVE")).scalars().all()
     pack_ids = []
     for p in packs:
+        # tenant isolation: platform packs (NULL) apply to all; tenant packs only to that tenant
+        if tenant_pk is not None and p.tenant_pk is not None and p.tenant_pk != tenant_pk:
+            continue
         if jurisdiction and p.jurisdiction not in (jurisdiction, "GLOBAL", "*"):
             continue
         if sector and p.sector not in (sector, "GENERAL"):
@@ -143,7 +146,7 @@ def active_rules(db: Session, jurisdiction: str = None, sector: str = None) -> L
 def apply(db: Session, ev, model, verdict) -> Dict:
     """Evaluate active policy rules against a decision; return findings + adjusted decision."""
     rules = active_rules(db, jurisdiction=getattr(model, "jurisdiction", "ZA"),
-                         sector=None)
+                         sector=None, tenant_pk=getattr(model, "tenant_pk", None))
     findings = []
     risk_num = RISK_TIER_R.get(ev.risk_tier, 0.5)
     haystack = f"{getattr(model,'use_case','')} {getattr(model,'name','')} {ev.model_id}".lower()

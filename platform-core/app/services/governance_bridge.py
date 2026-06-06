@@ -124,7 +124,7 @@ def evaluate(ev: Evidence) -> Verdict:
         W["validity"] * validity + W["confidence"] * confidence + W["risk"] * (1 - risk) +
         W["compliance"] * compliance + W["stability"] * stability + W["societal"] * societal, 0.0), 1.0)
     composite_eva = round(eva_svs * 10, 2)
-    dims = {"Validity": round(validity * 10, 1), "Reliability": round(confidence * 10, 1),
+    dims = {"Validity": round(validity * 10, 1), "Confidence": round(confidence * 10, 1),
             "Risk": round(risk * 10, 1), "Compliance": round(compliance * 10, 1),
             "Stability": round(stability * 10, 1), "Impact": round(impact_sev * 10, 1)}
 
