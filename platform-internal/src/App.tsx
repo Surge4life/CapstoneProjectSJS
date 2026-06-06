@@ -6,9 +6,11 @@ import { SethsOps } from "./consoles/SethsOps";
 import { MadibaOps } from "./consoles/MadibaOps";
 import { TSOps } from "./consoles/TSOps";
 import { UDOCGov } from "./consoles/UDOCGov";
+import { Intelligence } from "./consoles/Intelligence";
 
 interface Sys { key: string; title: string; path: string; }
 interface Profile { email: string; role: string; division: string; systems: Sys[]; is_admin: boolean; }
+const isInternal = (p: Profile) => p.is_admin || ["admin", "operator", "gov"].includes(p.role);
 
 function Login({ onAuth }: { onAuth: () => void }) {
   const [email, setEmail] = useState("admin@gods.local");
@@ -42,6 +44,9 @@ function Launcher({ profile }: { profile: Profile }) {
           <p style={{fontSize:".72rem"}}>Open →</p>
         </div>
       ))}
+      {isInternal(profile) && <div onClick={()=>nav("/intelligence")} className="card" style={{cursor:"pointer",borderTop:"3px solid #7C5CBF",textAlign:"center",padding:"24px 16px"}}>
+        <h3 style={{color:"#7C5CBF",fontSize:".95rem",marginBottom:6,textTransform:"none",letterSpacing:0}}>G.O.D.S Intelligence</h3>
+        <p style={{fontSize:".72rem"}}>Internal · Open →</p></div>}
     </div>
     <div style={{textAlign:"center",marginTop:30}}>
       <a onClick={()=>{setToken(null);location.reload();}} style={{color:"var(--bad)",fontSize:".8rem",cursor:"pointer"}}>Sign out</a></div>
@@ -62,6 +67,8 @@ function Shell({ profile, children }: { profile: Profile; children: React.ReactN
         {profile.systems.some(s=>s.key==="ts-ops") && <NavLink to="/ts" className={({isActive})=>isActive?"active":""}>TS Industries Ops</NavLink>}
         {profile.systems.some(s=>s.key==="udoc-gov") && <><div className="sec">Governance</div>
           <NavLink to="/udoc" className={({isActive})=>isActive?"active":""}>UDOC Governance</NavLink></>}
+        {isInternal(profile) && <><div className="sec">Intelligence</div>
+          <NavLink to="/intelligence" className={({isActive})=>isActive?"active":""}>G.O.D.S Intelligence</NavLink></>}
         <a onClick={()=>{setToken(null);location.reload();}} style={{color:"var(--bad)",marginTop:16}}>Sign out</a>
       </nav>
     </aside>
@@ -93,6 +100,7 @@ export function App(){
     <Route path="/madiba" element={<Guarded profile={profile} sysKey="madiba-ops"><MadibaOps/></Guarded>}/>
     <Route path="/ts" element={<Guarded profile={profile} sysKey="ts-ops"><TSOps/></Guarded>}/>
     <Route path="/udoc" element={<Guarded profile={profile} sysKey="udoc-gov"><UDOCGov/></Guarded>}/>
+    <Route path="/intelligence" element={isInternal(profile)?<Intelligence/>:<div className="main"><div className="top"><h2>Access denied</h2><span className="badge">🔒 403</span></div></div>}/>
     <Route path="*" element={<Navigate to="/launcher"/>}/>
   </Routes></Shell></BrowserRouter>);
 }

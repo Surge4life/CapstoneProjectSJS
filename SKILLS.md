@@ -50,3 +50,8 @@ Clean first: `rm -rf */node_modules */dist *.db *.log`. Zip: `zip -rq OUT.zip . 
 
 ## G.O.D.S Intelligence (internal brain) — extend it
 - Corpus + reasoning in `app/services/gods_intelligence.py`; internal-only router `app/routers/intel.py` (gate via `_gate(user, write=)`; client/viewer → 403). Add data via `/intel/ingest` (file) or `/intel/ingest-text`; remove via `DELETE /intel/docs/{id}` — both recompute corpus state. `ask()` is retrieval-grounded + citeable; keep it honest (no hallucination; "not in corpus"). Pillar VIII guardrail (`guardrail_check`) is non-overridable — never weaken it. Maturity stages 2–5 stay ROADMAP/gated; do NOT claim AGI/Singularity. Intelligence UI belongs in the ADMIN (platform-internal/cockpit), NOT the client udoc-app.
+
+## EVA white-paper alignment + certificates
+- Six 0–10 dims live in `governance_bridge.evaluate()` (`dims` + `composite_eva`); outcomes APPROVE/REVIEW/ESCALATE/BLOCK. Certificates issued on APPROVE in `decisions.py`; **bind `issued_at=d.created_at`** so the verify payload matches the seal. Verify via `/decisions/certificates/{id}/verify`.
+## Embedding an internal console in platform-internal
+- Add `src/consoles/X.tsx`; in `App.tsx` import it, add a launcher card + nav link + `<Route>`. Gate internal-only with `isInternal(profile)` (is_admin||admin/operator/gov). api supports get/post/del. Build with `VITE_API_BASE=<url> npm run build` to runtime-test the static bundle against a backend; serve `dist` + Playwright.

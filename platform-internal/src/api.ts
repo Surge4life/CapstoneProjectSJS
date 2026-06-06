@@ -11,6 +11,7 @@ async function req(p:string,o:RequestInit={}){
 }
 export const api={
   get:(p:string)=>req(p), post:(p:string,b?:any)=>req(p,{method:"POST",body:b?JSON.stringify(b):undefined}),
+  del:(p:string)=>req(p,{method:"DELETE"}),
   login: async(email:string,password:string)=>{
     const f=new URLSearchParams({username:email,password});
     const r=await fetch(`${BASE}/auth/login`,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});

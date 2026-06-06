@@ -76,3 +76,22 @@ A. **UDOC completion** → align EVA to white-paper canon (6 named dims/0–10/C
 B. **Admin completion** → React console mirroring the admin tab map, wired to platform-core across the eco-system (the static admin HTML is the UI/UX framework).
 C. **Intelligence maturation + UI** → embed an Intelligence panel in the ADMIN (platform-internal / cockpit, NOT client udoc-app); personalized desktop/app sync; Drive/zip corpus ingestion at scale; Stage-2 generative synthesis layer (pluggable LLM) behind COB gate.
 D. Multi-tenancy + SaaS commercial (tiers/API keys/metering) + EVA Certificate + policy versioning/COB workflow.
+
+---
+## Increment A DONE — EVA aligned to white paper + EVA Certificates
+- `governance_bridge.py`: six named dimensions on 0–10 (**Validity, Reliability, Risk, Compliance, Stability, Impact**; Impact severity from di+spd+risk), **Composite EVA Score** (0–10), outcome **RESTRICT→ESCALATE** (gating: risk≥.6 | compliance<.80 | impact_sev≥.55 | composite<.60 → ESCALATE; risk≥.5 | composite<.75 → REVIEW). Verdict gained validity/reliability/impact/composite_eva/dimensions. `seal_payload()` helper added.
+- `EvaCertificate` model + issuance on APPROVE in `decisions.py` (cert_id EVA-<hash12>, dims_json, HMAC seal; **issued_at bound to the signed payload** so verify matches). Endpoints `GET /decisions/certificates` + `GET /decisions/certificates/{cid}/verify`.
+- udoc-app EVA view: Composite EVA Score + six dims (from `verdict.dimensions`, Risk/Impact inverted) + ESCALATE colours + inline certificate + "EVA Certificates" panel; api fetches `/decisions/certificates`. Built + pushed to mobile www.
+- Verified: APPROVE composite 8.68 → cert issued → verify **valid:True**; ESCALATE (compliance .75); REVIEW (MEDIUM); BLOCK (biased, no cert). UI shows all six dims + composite + cert.
+
+## Increment C START DONE — G.O.D.S Intelligence console embedded in platform-internal (admin)
+- `platform-internal/src/consoles/Intelligence.tsx` + route `/intelligence` + launcher card + nav, gated `isInternal = is_admin || role∈{admin,operator,gov}` (backend `/intel/*` also enforces). api +`del`. Shows maturity ladder, corpus stats, **grounded ask + citations**, 250-yr mandate, Pillar VIII guardrails, archive **add (ingest-text) / remove (DELETE)**. Build (195KB) + runtime verified (login→Intelligence→state+ladder+grounded answer).
+
+## PENDING (next increments)
+- **UDOC v9.3 tab completion** in the admin console: u-control, u-evidence, u-exchange, u-incident, u-lifecycle, u-api, u-regulator, u-replay, u-schema, u-constitutional (per the admin tab map).
+- **Multi-tenancy / client isolation** (per-tenant scoping on models/decisions/policy/audit) — top SaaS gap.
+- **SaaS commercial**: 6-tier plans, API keys/service accounts, usage metering, rate limits (extend `saas.py`).
+- **Policy engine maturity**: rule versioning + COB approval workflow + signing + hot-reload.
+- **Intelligence Stage-2**: pluggable LLM synthesis layer behind COB gate; ingest the data-room (Drive/zips) at scale; embed an Intelligence assistant in the HTML cockpit too.
+- **Sector → 7-demo mapping** (Public: Welfare/SARS/Justice/Health; Private: Corporate).
+- Update the EVA white paper to reflect **GG54477 withdrawn 26 Apr 2026**.

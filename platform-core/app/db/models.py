@@ -353,3 +353,17 @@ class IntelState(Base):
     corpus_chars: Mapped[int] = mapped_column(Integer, default=0)
     last_trained_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     notes: Mapped[str] = mapped_column(Text, default="")
+
+
+class EvaCertificate(Base):
+    """Signed governance-evidence object issued on an EVA APPROVE outcome (white paper §4.3). WORM-style; verifiable via the UDOC seal."""
+    __tablename__ = "eva_certificates"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    certificate_id: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    model_id: Mapped[str] = mapped_column(String(80), index=True)
+    decision: Mapped[str] = mapped_column(String(20))
+    composite_eva: Mapped[float] = mapped_column(Float, default=0.0)
+    dimensions_json: Mapped[str] = mapped_column(Text, default="{}")
+    policy_pack: Mapped[str] = mapped_column(String(200), default="")
+    seal: Mapped[str] = mapped_column(String(128), default="")
+    issued_at: Mapped[datetime] = mapped_column(DateTime, default=_now)

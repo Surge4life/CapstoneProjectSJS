@@ -109,3 +109,12 @@ td{padding:8px 7px;border-bottom:1px solid rgba(36,58,90,.5);color:var(--text)}
 .sector-pick button{font-family:var(--fm);font-size:.72rem;color:var(--white);background:var(--navy2);border:1px solid var(--border);padding:7px 16px;border-radius:8px;cursor:pointer}
 .sector-pick button.on{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.08)}
 .sector-chip{font-family:var(--fm);font-size:.6rem;color:var(--cyan);border:1px solid rgba(0,194,212,.35);background:rgba(0,194,212,.08);padding:3px 9px;border-radius:6px;margin-right:10px;white-space:nowrap}
+
+/* ---- EVA outcomes + composite (white-paper aligned) ---- */
+.eva-big.APPROVE{color:var(--ok);background:rgba(46,160,67,.12)}
+.eva-big.REVIEW{color:var(--gold);background:rgba(201,168,76,.12)}
+.eva-big.ESCALATE{color:var(--warn);background:rgba(214,158,46,.14)}
+.eva-big.BLOCK{color:var(--bad);background:rgba(192,57,43,.12)}
+.composite{text-align:center;padding:0 12px;border-left:1px solid var(--border)}
+.composite .cscore{font-family:var(--fm);font-size:1.7rem;color:var(--white);font-weight:700;line-height:1}
+.composite .cscore small{font-size:.8rem;color:var(--muted)}
