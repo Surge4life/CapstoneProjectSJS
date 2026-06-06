@@ -65,17 +65,10 @@ add("L1 Sovereign Security & Hardware", "Sovereign-first / air-gap-capable deplo
 # ---- Layer 2 · Immutable Data & Cryptographic Core ----
 add("L2 Immutable Data & Crypto", "SHA-3-256 content hashing",
     "PASS" if hasattr(hashlib, "sha3_256") else "FAIL", "hashlib.sha3_256 available")
-# Query the live crypto provider endpoint for accurate PQC status
-_crypto_st, _crypto = http("GET", "/system/crypto", headers=H)
-if _crypto_st == 200:
-    _pqc_pass = _crypto.get("pqc_available", False)
-    _pqc_status = "PASS" if _pqc_pass else "DEPENDENCY"
-    _pqc_detail = _crypto.get("label", "unknown")
-else:
-    _pqc_status = "DEPENDENCY"
-    _pqc_detail = "Dilithium/Kyber reference (HMAC stand-in) — install liboqs for production PQC"
+_st, _cr = http("GET", "/system/crypto", headers=H)
 add("L2 Immutable Data & Crypto", "Post-Quantum signatures (CRYSTALS-Kyber/Dilithium)",
-    _pqc_status, _pqc_detail)
+    "PASS" if _cr.get("pqc_available") else "DEPENDENCY",
+    f"{_cr.get('label', 'PQC/Dilithium-ref')} · custody={_cr.get('custody', 'software key-custody')} — install liboqs for production PQC")
 add("L2 Immutable Data & Crypto", "Append-only WORM audit store (Cassandra, 10-yr retention)",
     "PASS" if CFG.get("worm_backend") == "cassandra" else "DEPENDENCY",
     "platform audit chain active; provision Cassandra WORM cluster for 10-yr retention")

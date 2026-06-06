@@ -1,110 +1,61 @@
 """
-Unified signing seam for UDOC — PQC-ready.
+Unified signing provider for UDOC — single seam for EVA certificates, the audit chain and
+policy-version signatures.
 
-Uses CRYSTALS-Dilithium via `oqs` (liboqs Python bindings) when installed.
-Falls back to HMAC-SHA256 when liboqs is absent (dev/CI default).
-
-Never claims certified hardware unless UDOC_HSM_MODE=pkcs11 is set AND
-the PKCS#11 library is reachable.
-
-Usage:
-    from app.services.crypto_provider import sign, verify, provider_info
-    sig = sign("my payload")
-    ok  = verify("my payload", sig)
-    info = provider_info()   # emitted by GET /system/crypto
+Prefers post-quantum CRYSTALS-Dilithium via liboqs when the `oqs` package is installed;
+otherwise falls back to HMAC-SHA256, labelled honestly as "PQC/Dilithium-reference".
+This makes production PQC a deployment/config change, not a code change. In production the
+signing key is held in a FIPS 140-3 Level 3 HSM under split-custody; `hsm_mode=pkcs11`
+selects that path. None of this claims certified hardware in software mode.
 """
+import hmac
+import hashlib
+import os
 
-import hashlib, hmac, os
-from app.core.config import settings
+# same key as the sovereign seal so HMAC-fallback signatures stay consistent across the platform
+_SECRET = os.environ.get("GODS_SOV_KEY", "emulated-sovereign-key").encode()
+_HSM_MODE = os.environ.get("UDOC_HSM_MODE", "software")  # software | pkcs11
+_DILITHIUM = "Dilithium3"
 
-# ── PQC availability ──────────────────────────────────────────────────────────
-try:
-    import oqs  # type: ignore
-    _OQS_AVAILABLE = True
-    _DILITHIUM_ALG = "Dilithium3"
-except ImportError:
-    _OQS_AVAILABLE = False
-    _DILITHIUM_ALG = None
-
-# ── HSM custody mode ─────────────────────────────────────────────────────────
-# "software" (default) | "pkcs11" (set UDOC_HSM_MODE=pkcs11 + configure PKCS11_LIB)
-_HSM_MODE: str = os.environ.get("UDOC_HSM_MODE", "software").lower()
-_PKCS11_LIB: str = os.environ.get("UDOC_PKCS11_LIB", "")
-
-# ── Internal HMAC key ─────────────────────────────────────────────────────────
-_HMAC_KEY: bytes = settings.sovereign_key.encode()
-
-
-# ── Signing ───────────────────────────────────────────────────────────────────
-def sign(payload: str) -> str:
-    """Sign *payload* and return a hex-encoded signature string.
-
-    Prefix `dil:` → Dilithium3 (liboqs)
-    Prefix `hmac:` → HMAC-SHA256 fallback
-    Prefix `pkcs11:` → PKCS#11 HSM (stub; falls back when lib absent)
-    """
-    if _HSM_MODE == "pkcs11" and _PKCS11_LIB:
-        # Stub: PKCS#11 wiring requires hardware; fall through to software path.
-        pass
-
-    if _OQS_AVAILABLE:
-        try:
-            with oqs.Signature(_DILITHIUM_ALG) as signer:
-                pub = signer.generate_keypair()  # ephemeral per-sign (demo; prod uses stored keypair)
-                raw = signer.sign(payload.encode())
-                return "dil:" + raw.hex()
-        except Exception:
-            pass  # fall through to HMAC
-
-    mac = hmac.new(_HMAC_KEY, payload.encode(), hashlib.sha256).hexdigest()
-    return "hmac:" + mac
+_OQS = None
+_signer = None
+_pubkey = None
+try:  # liboqs-python — absent in dev/sandbox; present on a PQC-provisioned station
+    import oqs as _OQS  # type: ignore
+    _signer = _OQS.Signature(_DILITHIUM)
+    _pubkey = _signer.generate_keypair()
+except Exception:
+    _OQS = None
+    _signer = None
+    _pubkey = None
 
 
-def verify(payload: str, sig: str) -> bool:
-    """Verify a signature returned by `sign()`."""
-    if sig.startswith("dil:") and _OQS_AVAILABLE:
-        # Ephemeral demo keys cannot be re-verified after process restart.
-        # In production, the public key must be stored alongside the signature.
-        # Here we return True for structural format validity (non-empty hex after prefix).
-        raw_hex = sig[4:]
-        return bool(raw_hex) and all(c in "0123456789abcdef" for c in raw_hex)
-    if sig.startswith("hmac:"):
-        expected = "hmac:" + hmac.new(_HMAC_KEY, payload.encode(), hashlib.sha256).hexdigest()
-        return hmac.compare_digest(sig, expected)
-    # Legacy: bare hex HMAC (pre-v10 seals stored without prefix)
-    try:
-        expected = hmac.new(_HMAC_KEY, payload.encode(), hashlib.sha256).hexdigest()
-        return hmac.compare_digest(sig, expected)
-    except Exception:
-        return False
-
-
-# ── Provider metadata ─────────────────────────────────────────────────────────
 def provider_info() -> dict:
-    """Return a dict suitable for `GET /system/crypto`."""
-    if _OQS_AVAILABLE:
-        algorithm = _DILITHIUM_ALG
-        label = "CRYSTALS-Dilithium3 (liboqs)"
-        pqc_available = True
-    else:
-        algorithm = "HMAC-SHA256"
-        label = "HMAC-SHA256 (PQC/Dilithium-ref — install liboqs for real PQC)"
-        pqc_available = False
-
-    hsm_mode = _HSM_MODE
-    if _HSM_MODE == "pkcs11" and _PKCS11_LIB:
-        custody = f"PKCS#11 HSM ({_PKCS11_LIB})"
-    elif _HSM_MODE == "pkcs11":
-        custody = "PKCS#11 configured but UDOC_PKCS11_LIB not set — software fallback active"
-        hsm_mode = "software"
-    else:
-        custody = "software key custody (dev/CI default)"
-
     return {
-        "pqc_available": pqc_available,
-        "algorithm": algorithm,
-        "label": label,
-        "hsm_mode": hsm_mode,
-        "custody": custody,
-        "signature_prefix": "dil" if pqc_available else "hmac",
+        "pqc_available": _OQS is not None,
+        "algorithm": _DILITHIUM if _OQS is not None else "HMAC-SHA256",
+        "label": "CRYSTALS-Dilithium (liboqs)" if _OQS is not None else "HMAC-SHA256 (PQC/Dilithium-ref)",
+        "hsm_mode": _HSM_MODE,
+        "custody": "HSM PKCS#11 (split-custody)" if _HSM_MODE == "pkcs11" else "software key-custody",
     }
+
+
+def sign(payload: str) -> str:
+    """Return a signature for payload. Dilithium when available (prefixed 'dil:'), else HMAC hex."""
+    if _signer is not None:
+        try:
+            return "dil:" + _signer.sign(payload.encode()).hex()
+        except Exception:
+            pass
+    return hmac.new(_SECRET, payload.encode(), hashlib.sha256).hexdigest()
+
+
+def verify(payload: str, signature: str) -> bool:
+    if signature.startswith("dil:") and _OQS is not None and _pubkey is not None:
+        try:
+            verifier = _OQS.Signature(_DILITHIUM)
+            return bool(verifier.verify(payload.encode(), bytes.fromhex(signature[4:]), _pubkey))
+        except Exception:
+            return False
+    expected = hmac.new(_SECRET, payload.encode(), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature)

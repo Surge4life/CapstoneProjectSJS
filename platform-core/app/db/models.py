@@ -51,6 +51,8 @@ class Decision(Base):
     seal: Mapped[str] = mapped_column(String(128), default="")   # HMAC / Dilithium-ref
     latency_ms: Mapped[float] = mapped_column(Float, default=0.0)
     block_reasons: Mapped[str] = mapped_column(Text, default="")
+    inputs_json: Mapped[str] = mapped_column(Text, default="{}")
+    certificate_id: Mapped[str] = mapped_column(String(40), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     model: Mapped["AIModel"] = relationship(back_populates="decisions")
 

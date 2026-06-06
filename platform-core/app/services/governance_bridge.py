@@ -157,19 +157,19 @@ def evaluate(ev: Evidence) -> Verdict:
 
 
 def seal_payload(payload: str) -> str:
-    """Sign an arbitrary payload via the unified crypto provider (PQC when available, HMAC fallback)."""
-    from app.services.crypto_provider import sign as _sign
-    return _sign(payload)
+    """Sovereign seal over an arbitrary payload (EVA Certificate, policy version, etc.).
+    Delegates to the unified crypto provider (PQC/Dilithium when available, else HMAC)."""
+    from app.services.crypto_provider import sign
+    return sign(payload)
 
 
-def verify_payload(payload: str, sig: str) -> bool:
-    """Verify a signature produced by seal_payload / crypto_provider.sign."""
-    from app.services.crypto_provider import verify as _verify
-    return _verify(payload, sig)
+def verify_payload(payload: str, signature: str) -> bool:
+    """Verify a seal produced by seal_payload (PQC- or HMAC-aware)."""
+    from app.services.crypto_provider import verify
+    return verify(payload, signature)
 
 
 def verify_seal(model_id: str, decision: str, svs: float, risk: float, seal: str) -> bool:
-    """Verify the per-decision sovereign seal (deterministic HMAC — used by smoke tests)."""
     payload = f"{model_id}:{decision}:{svs:.6f}:{risk:.6f}"
     expected = hmac.new(_SOV_KEY, payload.encode(), hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, seal)

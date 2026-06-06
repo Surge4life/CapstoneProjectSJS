@@ -9,7 +9,7 @@ from app.routers import (health, auth, registry, decisions, audit, oversight,
                          seths, ts, madiba, compliance, bias, sovereignty,
                          intelligence, admin, analytics,
                          portal_student, portal_employer, portal_employee,
-                         documents, saas, madiba_engage, ts_submit, access, policy, intel, tenants)
+                         documents, saas, madiba_engage, ts_submit, access, policy, intel, tenants, admin_udoc)
 
 app = FastAPI(title=settings.app_name, version="1.0.0",
               description="Sovereign AI governance backend for the G.O.D.S ecosystem.")
@@ -29,12 +29,24 @@ def admin_console():
     return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "admin.html"))
 
 
+@app.get("/udoc-admin", tags=["root"], include_in_schema=False)
+def udoc_admin_console():
+    """Serve the self-contained UDOC v9.3 admin console (same-origin, wired to this API)."""
+    return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "udoc_admin_v93.html"))
+
+
 @app.get("/", tags=["root"])
 def root():
     return {"system": "G.O.D.S Platform Core", "status": "live",
             "environment": settings.environment,
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
             "governance": "EVA 6-D + UDOC sovereignty, fail-closed for critical"}
+
+
+@app.get("/system/crypto", tags=["root"])
+def system_crypto():
+    from app.services.crypto_provider import provider_info
+    return provider_info()
 
 
 @app.get("/version", tags=["root"])
@@ -46,17 +58,10 @@ def version():
             "deployed_at": os.environ.get("RENDER_RELEASE_CREATED_AT", "")}
 
 
-@app.get("/system/crypto", tags=["system"])
-def system_crypto():
-    """Active cryptographic provider — reports PQC availability, algorithm, HSM custody mode."""
-    from app.services.crypto_provider import provider_info
-    return provider_info()
-
-
 for r in (health.router, auth.router, registry.router, decisions.router, audit.router,
           oversight.router, seths.router, ts.router, madiba.router, compliance.router,
           bias.router, sovereignty.router, intelligence.router, admin.router, analytics.router,
           portal_student.router, portal_employer.router, portal_employee.router,
           documents.router, saas.router, madiba_engage.router, ts_submit.router,
-          access.router, policy.router, intel.router, tenants.router):
+          access.router, policy.router, intel.router, tenants.router, admin_udoc.router):
     app.include_router(r)

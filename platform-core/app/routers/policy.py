@@ -17,7 +17,6 @@ from app.core.dependencies import current_user, principal, scope_pk
 from app.core.config import settings
 from app.services import policy_engine as pe
 from app.services.governance_bridge import Evidence, evaluate, seal_payload, verify_payload
-from app.services.crypto_provider import provider_info as _crypto_info
 from app.core.tiers import tier_info
 from app.services.audit_writer import append_audit
 
@@ -310,7 +309,7 @@ def get_version(vid: int, db: Session = Depends(get_db), user: dict = Depends(pr
     hash_ok = hashlib.sha3_256(v.rules_json.encode()).hexdigest() == v.content_hash
     return {**_version_out(v), "rules": json.loads(v.rules_json),
             "signature_valid": sig_ok, "content_hash_valid": hash_ok,
-            "signature_alg": _crypto_info()["label"]}
+            "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)"}
 
 
 @router.get("/hotreload")

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UDOC v9.3 — Sovereign AI Governance Admin</title>
+<style>
+  :root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--udoc:#7C5CBF;--cyan:#00C2D4;
+        --ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--bad:#d4504f}
+  *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);
+    font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;
+    background:linear-gradient(180deg,#08122400,#0a142880),var(--navy)}
+  .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--gold)}
+  .tag{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:20px;padding:2px 10px}
+  .wrap{max-width:1040px;margin:0 auto;padding:18px 22px}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  input{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px}
+  button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:16px}
+  .tabs button{background:transparent;color:var(--mut);border:0;border-bottom:2px solid transparent;border-radius:0;padding:9px 12px;font-weight:600}
+  .tabs button.on{color:var(--gold);border-bottom-color:var(--gold)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .card h4{margin:0 0 6px;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px}
+  .big{font-size:26px;font-weight:700}.big.gold{color:var(--gold)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .pill{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:700}
+  .ENFORCED{background:#163a2a;color:#7fe3ab}.DECLARED{background:#1b2740;color:#9fb4dd}
+  .PARTIAL{background:#3a2f16;color:#f0c674}.APPROVE{background:#163a2a;color:#7fe3ab}
+  .BLOCK{background:#3a1717;color:#f0a0a0}.REVIEW{background:#3a2f16;color:#f0c674}.ESCALATE{background:#33203a;color:#d6a8ef}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
+  .kv span:first-child{color:var(--mut)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--cyan)}
+  .note{color:var(--mut);font-size:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+  .err{color:var(--bad)}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--bad)}
+  .dot.live{background:var(--ok)}
+</style></head>
+<body>
+<header>
+  <span class="dot" id="conn"></span>
+  <span class="brand">G.O.D.S &middot; <b>UDOC</b> v9.3 Admin</span>
+  <span class="tag">Sovereign AI Governance</span>
+  <span class="tag" style="border-color:var(--udoc);color:#cdb8f0">PROPOSED &middot; pre-registration demo</span>
+</header>
+<div class="wrap">
+  <div class="bar">
+    <input id="api" placeholder="API base (blank = same origin)" style="width:240px">
+    <input id="email" placeholder="email" value="admin@gods.local" style="width:180px">
+    <input id="pass" type="password" placeholder="password" value="admin123" style="width:140px">
+    <button onclick="login()">Connect</button>
+    <span id="who" style="color:var(--mut)"></span>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"></div>
+  <div class="note">
+    UDOC is a <b>proposed</b> sovereign-AI-governance platform; this console is wired to the live governance
+    core over the same origin. Cryptographic signing runs in software mode (HMAC, PQC/Dilithium-reference) unless
+    liboqs and an HSM are provisioned. SA Draft National AI Policy GG54477 was <b>withdrawn 2026-04-26</b>;
+    compliance basis is POPIA s71 + Constitution ss 9/16/33.
+  </div>
+</div>
+<script>
+let API="", TOK="", lastMid="model-001", lastDid="1", active="regulator";
+const $=id=>document.getElementById(id);
+const TABS=[["regulator","Regulator"],["pillars","Constitutional"],["lifecycle","Lifecycle"],["evidence","Evidence"],["replay","Replay"]];
+function drawTabs(){$("tabs").innerHTML=TABS.map(([k,l])=>`<button class="${k===active?'on':''}" onclick="go('${k}')">${l}</button>`).join("");}
+function go(k){active=k;drawTabs();render();}
+async function api(path,opts={}){
+  const h=opts.headers||{}; if(TOK)h.Authorization="Bearer "+TOK;
+  const r=await fetch(API+path,{...opts,headers:h});
+  if(!r.ok) throw new Error("HTTP "+r.status+" on "+path);
+  return r.json();
+}
+async function login(){
+  API=$("api").value.trim().replace(/\/$/,"");
+  try{
+    const b=new URLSearchParams({username:$("email").value,password:$("pass").value});
+    const r=await fetch(API+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:b});
+    const d=await r.json(); if(!d.access_token) throw new Error("login failed");
+    TOK=d.access_token; $("who").textContent=`${$("email").value} · ${d.role}${d.tenant_id?(" · "+d.tenant_id):" · platform"}`;
+    $("conn").className="dot live"; render();
+  }catch(e){$("who").innerHTML=`<span class="err">${e.message}</span>`;}
+}
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function pill(s){return `<span class="pill ${esc(s)}">${esc(s)}</span>`;}
+function kv(o){return Object.entries(o).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${typeof v==="object"?esc(JSON.stringify(v)):esc(v)}</span></div>`).join("");}
+
+async function loadLifecycle(){
+  const mid=($("mid").value||"model-001"); lastMid=mid; const o=$("lc"); o.innerHTML="Loading…";
+  try{const d=await api("/udoc/models/"+encodeURIComponent(mid)+"/lifecycle");
+    o.innerHTML=`<div class="grid">
+      <div class="card"><h4>${esc(d.model_id)} · ${esc(d.name)}</h4>${kv({operator:d.operator_id,risk_tier:d.risk_tier,jurisdiction:d.jurisdiction,status:d.status,stage:d.stage})}</div>
+      <div class="card"><h4>Decisions</h4><div class="big gold">${d.decisions.total}</div>
+        <div style="margin-top:8px">${Object.entries(d.decisions.by_outcome||{}).map(([k,n])=>pill(k)+" "+n).join("&nbsp; ")}</div>
+        <div class="note" style="border:0;padding:0;margin-top:8px">last: ${esc(d.decisions.last_outcome)} @ ${esc(d.decisions.last_decision)}</div></div></div>`;
+  }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
+}
+async function loadEvidence(){
+  const did=($("did").value||"1"); lastDid=did; const o=$("out"); o.innerHTML="Loading…";
+  try{const d=await api("/udoc/decisions/"+encodeURIComponent(did)+"/evidence"); const c=d.certificate;
+    o.innerHTML=`<div class="grid">
+      <div class="card"><h4>Decision #${esc(d.decision.id)}</h4>${kv({model:d.decision.model_id,outcome:d.decision.outcome,risk:d.decision.risk,compliance:d.decision.compliance,sealed:d.decision.sealed,at:d.decision.at})}
+        <div class="note" style="border:0;padding:0;margin-top:6px">${esc(d.decision.reasons)}</div></div>
+      <div class="card"><h4>EVA certificate</h4>${c?kv({id:c.certificate_id,composite_eva:c.composite_eva,policy_version:c.policy_version,signature:c.signature_alg}):"none"}
+        ${c?`<div class="kv"><span>content_sha3</span><span class="mono">${esc(c.content_sha3)}</span></div><div class="kv"><span>merkle_leaf</span><span class="mono">${esc(c.merkle_leaf)}</span></div>`:""}</div>
+      <div class="card"><h4>Audit anchor</h4>${kv({chain_head_seq:d.audit_context.chain_head_seq})}<div class="kv"><span>chain_head_hash</span><span class="mono">${esc((d.audit_context.chain_head_hash||"").slice(0,24))}…</span></div></div>
+      <div class="card"><h4>Dimensions</h4>${c?kv(c.dimensions):"—"}</div></div>`;
+  }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
+}
+async function loadReplay(){
+  const did=($("did").value||"1"); lastDid=did; const o=$("out"); o.innerHTML="Loading…";
+  try{const d=await api("/udoc/decisions/"+encodeURIComponent(did)+"/replay");
+    o.innerHTML=`<div class="grid">
+      <div class="card"><h4>Original (sealed)</h4>${kv(d.original)}</div>
+      <div class="card"><h4>Replayed (current engine)</h4>${kv({outcome:d.replayed.outcome,svs:d.replayed.svs,risk:d.replayed.risk,composite_eva:d.replayed.composite_eva})}</div>
+      <div class="card"><h4>Drift</h4><div class="big" style="color:${d.drift?'var(--bad)':'var(--ok)'}">${d.drift?"DRIFT":"REPRODUCIBLE"}</div>
+        <div class="note" style="border:0;padding:0;margin-top:8px">${esc(d.note)}</div></div></div>`;
+  }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
+}
+
+async function render(){
+  if(!TOK){$("view").innerHTML=`<div class="card">Connect to the governance core to load admin data.</div>`;return;}
+  const v=$("view");
+  if(active==="lifecycle"){
+    v.innerHTML=`<div class="bar"><input id="mid" placeholder="model_id" value="${esc(lastMid)}" style="width:220px"><button class="ghost" onclick="loadLifecycle()">Load</button></div><div id="lc"></div>`;
+    loadLifecycle(); return;
+  }
+  if(active==="evidence"||active==="replay"){
+    const lbl=active==="evidence"?"Evidence bundle":"Replay", fn=active==="evidence"?"loadEvidence":"loadReplay";
+    v.innerHTML=`<div class="bar"><input id="did" placeholder="decision id" value="${esc(lastDid)}" style="width:140px"><button class="ghost" onclick="${fn}()">Load ${lbl}</button></div><div id="out"></div>`;
+    (active==="evidence"?loadEvidence:loadReplay)(); return;
+  }
+  v.innerHTML=`<div class="card">Loading…</div>`;
+  try{
+    if(active==="regulator"){
+      const d=await api("/udoc/regulator/summary"); const oc=d.decisions.by_outcome||{};
+      v.innerHTML=`<div class="grid">
+        <div class="card"><h4>Registered systems (${esc(d.scope)})</h4><div class="big gold">${d.systems.total}</div>
+          <div class="note" style="border:0;padding:0;margin-top:8px">${kv(d.systems.by_status)}</div></div>
+        <div class="card"><h4>Governed decisions</h4><div class="big">${d.decisions.total}</div>
+          <div style="margin-top:8px">${Object.entries(oc).map(([k,n])=>pill(k)+" "+n).join("&nbsp; ")}</div></div>
+        <div class="card"><h4>Blocked / Escalated</h4><div class="big" style="color:var(--bad)">${d.decisions.blocked}</div>
+          <div class="note" style="border:0;padding:0">escalated ${d.decisions.escalated}</div></div>
+        <div class="card"><h4>Oversight (COB)</h4><div class="big">${d.oversight.open}<span style="font-size:14px;color:var(--mut)"> open / ${d.oversight.total}</span></div></div>
+        <div class="card"><h4>Active policy</h4><div class="big">${d.policy.active_packs}<span style="font-size:14px;color:var(--mut)"> packs · ${d.policy.active_rules} rules</span></div>
+          <div class="note" style="border:0;padding:0">hot-reload ${d.policy.hot_reload.last_reload_ms} ms</div></div>
+        <div class="card"><h4>Crypto provider</h4><div>${esc(d.crypto.label)}</div><div class="note" style="border:0;padding:0">custody: ${esc(d.crypto.custody)}</div></div>
+      </div><div class="note">${esc(d.compliance_basis)}</div>`;
+    }
+    else if(active==="pillars"){
+      const d=await api("/udoc/constitutional/pillars");
+      v.innerHTML=`<div class="card"><h4>G.O.D.S Constitutional Pillars — ${d.count} · ${Object.entries(d.status_summary).map(([k,n])=>esc(k)+" "+n).join(" · ")}</h4>
+        <table><tr><th>#</th><th>Pillar</th><th>Enforcement</th><th>Status</th></tr>
+        ${d.pillars.map(p=>`<tr><td>${p.n}</td><td><b>${esc(p.name)}</b><div class="note" style="border:0;padding:0;margin:2px 0 0">${esc(p.principle)}</div></td>
+          <td>${esc(p.enforcement)}</td><td>${pill(p.status)}</td></tr>`).join("")}</table></div>`;
+    }
+  }catch(e){v.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
+}
+drawTabs(); render();
+</script>
+</body></html>

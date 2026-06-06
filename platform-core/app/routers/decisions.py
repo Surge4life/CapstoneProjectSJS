@@ -12,8 +12,7 @@ from app.db.models import AIModel, Decision, EvaCertificate, Tenant
 from app.core.dependencies import current_user, principal, scope_pk
 from app.core.config import settings
 import json, hashlib
-from app.services.governance_bridge import Evidence, evaluate, seal_payload, verify_payload
-from app.services.crypto_provider import provider_info as _crypto_info
+from app.services.governance_bridge import verify_payload, Evidence, evaluate, seal_payload
 from app.services.audit_writer import append_audit
 from app.services import policy_engine as pe
 from app.services.event_bus import bus
@@ -69,7 +68,8 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
     # Persist decision (policy-adjusted)
     d = Decision(model_pk=model.id, decision=final_decision, svs=v.svs, risk=v.risk,
                  compliance=v.compliance, sovereign=v.sovereign, seal=v.seal,
-                 latency_ms=v.latency_ms, block_reasons=" | ".join(all_reasons))
+                 latency_ms=v.latency_ms, block_reasons=" | ".join(all_reasons),
+                 inputs_json=json.dumps(req.model_dump()))
     db.add(d)
     # If blocked, reflect on model status for critical tiers
     if final_decision == "BLOCK" and ev.risk_tier in ("HIGH", "UNACCEPTABLE"):
@@ -92,6 +92,7 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
                           policy_pack=("active" if pol["policy_enforced"] else ""), seal=seal_payload(payload),
                           content_sha3=content_sha3, policy_version=policy_version, merkle_leaf=merkle_leaf,
                           issued_at=d.created_at))
+    d.certificate_id = certificate_id
     db.commit()
 
     # Immutable audit + event
@@ -113,7 +114,7 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
         "composite_eva": v.composite_eva, "dimensions": v.dimensions,
         "validity": v.validity, "reliability": v.reliability, "impact": v.impact,
         "certificate_id": certificate_id, "content_sha3": content_sha3,
-        "policy_version": policy_version, "signature_alg": _crypto_info()["label"],
+        "policy_version": policy_version, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
     }
 
 @router.get("")
@@ -153,5 +154,5 @@ def verify_certificate(cid: str, db: Session = Depends(get_db), _: dict = Depend
             "model_id": c.model_id, "composite_eva": c.composite_eva,
             "dimensions": json.loads(c.dimensions_json), "decision": c.decision,
             "content_sha3": c.content_sha3, "policy_version": c.policy_version,
-            "merkle_leaf": c.merkle_leaf, "signature_alg": _crypto_info()["label"],
+            "merkle_leaf": c.merkle_leaf, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
             "issued_at": c.issued_at.isoformat()}

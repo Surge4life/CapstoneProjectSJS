@@ -139,3 +139,21 @@ D. Multi-tenancy + SaaS commercial (tiers/API keys/metering) + EVA Certificate +
 2. Tenancy UI (tenant switcher + tier/usage) in admin + client app; sector→7-demo mapping.
 3. Full **Drive corpus** ingest once the user provides the merged zip (tools/ingest_corpus.py ready).
 4. Real hardware integration when in hand: install liboqs (PQC flips to PASS automatically), FIPS 140-3 L3 HSM (set UDOC_HSM_MODE=pkcs11 + PKCS#11 wiring), Cassandra WORM 10-yr; update whitepapers to reflect GG54477 withdrawal.
+
+---
+## SESSION ADD — UDOC v9.3 admin layer + self-contained admin console (COMPLETE / verified)
+**Decision model** += `inputs_json` (governed inputs captured for replay) + `certificate_id` (links the decision to its EVA cert); decide() populates both. list_decisions now returns `id`.
+**New router** `app/routers/admin_udoc.py` (prefix /udoc, tenant-isolated via principal+scope_pk):
+- `GET /udoc/regulator/summary` — systems by status/risk, decisions by outcome, blocked/escalated, oversight open/total, active policy packs+rules+hot_reload, crypto provider, compliance basis (POPIA s71; GG54477 withdrawn).
+- `GET /udoc/constitutional/pillars` — 12 G.O.D.S pillars with enforcement point + live status (PQC pillar reflects crypto_provider: ENFORCED if liboqs else PARTIAL). Status summary {ENFORCED:10, DECLARED:1, PARTIAL:1} in software mode.
+- `GET /udoc/models/{model_id}/lifecycle` — status, stage (REGISTERED/OPERATING/BLOCKED), decision counts + last outcome.
+- `GET /udoc/decisions/{id}/evidence` — decision + linked EVA cert (content_sha3, policy_version, merkle_leaf, dimensions) + audit chain head + inputs.
+- `GET /udoc/decisions/{id}/replay` — re-evaluates stored inputs through the current EVA + active policy; returns original vs replayed + drift flag (reproducible when stable).
+**Console** `platform-core/static/udoc_admin_v93.html` (self-contained, navy/gold/UDOC-purple, honest pre-registration labels) served at **`GET /udoc-admin`**; tabs Regulator/Constitutional/Lifecycle/Evidence/Replay wired live to the above. **Verified headless (Playwright):** all 5 tabs render — regulator ✓, constitutional 12 rows ✓, lifecycle OPERATING ✓, evidence cert+sha3 ✓, replay REPRODUCIBLE ✓. Smoke suite still 8/8.
+**UI bug fixed (lesson):** the Load button must NOT call render() (which rebuilds the input bar and resets the id to its default before fetching). Split into loadLifecycle/loadEvidence/loadReplay that only refresh the result div and read a persisted lastMid/lastDid.
+
+## PENDING (priority order, updated)
+1. Extend the admin console / v9.3 tabs: remaining UDOC tabs as pages (control/kill-switch surface, data-exchange, incident, schema, api-keys, regulator evidence export/download).
+2. Tenancy UI (tenant switcher + tier/usage + API-key issue) in admin + client app; sector→7-demo mapping.
+3. Full **Drive corpus** ingest once the user provides the merged zip (tools/ingest_corpus.py ready).
+4. Hardware integration when in hand: liboqs (PQC→PASS auto), FIPS 140-3 L3 HSM (UDOC_HSM_MODE=pkcs11), Cassandra WORM 10-yr; update whitepapers to reflect GG54477 withdrawal.

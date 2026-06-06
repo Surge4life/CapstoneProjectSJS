@@ -66,3 +66,14 @@ Clean first: `rm -rf */node_modules */dist *.db *.log`. Zip: `zip -rq OUT.zip . 
 - Versions freeze ENABLED rules → JSON snapshot + SHA-3-256 content_hash + HMAC signature over `pack_id|version|content_hash` (stays verifiable as state changes). Helpers (_freeze/_requires_cob/_next_version/_version_out) appended at end of policy.py — Python late-binding lets earlier `activate()` call them.
 - Hot-reload: `pe.invalidate()` on any policy change; first decision after rebuilds active_rules (timed → last_reload_ms), subsequent decisions hit the per-epoch memo. `GET /policy/hotreload` exposes it.
 - COB: approvers = roles {gov, admin}; clients propose. Seed a gov user (cob@gods.local/staff123); never use /auth/register (422 in this stack).
+
+## Unified crypto provider (PQC-ready)
+- `crypto_provider.sign/verify` + `provider_info`; `seal_payload` delegates to it; added `verify_payload`. Dilithium signatures are NON-deterministic → verify with `verify_payload`, never `seal_payload(x)==stored`. HMAC fallback uses GODS_SOV_KEY for cross-platform consistency.
+- liboqs (`oqs`) is optional/absent in sandbox; the try/except import keeps it graceful. `GET /system/crypto` surfaces the active backend; station self-test reads it.
+
+## Self-contained admin console pattern
+- Single HTML file served via FastAPI FileResponse at a route (no build step); same-origin fetch (API base blank). Mirrors /admin. Good for fast, visible admin tabs without a React build.
+- Pitfall: a "Load" button that re-runs the full render() rebuilds its own input and resets typed values BEFORE reading them. Build the input bar once per tab; put fetch+render-result in a separate load function that reads a persisted module var (lastDid/lastMid).
+- Playwright: the page's JWT is a module-scoped `let`, not on window — to script API calls in-page either expose it deliberately or drive via httpx in the test process (same sqlite file/origin).
+## UDOC v9.3 admin endpoints
+- Replay needs the original inputs → persist Decision.inputs_json at decide(); link Decision.certificate_id to the EVA cert for the evidence bundle. Replay re-runs evaluate()+pe.apply() (3 lines mirroring decide()) — faithful without refactoring decide().
