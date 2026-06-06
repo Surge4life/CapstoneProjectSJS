@@ -308,6 +308,7 @@ class PolicyPack(Base):
     sha256: Mapped[str] = mapped_column(String(64), default="")
     summary: Mapped[str] = mapped_column(Text, default="")
     rule_count: Mapped[int] = mapped_column(Integer, default=0)
+    current_version: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     activated_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
@@ -404,3 +405,22 @@ class ApiKey(Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_used_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class PolicyVersion(Base):
+    """An immutable, signed snapshot of a PolicyPack's enabled rules. COB-approved before it goes ACTIVE.
+    Every rule change/activation produces a new version — a tamper-evident commit record."""
+    __tablename__ = "policy_versions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pack_id: Mapped[int] = mapped_column(ForeignKey("policy_packs.id"), index=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    content_hash: Mapped[str] = mapped_column(String(64), default="")     # SHA-3-256 of the frozen rule set
+    rules_json: Mapped[str] = mapped_column(Text, default="[]")
+    rule_count: Mapped[int] = mapped_column(Integer, default=0)
+    state: Mapped[str] = mapped_column(String(20), default="PROPOSED")    # PROPOSED|APPROVED|ACTIVE|VETOED|SUPERSEDED
+    proposed_by: Mapped[str] = mapped_column(String(120), default="")
+    reviewed_by: Mapped[str] = mapped_column(String(120), default="")     # COB officer
+    review_note: Mapped[str] = mapped_column(Text, default="")
+    signature: Mapped[str] = mapped_column(String(128), default="")       # sovereign HMAC seal (PQC/Dilithium-ref)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    decided_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)

@@ -41,6 +41,7 @@ def run():
         ("seths.op@gods.local", "operator", "SETHS"),
         ("madiba.op@gods.local", "operator", "MADIBA"),
         ("ts.op@gods.local", "operator", "TS"),
+        ("cob@gods.local", "gov", "GODS"),
         ("auditor@gods.local", "auditor", "GODS"),
         ("exec@gods.local", "exec", "GODS"),
         ("viewer@gods.local", "viewer", "GODS"),

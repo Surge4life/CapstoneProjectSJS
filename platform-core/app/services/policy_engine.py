@@ -15,6 +15,7 @@ see exactly which clause produced which rule, edit it, and approve it before it 
 """
 import io
 import re
+import time
 from typing import List, Dict
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -125,7 +126,30 @@ def summarise(text: str, rules: List[Dict]) -> str:
 
 
 # ─────────────────────────── enforcement ───────────────────────────
+# ── hot-reload cache: enforcement reads the active rule set from memory; rebuilt on any policy change ──
+_EPOCH = 0
+_MEMO: Dict = {}
+_LAST_RELOAD_MS = 0.0
+
+
+def invalidate():
+    """Bump the policy epoch so the next decision hot-reloads the active rule set."""
+    global _EPOCH, _MEMO
+    _EPOCH += 1
+    _MEMO = {}
+
+
+def hot_reload_stats() -> Dict:
+    return {"epoch": _EPOCH, "last_reload_ms": round(_LAST_RELOAD_MS, 3), "cached_keys": len(_MEMO)}
+
+
 def active_rules(db: Session, jurisdiction: str = None, sector: str = None, tenant_pk: int = None) -> List[PolicyRule]:
+    global _LAST_RELOAD_MS
+    key = (_EPOCH, jurisdiction, sector, tenant_pk)
+    hit = _MEMO.get(key)
+    if hit is not None:
+        return hit
+    _t0 = time.perf_counter()
     packs = db.execute(select(PolicyPack).where(PolicyPack.status == "ACTIVE")).scalars().all()
     pack_ids = []
     for p in packs:
@@ -138,9 +162,13 @@ def active_rules(db: Session, jurisdiction: str = None, sector: str = None, tena
             continue
         pack_ids.append(p.id)
     if not pack_ids:
-        return []
-    return db.execute(select(PolicyRule).where(
-        PolicyRule.pack_id.in_(pack_ids), PolicyRule.enabled == True)).scalars().all()  # noqa: E712
+        rows: List[PolicyRule] = []
+    else:
+        rows = db.execute(select(PolicyRule).where(
+            PolicyRule.pack_id.in_(pack_ids), PolicyRule.enabled == True)).scalars().all()  # noqa: E712
+    _MEMO[key] = rows
+    _LAST_RELOAD_MS = (time.perf_counter() - _t0) * 1000.0
+    return rows
 
 
 def apply(db: Session, ev, model, verdict) -> Dict:

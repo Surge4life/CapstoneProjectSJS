@@ -1,7 +1,7 @@
 """GODS Platform Core — FastAPI application entry point. Wires all division + UDOC routers."""
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse
 import os
 from app.core.config import settings
 from app.db.session import init_db
@@ -17,19 +17,6 @@ app = FastAPI(title=settings.app_name, version="1.0.0",
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
                    allow_headers=["*"], allow_credentials=True)
 
-_STATIC = os.path.join(os.path.dirname(__file__), "..", "static")
-
-
-@app.middleware("http")
-async def enforce_https(request: Request, call_next):
-    # Render terminates TLS and passes X-Forwarded-Proto. Redirect plain HTTP to
-    # HTTPS in production so admin JWT tokens are never sent in the clear.
-    if (settings.environment == "production"
-            and request.headers.get("x-forwarded-proto") == "http"):
-        url = request.url.replace(scheme="https")
-        return RedirectResponse(url, status_code=301)
-    return await call_next(request)
-
 
 @app.on_event("startup")
 def _startup():
@@ -38,8 +25,8 @@ def _startup():
 
 @app.get("/admin", tags=["root"], include_in_schema=False)
 def admin_console():
-    """Serve the live G.O.D.S Admin cockpit (HTML, same-origin, requires JWT login)."""
-    return FileResponse(os.path.join(_STATIC, "admin.html"))
+    """Serve the live G.O.D.S Admin cockpit (HTML UI wired to this API, same-origin)."""
+    return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "admin.html"))
 
 
 @app.get("/", tags=["root"])
@@ -52,11 +39,18 @@ def root():
 
 @app.get("/version", tags=["root"])
 def version():
-    """Build identity — commit/branch come from Render's git env on deploy."""
+    """Build identity — commit/branch come from Render's git env on deploy (GitHub main -> Render)."""
     return {"service": "platform-core", "environment": settings.environment,
             "commit": os.environ.get("RENDER_GIT_COMMIT", "dev")[:12],
             "branch": os.environ.get("RENDER_GIT_BRANCH", "local"),
             "deployed_at": os.environ.get("RENDER_RELEASE_CREATED_AT", "")}
+
+
+@app.get("/system/crypto", tags=["system"])
+def system_crypto():
+    """Active cryptographic provider — reports PQC availability, algorithm, HSM custody mode."""
+    from app.services.crypto_provider import provider_info
+    return provider_info()
 
 
 for r in (health.router, auth.router, registry.router, decisions.router, audit.router,

@@ -12,7 +12,8 @@ from app.db.models import AIModel, Decision, EvaCertificate, Tenant
 from app.core.dependencies import current_user, principal, scope_pk
 from app.core.config import settings
 import json, hashlib
-from app.services.governance_bridge import Evidence, evaluate, seal_payload
+from app.services.governance_bridge import Evidence, evaluate, seal_payload, verify_payload
+from app.services.crypto_provider import provider_info as _crypto_info
 from app.services.audit_writer import append_audit
 from app.services import policy_engine as pe
 from app.services.event_bus import bus
@@ -112,7 +113,7 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
         "composite_eva": v.composite_eva, "dimensions": v.dimensions,
         "validity": v.validity, "reliability": v.reliability, "impact": v.impact,
         "certificate_id": certificate_id, "content_sha3": content_sha3,
-        "policy_version": policy_version, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
+        "policy_version": policy_version, "signature_alg": _crypto_info()["label"],
     }
 
 @router.get("")
@@ -148,9 +149,9 @@ def verify_certificate(cid: str, db: Session = Depends(get_db), _: dict = Depend
     if not c:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "certificate not found")
     payload = f"{c.model_id}|{c.composite_eva}|{c.decision}|{c.issued_at.isoformat()}|{c.content_sha3}"
-    return {"certificate_id": c.certificate_id, "valid": seal_payload(payload) == c.seal,
+    return {"certificate_id": c.certificate_id, "valid": verify_payload(payload, c.seal),
             "model_id": c.model_id, "composite_eva": c.composite_eva,
             "dimensions": json.loads(c.dimensions_json), "decision": c.decision,
             "content_sha3": c.content_sha3, "policy_version": c.policy_version,
-            "merkle_leaf": c.merkle_leaf, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
+            "merkle_leaf": c.merkle_leaf, "signature_alg": _crypto_info()["label"],
             "issued_at": c.issued_at.isoformat()}

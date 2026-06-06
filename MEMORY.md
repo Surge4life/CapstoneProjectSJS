@@ -111,3 +111,31 @@ D. Multi-tenancy + SaaS commercial (tiers/API keys/metering) + EVA Certificate +
 3. Remaining UDOC **v9.3 admin tab pages** (control/evidence/exchange/incident/lifecycle/api/regulator/replay/schema/constitutional).
 4. Full **Drive corpus** ingest once the user provides the merged zip; test corpus add/remove/update at scale.
 5. Tenancy UI (tenant switcher + tier/usage) in admin + client app; sector→7-demo mapping.
+
+---
+## SESSION ADD — Policy versioning + COB approval workflow + hot-reload (COMPLETE / verified)
+**New model** `PolicyVersion` (pack_id, version, content_hash=SHA-3-256 of frozen rules, rules_json snapshot, rule_count, state PROPOSED|APPROVED|ACTIVE|VETOED|SUPERSEDED, proposed_by, reviewed_by, review_note, signature=HMAC seal, created_at, decided_at) + `PolicyPack.current_version`.
+**policy_engine** hot-reload cache: module `_EPOCH`/`_MEMO`/`_LAST_RELOAD_MS`; `invalidate()` bumps epoch+clears memo; `active_rules()` memoised by (epoch,jurisdiction,sector,tenant_pk) and times the rebuild; `hot_reload_stats()`.
+**policy.py** endpoints: `POST /packs/{id}/submit` (freeze enabled rules → PROPOSED version, pack PENDING_APPROVAL), `POST /versions/{vid}/approve` (COB gov/admin only; separation-of-duties: proposer≠approver when tier requires COB; supersedes prior ACTIVE; pack ACTIVE; `pe.invalidate()` hot-reload), `POST /versions/{vid}/veto` (reason → VETOED, pack DRAFT), `GET /versions?pack_id=`, `GET /versions/{vid}` (rules + signature_valid + content_hash_valid), `GET /hotreload`. `/packs/{id}/activate` is now the **fast-path**: auto-approves (proposer=approver) for non-COB tiers, else returns 409 directing to submit→COB-approve. `invalidate()` also called on rule PATCH + archive.
+**COB requirement** by tier entitlement `cob` (Enterprise/Institutional/Sovereign = true) OR platform packs (tenant_pk NULL) always require COB.
+**Verified (port 8104, fresh seed):** ACME(GROWTH) fast-path → version ACTIVE; DSD(ENTERPRISE) fast-path → 409; submit → PROPOSED; client self-approve → 403; COB(gov) approve → ACTIVE; decision on model-001 (credit scoring) → **BLOCK via PR-001 PROHIBIT** (matched credit, scoring); veto → VETOED; versions trail [(1,ACTIVE)]; version integrity sig_valid=True hash_valid=True; **hot-reload last_reload_ms 1.83ms (sub-5ms ✓)**. Smoke suite tests/test_governance.py = 8 passed.
+**NOTE:** `/auth/register` returns 422 in this stack — DO NOT rely on it in tests; seed the user instead. Added gov COB officer **cob@gods.local / staff123** to seed.
+
+## PENDING (priority order, updated)
+1. **Production crypto/hardware seam** — unify EVA-cert + audit + policy-version signing behind a `crypto_provider` that uses liboqs (CRYSTALS-Dilithium) when installed, else HMAC fallback (honest "PQC/Dilithium-ref"); HSM-custody seam; report active backend in station self-test. (Software seam now; real PQC/HSM/Cassandra-WORM remain hardware-dependent.)
+2. Remaining UDOC **v9.3 admin tab pages** in platform-internal (control/evidence/exchange/incident/lifecycle/api/regulator/replay/schema/constitutional).
+3. Full **Drive corpus** ingest once the user provides the merged zip (loader ready: tools/ingest_corpus.py).
+4. Tenancy UI (tenant switcher + tier/usage) in admin + client app; sector→7-demo mapping; update whitepapers to reflect GG54477 withdrawal.
+
+---
+## SESSION ADD — Unified PQC-ready crypto provider + HSM-custody seam (COMPLETE / verified)
+**New** `app/services/crypto_provider.py`: single signing seam. `sign(payload)` → CRYSTALS-Dilithium via liboqs (`oqs`) when installed (prefix `dil:`), else HMAC-SHA256 (same `GODS_SOV_KEY` as the sovereign seal, so existing seals stay consistent). `verify(payload, sig)` is PQC- and HMAC-aware. `provider_info()` → {pqc_available, algorithm, label, hsm_mode software|pkcs11, custody}. HSM custody seam via `UDOC_HSM_MODE`. Software mode never claims certified hardware.
+**Threaded:** `governance_bridge.seal_payload` now delegates to `crypto_provider.sign`; added `verify_payload(payload, sig)` → `crypto_provider.verify`. EVA-certificate verify (decisions.py) and policy-version signature verify (policy.py) switched from equality to `verify_payload` (so non-deterministic PQC sigs verify correctly). The internal per-decision sovereign seal + specialized `verify_seal(model_id,decision,svs,risk,seal)` left as deterministic HMAC (smoke tests depend on it).
+**New endpoint** `GET /system/crypto` → provider_info. Station self-test L2 PQC check now queries it (PASS when liboqs present, else DEPENDENCY with honest label).
+**Verified (port 8105 + station):** smoke 8 passed; `/system/crypto` = HMAC fallback/software custody (dev); decision cert verify valid=True; policy version signature_valid=True & content_hash_valid=True; station verdict READY-WITH-DEPENDENCIES with PQC check reflecting the live provider. On a station with liboqs installed, sign() uses Dilithium and the PQC check flips to PASS — no code change.
+
+## PENDING (priority order, updated)
+1. Remaining UDOC **v9.3 admin tab pages** in platform-internal (control/evidence/exchange/incident/lifecycle/api/regulator/replay/schema/constitutional).
+2. Tenancy UI (tenant switcher + tier/usage) in admin + client app; sector→7-demo mapping.
+3. Full **Drive corpus** ingest once the user provides the merged zip (tools/ingest_corpus.py ready).
+4. Real hardware integration when in hand: install liboqs (PQC flips to PASS automatically), FIPS 140-3 L3 HSM (set UDOC_HSM_MODE=pkcs11 + PKCS#11 wiring), Cassandra WORM 10-yr; update whitepapers to reflect GG54477 withdrawal.

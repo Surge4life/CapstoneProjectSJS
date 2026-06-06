@@ -61,3 +61,8 @@ Clean first: `rm -rf */node_modules */dist *.db *.log`. Zip: `zip -rq OUT.zip . 
 - Corpus: `tools/ingest_corpus.py <dir|zip>` ingests into the Intelligence archive via gods_intelligence + policy_engine.extract_text (run with platform-core deps). Don't unzip multi-hundred-MB uploads in-sandbox; the loader is for the user's deployment host.
 ## EVA certificate alignment
 - Certificate fields: content_sha3 (SHA-3-256 of model+inputs+dims), policy_version, merkle_leaf; issued for every decision; verify recomputes the SHA-3 payload and checks the HMAC seal (PQC/Dilithium-ref). CGS is advisory — never drive BLOCK from composite.
+
+## Policy versioning + COB + hot-reload
+- Versions freeze ENABLED rules → JSON snapshot + SHA-3-256 content_hash + HMAC signature over `pack_id|version|content_hash` (stays verifiable as state changes). Helpers (_freeze/_requires_cob/_next_version/_version_out) appended at end of policy.py — Python late-binding lets earlier `activate()` call them.
+- Hot-reload: `pe.invalidate()` on any policy change; first decision after rebuilds active_rules (timed → last_reload_ms), subsequent decisions hit the per-epoch memo. `GET /policy/hotreload` exposes it.
+- COB: approvers = roles {gov, admin}; clients propose. Seed a gov user (cob@gods.local/staff123); never use /auth/register (422 in this stack).
