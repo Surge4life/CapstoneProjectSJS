@@ -64,6 +64,11 @@ class Verdict:
     seal: str
     latency_ms: float
     block_reasons: list
+    validity: float = 0.0
+    reliability: float = 0.0
+    impact: float = 0.0
+    composite_eva: float = 0.0
+    dimensions: dict = field(default_factory=dict)
 
 
 def _jsd(p, q):
@@ -95,8 +100,9 @@ def evaluate(ev: Evidence) -> Verdict:
     pr_u = _pos_rate(ev.unpriv_favorable, ev.unpriv_total)
     di = (min(pr_p, pr_u) / max(pr_p, pr_u)) if max(pr_p, pr_u) > 0 else 1.0
     spd = pr_u - pr_p
-    # Societal impact proxy (full H-OS-56 lives in the TS engine; here a calibrated proxy)
-    societal = 0.7
+    # Impact dimension (white paper): societal-impact severity from fairness + risk (higher = worse).
+    impact_sev = max(0.0, min(1.0, 0.4 * (1 - di) + 0.3 * min(1.0, abs(spd) / 0.2) + 0.3 * risk))
+    societal = 1 - impact_sev  # retained as a quality (higher = better) for backward compatibility
 
     block = []
     if risk >= THRESH["risk_block"]:
@@ -117,6 +123,10 @@ def evaluate(ev: Evidence) -> Verdict:
     eva_svs = min(max(
         W["validity"] * validity + W["confidence"] * confidence + W["risk"] * (1 - risk) +
         W["compliance"] * compliance + W["stability"] * stability + W["societal"] * societal, 0.0), 1.0)
+    composite_eva = round(eva_svs * 10, 2)
+    dims = {"Validity": round(validity * 10, 1), "Confidence": round(confidence * 10, 1),
+            "Risk": round(risk * 10, 1), "Compliance": round(compliance * 10, 1),
+            "Stability": round(stability * 10, 1), "Impact": round(impact_sev * 10, 1)}
 
     # Sovereignty: SVS = min of signals; any breach forces non-sovereign + isolate.
     sov_svs = min(ev.bgp, ev.traceroute, ev.dnssec, ev.storage)
@@ -126,10 +136,10 @@ def evaluate(ev: Evidence) -> Verdict:
 
     if block:
         decision = "BLOCK"
-    elif risk >= 0.6 or compliance < 0.80:
+    elif risk >= 0.6 or compliance < 0.80 or impact_sev >= 0.55 or eva_svs < 0.60:
+        decision = "ESCALATE"
+    elif risk >= 0.5 or eva_svs < 0.75:
         decision = "REVIEW"
-    elif risk >= 0.5:
-        decision = "RESTRICT"
     else:
         decision = "APPROVE"
 
@@ -138,9 +148,25 @@ def evaluate(ev: Evidence) -> Verdict:
     seal = hmac.new(_SOV_KEY, payload.encode(), hashlib.sha256).hexdigest()
     latency = (time.perf_counter() - t0) * 1000
 
-    return Verdict(ev.model_id, decision, round(eva_svs, 4), risk, compliance, round(stability, 4),
-                   societal, round(di, 4), round(spd, 4), ev.ecs, sovereign, round(sov_svs, 3),
-                   seal, round(latency, 3), block)
+    return Verdict(model_id=ev.model_id, decision=decision, svs=round(eva_svs, 4), risk=risk,
+                   compliance=compliance, stability=round(stability, 4), societal=round(societal, 4),
+                   disparate_impact=round(di, 4), spd=round(spd, 4), ecs=ev.ecs, sovereign=sovereign,
+                   sovereign_svs=round(sov_svs, 3), seal=seal, latency_ms=round(latency, 3),
+                   block_reasons=block, validity=round(validity, 4), reliability=round(confidence, 4),
+                   impact=round(impact_sev, 4), composite_eva=composite_eva, dimensions=dims)
+
+
+def seal_payload(payload: str) -> str:
+    """Sovereign seal over an arbitrary payload (EVA Certificate, policy version, etc.).
+    Delegates to the unified crypto provider (PQC/Dilithium when available, else HMAC)."""
+    from app.services.crypto_provider import sign
+    return sign(payload)
+
+
+def verify_payload(payload: str, signature: str) -> bool:
+    """Verify a seal produced by seal_payload (PQC- or HMAC-aware)."""
+    from app.services.crypto_provider import verify
+    return verify(payload, signature)
 
 
 def verify_seal(model_id: str, decision: str, svs: float, risk: float, seal: str) -> bool:

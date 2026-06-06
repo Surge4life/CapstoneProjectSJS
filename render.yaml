@@ -9,18 +9,15 @@ services:
     plan: free
     branch: main
     autoDeploy: true
-    buildCommand: pip install -r requirements.txt && python seed.py
-    # --proxy-headers trusts X-Forwarded-Proto from Render's TLS terminator (HTTPS enforcement).
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
-      - key: GODS_ENVIRONMENT
+      - key: ENVIRONMENT
         value: production
-      - key: GODS_JWT_SECRET       # auth signing key; Render generates + stores it
+      - key: GODS_SOV_KEY        # sovereign signing key; Render generates + stores it
         generateValue: true
-      - key: GODS_SOV_KEY          # sovereign signing key
-        generateValue: true
-      # RENDER_GIT_COMMIT / RENDER_GIT_BRANCH / RENDER_RELEASE_CREATED_AT injected by Render
+      # RENDER_GIT_COMMIT / RENDER_GIT_BRANCH / RENDER_RELEASE_CREATED_AT are injected by Render
       # and surfaced at GET /version so the mobile app can detect new deploys.
 
   # ---- UDOC web app / PWA (the mobile WebView points here for instant OTA) ----

@@ -17,6 +17,8 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(40), default="viewer")  # admin|operator|auditor|client|gov|viewer
     division: Mapped[str] = mapped_column(String(40), default="GODS")  # GODS|SETHS|MADIBA|TS|UDOC
+    tenant_id: Mapped[str] = mapped_column(String(60), default="", index=True)  # "" = platform staff
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
@@ -31,6 +33,7 @@ class AIModel(Base):
     risk_tier: Mapped[str] = mapped_column(String(20), default="NOTABLE")  # MINIMAL..UNACCEPTABLE
     use_case: Mapped[str] = mapped_column(String(200), default="")
     jurisdiction: Mapped[str] = mapped_column(String(20), default="ZA")
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
     status: Mapped[str] = mapped_column(String(20), default="ACTIVE")  # ACTIVE|BLOCKED|SUSPENDED
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     decisions: Mapped[list["Decision"]] = relationship(back_populates="model")
@@ -48,6 +51,8 @@ class Decision(Base):
     seal: Mapped[str] = mapped_column(String(128), default="")   # HMAC / Dilithium-ref
     latency_ms: Mapped[float] = mapped_column(Float, default=0.0)
     block_reasons: Mapped[str] = mapped_column(Text, default="")
+    inputs_json: Mapped[str] = mapped_column(Text, default="{}")
+    certificate_id: Mapped[str] = mapped_column(String(40), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     model: Mapped["AIModel"] = relationship(back_populates="decisions")
 
@@ -299,11 +304,13 @@ class PolicyPack(Base):
     source_filename: Mapped[str] = mapped_column(String(255), default="")
     jurisdiction: Mapped[str] = mapped_column(String(40), default="ZA")
     sector: Mapped[str] = mapped_column(String(20), default="GENERAL")  # PUBLIC|PRIVATE|GENERAL
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)  # NULL = platform-wide
     status: Mapped[str] = mapped_column(String(20), default="DRAFT")    # DRAFT|ACTIVE|ARCHIVED
     uploaded_by: Mapped[str] = mapped_column(String(120), default="")
     sha256: Mapped[str] = mapped_column(String(64), default="")
     summary: Mapped[str] = mapped_column(Text, default="")
     rule_count: Mapped[int] = mapped_column(Integer, default=0)
+    current_version: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     activated_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
@@ -324,3 +331,98 @@ class PolicyRule(Base):
     confidence: Mapped[float] = mapped_column(Float, default=0.6)
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+# ─── G.O.D.S Intelligence · internal self-contained knowledge + governance brain ───
+class KnowledgeDoc(Base):
+    """A document in the G.O.D.S Intelligence archive (the internal data room). Add/remove updates the corpus the system reasons over. INTERNAL ONLY — never client-exposed."""
+    __tablename__ = "gi_knowledge_docs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(240))
+    source: Mapped[str] = mapped_column(String(255), default="")      # filename / drive path
+    category: Mapped[str] = mapped_column(String(60), default="GENERAL")  # PATENT|SPEC|BRAND|MANDATE|FINANCIAL|LEGAL|MEMOIR|GENERAL
+    division: Mapped[str] = mapped_column(String(40), default="GODS")
+    sha256: Mapped[str] = mapped_column(String(64), default="")
+    content_text: Mapped[str] = mapped_column(Text, default="")
+    char_len: Mapped[int] = mapped_column(Integer, default=0)
+    tags: Mapped[str] = mapped_column(String(300), default="")
+    added_by: Mapped[str] = mapped_column(String(120), default="")
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class IntelState(Base):
+    """Singleton-ish state for the G.O.D.S Intelligence maturity + training position."""
+    __tablename__ = "gi_state"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    stage: Mapped[int] = mapped_column(Integer, default=1)  # 1 Automated/Assistive .. 5 Singularity-Governance
+    corpus_docs: Mapped[int] = mapped_column(Integer, default=0)
+    corpus_chars: Mapped[int] = mapped_column(Integer, default=0)
+    last_trained_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    notes: Mapped[str] = mapped_column(Text, default="")
+
+
+class EvaCertificate(Base):
+    """Signed governance-evidence object issued on an EVA APPROVE outcome (white paper §4.3). WORM-style; verifiable via the UDOC seal."""
+    __tablename__ = "eva_certificates"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    certificate_id: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    model_id: Mapped[str] = mapped_column(String(80), index=True)
+    tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
+    decision: Mapped[str] = mapped_column(String(20))
+    composite_eva: Mapped[float] = mapped_column(Float, default=0.0)
+    dimensions_json: Mapped[str] = mapped_column(Text, default="{}")
+    policy_pack: Mapped[str] = mapped_column(String(200), default="")
+    seal: Mapped[str] = mapped_column(String(128), default="")
+    content_sha3: Mapped[str] = mapped_column(String(64), default="")
+    policy_version: Mapped[str] = mapped_column(String(120), default="")
+    merkle_leaf: Mapped[str] = mapped_column(String(64), default="")
+    issued_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+# ─── SaaS multi-tenancy + commercial layer ───
+class Tenant(Base):
+    """A SaaS client organisation. Data of one tenant is isolated from every other tenant."""
+    __tablename__ = "tenants"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_id: Mapped[str] = mapped_column(String(60), unique=True, index=True)  # slug
+    name: Mapped[str] = mapped_column(String(200))
+    sector: Mapped[str] = mapped_column(String(20), default="GENERAL")   # PUBLIC|PRIVATE|GENERAL
+    tier: Mapped[str] = mapped_column(String(20), default="SANDBOX")     # SANDBOX..SOVEREIGN
+    status: Mapped[str] = mapped_column(String(20), default="TRIAL")     # TRIAL|ACTIVE|SUSPENDED
+    decision_quota: Mapped[int] = mapped_column(Integer, default=200)    # per period; -1 = unlimited
+    usage_decisions: Mapped[int] = mapped_column(Integer, default=0)
+    period_start: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class ApiKey(Base):
+    """Programmatic SaaS access for a tenant. The raw key is shown once; only its hash is stored."""
+    __tablename__ = "api_keys"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_pk: Mapped[int] = mapped_column(ForeignKey("tenants.id"), index=True)
+    name: Mapped[str] = mapped_column(String(120), default="default")
+    prefix: Mapped[str] = mapped_column(String(12), index=True)
+    key_hash: Mapped[str] = mapped_column(String(64), index=True)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_used_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class PolicyVersion(Base):
+    """An immutable, signed snapshot of a PolicyPack's enabled rules. COB-approved before it goes ACTIVE.
+    Every rule change/activation produces a new version — a tamper-evident commit record."""
+    __tablename__ = "policy_versions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pack_id: Mapped[int] = mapped_column(ForeignKey("policy_packs.id"), index=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    content_hash: Mapped[str] = mapped_column(String(64), default="")     # SHA-3-256 of the frozen rule set
+    rules_json: Mapped[str] = mapped_column(Text, default="[]")
+    rule_count: Mapped[int] = mapped_column(Integer, default=0)
+    state: Mapped[str] = mapped_column(String(20), default="PROPOSED")    # PROPOSED|APPROVED|ACTIVE|VETOED|SUPERSEDED
+    proposed_by: Mapped[str] = mapped_column(String(120), default="")
+    reviewed_by: Mapped[str] = mapped_column(String(120), default="")     # COB officer
+    review_note: Mapped[str] = mapped_column(Text, default="")
+    signature: Mapped[str] = mapped_column(String(128), default="")       # sovereign HMAC seal (PQC/Dilithium-ref)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    decided_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)

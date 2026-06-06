@@ -1,0 +1,16 @@
+{
+  "station_id": "UDOC-STATION-001",
+  "deployment_model": "edge-appliance (store-and-forward, air-gap-capable)",
+  "jurisdiction": "ZA",
+  "sovereignty_recheck_hours": 6,
+  "air_gap_capable": true,
+  "hsm_mode": "software",
+  "hsm_officers": 3,
+  "pqc": "reference",
+  "worm_backend": "none",
+  "api_base": "https://gods-platform-core.onrender.com",
+  "test_user": "admin@gods.local",
+  "test_pass": "admin123",
+  "test_model": "model-001",
+  "station_key": "dev-station-key-replace-in-production"
+}

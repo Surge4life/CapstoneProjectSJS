@@ -47,3 +47,37 @@ Serve static: `python3 -m http.server PORT --directory <dir>`.
 
 ## Packaging
 Clean first: `rm -rf */node_modules */dist *.db *.log`. Zip: `zip -rq OUT.zip . -x "*/node_modules/*" -x "*/.git/*" -x "*/dist/*" -x "*.tsbuildinfo"`. Deliver to `/mnt/user-data/outputs/`; `present_files` the zip + progress doc.
+
+## G.O.D.S Intelligence (internal brain) — extend it
+- Corpus + reasoning in `app/services/gods_intelligence.py`; internal-only router `app/routers/intel.py` (gate via `_gate(user, write=)`; client/viewer → 403). Add data via `/intel/ingest` (file) or `/intel/ingest-text`; remove via `DELETE /intel/docs/{id}` — both recompute corpus state. `ask()` is retrieval-grounded + citeable; keep it honest (no hallucination; "not in corpus"). Pillar VIII guardrail (`guardrail_check`) is non-overridable — never weaken it. Maturity stages 2–5 stay ROADMAP/gated; do NOT claim AGI/Singularity. Intelligence UI belongs in the ADMIN (platform-internal/cockpit), NOT the client udoc-app.
+
+## EVA white-paper alignment + certificates
+- Six 0–10 dims live in `governance_bridge.evaluate()` (`dims` + `composite_eva`); outcomes APPROVE/REVIEW/ESCALATE/BLOCK. Certificates issued on APPROVE in `decisions.py`; **bind `issued_at=d.created_at`** so the verify payload matches the seal. Verify via `/decisions/certificates/{id}/verify`.
+## Embedding an internal console in platform-internal
+- Add `src/consoles/X.tsx`; in `App.tsx` import it, add a launcher card + nav link + `<Route>`. Gate internal-only with `isInternal(profile)` (is_admin||admin/operator/gov). api supports get/post/del. Build with `VITE_API_BASE=<url> npm run build` to runtime-test the static bundle against a backend; serve `dist` + Playwright.
+
+## UDOC client-station + readiness self-test
+- `udoc-station/run_test_env.sh` boots platform-core (uvicorn) and runs `bringup_selftest.py` (stdlib urllib; authenticate ONCE up front, then all checks use the token). Self-test maps to the 5 planes; report DEPENDENCY (not FAIL) for HW-to-install (HSM/PQC/WORM/QPU) so verdict is READY-WITH-DEPENDENCIES. Signed `readiness_report.json`.
+- Corpus: `tools/ingest_corpus.py <dir|zip>` ingests into the Intelligence archive via gods_intelligence + policy_engine.extract_text (run with platform-core deps). Don't unzip multi-hundred-MB uploads in-sandbox; the loader is for the user's deployment host.
+## EVA certificate alignment
+- Certificate fields: content_sha3 (SHA-3-256 of model+inputs+dims), policy_version, merkle_leaf; issued for every decision; verify recomputes the SHA-3 payload and checks the HMAC seal (PQC/Dilithium-ref). CGS is advisory — never drive BLOCK from composite.
+
+## Policy versioning + COB + hot-reload
+- Versions freeze ENABLED rules → JSON snapshot + SHA-3-256 content_hash + HMAC signature over `pack_id|version|content_hash` (stays verifiable as state changes). Helpers (_freeze/_requires_cob/_next_version/_version_out) appended at end of policy.py — Python late-binding lets earlier `activate()` call them.
+- Hot-reload: `pe.invalidate()` on any policy change; first decision after rebuilds active_rules (timed → last_reload_ms), subsequent decisions hit the per-epoch memo. `GET /policy/hotreload` exposes it.
+- COB: approvers = roles {gov, admin}; clients propose. Seed a gov user (cob@gods.local/staff123); never use /auth/register (422 in this stack).
+
+## Unified crypto provider (PQC-ready)
+- `crypto_provider.sign/verify` + `provider_info`; `seal_payload` delegates to it; added `verify_payload`. Dilithium signatures are NON-deterministic → verify with `verify_payload`, never `seal_payload(x)==stored`. HMAC fallback uses GODS_SOV_KEY for cross-platform consistency.
+- liboqs (`oqs`) is optional/absent in sandbox; the try/except import keeps it graceful. `GET /system/crypto` surfaces the active backend; station self-test reads it.
+
+## Self-contained admin console pattern
+- Single HTML file served via FastAPI FileResponse at a route (no build step); same-origin fetch (API base blank). Mirrors /admin. Good for fast, visible admin tabs without a React build.
+- Pitfall: a "Load" button that re-runs the full render() rebuilds its own input and resets typed values BEFORE reading them. Build the input bar once per tab; put fetch+render-result in a separate load function that reads a persisted module var (lastDid/lastMid).
+- Playwright: the page's JWT is a module-scoped `let`, not on window — to script API calls in-page either expose it deliberately or drive via httpx in the test process (same sqlite file/origin).
+## UDOC v9.3 admin endpoints
+- Replay needs the original inputs → persist Decision.inputs_json at decide(); link Decision.certificate_id to the EVA cert for the evidence bundle. Replay re-runs evaluate()+pe.apply() (3 lines mirroring decide()) — faithful without refactoring decide().
+
+## FastAPI route ordering (gotcha)
+- Literal-segment routes (e.g. `/tenants/me/apikeys`) MUST be declared BEFORE typed-param routes (`/tenants/{tid:int}/apikeys`). Otherwise the typed route matches the literal segment first and returns 422 (int conversion of "me"). Reorder so literals come first.
+- Console kill-switch: `POST /registry/models/{id}/status?new_status=ACTIVE|SUSPENDED|BLOCKED` (query param). Regulator export downloads via a Blob from `GET /udoc/regulator/export`.

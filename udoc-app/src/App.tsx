@@ -48,6 +48,7 @@ export function App() {
   const [f, setF] = useState({ model_id: "", name: "", operator_id: "", risk_tier: "NOTABLE", use_case: "", jurisdiction: "ZA" });
   const [scenario, setScenario] = useState("healthy");
   const [verdict, setVerdict] = useState<any>(null);
+  const [certs, setCerts] = useState<any[]>([]);
   const [packs, setPacks] = useState<any[]>([]);
   const [activePol, setActivePol] = useState<any>(null);
   const [packDetail, setPackDetail] = useState<any>(null);
@@ -75,6 +76,7 @@ export function App() {
       setSov(sv); setBias(bs); setFrameworks((fw && fw.frameworks) || []); setSweep(sw); setMe(prof);
       api.get("/policy/packs").then(setPacks).catch(() => {});
       api.get("/policy/active").then(setActivePol).catch(() => {});
+      api.get("/decisions/certificates").then(setCerts).catch(() => {});
     } catch (e: any) { setErr(e.message); }
   }
   useEffect(() => { if (authed) { refresh(); const t = setInterval(refresh, 8000); return () => clearInterval(t); } }, [authed]);
@@ -218,25 +220,29 @@ export function App() {
             <div className="row"><select value={scenario} onChange={e => setScenario(e.target.value)}><option value="healthy">Healthy model</option><option value="biased">Biased + high-risk</option><option value="breach">Sovereignty breach</option></select>
               <button className="btn" onClick={decide}>Evaluate · model {models[0]?.model_id || "model-001"}</button></div>
             {verdict && !verdict.error && <>
-              <div className="eva-verdict"><span className={`eva-big ${verdict.decision}`}>{verdict.decision}</span>
-                <div><div className="lat">sealed {String(verdict.seal || "").slice(0, 22)}…</div>
+              <div className="eva-verdict">
+                <span className={`eva-big ${verdict.decision}`}>{verdict.decision}</span>
+                <div className="composite"><div className="cscore">{verdict.composite_eva ?? "—"}<small>/10</small></div><div className="lat">Composite EVA Score</div></div>
+                <div><div className="lat">sealed {String(verdict.seal || "").slice(0, 20)}…</div>
                   <div className="lat">latency {verdict.latency_ms}ms / budget {verdict.budget_ms}ms · within budget {String(verdict.within_budget)}</div>
+                  {verdict.certificate_id && <div className="lat" style={{ color: "var(--ok)" }}>✓ EVA Certificate {verdict.certificate_id} · verifiable</div>}
                   <div className="bar" style={{ width: 200, marginTop: 5 }}><i style={{ width: Math.min(100, (verdict.latency_ms / (verdict.budget_ms || 1)) * 100) + "%" }} /></div></div></div>
               <div className="meters">
-                <Meter label="Sovereign Validity (SVS)" value={clamp(verdict.svs > 1 ? verdict.svs / 100 : verdict.svs)} raw={verdict.svs} />
-                <Meter label="Risk" value={verdict.risk} raw={typeof verdict.risk === "number" ? verdict.risk.toFixed(2) : verdict.risk} invert />
-                <Meter label="Compliance" value={verdict.compliance} />
-                <Meter label="Stability" value={verdict.stability} />
-                <Meter label="Disparate Impact" value={clamp(verdict.disparate_impact)} raw={typeof verdict.disparate_impact === "number" ? verdict.disparate_impact.toFixed(2) : verdict.disparate_impact} />
+                {verdict.dimensions && Object.entries(verdict.dimensions).map(([k, val]: any) => (
+                  <Meter key={k} label={k} value={(Number(val) || 0) / 10} raw={val} invert={k === "Risk" || k === "Impact"} />
+                ))}
                 <Meter label="Sovereignty (ECS)" value={verdict.ecs} />
               </div>
-              {verdict.block_reasons?.length > 0 && <div className="err" style={{ marginTop: 10 }}>BLOCKED — {verdict.block_reasons.join(" | ")}</div>}
+              {verdict.block_reasons?.length > 0 && <div className="err" style={{ marginTop: 10 }}>{verdict.decision} — {verdict.block_reasons.join(" | ")}</div>}
             </>}
             {verdict?.error && <div className="err">{verdict.error}</div>}
           </div>
           <div className="panel"><h3>Recent EVA decisions — {decisions.length}</h3>
             <table><thead><tr><th>ID</th><th>Decision</th><th>SVS</th><th>Sovereign</th><th>Latency</th><th>Time</th></tr></thead>
               <tbody>{decisions.slice(0, 20).map(d => <tr key={d.id}><td className="mono">{d.id}</td><td><span className={`tag ${d.decision}`}>{d.decision}</span></td><td>{d.svs}</td><td>{String(d.sovereign)}</td><td>{d.latency_ms}ms</td><td className="mono">{String(d.created_at || "").slice(11, 19)}</td></tr>)}{!decisions.length && <tr><td colSpan={6} className="muted">No decisions yet.</td></tr>}</tbody></table></div>
+          <div className="panel"><h3>EVA Certificates — {certs.length} <span className="tag PASS">signed · verifiable</span></h3>
+            <table><thead><tr><th>Certificate ID</th><th>Model</th><th>Composite</th><th>Issued</th></tr></thead>
+              <tbody>{certs.slice(0, 10).map((ct: any) => <tr key={ct.certificate_id}><td className="mono">{ct.certificate_id}</td><td>{ct.model_id}</td><td>{ct.composite_eva}/10</td><td className="mono">{String(ct.issued_at || "").slice(0, 19)}</td></tr>)}{!certs.length && <tr><td colSpan={4} className="muted">No certificates yet — an APPROVE outcome issues one.</td></tr>}</tbody></table></div>
         </>}
 
         {isSw && swTab === "policy" && <>

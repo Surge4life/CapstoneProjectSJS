@@ -8,10 +8,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.db.session import get_db
-from app.db.models import AIModel, Decision
-from app.core.dependencies import current_user
+from app.db.models import AIModel, Decision, EvaCertificate, Tenant
+from app.core.dependencies import current_user, principal, scope_pk
 from app.core.config import settings
-from app.services.governance_bridge import Evidence, evaluate
+import json, hashlib
+from app.services.governance_bridge import verify_payload, Evidence, evaluate, seal_payload
 from app.services.audit_writer import append_audit
 from app.services import policy_engine as pe
 from app.services.event_bus import bus
@@ -34,11 +35,21 @@ class DecisionReq(BaseModel):
     storage: float = 1.0
 
 @router.post("")
-def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends(current_user)):
+def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends(principal)):
     model = db.execute(select(AIModel).where(AIModel.model_id == req.model_id)).scalar_one_or_none()
     if not model:
         # Fail-closed: unknown model is blocked, not allowed.
         raise HTTPException(status.HTTP_404_NOT_FOUND, "model not registered — fail-closed")
+    scope = scope_pk(user)
+    if scope is not None and model.tenant_pk != scope:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "model not registered — fail-closed")  # tenant isolation
+    tenant = db.get(Tenant, model.tenant_pk) if model.tenant_pk else None
+    if tenant:
+        if tenant.status != "ACTIVE":
+            raise HTTPException(status.HTTP_403_FORBIDDEN, f"tenant {tenant.tenant_id} is {tenant.status}")
+        if tenant.decision_quota >= 0 and tenant.usage_decisions >= tenant.decision_quota:
+            raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS,
+                                f"decision quota reached for tier {tenant.tier} ({tenant.decision_quota}/period)")
 
     ev = Evidence(
         model_id=req.model_id, risk_tier=req.risk_tier or model.risk_tier,
@@ -57,12 +68,32 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
     # Persist decision (policy-adjusted)
     d = Decision(model_pk=model.id, decision=final_decision, svs=v.svs, risk=v.risk,
                  compliance=v.compliance, sovereign=v.sovereign, seal=v.seal,
-                 latency_ms=v.latency_ms, block_reasons=" | ".join(all_reasons))
+                 latency_ms=v.latency_ms, block_reasons=" | ".join(all_reasons),
+                 inputs_json=json.dumps(req.model_dump()))
     db.add(d)
     # If blocked, reflect on model status for critical tiers
     if final_decision == "BLOCK" and ev.risk_tier in ("HIGH", "UNACCEPTABLE"):
         model.status = "BLOCKED"
+    if tenant:
+        tenant.usage_decisions += 1
     db.commit(); db.refresh(d)
+
+    # EVA Certificate — issued for EVERY decision (patent / whitepaper §4.3): SHA-3-256 content hash + policy version + Merkle leaf.
+    issued = d.created_at.isoformat()
+    dims_str = json.dumps(v.dimensions, sort_keys=True)
+    content_sha3 = hashlib.sha3_256(
+        f"{v.model_id}|{json.dumps(req.model_dump(), sort_keys=True)}|{dims_str}".encode()).hexdigest()
+    policy_version = f"rules@{pol['rules_evaluated']}" if pol["policy_enforced"] else "none"
+    payload = f"{v.model_id}|{v.composite_eva}|{final_decision}|{issued}|{content_sha3}"
+    certificate_id = "EVA-" + hashlib.sha3_256(payload.encode()).hexdigest()[:12].upper()
+    merkle_leaf = hashlib.sha3_256((v.seal or payload).encode()).hexdigest()
+    db.add(EvaCertificate(certificate_id=certificate_id, model_id=v.model_id, tenant_pk=model.tenant_pk,
+                          decision=final_decision, composite_eva=v.composite_eva, dimensions_json=dims_str,
+                          policy_pack=("active" if pol["policy_enforced"] else ""), seal=seal_payload(payload),
+                          content_sha3=content_sha3, policy_version=policy_version, merkle_leaf=merkle_leaf,
+                          issued_at=d.created_at))
+    d.certificate_id = certificate_id
+    db.commit()
 
     # Immutable audit + event
     append_audit(db, "AI_DECISION", {"model_id": req.model_id, "decision": final_decision,
@@ -80,10 +111,48 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
         "block_reasons": all_reasons,
         "policy_enforced": pol["policy_enforced"], "policy_rules_evaluated": pol["rules_evaluated"],
         "policy_findings": pol["fired"],
+        "composite_eva": v.composite_eva, "dimensions": v.dimensions,
+        "validity": v.validity, "reliability": v.reliability, "impact": v.impact,
+        "certificate_id": certificate_id, "content_sha3": content_sha3,
+        "policy_version": policy_version, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
     }
 
 @router.get("")
-def list_decisions(db: Session = Depends(get_db), _: dict = Depends(current_user)):
-    rows = db.execute(select(Decision).order_by(Decision.id.desc()).limit(100)).scalars().all()
+def list_decisions(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    scope = scope_pk(user)
+    if scope == -1:
+        return []
+    q = select(Decision).order_by(Decision.id.desc()).limit(100)
+    if scope is not None:
+        q = (select(Decision).join(AIModel, Decision.model_pk == AIModel.id)
+             .where(AIModel.tenant_pk == scope).order_by(Decision.id.desc()).limit(100))
+    rows = db.execute(q).scalars().all()
     return [{"id": d.id, "decision": d.decision, "svs": d.svs, "sovereign": d.sovereign,
              "latency_ms": d.latency_ms, "created_at": d.created_at.isoformat()} for d in rows]
+
+
+@router.get("/certificates")
+def list_certificates(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    scope = scope_pk(user)
+    if scope == -1:
+        return []
+    q = select(EvaCertificate).order_by(EvaCertificate.id.desc()).limit(100)
+    if scope is not None:
+        q = q.where(EvaCertificate.tenant_pk == scope)
+    rows = db.execute(q).scalars().all()
+    return [{"certificate_id": c.certificate_id, "model_id": c.model_id, "decision": c.decision,
+             "composite_eva": c.composite_eva, "issued_at": c.issued_at.isoformat()} for c in rows]
+
+
+@router.get("/certificates/{cid}/verify")
+def verify_certificate(cid: str, db: Session = Depends(get_db), _: dict = Depends(current_user)):
+    c = db.execute(select(EvaCertificate).where(EvaCertificate.certificate_id == cid)).scalar_one_or_none()
+    if not c:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "certificate not found")
+    payload = f"{c.model_id}|{c.composite_eva}|{c.decision}|{c.issued_at.isoformat()}|{c.content_sha3}"
+    return {"certificate_id": c.certificate_id, "valid": verify_payload(payload, c.seal),
+            "model_id": c.model_id, "composite_eva": c.composite_eva,
+            "dimensions": json.loads(c.dimensions_json), "decision": c.decision,
+            "content_sha3": c.content_sha3, "policy_version": c.policy_version,
+            "merkle_leaf": c.merkle_leaf, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
+            "issued_at": c.issued_at.isoformat()}
