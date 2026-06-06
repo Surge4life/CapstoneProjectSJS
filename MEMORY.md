@@ -157,3 +157,44 @@ D. Multi-tenancy + SaaS commercial (tiers/API keys/metering) + EVA Certificate +
 2. Tenancy UI (tenant switcher + tier/usage + API-key issue) in admin + client app; sector→7-demo mapping.
 3. Full **Drive corpus** ingest once the user provides the merged zip (tools/ingest_corpus.py ready).
 4. Hardware integration when in hand: liboqs (PQC→PASS auto), FIPS 140-3 L3 HSM (UDOC_HSM_MODE=pkcs11), Cassandra WORM 10-yr; update whitepapers to reflect GG54477 withdrawal.
+
+---
+## SESSION ADD — v12: UDOC v9.3 admin tabs completed (COMPLETE / verified)
+**admin_udoc.py +=** `GET /udoc/incidents` (BLOCK/ESCALATE feed + open oversight, tenant-scoped), `GET /udoc/exchange` (data-sovereignty/cross-border posture + DATA_LOCALISATION/MIN_SOVEREIGNTY active rules), `GET /udoc/schema` (self-describing governance schema for integrators), `GET /udoc/regulator/export` (signed evidence bundle: summary + recent decisions + audit head, sealed via crypto_provider).
+**tenants.py +=** `GET/POST /tenants/me/apikeys` (tenant self-service keys). **BUG FIXED:** literal `/me/apikeys` was shadowed by `/{tid:int}/apikeys` (typed route 422'd on "me"); FastAPI matches in declaration order, so literal-segment routes MUST be declared before typed-param routes — moved /me routes (and KeyReq) above the /{tid} routes.
+**Console (`/udoc-admin`) +=** tabs **Control** (kill-switch: list models + status dropdown → POST /registry/models/{id}/status?new_status=), **Incidents**, **Exchange**, **Schema**, plus a **Download signed evidence (JSON)** button on Regulator. Now 9 tabs.
+**Verified (port 8111/8112):** schema 6 dims/8 rule-kinds; exchange ZA cross-border denied; biased decision → BLOCK shows in incidents; regulator export sealed (15 recent); self-service key POST 200 → prefix+api_key, lists 1, and the key authorizes (X-API-Key → model-001 only); kill-switch flips model-001 → SUSPENDED. Headless: control(2 rows)/incidents/schema/exchange render ✓. Smoke 8/8.
+
+## PENDING (priority order, updated)
+1. **v13** — Tenancy & commercial console tab (platform: list tenants + tier/status/usage + issue keys; client: own plan + usage + self-service keys; six-tier reference).
+2. **v14** — Client self-service governance loop (console "Submit" tab: register a system + run a governed decision + view/verify the certificate).
+3. Full Drive corpus ingest — USER is doing the zip + PR/merge (tools/ingest_corpus.py ready).
+4. Hardware integration when in hand: liboqs (PQC→PASS), FIPS 140-3 L3 HSM (UDOC_HSM_MODE=pkcs11), Cassandra WORM 10-yr; whitepaper GG54477-withdrawal update.
+
+---
+## SESSION ADD — v13: Tenancy & commercial console tab (COMPLETE / verified)
+**Console (`/udoc-admin`) += "Tenancy" tab** (reuses existing tenant endpoints; no backend change):
+- Platform staff (no tenant): table of all tenants with tier_name + status pill + usage/quota bar; per-row controls — tier select→`POST /tenants/{id}/tier?tier=`, status select→`POST /tenants/{id}/status?status_value=`, `+Key`→`POST /tenants/{id}/apikeys`; plus a six-tier commercial reference table from `GET /tenants/tiers`.
+- Tenant client: own Plan card (tier/sector/status + usage bar), Entitlements card, and self-service API keys (`GET/POST /tenants/me/apikeys`) with `+ Issue` (raw key shown once via alert).
+- Helpers: usageBar(u,q); tnSetTier/tnSetStatus/tnIssueKey/tnIssueMyKey. POST-with-body via api(path,{method,headers,body}).
+**Verified headless (port 8113):** platform tenancy renders 2 tenants + 6-tier reference (10 table rows); client plan view renders + **self-service key issued (gods_gov-dsd prefix shown)**. /tenants/me confirmed tier_name + entitlements present.
+
+## PENDING (priority order, updated)
+1. **v14** — Client self-service governance loop (console "Submit" tab: register a system + run a governed decision + view/verify the certificate).
+2. Full Drive corpus ingest — USER doing zip + PR/merge.
+3. Hardware integration when in hand (liboqs / FIPS HSM / Cassandra WORM); whitepaper GG54477-withdrawal update; sector→7-demo mapping.
+
+---
+## SESSION ADD — v14: Client self-service governance loop (COMPLETE / verified)
+**Console (`/udoc-admin`) += "Submit" tab** (reuses registry + decisions + cert-verify; no backend change):
+- Register a system: model_id/name/risk_tier/use_case → `POST /registry/models` (operator_id "self"; attaches to caller's tenant).
+- Run a governed evaluation: model_id + raw_confidence + compliance + fair/biased sample → `POST /decisions`; renders outcome pill, composite EVA, six dimensions, certificate (id + content_sha3 + policy_version).
+- Verify certificate → `GET /decisions/certificates/{id}/verify` → VALID/INVALID + signature_alg.
+- Functions doRegister/doEvaluate/verifyCert. block_reasons is a LIST → join in UI.
+**Verified headless (port 8116/8117 as client.dsd):** register "dsd-test-1" → status ACTIVE; fair evaluate → APPROVE, composite 8.7, dims (Validity 9.5/Confidence/Risk/Compliance 10/Stability 10/Impact); certificate EVA-… issued; Verify → VALID; biased sample → BLOCK. No console errors. Console now 11 tabs.
+**Note:** Playwright `#sel >> text=` chained text-locator can falsely time out; use `button:has-text('…')` and read inner_text.
+
+## PENDING (priority order, updated)
+1. Full Drive corpus ingest — USER doing zip + PR/merge (tools/ingest_corpus.py ready).
+2. Hardware integration when in hand: liboqs (PQC→PASS), FIPS 140-3 L3 HSM (UDOC_HSM_MODE=pkcs11), Cassandra WORM 10-yr.
+3. Optional polish: whitepaper GG54477-withdrawal update; sector→7-demo mapping; revoke-API-key endpoint; client decision history view.

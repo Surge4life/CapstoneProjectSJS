@@ -57,6 +57,10 @@ def list_tenants(db: Session = Depends(get_db), _: dict = Depends(require_role("
     return [_tenant_out(t) for t in db.execute(select(Tenant).order_by(Tenant.id)).scalars().all()]
 
 
+class KeyReq(BaseModel):
+    name: str = "default"
+
+
 @router.get("/me")
 def my_tenant(db: Session = Depends(get_db), user: dict = Depends(principal)):
     pk = user.get("tenant_pk")
@@ -66,6 +70,35 @@ def my_tenant(db: Session = Depends(get_db), user: dict = Depends(principal)):
     if not t:
         raise HTTPException(404, "tenant not found")
     return _tenant_out(t)
+
+
+@router.get("/me/apikeys")
+def my_keys(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    pk = user.get("tenant_pk")
+    if not pk:
+        return []
+    rows = db.execute(select(ApiKey).where(ApiKey.tenant_pk == pk)).scalars().all()
+    return [{"id": k.id, "prefix": k.prefix, "name": k.name, "active": k.active,
+             "last_used_at": k.last_used_at.isoformat() if k.last_used_at else None} for k in rows]
+
+
+@router.post("/me/apikeys")
+def issue_my_key(req: KeyReq, db: Session = Depends(get_db), user: dict = Depends(principal)):
+    pk = user.get("tenant_pk")
+    if not pk:
+        raise HTTPException(400, "not a tenant-scoped caller")
+    t = db.get(Tenant, pk)
+    existing = db.execute(select(ApiKey).where(ApiKey.tenant_pk == pk, ApiKey.active == True)).scalars().all()  # noqa: E712
+    if len(existing) >= tier_info(t.tier)["api_keys"]:
+        raise HTTPException(402, f"tier {t.tier} allows {tier_info(t.tier)['api_keys']} active key(s)")
+    raw = f"gods_{t.tenant_id}_{secrets.token_urlsafe(24)}"
+    ak = ApiKey(tenant_pk=pk, name=req.name, prefix=raw[:12],
+                key_hash=hashlib.sha256(raw.encode()).hexdigest(), active=True)
+    db.add(ak); db.commit()
+    append_audit(db, "APIKEY_ISSUE", {"tenant": t.tenant_id, "prefix": ak.prefix, "self": True},
+                 classification="GOVERNANCE", actor_class=user.get("role", "CLIENT"))
+    return {"api_key": raw, "prefix": ak.prefix, "name": ak.name,
+            "note": "Store this now — shown once. Send as X-API-Key."}
 
 
 @router.get("/{tid}")
@@ -96,10 +129,6 @@ def set_status(tid: int, status_value: str, db: Session = Depends(get_db), user:
         raise HTTPException(404, "tenant not found")
     t.status = status_value.upper(); db.commit()
     return _tenant_out(t)
-
-
-class KeyReq(BaseModel):
-    name: str = "default"
 
 
 @router.post("/{tid}/apikeys")

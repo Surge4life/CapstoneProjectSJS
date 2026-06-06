@@ -64,7 +64,7 @@
 <script>
 let API="", TOK="", lastMid="model-001", lastDid="1", active="regulator";
 const $=id=>document.getElementById(id);
-const TABS=[["regulator","Regulator"],["pillars","Constitutional"],["lifecycle","Lifecycle"],["evidence","Evidence"],["replay","Replay"]];
+const TABS=[["regulator","Regulator"],["pillars","Constitutional"],["control","Control"],["incidents","Incidents"],["lifecycle","Lifecycle"],["evidence","Evidence"],["replay","Replay"],["exchange","Exchange"],["schema","Schema"],["submit","Submit"],["tenancy","Tenancy"]];
 function drawTabs(){$("tabs").innerHTML=TABS.map(([k,l])=>`<button class="${k===active?'on':''}" onclick="go('${k}')">${l}</button>`).join("");}
 function go(k){active=k;drawTabs();render();}
 async function api(path,opts={}){
@@ -120,6 +120,94 @@ async function loadReplay(){
   }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
 
+async function loadControl(){
+  const o=$("ctl"); o.innerHTML="Loading…";
+  try{const ms=await api("/registry/models");
+    o.innerHTML=`<table><tr><th>Model</th><th>Risk</th><th>Status</th><th>Kill-switch</th></tr>`+
+      ms.map(m=>`<tr><td><b>${esc(m.model_id)}</b><div class="note" style="border:0;padding:0;margin:0">${esc(m.name)}</div></td>
+        <td>${esc(m.risk_tier)}</td><td>${pill(m.status==='ACTIVE'?'APPROVE':(m.status==='BLOCKED'?'BLOCK':'REVIEW'))} ${esc(m.status)}</td>
+        <td><select id="st_${esc(m.model_id)}"><option>ACTIVE</option><option>SUSPENDED</option><option>BLOCKED</option></select>
+        <button class="ghost" onclick="setModelStatus('${esc(m.model_id)}')">Apply</button></td></tr>`).join("")+`</table>`;
+  }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
+}
+async function setModelStatus(mid){
+  try{await api("/registry/models/"+encodeURIComponent(mid)+"/status?new_status="+$("st_"+mid).value,{method:"POST"}); loadControl();}
+  catch(e){alert(e.message);}
+}
+async function downloadExport(){
+  try{const d=await api("/udoc/regulator/export");
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));
+    a.download="udoc_regulator_export.json"; a.click();
+  }catch(e){alert(e.message);}
+}
+
+function usageBar(u,q){
+  if(q<0) return `<div class="note" style="border:0;padding:0;margin-top:6px">${u} decisions · unlimited</div>`;
+  const pct=Math.min(100,Math.round(u/Math.max(1,q)*100));
+  return `<div style="background:var(--line);border-radius:6px;height:8px;overflow:hidden;margin-top:8px"><div style="width:${pct}%;height:8px;background:${pct>90?'var(--bad)':'var(--gold)'}"></div></div><div class="note" style="border:0;padding:0;margin-top:4px">${u}/${q} (${pct}%)</div>`;
+}
+async function loadTenancy(){
+  const o=$("ten"); o.innerHTML="Loading…";
+  try{
+    const me=await api("/tenants/me");
+    if(me && me.tenant_id){
+      o.innerHTML=`<div class="grid">
+        <div class="card"><h4>Plan · ${esc(me.tier_name)}</h4>${kv({tenant:me.tenant_id,sector:me.sector,status:me.status})}${usageBar(me.usage_decisions,me.decision_quota)}</div>
+        <div class="card"><h4>Entitlements</h4>${kv({max_models:me.entitlements.max_models,api_keys:me.entitlements.api_keys,certificates:me.entitlements.certificates,async_tiers:me.entitlements.async_tiers,cob:me.entitlements.cob})}</div>
+        <div class="card"><h4>API keys <button class="ghost" style="float:right;padding:3px 8px" onclick="tnIssueMyKey()">+ Issue</button></h4><div id="keys">…</div></div></div>`;
+      const ks=await api("/tenants/me/apikeys");
+      $("keys").innerHTML=ks.map(k=>`<div class="kv"><span class="mono">${esc(k.prefix)}…</span><span>${esc(k.name)}${k.active?'':' (revoked)'}</span></div>`).join("")||"<div class='note' style='border:0;padding:0'>none yet</div>";
+    } else {
+      const ts=await api("/tenants"), tiers=await api("/tenants/tiers");
+      const TI=["SANDBOX","STARTER","GROWTH","ENTERPRISE","INSTITUTIONAL","SOVEREIGN"];
+      o.innerHTML=`<div class="card"><h4>Tenants (${ts.length})</h4><table><tr><th>Tenant</th><th>Tier / status</th><th>Usage</th><th>Controls</th></tr>
+        ${ts.map(t=>`<tr><td><b>${esc(t.tenant_id)}</b><div class="note" style="border:0;padding:0">${esc(t.name)}</div></td>
+          <td>${esc(t.tier_name)} <span class="pill ${t.status==='ACTIVE'?'APPROVE':(t.status==='SUSPENDED'?'BLOCK':'REVIEW')}">${esc(t.status)}</span></td>
+          <td style="min-width:150px">${usageBar(t.usage_decisions,t.decision_quota)}</td>
+          <td><select id="tier_${t.id}">${TI.map(x=>`<option ${x===t.tier?'selected':''}>${x}</option>`).join("")}</select><button class="ghost" onclick="tnSetTier(${t.id})">Tier</button>
+            <select id="stat_${t.id}">${["TRIAL","ACTIVE","SUSPENDED"].map(x=>`<option ${x===t.status?'selected':''}>${x}</option>`).join("")}</select><button class="ghost" onclick="tnSetStatus(${t.id})">Status</button>
+            <button class="ghost" onclick="tnIssueKey(${t.id})">+Key</button></td></tr>`).join("")}</table></div>
+        <div class="card"><h4>Six-tier commercial architecture</h4><table><tr><th>Tier</th><th>Decisions/period</th><th>Models</th><th>API keys</th><th>COB</th></tr>
+        ${tiers.order.map(k=>{const t=tiers.tiers[k];return `<tr><td>${esc(t.name)}</td><td>${t.decision_quota<0?'unlimited':t.decision_quota}</td><td>${t.max_models<0?'∞':t.max_models}</td><td>${t.api_keys}</td><td>${t.cob?'yes':'—'}</td></tr>`;}).join("")}</table></div>`;
+    }
+  }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
+}
+async function tnSetTier(id){try{await api("/tenants/"+id+"/tier?tier="+$("tier_"+id).value,{method:"POST"});loadTenancy();}catch(e){alert(e.message);}}
+async function tnSetStatus(id){try{await api("/tenants/"+id+"/status?status_value="+$("stat_"+id).value,{method:"POST"});loadTenancy();}catch(e){alert(e.message);}}
+async function tnIssueKey(id){try{const r=await api("/tenants/"+id+"/apikeys",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"console"})});alert("API key (copy now — shown once):\n"+r.api_key);loadTenancy();}catch(e){alert(e.message);}}
+async function tnIssueMyKey(){try{const r=await api("/tenants/me/apikeys",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"console"})});alert("API key (copy now — shown once):\n"+r.api_key);loadTenancy();}catch(e){alert(e.message);}}
+
+async function doRegister(){
+  const o=$("regout");
+  try{const id=$("r_id").value.trim(); if(!id){o.innerHTML="<span class=err>model_id required</span>";return;}
+    const r=await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model_id:id,name:$("r_name").value||id,operator_id:"self",risk_tier:$("r_tier").value,use_case:$("r_use").value})});
+    o.innerHTML=`Registered <b>${esc(r.model_id)}</b> · status ${esc(r.status)}`; if($("e_id"))$("e_id").value=r.model_id;
+  }catch(e){o.innerHTML=`<span class="err">${esc(e.message)}</span>`;}
+}
+async function doEvaluate(){
+  const o=$("evout"); o.innerHTML="<div class='card'>Evaluating…</div>";
+  const body={model_id:$("e_id").value,raw_confidence:parseFloat($("e_conf").value)||0.9,compliance:parseFloat($("e_comp").value)||1.0};
+  if($("e_fair").value==="biased"){body.priv_favorable=900;body.priv_total=1000;body.unpriv_favorable=120;body.unpriv_total=1000;}
+  try{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const reasons=Array.isArray(d.block_reasons)?d.block_reasons.join(" · "):(d.block_reasons||"");
+    o.innerHTML=`<div class="grid">
+      <div class="card"><h4>Outcome</h4><div class="big">${pill(d.decision)}</div>
+        <div class="note" style="border:0;padding:0;margin-top:8px">composite EVA ${d.composite_eva}</div>
+        ${reasons?`<div class="note">${esc(reasons)}</div>`:""}</div>
+      <div class="card"><h4>EVA dimensions</h4>${kv(d.dimensions||{})}</div>
+      <div class="card"><h4>Certificate</h4>${kv({id:d.certificate_id,policy_version:d.policy_version})}
+        <div class="kv"><span>content_sha3</span><span class="mono">${esc((d.content_sha3||'').slice(0,20))}…</span></div>
+        <button class="ghost" onclick="verifyCert('${esc(d.certificate_id)}')">Verify certificate</button>
+        <div id="vout" class="note" style="border:0;padding:0;margin-top:6px"></div></div></div>`;
+  }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
+}
+async function verifyCert(cid){
+  try{const v=await api("/decisions/certificates/"+encodeURIComponent(cid)+"/verify");
+    $("vout").innerHTML=`<b style="color:${v.valid?'var(--ok)':'var(--bad)'}">${v.valid?'VALID':'INVALID'}</b> · ${esc(v.signature_alg)}`;
+  }catch(e){$("vout").innerHTML=`<span class="err">${esc(e.message)}</span>`;}
+}
+
 async function render(){
   if(!TOK){$("view").innerHTML=`<div class="card">Connect to the governance core to load admin data.</div>`;return;}
   const v=$("view");
@@ -131,6 +219,33 @@ async function render(){
     const lbl=active==="evidence"?"Evidence bundle":"Replay", fn=active==="evidence"?"loadEvidence":"loadReplay";
     v.innerHTML=`<div class="bar"><input id="did" placeholder="decision id" value="${esc(lastDid)}" style="width:140px"><button class="ghost" onclick="${fn}()">Load ${lbl}</button></div><div id="out"></div>`;
     (active==="evidence"?loadEvidence:loadReplay)(); return;
+  }
+  if(active==="control"){
+    v.innerHTML=`<div class="card"><h4>System control · kill-switch</h4><div id="ctl"></div></div>`;
+    loadControl(); return;
+  }
+  if(active==="tenancy"){
+    v.innerHTML=`<div id="ten"></div>`; loadTenancy(); return;
+  }
+  if(active==="submit"){
+    v.innerHTML=`<div class="grid">
+      <div class="card"><h4>Register a system</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <input id="r_id" placeholder="model_id (e.g. my-model-1)">
+          <input id="r_name" placeholder="name (optional)">
+          <select id="r_tier"><option>MINIMAL</option><option selected>NOTABLE</option><option>HIGH</option><option>UNACCEPTABLE</option></select>
+          <input id="r_use" placeholder="use_case (e.g. fraud detection)">
+          <button onclick="doRegister()">Register</button></div>
+        <div id="regout" class="note" style="border:0;padding:4px 0"></div></div>
+      <div class="card"><h4>Run a governed evaluation</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <input id="e_id" placeholder="model_id" value="model-001">
+          <input id="e_conf" placeholder="raw_confidence 0-1" value="0.92">
+          <input id="e_comp" placeholder="compliance 0-1" value="1.0">
+          <select id="e_fair"><option value="fair">fair sample</option><option value="biased">biased sample (triggers block)</option></select>
+          <button onclick="doEvaluate()">Evaluate</button></div></div></div>
+      <div id="evout"></div>`;
+    return;
   }
   v.innerHTML=`<div class="card">Loading…</div>`;
   try{
@@ -147,7 +262,27 @@ async function render(){
         <div class="card"><h4>Active policy</h4><div class="big">${d.policy.active_packs}<span style="font-size:14px;color:var(--mut)"> packs · ${d.policy.active_rules} rules</span></div>
           <div class="note" style="border:0;padding:0">hot-reload ${d.policy.hot_reload.last_reload_ms} ms</div></div>
         <div class="card"><h4>Crypto provider</h4><div>${esc(d.crypto.label)}</div><div class="note" style="border:0;padding:0">custody: ${esc(d.crypto.custody)}</div></div>
+        <div class="card"><h4>Regulator export</h4><button class="ghost" onclick="downloadExport()">Download signed evidence (JSON)</button></div>
       </div><div class="note">${esc(d.compliance_basis)}</div>`;
+    }
+    else if(active==="incidents"){
+      const d=await api("/udoc/incidents");
+      v.innerHTML=`<div class="card"><h4>Incidents — BLOCK / ESCALATE (${d.count})</h4>
+        <table><tr><th>#</th><th>Model</th><th>Severity</th><th>Risk</th><th>When</th></tr>
+        ${d.incidents.map(i=>`<tr><td>${i.decision_id}</td><td>${esc(i.model_id)}</td><td>${pill(i.severity)}</td><td>${i.risk}</td><td>${esc(i.at)}</td></tr>`).join("")||"<tr><td colspan=5 style='color:var(--mut)'>No incidents recorded.</td></tr>"}</table>
+        <div class="note">Open oversight cases: ${d.open_cases.length}</div></div>`;
+    }
+    else if(active==="exchange"){
+      const d=await api("/udoc/exchange");
+      v.innerHTML=`<div class="grid">
+        <div class="card"><h4>Data sovereignty</h4>${kv({jurisdiction:d.jurisdiction,data_localisation:d.data_localisation,cross_border:d.cross_border_transfer,recheck_hours:d.sovereignty_recheck_hours})}</div>
+        <div class="card"><h4>Localisation rules (${d.rules_active})</h4>${d.localisation_rules.map(r=>`<div class="kv"><span>${esc(r.code)}</span><span>${esc(r.kind)}</span></div>`).join("")||"<div class='note' style='border:0;padding:0'>none active</div>"}</div>
+        </div><div class="note">${esc(d.basis)}</div>`;
+    }
+    else if(active==="schema"){
+      const d=await api("/udoc/schema");
+      v.innerHTML=`<div class="card"><h4>Governance data schema (integrators)</h4>`+
+        Object.entries(d).map(([k,val])=>`<div class="kv"><span>${esc(k)}</span><span class="mono">${Array.isArray(val)?esc(val.join(", ")):esc(val)}</span></div>`).join("")+`</div>`;
     }
     else if(active==="pillars"){
       const d=await api("/udoc/constitutional/pillars");

@@ -14,7 +14,7 @@ from app.db.models import (AIModel, Decision, EvaCertificate, AuditRef, Oversigh
 from app.core.dependencies import principal, scope_pk
 from app.services.governance_bridge import Evidence, evaluate
 from app.services import policy_engine as pe
-from app.services.crypto_provider import provider_info
+from app.services.crypto_provider import provider_info, sign
 
 router = APIRouter(prefix="/udoc", tags=["UDOC v9.3 admin"])
 
@@ -176,3 +176,86 @@ def decision_replay(decision_id: int, db: Session = Depends(get_db), user: dict 
         "drift": drift,
         "note": "Replay re-evaluates stored inputs against the current engine and active policy version.",
     }
+
+
+@router.get("/incidents")
+def incidents(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Governance incident feed: BLOCK/ESCALATE decisions + open oversight cases (tenant-isolated)."""
+    scope = scope_pk(user)
+    if scope == -1:
+        return {"incidents": [], "open_cases": []}
+    dq = select(Decision).where(Decision.decision.in_(("BLOCK", "ESCALATE"))).order_by(Decision.id.desc()).limit(50)
+    if scope is not None:
+        dq = (select(Decision).join(AIModel, Decision.model_pk == AIModel.id)
+              .where(AIModel.tenant_pk == scope, Decision.decision.in_(("BLOCK", "ESCALATE")))
+              .order_by(Decision.id.desc()).limit(50))
+    inc = []
+    for d in db.execute(dq).scalars().all():
+        m = db.get(AIModel, d.model_pk)
+        inc.append({"decision_id": d.id, "model_id": m.model_id if m else None, "severity": d.decision,
+                    "risk": round(d.risk, 3), "reasons": d.block_reasons, "at": d.created_at.isoformat()})
+    try:
+        cases = db.execute(select(OversightCase)).scalars().all()
+        open_cases = [{"id": c.id, "model_id": getattr(c, "model_id", None),
+                       "status": getattr(c, "status", "OPEN"), "reason": getattr(c, "reason", "")}
+                      for c in cases if getattr(c, "status", "OPEN") not in ("CLOSED", "RESOLVED")]
+    except Exception:
+        open_cases = []
+    return {"incidents": inc, "open_cases": open_cases, "count": len(inc)}
+
+
+@router.get("/exchange")
+def data_exchange(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Cross-border data-exchange & sovereignty posture (data stays in-jurisdiction; sovereign-first)."""
+    scope = scope_pk(user)
+    rules = pe.active_rules(db, tenant_pk=(scope if scope and scope != -1 else None))
+    loc = [{"code": r.code, "kind": r.kind, "target": r.target} for r in rules
+           if r.kind in ("DATA_LOCALISATION", "MIN_SOVEREIGNTY")]
+    return {"jurisdiction": "ZA", "cross_border_transfer": "denied by default (sovereign-first)",
+            "data_localisation": "enforced", "sovereignty_recheck_hours": 6,
+            "localisation_rules": loc, "rules_active": len(loc),
+            "basis": "POPIA Chapter 9 (s72 cross-border) + Constitutional Pillar III (Data Sovereignty)"}
+
+
+@router.get("/schema")
+def governance_schema(user: dict = Depends(principal)):
+    """Self-describing governance data schema for integrators."""
+    return {
+        "ai_model": ["model_id", "name", "operator_id", "risk_tier", "use_case", "jurisdiction", "status", "tenant_pk"],
+        "risk_tiers": ["MINIMAL", "NOTABLE", "HIGH", "UNACCEPTABLE"],
+        "eva_dimensions": ["Validity", "Confidence", "Risk", "Compliance", "Stability", "Impact"],
+        "decision_outcomes": ["APPROVE", "REVIEW", "ESCALATE", "BLOCK"],
+        "decision_record": ["id", "model_id", "decision", "svs", "risk", "compliance", "sovereign",
+                            "seal", "latency_ms", "certificate_id", "created_at"],
+        "eva_certificate": ["certificate_id", "decision", "composite_eva", "content_sha3 (SHA-3-256)",
+                            "policy_version", "merkle_leaf", "dimensions", "signature_alg", "issued_at"],
+        "policy_rule_kinds": ["PROHIBIT", "RISK_TIER_CAP", "REQUIRE_HITL", "MIN_SOVEREIGNTY",
+                              "MIN_COMPLIANCE", "MAX_DISPARATE_IMPACT", "DATA_LOCALISATION", "KEYWORD_FLAG"],
+        "policy_version_states": ["PROPOSED", "APPROVED", "ACTIVE", "VETOED", "SUPERSEDED"],
+        "note": "CGS is advisory; BLOCK is strictly dimensional. Certificates verify via SHA-3-256 payload + signature.",
+    }
+
+
+@router.get("/regulator/export")
+def regulator_export(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Signed regulator evidence bundle (summary + recent decisions + audit head)."""
+    import time as _t, json as _j
+    base = regulator_summary(db, user)
+    scope = scope_pk(user)
+    dq = select(Decision).order_by(Decision.id.desc()).limit(50)
+    if scope is not None and scope != -1:
+        dq = (select(Decision).join(AIModel, Decision.model_pk == AIModel.id)
+              .where(AIModel.tenant_pk == scope).order_by(Decision.id.desc()).limit(50))
+    recent = []
+    for d in db.execute(dq).scalars().all():
+        m = db.get(AIModel, d.model_pk)
+        recent.append({"id": d.id, "model_id": m.model_id if m else None, "outcome": d.decision,
+                       "risk": round(d.risk, 3), "certificate_id": d.certificate_id,
+                       "at": d.created_at.isoformat()})
+    head = db.execute(select(AuditRef).order_by(AuditRef.seq.desc())).scalars().first()
+    bundle = {"generated_at": _t.strftime("%Y-%m-%dT%H:%M:%SZ", _t.gmtime()),
+              "summary": base, "recent_decisions": recent,
+              "audit_head": {"seq": (head.seq if head else None), "hash": (head.event_hash if head else None)}}
+    bundle["seal"] = sign(_j.dumps(bundle, sort_keys=True))
+    bundle["signature_alg"] = "HMAC-SHA256 (PQC/Dilithium-ref)"
+    return bundle

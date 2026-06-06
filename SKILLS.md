@@ -77,3 +77,7 @@ Clean first: `rm -rf */node_modules */dist *.db *.log`. Zip: `zip -rq OUT.zip . 
 - Playwright: the page's JWT is a module-scoped `let`, not on window — to script API calls in-page either expose it deliberately or drive via httpx in the test process (same sqlite file/origin).
 ## UDOC v9.3 admin endpoints
 - Replay needs the original inputs → persist Decision.inputs_json at decide(); link Decision.certificate_id to the EVA cert for the evidence bundle. Replay re-runs evaluate()+pe.apply() (3 lines mirroring decide()) — faithful without refactoring decide().
+
+## FastAPI route ordering (gotcha)
+- Literal-segment routes (e.g. `/tenants/me/apikeys`) MUST be declared BEFORE typed-param routes (`/tenants/{tid:int}/apikeys`). Otherwise the typed route matches the literal segment first and returns 422 (int conversion of "me"). Reorder so literals come first.
+- Console kill-switch: `POST /registry/models/{id}/status?new_status=ACTIVE|SUSPENDED|BLOCKED` (query param). Regulator export downloads via a Blob from `GET /udoc/regulator/export`.
