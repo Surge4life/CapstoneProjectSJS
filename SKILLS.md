@@ -47,3 +47,6 @@ Serve static: `python3 -m http.server PORT --directory <dir>`.
 
 ## Packaging
 Clean first: `rm -rf */node_modules */dist *.db *.log`. Zip: `zip -rq OUT.zip . -x "*/node_modules/*" -x "*/.git/*" -x "*/dist/*" -x "*.tsbuildinfo"`. Deliver to `/mnt/user-data/outputs/`; `present_files` the zip + progress doc.
+
+## G.O.D.S Intelligence (internal brain) — extend it
+- Corpus + reasoning in `app/services/gods_intelligence.py`; internal-only router `app/routers/intel.py` (gate via `_gate(user, write=)`; client/viewer → 403). Add data via `/intel/ingest` (file) or `/intel/ingest-text`; remove via `DELETE /intel/docs/{id}` — both recompute corpus state. `ask()` is retrieval-grounded + citeable; keep it honest (no hallucination; "not in corpus"). Pillar VIII guardrail (`guardrail_check`) is non-overridable — never weaken it. Maturity stages 2–5 stay ROADMAP/gated; do NOT claim AGI/Singularity. Intelligence UI belongs in the ADMIN (platform-internal/cockpit), NOT the client udoc-app.

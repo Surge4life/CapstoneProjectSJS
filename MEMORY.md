@@ -33,3 +33,46 @@ G.O.D.S Holdings (Pty) Ltd is **proposed / not registered**. No company, trust, 
 ## OPEN QUESTIONS for the founder
 - The **7 UDOC HTML demos**: names + what each shows (to model Private/Public sector).
 - The **Render deployment URL** for platform-core (to wire mobile + OTA).
+
+---
+## SESSION ADD — White paper, 7 demos, admin tabs, GAP analysis, G.O.D.S Intelligence scaffold
+
+### Uploads read (in /mnt/user-data/uploads)
+- `UDOC_EVA_Whitepaper_v1.docx` (EVA = "Evaluating Valiant Algorithms"; the canonical EVA spec).
+- `index.html` (the Netlify site, launches 25 Jun 2026) — the **7 UDOC demos** + AGI/Singularity paper + Intelligence framing.
+- `GODS_Admin_Stack_Enhanced_v3_6_attached_package.html` — the **authoritative admin tab map** for the React console.
+- (Also huge zips UDOC.zip 499M / SYSTEM_BUILD 205M / BRANDING 182M / SJSCAPSTONE 24M — the portfolio; NOT unzipped.)
+
+### The 7 UDOC demos (a version lineage; target = v9.3)
+mvp-1 International Standards Dashboard · mvp-2 Multi-Framework Compliance Engine · v5-sa SA-Aligned Architecture Lineage · v7-platform Full Platform (World Deterministic Governance) · v7-eva EVA Engine (Multi-Dimensional Evaluation) · **udoc-platform-ui Operational Control Platform v9.3** · **udoc-sovereign-console Sovereign AI Governance Platform v9.3**. v7/v9.3 contain sector consoles → **Public sector** = Welfare/SARS/Justice/Health; **Private sector** = Corporate.
+
+### Authoritative admin tab map (mirror in React console + cockpit)
+overview · users · config · logs · cob · **UDOC**: u-registry, u-policy, u-compliance, u-bias, u-constitutional, u-control, u-evidence, u-exchange, u-hardware, u-incident, u-lifecycle, u-api, u-regulator, u-replay, u-schema · **SETHS**: s-participants, s-employers, s-outcomes · **TS**: ts-projects · madiba.
+
+### EVA canonical (white paper) — alignment gaps vs current build
+White paper: 6 dims **Validity, Reliability, Risk, Compliance, Stability, Impact** (0–10), Composite EVA Score (Risk+Impact inverted), outcomes **APPROVE/REVIEW/ESCALATE/BLOCK**, **EVA Certificate** on APPROVE (signed, WORM, publicly verifiable), <50ms sync for HIGH (async for MED/LOW), CRYSTALS-Dilithium signing + 10-yr retention, Policy-as-Code (OPA/Rego-style, versioned, COB-approved, signed, hot-reload <5ms). Current build uses SVS + APPROVE/REVIEW/**RESTRICT**/BLOCK + HMAC seal + Merkle; policy engine has upload/activate/edit. ⚠ White paper cites GG54477 as active (April 2026, pre-withdrawal) — UPDATE to reflect **withdrawn 26 Apr 2026**.
+
+### UDOC enterprise-SaaS readiness GAP list (priority)
+1. **Multi-tenancy / client isolation** (per-tenant data on models/decisions/policy/audit) — biggest gap; currently single-tenant.
+2. **EVA alignment**: rename/Add the 6 named dims + 0–10 + Composite score + **ESCALATE** outcome + per-dim thresholds.
+3. **EVA Certificate** issuance + public verify endpoint (per APPROVE).
+4. **Policy engine maturity**: rule versioning + COB approval state + signing + hot-reload + test harness.
+5. **HITL routing + COB workflow** (ESCALATE→COB queue; rule veto).
+6. **SaaS commercial**: 6-tier product plans, API keys/service accounts, usage metering, rate limits, per-tenant quotas (check `saas.py`).
+7. **Enterprise auth**: SSO/OIDC + API keys.
+8. **Observability/SLA**: <50ms tracking + async tiers + metrics + incident.
+9. **Data lifecycle**: 10-yr retention, classification tiers, evidence export (FRIA/DPIA), POPIA deletion.
+10. **Admin completion** (build the React console to the v9.3 tab map) + **regulator/replay/schema/exchange/lifecycle/evidence/control** pages.
+
+### ✅ G.O.D.S Intelligence — BUILT (backend scaffold, internal-only) this session
+- Models: `KnowledgeDoc` (archive/data-room: title/source/category/content_text/active…), `IntelState` (stage 1–5, corpus stats).
+- Service `app/services/gods_intelligence.py`: ingest/set_active/remove (add-remove data updates corpus), `ask()` = **retrieval-grounded, citeable** answer over ACTIVE corpus (no hallucination; "not in corpus" otherwise), `guardrail_check()` = **Pillar VIII Human Primacy**, non-overridable (regex blocks override/disable-safety/subordinate-human), `MATURITY` ladder (Stage 1 ACTIVE Automated·Assistive → 2 Generative → 3 Agentic → 4 Recursive → 5 Singularity-Governance, 2–5 ROADMAP/gated), `MANDATE` (250-yr phases), `overview()`.
+- Router `app/routers/intel.py` (prefix `/intel`, **INTERNAL ONLY**: write=admin/operator/gov, read also auditor; client/viewer → 403): `/state`, `/docs`, `/ingest` (multipart PDF/DOCX/TXT, reuses policy_engine.extract_text), `/ingest-text`, `PATCH /docs/{id}` (active), `DELETE /docs/{id}`, `/ask`. Audited INTEL_INGEST/REMOVE/QUERY. Registered in main.py.
+- Verified: ingest 2 docs → stage 1, grounded EVA answer w/ citation; "override human oversight" BLOCKED (Pillar VIII); out-of-corpus handled.
+- Honest framing: corpus-grounded internal brain; "training" = curating the indexed corpus; AGI/Singularity = ROADMAP (per G.O.D.S's own position paper, subsumed by Constitutional Doctrine). NOT client-exposed. Does NOT replace EVA yet (parallel; future successor per roadmap).
+
+### PENDING after this session (sequenced per founder priority)
+A. **UDOC completion** → align EVA to white-paper canon (6 named dims/0–10/Composite/ESCALATE) + EVA Certificate; build the v9.3 tab pages (control/evidence/exchange/incident/lifecycle/api/regulator/replay/schema/constitutional). Map Public/Private sector → demo domains.
+B. **Admin completion** → React console mirroring the admin tab map, wired to platform-core across the eco-system (the static admin HTML is the UI/UX framework).
+C. **Intelligence maturation + UI** → embed an Intelligence panel in the ADMIN (platform-internal / cockpit, NOT client udoc-app); personalized desktop/app sync; Drive/zip corpus ingestion at scale; Stage-2 generative synthesis layer (pluggable LLM) behind COB gate.
+D. Multi-tenancy + SaaS commercial (tiers/API keys/metering) + EVA Certificate + policy versioning/COB workflow.

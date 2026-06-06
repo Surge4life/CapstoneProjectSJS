@@ -10,7 +10,7 @@ services:
     branch: main
     autoDeploy: true
     buildCommand: pip install -r requirements.txt && python seed.py
-    # --proxy-headers trusts X-Forwarded-Proto from Render's TLS terminator (HTTPS enforcement).
+    # --proxy-headers trusts X-Forwarded-Proto from Render's TLS terminator for HTTPS enforcement.
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
     healthCheckPath: /health
     envVars:

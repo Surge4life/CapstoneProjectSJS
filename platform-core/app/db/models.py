@@ -324,3 +324,32 @@ class PolicyRule(Base):
     confidence: Mapped[float] = mapped_column(Float, default=0.6)
     enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+# ─── G.O.D.S Intelligence · internal self-contained knowledge + governance brain ───
+class KnowledgeDoc(Base):
+    """A document in the G.O.D.S Intelligence archive (the internal data room). Add/remove updates the corpus the system reasons over. INTERNAL ONLY — never client-exposed."""
+    __tablename__ = "gi_knowledge_docs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(240))
+    source: Mapped[str] = mapped_column(String(255), default="")      # filename / drive path
+    category: Mapped[str] = mapped_column(String(60), default="GENERAL")  # PATENT|SPEC|BRAND|MANDATE|FINANCIAL|LEGAL|MEMOIR|GENERAL
+    division: Mapped[str] = mapped_column(String(40), default="GODS")
+    sha256: Mapped[str] = mapped_column(String(64), default="")
+    content_text: Mapped[str] = mapped_column(Text, default="")
+    char_len: Mapped[int] = mapped_column(Integer, default=0)
+    tags: Mapped[str] = mapped_column(String(300), default="")
+    added_by: Mapped[str] = mapped_column(String(120), default="")
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+class IntelState(Base):
+    """Singleton-ish state for the G.O.D.S Intelligence maturity + training position."""
+    __tablename__ = "gi_state"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    stage: Mapped[int] = mapped_column(Integer, default=1)  # 1 Automated/Assistive .. 5 Singularity-Governance
+    corpus_docs: Mapped[int] = mapped_column(Integer, default=0)
+    corpus_chars: Mapped[int] = mapped_column(Integer, default=0)
+    last_trained_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    notes: Mapped[str] = mapped_column(Text, default="")
