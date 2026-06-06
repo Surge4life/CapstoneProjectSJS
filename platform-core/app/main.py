@@ -1,7 +1,7 @@
 """GODS Platform Core — FastAPI application entry point. Wires all division + UDOC routers."""
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 import os
 from app.core.config import settings
 from app.db.session import init_db
@@ -16,6 +16,17 @@ app = FastAPI(title=settings.app_name, version="1.0.0",
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
                    allow_headers=["*"], allow_credentials=True)
+
+
+@app.middleware("http")
+async def enforce_https(request: Request, call_next):
+    """Redirect HTTP → HTTPS in production. Checks X-Forwarded-Proto set by Render's proxy;
+    health-check and internal traffic (no header) pass through unchanged."""
+    if (os.environ.get("ENVIRONMENT") == "production"
+            and request.headers.get("x-forwarded-proto") == "http"):
+        https_url = str(request.url).replace("http://", "https://", 1)
+        return RedirectResponse(https_url, status_code=301)
+    return await call_next(request)
 
 
 @app.on_event("startup")
