@@ -22,7 +22,7 @@ function Meter({ label, value, raw, invert }: { label: string; value: number; ra
 }
 
 type Plane = "select" | "software" | "hardware";
-type SwTab = "dash" | "registry" | "eva" | "policy" | "audit" | "compliance";
+type SwTab = "dash" | "registry" | "eva" | "policy" | "intel" | "tenancy" | "audit" | "compliance";
 type HwTab = "hqos" | "edge" | "sovereignty" | "killswitch";
 
 export function App() {
@@ -58,6 +58,21 @@ export function App() {
   const [sector, setSectorState] = useState<string>(localStorage.getItem("udoc_sector") || "PUBLIC");
   function setSector(x: string) { localStorage.setItem("udoc_sector", x); setSectorState(x); }
 
+  const [intelSt, setIntelSt] = useState<any>(null);
+  const [intelDocs, setIntelDocs] = useState<any[]>([]);
+  const [askQ, setAskQ] = useState(""); const [askA, setAskA] = useState<any>(null);
+  const [iText, setIText] = useState({ title: "", text: "", category: "GENERAL" });
+  const [iFile, setIFile] = useState<File | null>(null);
+  const [plan, setPlan] = useState<any>(null); const [myKeys, setMyKeys] = useState<any[]>([]);
+  const [versions, setVersions] = useState<any[]>([]); const [hot, setHot] = useState<any>(null);
+
+  async function doAsk() { setErr(""); setAskA(null); try { setAskA(await api.intelAsk(askQ)); } catch (e: any) { setErr(e.message); } }
+  async function doIntelText() { setErr(""); try { await api.intelText(iText.title, iText.text, iText.category); setMsg("Added to corpus."); setIText({ title: "", text: "", category: "GENERAL" }); api.intelState().then(setIntelSt).catch(()=>{}); api.intelDocs().then(setIntelDocs).catch(()=>{}); } catch (e: any) { setErr(e.message); } }
+  async function doIntelFile() { if (!iFile) return; setErr(""); try { await api.intelIngest(iFile, iFile.name, "GENERAL"); setMsg("Document ingested into the corpus."); setIFile(null); api.intelState().then(setIntelSt).catch(()=>{}); api.intelDocs().then(setIntelDocs).catch(()=>{}); } catch (e: any) { setErr(e.message); } }
+  async function doIssueKey() { setErr(""); try { const r = await api.issueMyKey("mobile"); setMsg("API key (copy now — shown once): " + r.api_key); api.myKeys().then(setMyKeys).catch(()=>{}); } catch (e: any) { setErr(e.message); } }
+  async function doSubmitPack(id: number) { setErr(""); try { const r = await api.submitPack(id); setMsg(`Submitted v${r.version.version} for COB review.`); api.packVersions(id).then(setVersions).catch(()=>{}); refresh(); } catch (e: any) { setErr(e.message); } }
+  async function doApproveVer(vid: number, pid: number) { setErr(""); try { await api.approveVersion(vid); setMsg("COB approved · hot-reloaded into the live path."); api.packVersions(pid).then(setVersions).catch(()=>{}); api.hotreload().then(setHot).catch(()=>{}); refresh(); } catch (e: any) { setErr(e.message); } }
+
   async function checkConn() { setConnected(await ping()); }
   useEffect(() => { checkConn(); }, []);
   function saveBase() { setBase(base); setBaseState(getBase()); checkConn(); }
@@ -77,6 +92,9 @@ export function App() {
       api.get("/policy/packs").then(setPacks).catch(() => {});
       api.get("/policy/active").then(setActivePol).catch(() => {});
       api.get("/decisions/certificates").then(setCerts).catch(() => {});
+      api.intelState().then(setIntelSt).catch(() => {}); api.intelDocs().then(setIntelDocs).catch(() => {});
+      api.myTenant().then(setPlan).catch(() => {}); api.myKeys().then(setMyKeys).catch(() => {});
+      api.hotreload().then(setHot).catch(() => {});
     } catch (e: any) { setErr(e.message); }
   }
   useEffect(() => { if (authed) { refresh(); const t = setInterval(refresh, 8000); return () => clearInterval(t); } }, [authed]);
@@ -119,7 +137,7 @@ export function App() {
       setPackDetail(r); setPform({ name: "", jurisdiction: "ZA", sector: "PUBLIC" }); setPfile(null); refresh();
     } catch (e: any) { setErr(e.message); }
   }
-  async function loadPack(id: number) { try { setPackDetail(await api.get(`/policy/packs/${id}`)); } catch (e: any) { setErr(e.message); } }
+  async function loadPack(id: number) { try { setPackDetail(await api.get(`/policy/packs/${id}`)); api.packVersions(id).then(setVersions).catch(() => {}); } catch (e: any) { setErr(e.message); } }
   async function activatePack(id: number) { try { const r = await api.post(`/policy/packs/${id}/activate`); setMsg(`Pack ${id} ACTIVE — ${r.active_rules} rules enforced.`); refresh(); loadPack(id); } catch (e: any) { setErr(e.message); } }
   async function toggleRule(rid: number, enabled: boolean) { try { await api.patch(`/policy/rules/${rid}`, { enabled }); if (packDetail) loadPack(packDetail.pack.id); } catch (e: any) { setErr(e.message); } }
 
@@ -169,7 +187,7 @@ export function App() {
 
   const sovPct = sov ? Math.round((sov.sovereign_rate ?? 1) * 100) : "—";
   const isSw = plane === "software";
-  const SW: [SwTab, string][] = [["dash", "Dashboard"], ["registry", "AI Registry"], ["eva", "EVA Engine"], ["policy", "Policy-to-Code"], ["audit", "Audit Trail"], ["compliance", "Compliance"]];
+  const SW: [SwTab, string][] = [["dash", "Dashboard"], ["registry", "AI Registry"], ["eva", "EVA Engine"], ["policy", "Policy-to-Code"], ["intel", "Intelligence"], ["tenancy", "Tenancy"], ["audit", "Audit Trail"], ["compliance", "Compliance"]];
   const HW: [HwTab, string][] = [["hqos", "HQ-OS"], ["edge", "Sovereign Edge"], ["sovereignty", "Sovereignty"], ["killswitch", "Kill-Switch"]];
 
   return (
@@ -261,11 +279,52 @@ export function App() {
             <div className="card udoc"><h3>Enforced Rules</h3><div className="metric">{activePol.enforced_rules || 0}</div></div></div>}
           <div className="panel"><h3>Policy packs — {packs.length}</h3>
             <table><thead><tr><th>Name</th><th>Sector</th><th>Jurisdiction</th><th>Rules</th><th>Status</th><th>Action</th></tr></thead>
-              <tbody>{packs.map(p => <tr key={p.id}><td>{p.name}</td><td>{p.sector}</td><td>{p.jurisdiction}</td><td>{p.rule_count}</td><td><span className={`tag ${p.status === "ACTIVE" ? "ACTIVE" : "REVIEW"}`}>{p.status}</span></td><td><button className="btn sm ghost" onClick={() => loadPack(p.id)}>Review</button>{p.status !== "ACTIVE" && <button className="btn sm" style={{ marginLeft: 6 }} onClick={() => activatePack(p.id)}>Activate</button>}</td></tr>)}{!packs.length && <tr><td colSpan={6} className="muted">No policy packs yet — upload legislation above.</td></tr>}</tbody></table></div>
+              <tbody>{packs.map(p => <tr key={p.id}><td>{p.name}</td><td>{p.sector}</td><td>{p.jurisdiction}</td><td>{p.rule_count}</td><td><span className={`tag ${p.status === "ACTIVE" ? "ACTIVE" : "REVIEW"}`}>{p.status}</span></td><td><button className="btn sm ghost" onClick={() => loadPack(p.id)}>Review</button>{p.status !== "ACTIVE" && <button className="btn sm" style={{ marginLeft: 6 }} onClick={() => activatePack(p.id)}>Activate</button>}{(p.status === "DRAFT" || p.status === "PENDING_APPROVAL") && <button className="btn sm ghost" style={{ marginLeft: 6 }} onClick={() => doSubmitPack(p.id)}>Submit→COB</button>}</td></tr>)}{!packs.length && <tr><td colSpan={6} className="muted">No policy packs yet — upload legislation above.</td></tr>}</tbody></table></div>
+          {versions.length > 0 && <div className="panel"><h3>Policy versions <span className="tag PASS">hot-reload {hot?.last_reload_ms ?? "—"}ms</span></h3>
+            <table><thead><tr><th>v</th><th>State</th><th>Rules</th><th>Proposed by</th><th>COB</th></tr></thead>
+              <tbody>{versions.map((v: any) => <tr key={v.id}><td>{v.version}</td><td><span className={`tag ${v.state === "ACTIVE" ? "ACTIVE" : (v.state === "VETOED" ? "FAIL" : "REVIEW")}`}>{v.state}</span></td><td>{v.rule_count}</td><td className="mono" style={{ fontSize: ".7rem" }}>{v.proposed_by}</td><td>{v.state === "PROPOSED" && (me?.role === "gov" || me?.role === "admin") && <button className="btn sm" onClick={() => doApproveVer(v.id, v.pack_id)}>Approve</button>}</td></tr>)}</tbody></table>
+            <p className="note-hw">COB approval (gov/admin) freezes a signed version and hot-reloads it into the live EVA path. Veto is available in the admin console.</p></div>}
           {packDetail && <div className="panel"><h3>{packDetail.pack.name} — {packDetail.rules.length} rules <span className={`tag ${packDetail.pack.status === "ACTIVE" ? "ACTIVE" : "REVIEW"}`}>{packDetail.pack.status}</span></h3>
             <p className="muted" style={{ fontSize: ".74rem", marginBottom: 10 }}>{packDetail.pack.summary}</p>
             <table><thead><tr><th>Code</th><th>Kind</th><th>Severity</th><th>Source clause</th><th>On</th></tr></thead>
               <tbody>{packDetail.rules.map((r: any) => <tr key={r.id}><td className="mono">{r.code}</td><td><span className="tag">{r.kind}</span></td><td><span className={`tag ${r.severity}`}>{r.severity}</span></td><td style={{ fontSize: ".72rem" }}>{r.source_excerpt}</td><td><button className={`btn sm ${r.enabled ? "" : "ghost"}`} onClick={() => toggleRule(r.id, !r.enabled)}>{r.enabled ? "ON" : "off"}</button></td></tr>)}</tbody></table></div>}
+        </>}
+
+        {isSw && swTab === "intel" && <>
+          <div className="pg-h"><div><h2>G.O.D.S Intelligence</h2><p>Retrieval-grounded intelligence over your curated corpus (internal — operator / gov / admin). Answers cite ingested documents and never invent sources. Human primacy is non-overridable.</p></div></div>
+          <div className="grid">
+            <div className="card udoc"><h3>Corpus</h3><div className="metric">{intelSt?.corpus_docs ?? "—"}<small>documents</small></div></div>
+            <div className="card udoc"><h3>Characters</h3><div className="metric">{intelSt?.corpus_chars ?? 0}</div></div>
+            <div className="card udoc"><h3>Maturity</h3><div className="metric" style={{ fontSize: ".85rem" }}>{intelSt?.stage_name || "Automated · Assistive"}</div></div>
+          </div>
+          <div className="panel"><h3>Ask the corpus</h3>
+            <div className="row"><input placeholder="ask a question grounded in the corpus" value={askQ} onChange={e => setAskQ(e.target.value)} style={{ minWidth: 260 }} /><button className="btn" onClick={doAsk} disabled={!askQ}>Ask</button></div>
+            {askA && <div className="panel" style={{ marginTop: 10 }}><p style={{ whiteSpace: "pre-wrap" }}>{askA.answer}</p>{askA.citations?.length > 0 && <p className="muted" style={{ fontSize: ".72rem" }}>Sources: {askA.citations.map((c: any) => c.title).join(" · ")}</p>}</div>}</div>
+          <div className="panel"><h3>Add to corpus</h3>
+            <div className="row"><input placeholder="title" value={iText.title} onChange={e => setIText({ ...iText, title: e.target.value })} /><select value={iText.category} onChange={e => setIText({ ...iText, category: e.target.value })}><option>GENERAL</option><option>SPEC</option><option>PATENT</option><option>LEGAL</option><option>FINANCIAL</option></select></div>
+            <textarea placeholder="paste text to ingest" value={iText.text} onChange={e => setIText({ ...iText, text: e.target.value })} style={{ width: "100%", minHeight: 80, marginTop: 8, background: "#0b1830", color: "#e8edf6", border: "1px solid #1c2a45", borderRadius: 8, padding: 8 }} />
+            <div className="row" style={{ marginTop: 8 }}><button className="btn" onClick={doIntelText} disabled={!iText.title || !iText.text}>Add text</button>
+              <input type="file" accept=".pdf,.docx,.txt,.md,.html" onChange={e => setIFile(e.target.files?.[0] || null)} />
+              <button className="btn" onClick={doIntelFile} disabled={!iFile}>Upload document</button></div>
+            <p className="note-hw">Large Google-Drive corpora load server-side via tools/ingest_corpus.py; single documents upload here.</p></div>
+          <div className="panel"><h3>Corpus documents — {intelDocs.length}</h3>
+            <table><thead><tr><th>Title</th><th>Category</th><th>Active</th></tr></thead>
+              <tbody>{intelDocs.slice(0, 30).map((d: any) => <tr key={d.id}><td>{d.title}</td><td><span className="tag">{d.category}</span></td><td>{String(d.active)}</td></tr>)}{!intelDocs.length && <tr><td colSpan={3} className="muted">Corpus empty — add text or upload a document (or load your Drive zip server-side).</td></tr>}</tbody></table></div>
+        </>}
+
+        {isSw && swTab === "tenancy" && <>
+          <div className="pg-h"><div><h2>Tenancy &amp; Plan</h2><p>Your organisation's commercial plan, decision usage and API keys on the G.O.D.S platform.</p></div></div>
+          {plan && plan.tenant_id ? <>
+            <div className="grid">
+              <div className="card udoc"><h3>Plan</h3><div className="metric" style={{ fontSize: "1rem" }}>{plan.tier_name}<small>{plan.status}</small></div></div>
+              <div className="card udoc"><h3>Decisions used</h3><div className="metric">{plan.usage_decisions}<small>{plan.decision_quota < 0 ? "of unlimited" : ("of " + plan.decision_quota)}</small></div></div>
+              <div className="card udoc"><h3>Max models</h3><div className="metric">{plan.entitlements?.max_models < 0 ? "∞" : plan.entitlements?.max_models}</div></div>
+              <div className="card udoc"><h3>COB sign-off</h3><div className="metric" style={{ fontSize: "1rem" }}>{plan.entitlements?.cob ? "required" : "not required"}</div></div>
+            </div>
+            <div className="panel"><h3>API keys — {myKeys.length} <button className="btn sm" style={{ float: "right" }} onClick={doIssueKey}>+ Issue key</button></h3>
+              <table><thead><tr><th>Prefix</th><th>Name</th><th>Active</th><th>Last used</th></tr></thead>
+                <tbody>{myKeys.map((k: any) => <tr key={k.id}><td className="mono">{k.prefix}…</td><td>{k.name}</td><td>{String(k.active)}</td><td className="mono">{String(k.last_used_at || "—").slice(0, 19)}</td></tr>)}{!myKeys.length && <tr><td colSpan={4} className="muted">No keys yet — issue one to call the API as a service (X-API-Key).</td></tr>}</tbody></table></div>
+          </> : <div className="panel"><p className="muted">Signed in as platform staff (not tenant-scoped) — tenant plans are managed in the admin console.</p></div>}
         </>}
 
         {isSw && swTab === "audit" && <>

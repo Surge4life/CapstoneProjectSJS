@@ -15,7 +15,7 @@ app = FastAPI(title=settings.app_name, version="1.0.0",
               description="Sovereign AI governance backend for the G.O.D.S ecosystem.")
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
-                   allow_headers=["*"], allow_credentials=True)
+                   allow_headers=["*"], allow_credentials=False)
 
 
 @app.middleware("http")
