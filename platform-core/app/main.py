@@ -32,8 +32,64 @@ async def enforce_https(request: Request, call_next):
 
 @app.on_event("startup")
 def _startup():
-    init_db()
-    _ensure_bootstrap_admin()
+    # Each step is guarded so a database/schema problem can NEVER crash boot — a dead app helps no one.
+    try:
+        init_db()
+    except Exception as e:
+        print(f"[startup] init_db error (continuing): {e}")
+    try:
+        _heal_schema()
+    except Exception as e:
+        print(f"[startup] schema-heal error (continuing): {e}")
+    try:
+        _ensure_bootstrap_admin()
+    except Exception as e:
+        print(f"[startup] bootstrap-admin skipped: {e}")
+
+
+def _heal_schema():
+    """Additively reconcile existing tables with the ORM models: ADD any columns the models declare
+    that are missing from the live database. Idempotent; never drops or retypes a column. Lets a
+    database created under an OLDER schema work without a manual migration and without data loss.
+    (This is what was missing: a live table created before new columns were added.)"""
+    from sqlalchemy import inspect as sa_inspect, text
+    from app.db.session import engine, Base
+    from app.db import models  # noqa: F401 — ensure all tables are registered on Base.metadata
+    insp = sa_inspect(engine)
+    existing = set(insp.get_table_names())
+    dialect = engine.dialect.name
+    added = 0
+    for table in Base.metadata.sorted_tables:
+        if table.name not in existing:
+            continue  # brand-new table — create_all already built it with every column
+        have = {c["name"] for c in insp.get_columns(table.name)}
+        for col in table.columns:
+            if col.name in have:
+                continue
+            try:
+                coltype = col.type.compile(dialect=engine.dialect)
+            except Exception:
+                coltype = "TEXT"
+            ine = "IF NOT EXISTS " if dialect == "postgresql" else ""
+            ddl = f'ALTER TABLE "{table.name}" ADD COLUMN {ine}"{col.name}" {coltype}'
+            d = getattr(col, "default", None)
+            if d is not None and getattr(d, "is_scalar", False):  # backfill existing rows when sensible
+                val = d.arg
+                if isinstance(val, bool):
+                    ddl += f" DEFAULT {'TRUE' if val else 'FALSE'}"
+                elif isinstance(val, (int, float)):
+                    ddl += f" DEFAULT {val}"
+                elif isinstance(val, str):
+                    ddl += " DEFAULT '" + val.replace("'", "''") + "'"
+            try:
+                with engine.begin() as conn:   # isolate each DDL so one failure can't abort the rest
+                    conn.execute(text(ddl))
+                added += 1
+                print(f"[schema-heal] added {table.name}.{col.name}")
+            except Exception as e:
+                print(f"[schema-heal] skipped {table.name}.{col.name}: {str(e)[:120]}")
+    if added:
+        print(f"[schema-heal] reconciled {added} missing column(s)")
 
 
 def _ensure_bootstrap_admin():
