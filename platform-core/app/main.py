@@ -9,7 +9,8 @@ from app.routers import (health, auth, registry, decisions, audit, oversight,
                          seths, ts, madiba, compliance, bias, sovereignty,
                          intelligence, admin, analytics,
                          portal_student, portal_employer, portal_employee,
-                         documents, saas, madiba_engage, ts_submit, access, policy, intel, tenants, admin_udoc)
+                         documents, saas, madiba_engage, ts_submit, access, policy, intel, tenants, admin_udoc,
+                         system_backup)
 
 app = FastAPI(title=settings.app_name, version="1.0.0",
               description="Sovereign AI governance backend for the G.O.D.S ecosystem.")
@@ -32,6 +33,27 @@ async def enforce_https(request: Request, call_next):
 @app.on_event("startup")
 def _startup():
     init_db()
+    _ensure_bootstrap_admin()
+
+
+def _ensure_bootstrap_admin():
+    """On a brand-new EMPTY database (e.g. just after a DB migration), create one admin so the
+    operator can log in and run a restore. No-op the moment any user exists. A restore then
+    replaces this with the real users from the backup bundle. Override creds via GODS_BOOTSTRAP_*."""
+    from app.db.session import SessionLocal
+    from app.db.models import User
+    from app.core.security import hash_password
+    db = SessionLocal()
+    try:
+        if db.query(User).count() == 0:
+            email = os.environ.get("GODS_BOOTSTRAP_EMAIL", "admin@gods.local")
+            pw = os.environ.get("GODS_BOOTSTRAP_PASSWORD", "admin123")
+            db.add(User(email=email, password_hash=hash_password(pw), role="admin", division="GODS"))
+            db.commit()
+            print(f"[bootstrap] empty database detected — created bootstrap admin '{email}'. "
+                  f"Restore a backup or change this password immediately.")
+    finally:
+        db.close()
 
 
 @app.get("/admin", tags=["root"], include_in_schema=False)
@@ -74,5 +96,6 @@ for r in (health.router, auth.router, registry.router, decisions.router, audit.r
           bias.router, sovereignty.router, intelligence.router, admin.router, analytics.router,
           portal_student.router, portal_employer.router, portal_employee.router,
           documents.router, saas.router, madiba_engage.router, ts_submit.router,
-          access.router, policy.router, intel.router, tenants.router, admin_udoc.router):
+          access.router, policy.router, intel.router, tenants.router, admin_udoc.router,
+          system_backup.router):
     app.include_router(r)

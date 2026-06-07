@@ -1,7 +1,21 @@
-# Render blueprint for the G.O.D.S / UDOC eco-system.
-# Connect this GitHub repo to Render (New > Blueprint). Pushes to `main` auto-deploy both services.
+# Render Blueprint — the ENTIRE G.O.D.S / UDOC stack as code (4 web services + 1 database).
+# Connect this repo in Render (New > Blueprint). Pushes to `main` auto-deploy.
+#
+# ⚠ FREE POSTGRES EXPIRES ~30 DAYS AFTER CREATION — Render DELETES it. See DB_EXPIRY_RUNBOOK.md.
+#   The core's DATABASE_URL is wired from gods-db below, so if the DB is recreated the connection
+#   re-populates automatically; you then restore your data with tools/db_restore.py.
+#   To make the database PERMANENT: change gods-db `plan:` to a paid tier, OR delete the
+#   `fromDatabase` block and set DATABASE_URL to an external DSN (e.g. a Neon/Supabase free DB,
+#   which does not auto-delete). Either way, preserve GODS_SOV_KEY or past seals won't verify.
+
+databases:
+  - name: gods-db
+    plan: free                 # ⚠ free tier is deleted ~30 days after creation; upgrade for permanence
+    region: oregon
+    postgresMajorVersion: "18"
+
 services:
-  # ---- UDOC governance API (FastAPI) ----
+  # ---- UDOC governance API (FastAPI) — the core; ALL data lives in gods-db ----
   - type: web
     name: gods-platform-core
     runtime: python
@@ -15,12 +29,17 @@ services:
     envVars:
       - key: ENVIRONMENT
         value: production
-      - key: GODS_SOV_KEY        # sovereign signing key; Render generates + stores it
-        generateValue: true
+      - key: GODS_SOV_KEY        # sovereign signing key — Render generates it ONCE and keeps it.
+        generateValue: true      #   PRESERVE this value across redeploys or certificate/version seals stop verifying.
+      - key: DATABASE_URL        # auto-wired from gods-db; re-populates automatically if the DB is recreated.
+        fromDatabase:
+          name: gods-db
+          property: connectionString
+      # GODS_BOOTSTRAP_PASSWORD (optional) overrides the empty-database bootstrap admin password.
       # RENDER_GIT_COMMIT / RENDER_GIT_BRANCH / RENDER_RELEASE_CREATED_AT are injected by Render
       # and surfaced at GET /version so the mobile app can detect new deploys.
 
-  # ---- UDOC web app / PWA (the mobile WebView points here for instant OTA) ----
+  # ---- UDOC web app / PWA (the page the mobile WebView can point at for OTA UI) ----
   - type: web
     name: gods-udoc-web
     runtime: static
@@ -49,3 +68,37 @@ services:
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+
+  # ---- Internal staff console (React/Vite static) ----
+  - type: web
+    name: gods-platform-internal
+    runtime: static
+    rootDir: platform-internal
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # ---- Division portals web (React/Vite static) ----
+  - type: web
+    name: gods-portals
+    runtime: static
+    rootDir: portals-web
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
