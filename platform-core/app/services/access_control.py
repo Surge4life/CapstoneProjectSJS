@@ -23,6 +23,7 @@ ROLE_GRANTS = {
     "auditor":  {"holdings-overview", "udoc-gov"},
     "operator": {"holdings-overview", "seths-ops", "madiba-ops", "ts-ops"},
     "governance": {"holdings-overview", "udoc-gov"},
+    "gov":      {"holdings-overview", "udoc-gov"},   # COB / governance authority (seed uses role="gov")
     "viewer":   {"holdings-overview"},
 }
 
@@ -41,7 +42,7 @@ def systems_for(role: str, division: str) -> list[dict]:
 
     # Division scoping: if the user is bound to a specific division (not GODS) and is NOT
     # admin/exec/auditor, restrict their ops access to that division's system only.
-    if division and division != "GODS" and role not in ("admin", "exec", "auditor", "governance"):
+    if division and division != "GODS" and role not in ("admin", "exec", "auditor", "governance", "gov"):
         own = DIVISION_SYSTEM.get(division)
         ops = {"seths-ops", "madiba-ops", "ts-ops", "udoc-gov"}
         granted = (granted - ops) | ({own} if own else set())

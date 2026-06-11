@@ -187,8 +187,22 @@ export function App() {
 
   const sovPct = sov ? Math.round((sov.sovereign_rate ?? 1) * 100) : "—";
   const isSw = plane === "software";
-  const SW: [SwTab, string][] = [["dash", "Dashboard"], ["registry", "AI Registry"], ["eva", "EVA Engine"], ["policy", "Policy-to-Code"], ["intel", "Intelligence"], ["tenancy", "Tenancy"], ["audit", "Audit Trail"], ["compliance", "Compliance"]];
-  const HW: [HwTab, string][] = [["hqos", "HQ-OS"], ["edge", "Sovereign Edge"], ["sovereignty", "Sovereignty"], ["killswitch", "Kill-Switch"]];
+  const SW_ALL: [SwTab, string][] = [["dash", "Dashboard"], ["registry", "AI Registry"], ["eva", "EVA Engine"], ["policy", "Policy-to-Code"], ["intel", "Intelligence"], ["tenancy", "Tenancy"], ["audit", "Audit Trail"], ["compliance", "Compliance"]];
+  const HW_ALL: [HwTab, string][] = [["hqos", "HQ-OS"], ["edge", "Sovereign Edge"], ["sovereignty", "Sovereignty"], ["killswitch", "Kill-Switch"]];
+  // Role-scoped capabilities — the UI shows only what the role may operate; the backend enforces it independently.
+  const role: string = me?.role || "viewer";
+  const isAdmin: boolean = !!me?.is_admin;
+  const CAPS: Record<string, { sw: string[]; hw: string[]; reg: boolean; kill: boolean; appr: boolean; ro: boolean }> = {
+    admin:    { sw: ["dash", "registry", "eva", "policy", "intel", "tenancy", "audit", "compliance"], hw: ["hqos", "edge", "sovereignty", "killswitch"], reg: true,  kill: true,  appr: true,  ro: false },
+    operator: { sw: ["dash", "registry", "eva", "audit", "compliance"],                               hw: ["hqos", "edge", "sovereignty"],               reg: true,  kill: false, appr: false, ro: false },
+    gov:      { sw: ["dash", "eva", "policy", "intel", "audit", "compliance"],                         hw: ["hqos", "edge", "sovereignty"],               reg: false, kill: false, appr: true,  ro: false },
+    auditor:  { sw: ["dash", "eva", "audit", "compliance"],                                            hw: ["hqos", "edge", "sovereignty"],               reg: false, kill: false, appr: false, ro: true  },
+    viewer:   { sw: ["dash", "eva", "audit", "compliance"],                                            hw: ["hqos", "edge", "sovereignty"],               reg: false, kill: false, appr: false, ro: true  },
+    client:   { sw: ["dash", "registry", "eva", "policy", "intel", "tenancy"],                         hw: [],                                            reg: true,  kill: false, appr: false, ro: false },
+  };
+  const cap = isAdmin ? CAPS.admin : (CAPS[role] || CAPS.viewer);
+  const SW = SW_ALL.filter(([k]) => cap.sw.includes(k));
+  const HW = HW_ALL.filter(([k]) => cap.hw.includes(k));
 
   return (
     <div className="wrap">
@@ -201,6 +215,7 @@ export function App() {
         <span className="signout" onClick={() => { setToken(null); location.reload(); }} style={{ marginLeft: 10 }}>sign out</span>
       </div>
       <div className="ribbon">PRE-REGISTRATION FORECAST · NO COMPANY / TRUST / TRADEMARK / DOMAIN YET REGISTERED · IP-PREPARATION WORK</div>
+      <div style={{ fontSize: ".72rem", color: "#9fb3d6", padding: "2px 0 6px" }}>Role <b style={{ color: "#C9A84C" }}>{role}{me?.division && me.division !== "GODS" ? " · " + me.division : ""}</b> — scoped to {cap.sw.length} software area{cap.sw.length === 1 ? "" : "s"}{cap.ro ? " · read-only" : ""}{cap.kill ? " · kill-switch" : ""}{cap.appr ? " · policy approval" : ""}</div>
       <div className="tabs">{(isSw ? SW : HW).map(([k, t]) => <button key={k} className={(isSw ? swTab : hwTab) === k ? "active" : ""} onClick={() => isSw ? setSwTab(k as SwTab) : setHwTab(k as HwTab)}>{t}</button>)}</div>
 
       <div className="main">
@@ -229,7 +244,7 @@ export function App() {
               <button className="btn" onClick={registerModel} disabled={!f.model_id || !f.name}>Register</button></div></div>
           <div className="panel"><h3>Registered systems — {models.length}</h3>
             <table><thead><tr><th>System ID</th><th>Name</th><th>Operator</th><th>Risk</th><th>Status</th><th>Control</th></tr></thead>
-              <tbody>{models.map(m => <tr key={m.model_id}><td className="mono">{m.model_id}</td><td>{m.name}</td><td>{m.operator_id || "—"}</td><td><span className={`tag ${m.risk_tier}`}>{m.risk_tier}</span></td><td><span className={`tag ${m.status}`}>{m.status}</span></td><td><button className={`btn sm ${m.status === "ACTIVE" ? "danger" : ""}`} onClick={() => toggle(m.model_id, m.status)}>{m.status === "ACTIVE" ? "Suspend" : "Resume"}</button></td></tr>)}{!models.length && <tr><td colSpan={6} className="muted">No systems registered.</td></tr>}</tbody></table></div>
+              <tbody>{models.map(m => <tr key={m.model_id}><td className="mono">{m.model_id}</td><td>{m.name}</td><td>{m.operator_id || "—"}</td><td><span className={`tag ${m.risk_tier}`}>{m.risk_tier}</span></td><td><span className={`tag ${m.status}`}>{m.status}</span></td><td>{cap.kill ? <button className={`btn sm ${m.status === "ACTIVE" ? "danger" : ""}`} onClick={() => toggle(m.model_id, m.status)}>{m.status === "ACTIVE" ? "Suspend" : "Resume"}</button> : <span className="muted">—</span>}</td></tr>)}{!models.length && <tr><td colSpan={6} className="muted">No systems registered.</td></tr>}</tbody></table></div>
         </>}
 
         {isSw && swTab === "eva" && <>
@@ -282,7 +297,7 @@ export function App() {
               <tbody>{packs.map(p => <tr key={p.id}><td>{p.name}</td><td>{p.sector}</td><td>{p.jurisdiction}</td><td>{p.rule_count}</td><td><span className={`tag ${p.status === "ACTIVE" ? "ACTIVE" : "REVIEW"}`}>{p.status}</span></td><td><button className="btn sm ghost" onClick={() => loadPack(p.id)}>Review</button>{p.status !== "ACTIVE" && <button className="btn sm" style={{ marginLeft: 6 }} onClick={() => activatePack(p.id)}>Activate</button>}{(p.status === "DRAFT" || p.status === "PENDING_APPROVAL") && <button className="btn sm ghost" style={{ marginLeft: 6 }} onClick={() => doSubmitPack(p.id)}>Submit→COB</button>}</td></tr>)}{!packs.length && <tr><td colSpan={6} className="muted">No policy packs yet — upload legislation above.</td></tr>}</tbody></table></div>
           {versions.length > 0 && <div className="panel"><h3>Policy versions <span className="tag PASS">hot-reload {hot?.last_reload_ms ?? "—"}ms</span></h3>
             <table><thead><tr><th>v</th><th>State</th><th>Rules</th><th>Proposed by</th><th>COB</th></tr></thead>
-              <tbody>{versions.map((v: any) => <tr key={v.id}><td>{v.version}</td><td><span className={`tag ${v.state === "ACTIVE" ? "ACTIVE" : (v.state === "VETOED" ? "FAIL" : "REVIEW")}`}>{v.state}</span></td><td>{v.rule_count}</td><td className="mono" style={{ fontSize: ".7rem" }}>{v.proposed_by}</td><td>{v.state === "PROPOSED" && (me?.role === "gov" || me?.role === "admin") && <button className="btn sm" onClick={() => doApproveVer(v.id, v.pack_id)}>Approve</button>}</td></tr>)}</tbody></table>
+              <tbody>{versions.map((v: any) => <tr key={v.id}><td>{v.version}</td><td><span className={`tag ${v.state === "ACTIVE" ? "ACTIVE" : (v.state === "VETOED" ? "FAIL" : "REVIEW")}`}>{v.state}</span></td><td>{v.rule_count}</td><td className="mono" style={{ fontSize: ".7rem" }}>{v.proposed_by}</td><td>{v.state === "PROPOSED" && cap.appr && <button className="btn sm" onClick={() => doApproveVer(v.id, v.pack_id)}>Approve</button>}</td></tr>)}</tbody></table>
             <p className="note-hw">COB approval (gov/admin) freezes a signed version and hot-reloads it into the live EVA path. Veto is available in the admin console.</p></div>}
           {packDetail && <div className="panel"><h3>{packDetail.pack.name} — {packDetail.rules.length} rules <span className={`tag ${packDetail.pack.status === "ACTIVE" ? "ACTIVE" : "REVIEW"}`}>{packDetail.pack.status}</span></h3>
             <p className="muted" style={{ fontSize: ".74rem", marginBottom: 10 }}>{packDetail.pack.summary}</p>
