@@ -22,7 +22,7 @@ function Meter({ label, value, raw, invert }: { label: string; value: number; ra
 }
 
 type Plane = "select" | "software" | "hardware";
-type SwTab = "dash" | "registry" | "eva" | "policy" | "intel" | "tenancy" | "audit" | "compliance";
+type SwTab = "dash" | "registry" | "eva" | "policy" | "intel" | "tenancy" | "audit" | "compliance" | "access";
 type HwTab = "hqos" | "edge" | "sovereignty" | "killswitch";
 
 export function App() {
@@ -55,6 +55,8 @@ export function App() {
   const [pform, setPform] = useState({ name: "", jurisdiction: "ZA", sector: localStorage.getItem("udoc_sector") || "PUBLIC" });
   const [pfile, setPfile] = useState<File | null>(null);
   const [updateReady, setUpdateReady] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [nu, setNu] = useState({ email: "", password: "", role: "viewer", division: "GODS" });
   const [sector, setSectorState] = useState<string>(localStorage.getItem("udoc_sector") || "PUBLIC");
   function setSector(x: string) { localStorage.setItem("udoc_sector", x); setSectorState(x); }
 
@@ -95,6 +97,7 @@ export function App() {
       api.intelState().then(setIntelSt).catch(() => {}); api.intelDocs().then(setIntelDocs).catch(() => {});
       api.myTenant().then(setPlan).catch(() => {}); api.myKeys().then(setMyKeys).catch(() => {});
       api.hotreload().then(setHot).catch(() => {});
+      api.listUsers().then((r: any) => setUsers(r.users || [])).catch(() => { });
     } catch (e: any) { setErr(e.message); }
   }
   useEffect(() => { if (authed) { refresh(); const t = setInterval(refresh, 8000); return () => clearInterval(t); } }, [authed]);
@@ -109,6 +112,10 @@ export function App() {
     };
     check(); const t = setInterval(check, 60000); return () => clearInterval(t);
   }, [connected]);
+
+  async function createUserFn() { setErr(""); setMsg(""); try { const r = await api.createUser(nu); setMsg(`Granted ${r.user.email} · ${r.user.role}`); setNu({ email: "", password: "", role: "viewer", division: "GODS" }); api.listUsers().then((x: any) => setUsers(x.users || [])).catch(() => { }); } catch (e: any) { setErr(e.message); } }
+  async function setUserActive(uid: number, active: boolean) { try { await api.updateUser(uid, { active }); api.listUsers().then((x: any) => setUsers(x.users || [])).catch(() => { }); } catch (e: any) { setErr(e.message); } }
+  async function setUserRole(uid: number, role: string) { try { await api.updateUser(uid, { role }); api.listUsers().then((x: any) => setUsers(x.users || [])).catch(() => { }); } catch (e: any) { setErr(e.message); } }
 
   async function registerModel() {
     setMsg(""); setErr("");
@@ -187,13 +194,13 @@ export function App() {
 
   const sovPct = sov ? Math.round((sov.sovereign_rate ?? 1) * 100) : "—";
   const isSw = plane === "software";
-  const SW_ALL: [SwTab, string][] = [["dash", "Dashboard"], ["registry", "AI Registry"], ["eva", "EVA Engine"], ["policy", "Policy-to-Code"], ["intel", "Intelligence"], ["tenancy", "Tenancy"], ["audit", "Audit Trail"], ["compliance", "Compliance"]];
+  const SW_ALL: [SwTab, string][] = [["dash", "Dashboard"], ["registry", "AI Registry"], ["eva", "EVA Engine"], ["policy", "Policy-to-Code"], ["intel", "Intelligence"], ["tenancy", "Tenancy"], ["audit", "Audit Trail"], ["compliance", "Compliance"], ["access", "Access Control"]];
   const HW_ALL: [HwTab, string][] = [["hqos", "HQ-OS"], ["edge", "Sovereign Edge"], ["sovereignty", "Sovereignty"], ["killswitch", "Kill-Switch"]];
   // Role-scoped capabilities — the UI shows only what the role may operate; the backend enforces it independently.
   const role: string = me?.role || "viewer";
   const isAdmin: boolean = !!me?.is_admin;
   const CAPS: Record<string, { sw: string[]; hw: string[]; reg: boolean; kill: boolean; appr: boolean; ro: boolean }> = {
-    admin:    { sw: ["dash", "registry", "eva", "policy", "intel", "tenancy", "audit", "compliance"], hw: ["hqos", "edge", "sovereignty", "killswitch"], reg: true,  kill: true,  appr: true,  ro: false },
+    admin:    { sw: ["dash", "registry", "eva", "policy", "intel", "tenancy", "audit", "compliance", "access"], hw: ["hqos", "edge", "sovereignty", "killswitch"], reg: true,  kill: true,  appr: true,  ro: false },
     operator: { sw: ["dash", "registry", "eva", "audit", "compliance"],                               hw: ["hqos", "edge", "sovereignty"],               reg: true,  kill: false, appr: false, ro: false },
     gov:      { sw: ["dash", "eva", "policy", "intel", "audit", "compliance"],                         hw: ["hqos", "edge", "sovereignty"],               reg: false, kill: false, appr: true,  ro: false },
     auditor:  { sw: ["dash", "eva", "audit", "compliance"],                                            hw: ["hqos", "edge", "sovereignty"],               reg: false, kill: false, appr: false, ro: true  },
@@ -340,6 +347,21 @@ export function App() {
               <table><thead><tr><th>Prefix</th><th>Name</th><th>Active</th><th>Last used</th></tr></thead>
                 <tbody>{myKeys.map((k: any) => <tr key={k.id}><td className="mono">{k.prefix}…</td><td>{k.name}</td><td>{String(k.active)}</td><td className="mono">{String(k.last_used_at || "—").slice(0, 19)}</td></tr>)}{!myKeys.length && <tr><td colSpan={4} className="muted">No keys yet — issue one to call the API as a service (X-API-Key).</td></tr>}</tbody></table></div>
           </> : <div className="panel"><p className="muted">Signed in as platform staff (not tenant-scoped) — tenant plans are managed in the admin console.</p></div>}
+        </>}
+
+        {isSw && swTab === "access" && <>
+          <div className="pg-h"><div><h2>Access Control</h2><p>Grant, re-grant and revoke staff access. The role decides what each user may open; the backend enforces it and every change is audited.</p></div></div>
+          <div className="panel"><h3>Grant a new user</h3>
+            <div className="row">
+              <input placeholder="email" value={nu.email} onChange={e => setNu({ ...nu, email: e.target.value })} style={{ minWidth: 200 }} />
+              <input placeholder="temp password (min 6)" value={nu.password} onChange={e => setNu({ ...nu, password: e.target.value })} />
+              <select value={nu.role} onChange={e => setNu({ ...nu, role: e.target.value })}><option>viewer</option><option>auditor</option><option>operator</option><option>gov</option><option>exec</option><option>admin</option><option>client</option></select>
+              <select value={nu.division} onChange={e => setNu({ ...nu, division: e.target.value })}><option>GODS</option><option>SETHS</option><option>MADIBA</option><option>TS</option><option>UDOC</option></select>
+              <button className="btn" onClick={createUserFn} disabled={!nu.email || nu.password.length < 6}>Grant access</button></div>
+            <p className="note-hw">An operator bound to a division (not GODS) is scoped to that division only. Revoking blocks sign-in immediately.</p></div>
+          <div className="panel"><h3>Users — {users.length}</h3>
+            <table><thead><tr><th>Email</th><th>Role</th><th>Division</th><th>Access</th><th>Action</th></tr></thead>
+              <tbody>{users.map((u: any) => <tr key={u.id}><td className="mono">{u.email}</td><td><select value={u.role} onChange={e => setUserRole(u.id, e.target.value)}><option>viewer</option><option>auditor</option><option>operator</option><option>gov</option><option>exec</option><option>admin</option><option>client</option></select></td><td>{u.division}</td><td><span className={`tag ${u.active ? "PASS" : "FAIL"}`}>{u.active ? "active" : "revoked"}</span></td><td><button className={`btn sm ${u.active ? "danger" : ""}`} onClick={() => setUserActive(u.id, !u.active)}>{u.active ? "Revoke" : "Restore"}</button></td></tr>)}{!users.length && <tr><td colSpan={5} className="muted">No users loaded (admin only).</td></tr>}</tbody></table></div>
         </>}
 
         {isSw && swTab === "audit" && <>

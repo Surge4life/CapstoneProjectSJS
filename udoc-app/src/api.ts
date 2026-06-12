@@ -48,6 +48,11 @@ export const api={
   packVersions:(id:number)=>req(`/policy/versions?pack_id=${id}`),
   approveVersion:(vid:number)=>req(`/policy/versions/${vid}/approve`,{method:"POST"}),
   hotreload:()=>req("/policy/hotreload"),
+  // user & access management (admin)
+  listUsers:()=>req("/users"),
+  userRoles:()=>req("/users/roles"),
+  createUser:(p:any)=>req("/users",{method:"POST",body:JSON.stringify(p)}),
+  updateUser:(uid:number,patch:any)=>req(`/users/${uid}`,{method:"PATCH",body:JSON.stringify(patch)}),
   // multipart upload (documents)
   upload: async(division:string,owner:string,category:string,file:File)=>{
     const fd=new FormData(); fd.append("division",division); fd.append("owner_ref",owner);

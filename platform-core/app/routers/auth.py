@@ -29,6 +29,8 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     u = db.execute(select(User).where(User.email == form.username)).scalar_one_or_none()
     if not u or not verify_password(form.password, u.password_hash):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "bad credentials")
+    if not u.active:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "account deactivated — contact an administrator")
     token = create_token(u.email, u.role, {"division": u.division,
                           "tenant_id": u.tenant_id or "", "tenant_pk": u.tenant_pk})
     return {"access_token": token, "token_type": "bearer", "role": u.role,
