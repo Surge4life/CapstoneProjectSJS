@@ -114,13 +114,23 @@
     <div class="sech">OPERATIONS</div>
     <div class="navitem active" data-view="overview"><span class="ico">◎</span> Overview</div>
     <div class="navitem" data-view="systems"><span class="ico">▤</span> AI Systems</div>
+    <div class="navitem" data-view="decisions"><span class="ico">⚡</span> Decisions · EVA</div>
+    <div class="navitem" data-view="policy"><span class="ico">§</span> Policy &amp; COB</div>
     <div class="navitem" data-view="oversight"><span class="ico">⚖</span> Oversight (HITL)</div>
     <div class="navitem" data-view="audit"><span class="ico">⛓</span> Audit &amp; Integrity</div>
     <div class="sech">GOVERNANCE</div>
     <div class="navitem" data-view="governance"><span class="ico">▦</span> Constitution</div>
+    <div class="navitem" data-view="compliance"><span class="ico">✓</span> Compliance</div>
+    <div class="navitem" data-view="sovereignty"><span class="ico">⬡</span> Sovereignty</div>
     <div class="navitem" data-view="incidents"><span class="ico">⚠</span> Incidents</div>
+    <div class="sech">INTELLIGENCE</div>
+    <div class="navitem" data-view="intelligence"><span class="ico">◈</span> Intelligence</div>
+    <div class="sech">ECOSYSTEM</div>
+    <div class="navitem" data-view="tenants"><span class="ico">⌂</span> Clients / Tenants</div>
+    <div class="navitem" data-view="divisions"><span class="ico">⬓</span> Division Ops</div>
     <div class="sech">CONTROL</div>
     <div class="navitem" data-view="access"><span class="ico">⚿</span> Access Control</div>
+    <div class="navitem" data-view="roles"><span class="ico">⚇</span> Roles &amp; Profiles</div>
   </nav>
   <main id="main"><div class="loading">Loading…</div></main>
 </div>
@@ -177,7 +187,7 @@ async function heartbeat(){
 function nav(view){
   document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active", n.dataset.view===view));
   const m=document.getElementById("main"); m.innerHTML='<div class="loading">Loading…</div>';
-  ({overview:vOverview,systems:vSystems,oversight:vOversight,audit:vAudit,governance:vGovernance,incidents:vIncidents,access:vAccess}[view]||vOverview)(m);
+  ({overview:vOverview,systems:vSystems,decisions:vDecisions,policy:vPolicy,oversight:vOversight,audit:vAudit,governance:vGovernance,compliance:vCompliance,sovereignty:vSovereignty,incidents:vIncidents,intelligence:vIntelligence,tenants:vTenants,divisions:vDivisions,access:vAccess,roles:vRoles}[view]||vOverview)(m);
 }
 document.querySelectorAll("#nav .navitem").forEach(n=>n.addEventListener("click",()=>nav(n.dataset.view)));
 // ---------- helpers ----------
@@ -317,6 +327,86 @@ async function createUser(){
 }
 async function setRole(id,role){ try{ await api("/users/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({role})}); nav("access"); }catch(e){ alert(e.message);} }
 async function setActive(id,active){ try{ await api("/users/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({active})}); nav("access"); }catch(e){ alert(e.message);} }
+
+async function vDecisions(m){ await safe(m, async()=>{
+  let rows=[],certs=[]; try{ rows=asArray(await api("/decisions")); }catch(e){} try{ certs=asArray(await api("/decisions/certificates")); }catch(e){}
+  m.innerHTML='<div class="pgh"><h2>Decisions · EVA Engine</h2><span class="desc">6-dimension governance verdicts across all systems</span></div>'+
+   '<div class="panel"><h3>Recent decisions · '+rows.length+'</h3>'+tableFrom(rows.slice(0,80),[
+     {h:"Ref",r:x=>'<span class="mono">'+esc(x.decision_id||x.id||"—")+'</span>'},
+     {h:"System",r:x=>esc(x.model_id||x.system_code||"—")},
+     {h:"EVA",r:x=>esc(x.composite_eva!=null?x.composite_eva:(x.eva!=null?x.eva:"—"))},
+     {h:"Verdict",r:x=>statusTag(x.verdict||x.status||x.outcome)},
+   ])+'</div>'+
+   '<div class="panel"><h3>Signed certificates · '+certs.length+'</h3>'+tableFrom(certs.slice(0,40),[
+     {h:"Cert",r:x=>'<span class="mono">'+esc(x.cert_id||x.id||"—")+'</span>'},
+     {h:"Decision",r:x=>esc(x.decision_id||"—")},
+     {h:"Seal",r:x=>statusTag(x.signed!==false?"SIGNED":"UNSIGNED")},
+   ])+'</div>';
+}); }
+async function vPolicy(m){ await safe(m, async()=>{
+  let packs=[],vers=[],active=null;
+  try{ packs=asArray(await api("/policy/packs")); }catch(e){} try{ vers=asArray(await api("/policy/versions")); }catch(e){} try{ active=await api("/policy/active"); }catch(e){}
+  m.innerHTML='<div class="pgh"><h2>Policy-to-Code · COB</h2><span class="desc">Legislation compiled to executable rules — Constitutional Oversight Board</span></div>'+
+   (active?'<div class="panel"><h3>Active policy</h3><div class="mono small">'+esc(typeof active==="object"?(active.pack_id||active.name||JSON.stringify(active).slice(0,200)):active)+'</div></div>':'')+
+   '<div class="panel"><h3>Policy packs · '+packs.length+'</h3>'+tableFrom(packs,[
+     {h:"Pack",r:x=>'<b>'+esc(x.name||x.pack_id||x.id)+'</b>'},{h:"Version",r:x=>esc(x.version||"—")},{h:"Status",r:x=>statusTag(x.status||x.state)},
+   ])+'</div>'+
+   '<div class="panel"><h3>Versions (COB approve/veto) · '+vers.length+'</h3>'+tableFrom(vers.slice(0,40),[
+     {h:"Ver",r:x=>'<span class="mono">'+esc(x.id||x.version||"—")+'</span>'},{h:"Pack",r:x=>esc(x.pack_id||"—")},{h:"State",r:x=>statusTag(x.state||x.status)},
+   ])+'</div>';
+}); }
+async function vCompliance(m){ await safe(m, async()=>{
+  let fw=[]; try{ fw=asArray(await api("/compliance/frameworks")); }catch(e){}
+  m.innerHTML='<div class="pgh"><h2>Compliance</h2><span class="desc">Framework conformance — SA AI Policy + international standards</span></div>'+
+   '<div class="panel"><h3>Frameworks · '+fw.length+'</h3>'+tableFrom(fw,[
+     {h:"Framework",r:x=>'<b>'+esc(x.name||x.framework||x.id||x)+'</b>'},{h:"Coverage",r:x=>esc(x.coverage||x.status||"—")},
+   ])+'<div style="margin-top:12px"><button class="btn cyan" onclick="runSweep(this)">Run compliance sweep</button> <span id="sweep-res" class="small muted"></span></div></div>';
+}); }
+async function runSweep(btn){ btn.disabled=true; const r=document.getElementById("sweep-res"); r.textContent="running…"; try{ const d=await api("/compliance/sweep",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}); r.textContent="done · "+esc(JSON.stringify(d).slice(0,140)); }catch(e){ r.textContent=e.message; } finally{ btn.disabled=false; } }
+async function vSovereignty(m){ await safe(m, async()=>{
+  let p={}; try{ p=await api("/sovereignty/posture"); }catch(e){}
+  const rows=Object.entries(p||{}).filter(([k,v])=>typeof v!=="object").map(([k,v])=>'<tr><td class="muted">'+esc(k)+'</td><td class="mono">'+esc(v)+'</td></tr>');
+  m.innerHTML='<div class="pgh"><h2>Sovereignty Posture</h2><span class="desc">Data residency · jurisdiction · quantum-ready cryptography</span></div>'+
+   '<div class="panel"><h3>Posture</h3>'+(rows.length?'<table><tbody>'+rows.join("")+'</tbody></table>':'<div class="muted small">No posture data.</div>')+'</div>';
+}); }
+async function vIntelligence(m){ await safe(m, async()=>{
+  let st={},docs=[]; try{ st=await api("/intel/state"); }catch(e){} try{ docs=asArray(await api("/intel/docs")); }catch(e){}
+  m.innerHTML='<div class="pgh"><h2>Intelligence</h2><span class="desc">Internal knowledge, data-sharing &amp; retrieval-grounded reporting</span></div>'+
+   '<div class="grid kpis"><div class="kpi"><div class="k">Documents</div><div class="v cyan">'+(st.documents!=null?st.documents:docs.length)+'</div></div>'+
+   '<div class="kpi"><div class="k">Chunks</div><div class="v">'+esc(st.chunks!=null?st.chunks:(st.total_chunks!=null?st.total_chunks:"—"))+'</div></div></div>'+
+   '<div class="panel"><h3>Ask the knowledge base</h3><div class="row"><div class="f"><input id="iq" placeholder="Ask a question grounded in the corpus…"></div><button class="btn cyan" onclick="askIntel()">Ask</button></div><div id="ians" class="small" style="margin-top:10px;white-space:pre-wrap;color:var(--txt2)"></div></div>'+
+   '<div class="panel"><h3>Sources · '+docs.length+'</h3>'+tableFrom(docs.slice(0,60),[
+     {h:"Document",r:x=>'<b>'+esc(x.title||x.name||x.doc_id||x.id||"—")+'</b>'},{h:"Source",r:x=>esc(x.source||x.source_class||"—")},
+   ])+'</div>';
+}); }
+async function askIntel(){ const a=document.getElementById("ians"); a.textContent="…"; try{ const d=await api("/intel/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:document.getElementById("iq").value})}); a.textContent=(d.answer||d.response||JSON.stringify(d)).toString(); }catch(e){ a.textContent=e.message; } }
+async function vTenants(m){ await safe(m, async()=>{
+  let ten=[],tiers=[]; try{ ten=asArray(await api("/tenants")); }catch(e){} try{ tiers=asArray(await api("/tenants/tiers")); }catch(e){}
+  m.innerHTML='<div class="pgh"><h2>Clients / Tenants</h2><span class="desc">External organisations running their dedicated UDOC</span></div>'+
+   '<div class="panel"><h3>Tenants · '+ten.length+'</h3>'+tableFrom(ten,[
+     {h:"Tenant",r:x=>'<b>'+esc(x.name||x.tenant_id||x.id)+'</b><br><span class="mono muted small">'+esc(x.tenant_id||"")+'</span>'},
+     {h:"Tier",r:x=>'<span class="tag2 t-info">'+esc(x.tier||"—")+'</span>'},{h:"Status",r:x=>statusTag(x.status)},
+   ])+'</div>'+
+   '<div class="panel"><h3>Service tiers</h3>'+tableFrom(tiers,[{h:"Tier",r:x=>esc(x.name||x.tier||x.id||x)},{h:"Detail",r:x=>esc(x.limits||x.description||"—")}])+'</div>';
+}); }
+async function vDivisions(m){
+  m.innerHTML='<div class="pgh"><h2>Division Operations</h2><span class="desc">Cross-division UDOC operational metrics</span></div><div id="dv" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))"></div>';
+  const g=document.getElementById("dv");
+  for(const d of ["SETHS","MADIBA","TS","UDOC"]){ let k={}; try{ k=await api("/analytics/"+d+"/kpis"); }catch(e){}
+    const items=Object.entries(k||{}).filter(([a,b])=>typeof b!=="object").slice(0,7).map(([a,b])=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span class="muted small">'+esc(a)+'</span><span class="mono">'+esc(b)+'</span></div>').join("");
+    g.innerHTML+='<div class="panel"><h3>'+esc(d)+'</h3>'+(items||'<div class="muted small">No metrics.</div>')+'</div>';
+  }
+}
+async function vRoles(m){ await safe(m, async()=>{
+  let roles=[],prof={}; try{ const rc=await api("/users/roles"); roles=rc.roles||asArray(rc); }catch(e){} try{ prof=await api("/access/profile"); }catch(e){}
+  m.innerHTML='<div class="pgh"><h2>Roles &amp; Profiles</h2><span class="desc">Role catalogue &amp; the systems each role may operate</span></div>'+
+   '<div class="panel"><h3>Your profile</h3><table><tbody>'+Object.entries(prof||{}).filter(([k,v])=>typeof v!=="object").map(([k,v])=>'<tr><td class="muted">'+esc(k)+'</td><td class="mono">'+esc(v)+'</td></tr>').join("")+
+   (Array.isArray(prof.systems)?'<tr><td class="muted">systems</td><td>'+prof.systems.map(s=>'<span class="tag2 t-info">'+esc(s.key||s)+'</span>').join(" ")+'</td></tr>':'')+'</tbody></table></div>'+
+   '<div class="panel"><h3>Role catalogue · '+roles.length+'</h3>'+tableFrom(roles,[
+     {h:"Role",r:x=>'<b>'+esc(x.role||x)+'</b>'},
+     {h:"Grants / systems",r:x=>Array.isArray(x.systems)?x.systems.map(s=>'<span class="tag2 t-info">'+esc(s.key||s)+'</span>').join(" "):esc(x.description||x.granted||"—")},
+   ])+'</div>';
+}); }
 
 // ---------- boot ----------
 if(token()){ try{ enterApp(); }catch(e){ logout(); } }
