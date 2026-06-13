@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · UDOC Admin — Sovereign Operations Mainframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0A1628; --navy2:#0D1F3C; --navy3:#112040; --navy4:#1A3A5C;
+    --gold:#C9A84C; --gold-l:#E8C97A; --gold-d:#8B6914;
+    --cyan:#00C2D4; --cyan-b:#00E5FF; --indigo:#6366F1;
+    --txt:#EDE7D6; --txt2:#A9B6CC; --muted:#8A9BB0;
+    --green:#10B981; --red:#EF4444; --amber:#F59E0B;
+    --bd:rgba(201,168,76,.22); --bd2:rgba(201,168,76,.12);
+    --fc:'Barlow Condensed',sans-serif; --fb:'Barlow',sans-serif; --fm:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:var(--navy);color:var(--txt);font-family:var(--fb);font-size:14px;line-height:1.45}
+  a{color:var(--cyan)} .mono{font-family:var(--fm)} .muted{color:var(--muted)}
+  /* ---- login ---- */
+  #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%)}
+  .card{width:380px;max-width:92vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:14px;padding:28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .brandmark{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .shield{width:40px;height:40px;flex:none}
+  .brandmark h1{font-family:var(--fc);font-weight:700;letter-spacing:.06em;font-size:22px;margin:0;color:var(--gold)}
+  .brandmark .sub{font-family:var(--fc);letter-spacing:.32em;color:var(--cyan);font-size:11px}
+  label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 5px}
+  input,select{width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:10px 12px;font-family:var(--fb);font-size:14px}
+  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:1px solid var(--gold);background:linear-gradient(180deg,rgba(201,168,76,.18),rgba(201,168,76,.06));color:var(--gold-l);font-family:var(--fc);font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:8px;padding:10px 16px;font-size:13px}
+  .btn:hover{background:rgba(201,168,76,.22)} .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.sm{padding:5px 10px;font-size:11px} .btn.cyan{border-color:var(--cyan);color:var(--cyan-b);background:rgba(0,194,212,.1)}
+  .btn.danger{border-color:var(--red);color:#fda4a4;background:rgba(239,68,68,.08)}
+  .err{color:#fda4a4;font-size:12.5px;margin-top:10px;min-height:16px}
+  .classbar{margin-top:16px;text-align:center;font-family:var(--fm);font-size:9.5px;letter-spacing:.16em;color:var(--gold-d)}
+  /* ---- shell ---- */
+  #app{display:none;grid-template-columns:230px 1fr;grid-template-rows:54px 1fr;height:100%}
+  header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:linear-gradient(90deg,var(--navy2),var(--navy));border-bottom:1px solid var(--bd)}
+  header .shield{width:30px;height:30px}
+  header .wm{font-family:var(--fc);font-weight:700;letter-spacing:.05em;color:var(--gold);font-size:17px}
+  header .tag{font-family:var(--fc);letter-spacing:.28em;color:var(--cyan);font-size:10px;border:1px solid var(--bd2);padding:3px 8px;border-radius:5px}
+  header .spacer{flex:1}
+  header .who{font-size:12px;color:var(--txt2);text-align:right}
+  header .who b{color:var(--gold-l)}
+  nav{grid-row:2;background:var(--navy);border-right:1px solid var(--bd2);padding:12px 8px;overflow:auto}
+  nav .navitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt2);font-size:13.5px;margin-bottom:2px}
+  nav .navitem:hover{background:var(--navy3)} nav .navitem.active{background:linear-gradient(90deg,rgba(201,168,76,.16),transparent);color:var(--gold-l);border-left:2px solid var(--gold)}
+  nav .navitem .ico{width:18px;text-align:center;color:var(--cyan)}
+  nav .sech{font-family:var(--fc);letter-spacing:.2em;font-size:10px;color:var(--muted);padding:14px 12px 6px}
+  main{grid-row:2;overflow:auto;padding:20px 24px}
+  .pgh{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+  .pgh h2{font-family:var(--fc);font-weight:700;letter-spacing:.04em;font-size:24px;margin:0;color:var(--txt)}
+  .pgh .desc{color:var(--muted);font-size:12.5px}
+  .grid{display:grid;gap:14px} .kpis{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .kpi{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px}
+  .kpi .k{font-family:var(--fc);letter-spacing:.14em;text-transform:uppercase;font-size:10.5px;color:var(--muted)}
+  .kpi .v{font-family:var(--fc);font-weight:700;font-size:30px;color:var(--gold-l);line-height:1.1;margin-top:6px}
+  .kpi .v.cyan{color:var(--cyan-b)} .kpi .v.green{color:var(--green)} .kpi .v.amber{color:var(--amber)} .kpi .v.red{color:#fda4a4}
+  .panel{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px;margin-top:14px}
+  .panel h3{font-family:var(--fc);font-weight:600;letter-spacing:.06em;font-size:15px;margin:0 0 12px;color:var(--gold)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{font-family:var(--fc);letter-spacing:.08em;text-transform:uppercase;font-size:10.5px;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd2)}
+  td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .tag2{display:inline-block;font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--bd2)}
+  .t-ok{color:var(--green);border-color:rgba(16,185,129,.4)} .t-warn{color:var(--amber);border-color:rgba(245,158,11,.4)}
+  .t-bad{color:#fda4a4;border-color:rgba(239,68,68,.4)} .t-info{color:var(--cyan-b);border-color:rgba(0,194,212,.4)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .row .f{flex:1;min-width:130px} .row .f label{margin-top:0}
+  .small{font-size:11.5px} .right{margin-left:auto}
+  .loading{color:var(--muted);font-size:12px;padding:10px 0}
+  .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}
+  .apibar input{width:230px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
+  .pill{font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--bd2)}
+  .pill.up{color:var(--green);border-color:rgba(16,185,129,.4)} .pill.down{color:#fda4a4;border-color:rgba(239,68,68,.4)}
+</style>
+</head>
+<body>
+<!-- ===================== LOGIN ===================== -->
+<div id="login">
+  <div class="card">
+    <div class="brandmark">
+      <svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/><circle cx="32" cy="30" r="1.8" fill="#E8C97A"/></svg>
+      <div><h1>G.O.D.S</h1><div class="sub">UDOC · ADMIN MAINFRAME</div></div>
+    </div>
+    <p class="muted small" style="margin:10px 0 0">Sovereign operations control for all UDOC deployments. Authorised personnel only.</p>
+    <label>Operator email</label>
+    <input id="li-email" type="email" autocomplete="username" placeholder="admin@gods.local" value="admin@gods.local"/>
+    <label>Password</label>
+    <input id="li-pass" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div style="margin-top:16px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Authenticate</button></div>
+    <div class="err" id="li-err"></div>
+    <div class="apibar" style="margin-top:14px;justify-content:center">
+      <span>API</span><input id="li-api" class="mono" title="platform-core base URL"/>
+    </div>
+    <div class="classbar">CONFIDENTIAL — IP TRUST PROTECTED · G.O.D.S HOLDINGS (PTY) LTD</div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app">
+  <header>
+    <svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
+    <span class="wm">G.O.D.S</span><span class="tag">UDOC ADMIN</span>
+    <span class="pill" id="hb">· checking</span>
+    <span class="spacer"></span>
+    <div class="apibar"><span class="mono small" id="api-label"></span></div>
+    <div class="who"><b id="who-email">—</b><br><span class="mono" style="font-size:10px" id="who-role"></span></div>
+    <button class="btn sm" onclick="logout()">Sign out</button>
+  </header>
+  <nav id="nav">
+    <div class="sech">OPERATIONS</div>
+    <div class="navitem active" data-view="overview"><span class="ico">◎</span> Overview</div>
+    <div class="navitem" data-view="systems"><span class="ico">▤</span> AI Systems</div>
+    <div class="navitem" data-view="oversight"><span class="ico">⚖</span> Oversight (HITL)</div>
+    <div class="navitem" data-view="audit"><span class="ico">⛓</span> Audit &amp; Integrity</div>
+    <div class="sech">GOVERNANCE</div>
+    <div class="navitem" data-view="governance"><span class="ico">▦</span> Constitution</div>
+    <div class="navitem" data-view="incidents"><span class="ico">⚠</span> Incidents</div>
+    <div class="sech">CONTROL</div>
+    <div class="navitem" data-view="access"><span class="ico">⚿</span> Access Control</div>
+  </nav>
+  <main id="main"><div class="loading">Loading…</div></main>
+</div>
+
+<script>
+// ---------- API ----------
+const PROD_API = "https://gods-platform-core.onrender.com";
+function apiBase(){ return localStorage.getItem("gods_admin_api") || PROD_API; }
+function setApiBase(v){ localStorage.setItem("gods_admin_api", v.replace(/\/+$/,"")); }
+function token(){ return localStorage.getItem("gods_admin_tok") || ""; }
+async function api(path, opts={}){
+  const h = Object.assign({}, opts.headers||{});
+  if(token()) h["Authorization"]="Bearer "+token();
+  const r = await fetch(apiBase()+path, Object.assign({}, opts, {headers:h}));
+  if(r.status===401||r.status===403){ if(token()){ logout(); } throw new Error("Not authorised ("+r.status+")"); }
+  const ct=r.headers.get("content-type")||""; const body = ct.includes("json")? await r.json().catch(()=>null) : await r.text();
+  if(!r.ok) throw new Error((body&&body.detail)|| (typeof body==="string"?body:("HTTP "+r.status)));
+  return body;
+}
+// ---------- auth ----------
+document.getElementById("li-api").value = apiBase();
+async function doLogin(){
+  const e=document.getElementById("li-err"); e.textContent="";
+  const api_in=document.getElementById("li-api").value.trim(); if(api_in) setApiBase(api_in);
+  const email=document.getElementById("li-email").value.trim().toLowerCase();
+  const pass=document.getElementById("li-pass").value;
+  const btn=document.getElementById("li-btn"); btn.disabled=true; btn.textContent="Authenticating…";
+  try{
+    const form=new URLSearchParams(); form.set("username",email); form.set("password",pass);
+    const r=await fetch(apiBase()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+    if(!r.ok){ throw new Error(r.status===401?"Invalid credentials":("Login failed ("+r.status+")")); }
+    const d=await r.json();
+    localStorage.setItem("gods_admin_tok", d.access_token);
+    localStorage.setItem("gods_admin_who", JSON.stringify({email, role:d.role, division:d.division, tenant_id:d.tenant_id}));
+    enterApp();
+  }catch(err){ e.textContent=err.message; } finally { btn.disabled=false; btn.textContent="Authenticate"; }
+}
+function logout(){ localStorage.removeItem("gods_admin_tok"); document.getElementById("app").style.display="none"; document.getElementById("login").style.display="flex"; }
+function enterApp(){
+  const who=JSON.parse(localStorage.getItem("gods_admin_who")||"{}");
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="grid";
+  document.getElementById("who-email").textContent=who.email||"—";
+  document.getElementById("who-role").textContent=(who.role||"")+(who.division&&who.division!=="GODS"?(" · "+who.division):"");
+  document.getElementById("api-label").textContent=apiBase().replace(/^https?:\/\//,"");
+  heartbeat(); nav("overview");
+}
+async function heartbeat(){
+  const el=document.getElementById("hb");
+  try{ await fetch(apiBase()+"/health"); el.textContent="· online"; el.className="pill up"; }
+  catch{ el.textContent="· offline"; el.className="pill down"; }
+}
+// ---------- nav ----------
+function nav(view){
+  document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active", n.dataset.view===view));
+  const m=document.getElementById("main"); m.innerHTML='<div class="loading">Loading…</div>';
+  ({overview:vOverview,systems:vSystems,oversight:vOversight,audit:vAudit,governance:vGovernance,incidents:vIncidents,access:vAccess}[view]||vOverview)(m);
+}
+document.querySelectorAll("#nav .navitem").forEach(n=>n.addEventListener("click",()=>nav(n.dataset.view)));
+// ---------- helpers ----------
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function asArray(d){ if(Array.isArray(d))return d; if(d&&typeof d==="object"){ for(const k of ["items","records","cases","models","users","results","data","pillars","incidents"]) if(Array.isArray(d[k]))return d[k]; } return []; }
+function riskTag(v){ v=String(v||"").toUpperCase(); const c=v.includes("CRIT")||v==="HIGH"||v==="UNACCEPTABLE"?"t-bad":(v==="MEDIUM"||v==="NOTABLE"?"t-warn":"t-ok"); return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>'; }
+function statusTag(v){ v=String(v||""); const u=v.toUpperCase(); const c=u.includes("ACTIVE")||u.includes("VERIFIED")||u.includes("APPROVED")?"t-ok":(u.includes("PEND")||u.includes("REVIEW")?"t-warn":(u.includes("SUSP")||u.includes("DENIED")||u.includes("BREACH")?"t-bad":"t-info")); return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>'; }
+function tableFrom(rows, cols){ if(!rows.length) return '<div class="muted small">No records.</div>'; let h='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c.h)+'</th>').join("")+'</tr></thead><tbody>'; rows.forEach(r=>{ h+='<tr>'+cols.map(c=>'<td>'+(c.r?c.r(r):esc(r[c.k]))+'</td>').join("")+'</tr>'; }); return h+'</tbody></table>'; }
+async function safe(host, fn){ try{ return await fn(); }catch(e){ host.innerHTML='<div class="panel"><div class="t-bad small">⚠ '+esc(e.message)+'</div></div>'; throw e; } }
+
+// ---------- VIEWS ----------
+async function vOverview(m){
+  m.innerHTML='<div class="pgh"><h2>Sovereign Operations</h2><span class="desc">Cross-deployment posture · all UDOC systems under G.O.D.S control</span></div><div id="ov-k" class="grid kpis"></div><div id="ov-p"></div>';
+  let sum={}; try{ sum=await api("/udoc/regulator/summary"); }catch(e){}
+  const counts={};
+  try{ counts.systems=asArray(await api("/registry/models")).length; }catch(e){}
+  try{ counts.cases=asArray(await api("/oversight/cases")).length; }catch(e){}
+  try{ counts.audit=asArray(await api("/audit/records")).length; }catch(e){}
+  try{ const u=await api("/users"); counts.users=(u.users||asArray(u)).length; }catch(e){}
+  try{ counts.incidents=asArray(await api("/udoc/incidents")).length; }catch(e){}
+  const pick=(o,keys)=>{ for(const k of keys){ if(o&&o[k]!=null&&typeof o[k]!=="object") return o[k]; } return undefined; };
+  const card=(k,v,cls)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v '+(cls||"")+'">'+(v==null?"—":esc(v))+'</div></div>';
+  let html="";
+  html+=card("UDOC systems", counts.systems!=null?counts.systems:pick(sum,["systems","total_systems","registered_systems"]), "cyan");
+  html+=card("Decisions", pick(sum,["decisions","total_decisions","decisions_total"]));
+  html+=card("Audit events", counts.audit!=null?counts.audit:pick(sum,["audit_events","audit_total"]));
+  html+=card("Pending oversight", counts.cases!=null?counts.cases:pick(sum,["pending_reviews","pending"]), "amber");
+  html+=card("Open incidents", counts.incidents!=null?counts.incidents:pick(sum,["incidents","open_incidents"]), counts.incidents?"red":"green");
+  html+=card("Personnel", counts.users!=null?counts.users:pick(sum,["users","operators"]));
+  document.getElementById("ov-k").innerHTML=html;
+  // raw summary panel (defensive render of whatever the regulator summary returns)
+  if(sum && typeof sum==="object" && Object.keys(sum).length){
+    let rows=Object.entries(sum).filter(([k,v])=>typeof v!=="object").map(([k,v])=>'<tr><td class="muted">'+esc(k)+'</td><td class="mono">'+esc(v)+'</td></tr>');
+    document.getElementById("ov-p").innerHTML='<div class="panel"><h3>Regulator summary</h3><table><tbody>'+rows.join("")+'</tbody></table></div>';
+  }
+}
+async function vSystems(m){
+  await safe(m, async()=>{
+    const rows=asArray(await api("/registry/models"));
+    m.innerHTML='<div class="pgh"><h2>AI Systems</h2><span class="desc">Every UDOC-governed system across deployments</span></div><div class="panel"><h3>Registry · '+rows.length+'</h3>'+
+      tableFrom(rows,[
+        {h:"System",r:x=>'<b>'+esc(x.name||x.model_id||x.system_code||x.id)+'</b><br><span class="mono muted small">'+esc(x.model_id||x.system_code||"")+'</span>'},
+        {h:"Owner / Tenant",r:x=>esc(x.owner_org||x.operator_id||x.tenant_id||x.tenant_code||"—")},
+        {h:"Risk",r:x=>riskTag(x.risk_tier||x.risk_level)},
+        {h:"Status",r:x=>statusTag(x.status)},
+      ])+'</div>';
+  });
+}
+async function vOversight(m){
+  await safe(m, async()=>{
+    const rows=asArray(await api("/oversight/cases"));
+    m.innerHTML='<div class="pgh"><h2>Human Oversight</h2><span class="desc">HITL review queue — escalated &amp; blocked decisions</span></div><div class="panel"><h3>Cases · '+rows.length+'</h3>'+
+      tableFrom(rows,[
+        {h:"Case",r:x=>'<span class="mono">'+esc(x.case_ref||x.id||"—")+'</span>'},
+        {h:"Subject",r:x=>esc(x.subject||x.model_id||x.decision_id||"—")},
+        {h:"Reason",r:x=>esc(x.reason||x.kind||"—")},
+        {h:"Status",r:x=>statusTag(x.status)},
+      ])+'</div>';
+  });
+}
+async function vAudit(m){
+  await safe(m, async()=>{
+    let root=null,verify=null;
+    try{ root=await api("/audit/chain/merkle-root"); }catch(e){}
+    try{ verify=await api("/audit/chain/verify"); }catch(e){}
+    const rows=asArray(await api("/audit/records")).slice(0,100);
+    const rootStr=root? (root.merkle_root||root.root||JSON.stringify(root)) : "—";
+    const ok = verify && (verify.valid===true||verify.ok===true||verify.verified===true);
+    m.innerHTML='<div class="pgh"><h2>Audit &amp; Integrity</h2><span class="desc">Merkle-linked, tamper-evident decision ledger</span></div>'+
+      '<div class="grid kpis"><div class="kpi"><div class="k">Chain integrity</div><div class="v '+(ok?"green":(verify?"red":""))+'">'+(verify?(ok?"VERIFIED":"FAILED"):"—")+'</div></div>'+
+      '<div class="kpi"><div class="k">Records</div><div class="v cyan">'+rows.length+'</div></div></div>'+
+      '<div class="panel"><h3>Merkle root</h3><div class="mono small" style="word-break:break-all;color:var(--gold-l)">'+esc(rootStr)+'</div></div>'+
+      '<div class="panel"><h3>Recent records</h3>'+tableFrom(rows,[
+        {h:"Ref",r:x=>'<span class="mono">'+esc(x.event_code||x.id||x.ref||"—")+'</span>'},
+        {h:"Action",r:x=>esc(x.action_type||x.action||x.event||"—")},
+        {h:"Actor",r:x=>esc(x.actor||x.actor_class||"—")},
+        {h:"Outcome",r:x=>statusTag(x.outcome||x.result)},
+      ])+'</div>';
+  });
+}
+async function vGovernance(m){
+  await safe(m, async()=>{
+    const rows=asArray(await api("/udoc/constitutional/pillars"));
+    m.innerHTML='<div class="pgh"><h2>Constitutional Framework</h2><span class="desc">UDOC governance pillars enforced across systems</span></div><div class="panel"><h3>Pillars · '+rows.length+'</h3>'+
+      tableFrom(rows,[
+        {h:"#",r:x=>'<span class="mono">'+esc(x.number||x.id||x.pillar||"")+'</span>'},
+        {h:"Pillar",r:x=>'<b>'+esc(x.title||x.name||x.pillar||"—")+'</b>'},
+        {h:"Description",r:x=>'<span class="small muted">'+esc(x.description||x.detail||x.summary||"")+'</span>'},
+        {h:"Status",r:x=>statusTag(x.status||"ENFORCED")},
+      ])+'</div>';
+  });
+}
+async function vIncidents(m){
+  await safe(m, async()=>{
+    const rows=asArray(await api("/udoc/incidents"));
+    m.innerHTML='<div class="pgh"><h2>Incidents</h2><span class="desc">Governance breaches &amp; escalations</span></div><div class="panel"><h3>Register · '+rows.length+'</h3>'+
+      tableFrom(rows,[
+        {h:"Ref",r:x=>'<span class="mono">'+esc(x.id||x.ref||x.incident_code||"—")+'</span>'},
+        {h:"Type",r:x=>esc(x.type||x.kind||x.category||"—")},
+        {h:"Severity",r:x=>riskTag(x.severity||x.level)},
+        {h:"Status",r:x=>statusTag(x.status)},
+      ])+'</div>';
+  });
+}
+async function vAccess(m){
+  await safe(m, async()=>{
+    let roles=["admin","exec","operator","gov","auditor","viewer","client"];
+    try{ const rc=await api("/users/roles"); if(rc&&rc.roles) roles=rc.roles.map(r=>r.role||r); }catch(e){}
+    const data=await api("/users"); const users=data.users||asArray(data);
+    const roleOpts=roles.map(r=>'<option>'+esc(r)+'</option>').join("");
+    m.innerHTML='<div class="pgh"><h2>Access Control</h2><span class="desc">Grant &amp; revoke access to all UDOC systems · every change is audited</span></div>'+
+      '<div class="panel"><h3>Grant a new operator</h3><div class="row">'+
+        '<div class="f"><label>Email</label><input id="nu-email" placeholder="name@org"></div>'+
+        '<div class="f"><label>Temp password</label><input id="nu-pass" placeholder="min 6 chars"></div>'+
+        '<div class="f"><label>Role</label><select id="nu-role">'+roleOpts+'</select></div>'+
+        '<div class="f"><label>Division</label><select id="nu-div"><option>GODS</option><option>SETHS</option><option>MADIBA</option><option>TS</option><option>UDOC</option></select></div>'+
+        '<button class="btn cyan" onclick="createUser()">Grant</button>'+
+      '</div><div class="err small" id="nu-err"></div></div>'+
+      '<div class="panel"><h3>Operators · '+users.length+'</h3><div id="ulist">'+usersTable(users,roleOpts)+'</div></div>';
+  });
+}
+function usersTable(users,roleOpts){
+  return tableFrom(users,[
+    {h:"Email",r:u=>'<span class="mono">'+esc(u.email)+'</span>'},
+    {h:"Role",r:u=>'<select class="small" style="width:auto;padding:4px 8px" onchange="setRole('+u.id+',this.value)">'+roleOpts.replace('>'+esc(u.role)+'<','selected>'+esc(u.role)+'<')+'</select>'},
+    {h:"Division",r:u=>esc(u.division||"—")},
+    {h:"Access",r:u=>'<span class="tag2 '+((u.active!==false)?"t-ok":"t-bad")+'">'+((u.active!==false)?"active":"revoked")+'</span>'},
+    {h:"",r:u=>'<button class="btn sm '+((u.active!==false)?"danger":"")+'" onclick="setActive('+u.id+','+(u.active===false)+')">'+((u.active!==false)?"Revoke":"Restore")+'</button>'},
+  ]);
+}
+async function createUser(){
+  const e=document.getElementById("nu-err"); e.textContent="";
+  const body={email:document.getElementById("nu-email").value.trim().toLowerCase(),password:document.getElementById("nu-pass").value,role:document.getElementById("nu-role").value,division:document.getElementById("nu-div").value};
+  if(!body.email||body.password.length<6){ e.textContent="Email and a 6+ char password are required."; return; }
+  try{ await api("/users",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); nav("access"); }
+  catch(err){ e.textContent=err.message; }
+}
+async function setRole(id,role){ try{ await api("/users/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({role})}); nav("access"); }catch(e){ alert(e.message);} }
+async function setActive(id,active){ try{ await api("/users/"+id,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({active})}); nav("access"); }catch(e){ alert(e.message);} }
+
+// ---------- boot ----------
+if(token()){ try{ enterApp(); }catch(e){ logout(); } }
+</script>
+</body>
+</html>
