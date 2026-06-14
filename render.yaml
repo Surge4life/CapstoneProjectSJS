@@ -116,3 +116,17 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  # ---- UDOC Client Platform — external tenant-scoped client governance console (static; talks to gods-platform-core) ----
+  - type: web
+    name: gods-udoc-client
+    runtime: static
+    rootDir: udoc-public
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

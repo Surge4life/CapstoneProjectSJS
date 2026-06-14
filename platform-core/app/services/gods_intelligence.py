@@ -170,3 +170,27 @@ def overview(db: Session) -> Dict:
             "corpus_docs": st.corpus_docs, "corpus_chars": st.corpus_chars, "by_category": by_cat,
             "maturity": MATURITY, "mandate": MANDATE, "guardrails": GUARDRAILS, "pillar": PILLAR_PRIMACY,
             "client_exposed": False}
+
+
+def gaps(db: Session) -> Dict:
+    """Knowledge-gap analysis over the internal corpus — which institutional categories are
+    well-covered vs thin vs absent. A faithful, self-contained port of the intelligence gap concept;
+    guides what to ingest next to strengthen grounded coverage. INTERNAL ONLY."""
+    EXPECTED = {"PATENT": "IP / patent instruments", "SPEC": "technical specifications",
+                "BRAND": "brand & identity", "MANDATE": "mandate & doctrine",
+                "FINANCIAL": "financial models", "LEGAL": "legal & compliance",
+                "MEMOIR": "founder memoir / S.E.T.H.S", "GENERAL": "general corpus"}
+    docs = db.execute(select(KnowledgeDoc).where(KnowledgeDoc.active == True)).scalars().all()  # noqa: E712
+    counts: Dict[str, int] = {}
+    for d in docs:
+        counts[d.category] = counts.get(d.category, 0) + 1
+    cats = []
+    for c, label in EXPECTED.items():
+        n = counts.get(c, 0)
+        cats.append({"category": c, "label": label, "docs": n,
+                     "status": "ABSENT" if n == 0 else ("THIN" if n < 2 else "COVERED")})
+    covered = sum(1 for g in cats if g["status"] == "COVERED")
+    return {"categories": cats, "covered": covered, "total": len(EXPECTED),
+            "maturity_pct": round(100 * covered / len(EXPECTED)),
+            "uncategorised": [k for k in counts if k not in EXPECTED],
+            "recommendation": "Ingest material for ABSENT/THIN categories to strengthen grounded coverage."}

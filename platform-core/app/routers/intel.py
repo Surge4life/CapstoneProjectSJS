@@ -116,3 +116,10 @@ def ask(body: AskReq, db: Session = Depends(get_db), user: dict = Depends(curren
                  "coverage": res.get("coverage", 0)}, classification="INTERNAL",
                  actor_class=user.get("role", "SYSTEM"))
     return res
+
+
+@router.get("/gaps")
+def gaps(db: Session = Depends(get_db), user: dict = Depends(current_user)):
+    """Internal knowledge-gap report — coverage by institutional category."""
+    _gate(user)
+    return gi.gaps(db)

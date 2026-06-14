@@ -6,6 +6,7 @@ Server-authoritative: /access/profile returns ONLY the systems the user may open
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.dependencies import current_user
 from app.services.access_control import systems_for, may_open
+from app.services import sovereign_profiles as sp
 
 router = APIRouter(prefix="/access", tags=["Access control"])
 
@@ -22,6 +23,17 @@ def profile(user: dict = Depends(current_user)):
         "systems": systems,                       # the launcher renders exactly these
         "is_admin": role in ("admin", "exec"),
     }
+
+
+@router.get("/profiles", summary="The 24 Sovereign-Operator profiles (grouped) + their capabilities")
+def profiles(user: dict = Depends(current_user)):
+    return {"profiles": sp.catalog(), "by_group": sp.by_group(),
+            "groups": sp.GROUPS, "count": len(sp.PROFILES)}
+
+
+@router.get("/matrix", summary="Profile × capability matrix + role→systems grid")
+def matrix(user: dict = Depends(current_user)):
+    return sp.matrix()
 
 
 @router.get("/guard/{system_key}")
