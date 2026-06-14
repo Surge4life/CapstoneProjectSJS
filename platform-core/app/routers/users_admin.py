@@ -15,6 +15,7 @@ from app.core.dependencies import require_role
 from app.core.security import hash_password
 from app.services.audit_writer import append_audit
 from app.services.access_control import systems_for
+from app.services import sovereign_profiles as sp
 
 router = APIRouter(prefix="/users", tags=["User & access management"])
 
@@ -29,6 +30,7 @@ class NewUser(BaseModel):
     role: str = "viewer"
     division: str = "GODS"
     tenant_id: str = ""
+    profile: str = ""          # optional Sovereign-Operator profile → sets role + division
 
 
 class UserPatch(BaseModel):
@@ -36,11 +38,16 @@ class UserPatch(BaseModel):
     division: str | None = None
     active: bool | None = None
     password: str | None = None
+    profile: str | None = None  # assign/clear a Sovereign-Operator profile
 
 
 def _out(u: User) -> dict:
+    prof = getattr(u, "profile", "") or ""
+    meta = sp.PROFILES.get(prof)
     return {"id": u.id, "email": u.email, "role": u.role, "division": u.division,
             "tenant_id": u.tenant_id or "", "active": bool(u.active),
+            "profile": prof, "profile_title": meta["title"] if meta else "",
+            "profile_group": meta["group"] if meta else "",
             "created_at": u.created_at.isoformat() if u.created_at else None}
 
 
@@ -63,9 +70,16 @@ def create_user(req: NewUser, db: Session = Depends(get_db), user: dict = Depend
     email = req.email.strip().lower()
     if not email or "@" not in email:
         raise HTTPException(400, "a valid email is required")
-    if req.role not in ROLES:
+    role, division, profile = req.role, req.division, ""
+    if req.profile:
+        pr = req.profile.upper()
+        r, dv = sp.resolve(pr)
+        if not r:
+            raise HTTPException(400, f"unknown Sovereign-Operator profile '{req.profile}'")
+        role, division, profile = r, dv, pr
+    if role not in ROLES:
         raise HTTPException(400, f"role must be one of {ROLES}")
-    if req.division not in DIVISIONS:
+    if division not in DIVISIONS:
         raise HTTPException(400, f"division must be one of {DIVISIONS}")
     if not req.password or len(req.password) < 6:
         raise HTTPException(400, "password must be at least 6 characters")
@@ -77,11 +91,11 @@ def create_user(req: NewUser, db: Session = Depends(get_db), user: dict = Depend
         if not t:
             raise HTTPException(400, f"unknown tenant_id '{tid}'")
         tpk = t.id
-    u = User(email=email, password_hash=hash_password(req.password), role=req.role,
-             division=req.division, tenant_id=tid, tenant_pk=tpk, active=True)
+    u = User(email=email, password_hash=hash_password(req.password), role=role,
+             division=division, profile=profile, tenant_id=tid, tenant_pk=tpk, active=True)
     db.add(u); db.commit(); db.refresh(u)
     append_audit(db, "USER_CREATE",
-                 {"email": email, "role": req.role, "division": req.division, "by": user.get("sub")},
+                 {"email": email, "role": role, "division": division, "profile": profile, "by": user.get("sub")},
                  classification="GOVERNANCE", actor_class=user.get("role", "admin"))
     return {"created": True, "user": _out(u)}
 
@@ -111,6 +125,15 @@ def update_user(uid: int, req: UserPatch, db: Session = Depends(get_db), user: d
         if len(req.password) < 6:
             raise HTTPException(400, "password must be at least 6 characters")
         u.password_hash = hash_password(req.password); changes["password"] = "reset"
+    if req.profile is not None:
+        if req.profile == "":
+            changes["profile"] = ""; u.profile = ""
+        else:
+            pr = req.profile.upper(); r, dv = sp.resolve(pr)
+            if not r:
+                raise HTTPException(400, f"unknown Sovereign-Operator profile '{req.profile}'")
+            u.profile = pr; u.role = r; u.division = dv
+            changes.update({"profile": pr, "role": r, "division": dv})
     if not changes:
         raise HTTPException(400, "no changes supplied")
     db.commit(); db.refresh(u)

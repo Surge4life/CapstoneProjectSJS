@@ -17,6 +17,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(40), default="viewer")  # admin|operator|auditor|client|gov|viewer
     division: Mapped[str] = mapped_column(String(40), default="GODS")  # GODS|SETHS|MADIBA|TS|UDOC
+    profile: Mapped[str] = mapped_column(String(48), default="")  # Sovereign-Operator profile key (persona)
     tenant_id: Mapped[str] = mapped_column(String(60), default="", index=True)  # "" = platform staff
     tenant_pk: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -426,3 +427,23 @@ class PolicyVersion(Base):
     signature: Mapped[str] = mapped_column(String(128), default="")       # sovereign HMAC seal (PQC/Dilithium-ref)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
     decided_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+
+
+class ClientKBDoc(Base):
+    """A document in a SaaS CLIENT's PRIVATE knowledge base. Strictly isolated per tenant
+    (tenant_pk) and never mixed with the internal G.O.D.S Intelligence corpus (gi_knowledge_docs).
+    Clients upload/curate their own operational documents; their team queries them as an automated
+    grounded reference, scoped only to their own tenant."""
+    __tablename__ = "client_kb_docs"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tenant_pk: Mapped[int] = mapped_column(Integer, index=True)          # isolation key -> tenants.id
+    title: Mapped[str] = mapped_column(String(240))
+    source: Mapped[str] = mapped_column(String(255), default="")
+    category: Mapped[str] = mapped_column(String(60), default="GENERAL")
+    sha256: Mapped[str] = mapped_column(String(64), default="")
+    content_text: Mapped[str] = mapped_column(Text, default="")
+    char_len: Mapped[int] = mapped_column(Integer, default=0)
+    tags: Mapped[str] = mapped_column(String(300), default="")
+    added_by: Mapped[str] = mapped_column(String(120), default="")
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
