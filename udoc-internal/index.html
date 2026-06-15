@@ -135,6 +135,7 @@
     <div class="sech">ECOSYSTEM</div>
     <div class="navitem" data-view="tenants"><span class="ico">⌂</span> Clients / Tenants</div>
     <div class="navitem" data-view="divisions"><span class="ico">⬓</span> Division Ops</div>
+    <div class="navitem" data-view="sectors"><span class="ico">◫</span> Sectors</div>
     <div class="sech">CONTROL</div>
     <div class="navitem" data-view="access"><span class="ico">⚿</span> Access Control</div>
     <div class="navitem" data-view="roles"><span class="ico">⚇</span> Roles &amp; Profiles</div>
@@ -194,7 +195,7 @@ async function heartbeat(){
 function nav(view){
   document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active", n.dataset.view===view));
   const m=document.getElementById("main"); if(!m) return; m.innerHTML='<div class="loading">Loading…</div>';
-  ({overview:vOverview,systems:vSystems,decisions:vDecisions,policy:vPolicy,oversight:vOversight,audit:vAudit,governance:vGovernance,compliance:vCompliance,sovereignty:vSovereignty,incidents:vIncidents,intelligence:vIntelligence,tenants:vTenants,divisions:vDivisions,access:vAccess,roles:vRoles}[view]||vOverview)(m);
+  ({overview:vOverview,systems:vSystems,decisions:vDecisions,policy:vPolicy,oversight:vOversight,audit:vAudit,governance:vGovernance,compliance:vCompliance,sovereignty:vSovereignty,incidents:vIncidents,intelligence:vIntelligence,tenants:vTenants,divisions:vDivisions,access:vAccess,roles:vRoles,sectors:vSectors}[view]||vOverview)(m);
 }
 document.querySelectorAll("#nav .navitem").forEach(n=>n.addEventListener("click",()=>nav(n.dataset.view)));
 // ---------- helpers ----------
@@ -464,6 +465,26 @@ async function vRoles(m){ await safe(m, async()=>{
   html+='</div>';
   m.innerHTML=html;
 }); }
+function toast(msg){ var t=document.getElementById("gods-toast"); if(!t){ t=document.createElement("div"); t.id="gods-toast"; t.style.cssText="position:fixed;right:18px;bottom:18px;max-width:360px;background:linear-gradient(180deg,#112040,#0D1F3C);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:11px 14px;font-size:12.5px;color:#EDE7D6;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:50;transition:opacity .3s"; document.body.appendChild(t); } t.innerHTML=msg; t.style.opacity="1"; clearTimeout(window._gt); window._gt=setTimeout(function(){t.style.opacity="0";},3500); }
+function sectorTag(s){ var col={PUBLIC:"#00C2D4",PRIVATE:"#C9A84C",GENERAL:"#8A9BB0"}[s]||"#8A9BB0"; return '<span style="font-family:monospace;font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid '+col+'55;color:'+col+'">'+esc(s)+'</span>'; }
+async function vSectors(m){
+  let bd={sectors:[],open_oversight:0};
+  try{ bd=await api("/sector/admin/breakdown"); }catch(e){ const g=document.getElementById("main"); if(g) g.innerHTML='<div class="panel"><div class="small" style="color:#fda4a4">⚠ '+esc(e.message)+'</div></div>'; return; }
+  const card=(k,v)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v">'+esc(v)+'</div></div>';
+  const cards=(bd.sectors||[]).map(s=>'<div class="panel" style="border-top:3px solid '+esc(s.accent)+'"><h3>'+esc(s.label)+' <span class="muted small">· '+esc(s.audience)+'</span></h3>'+
+     '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px">'+card("Tenants",s.tenants)+card("Decisions",s.decisions)+card("Blocked",s.blocked)+card("Block rate",s.block_rate)+card("Certificates",s.certificates)+card("Frameworks",s.frameworks)+'</div></div>').join("");
+  let rows=[]; (bd.sectors||[]).forEach(s=>(s.tenant_list||[]).forEach(t=>rows.push(Object.assign({sector:s.sector},t))));
+  const trows=rows.map(t=>{ const opt=v=>'<option'+(t.sector===v?" selected":"")+'>'+v+'</option>';
+    return '<tr><td><b>'+esc(t.name)+'</b><br><span class="muted mono" style="font-size:10px">'+esc(t.tenant_id)+'</span></td>'+
+     '<td>'+sectorTag(t.sector)+'</td><td class="mono">'+t.decisions+'</td><td class="mono">'+t.blocked+'</td>'+
+     '<td><select id="sa-'+esc(t.tenant_id)+'">'+opt("PUBLIC")+opt("PRIVATE")+opt("GENERAL")+'</select> <button class="btn sm" onclick="assignSector(\''+esc(t.tenant_id)+'\')">Set</button></td></tr>'; }).join("");
+  const out='<div class="pgh"><h2>Sector Portfolio</h2><span class="desc">Public vs Private governance across all tenants · '+bd.open_oversight+' open oversight</span></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">'+cards+'</div>'+
+    '<div class="panel" style="margin-top:16px"><h3>Tenants by sector</h3><table><thead><tr><th>Tenant</th><th>Sector</th><th>Decisions</th><th>Blocked</th><th>Reclassify</th></tr></thead><tbody>'+(trows||'<tr><td colspan="5" class="muted small">No tenants.</td></tr>')+'</tbody></table></div>';
+  const g=document.getElementById("main"); if(g) g.innerHTML=out;
+}
+async function assignSector(tid){ const sel=document.getElementById("sa-"+tid); if(!sel)return; const sector=sel.value;
+  try{ await api("/sector/admin/assign",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tenant_id:tid,sector:sector})}); toast("✓ "+esc(tid)+" → "+esc(sector)); vSectors(document.getElementById("main")); }catch(e){ toast("⚠ "+esc(e.message)); } }
 
 // ---------- boot ----------
 (function(){var h=location.hash||"";var g=function(k){var m=h.match(new RegExp("[#&]"+k+"=([^&]+)"));return m?decodeURIComponent(m[1]):"";};if(g("sso")){localStorage.setItem("gods_admin_tok",g("sso"));if(g("api"))localStorage.setItem("gods_admin_api",g("api"));localStorage.setItem("gods_admin_who",JSON.stringify({email:g("email"),role:g("role"),division:g("division"),tenant_id:g("tenant")}));try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}})();
