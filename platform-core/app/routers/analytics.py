@@ -11,7 +11,7 @@ from app.services import analytics_engine as ae
 
 router = APIRouter(prefix="/analytics", tags=["UDOC analytics"])
 
-VALID = {"SETHS", "MADIBA", "TS"}
+VALID = {"SETHS", "MADIBA", "TS", "UDOC"}
 
 @router.get("/{division}/kpis")
 def kpis(division: str, db: Session = Depends(get_db), _: dict = Depends(current_user)):

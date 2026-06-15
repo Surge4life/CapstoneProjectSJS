@@ -217,11 +217,11 @@ async function vOverview(m){
   html+=card("Pending oversight", counts.cases!=null?counts.cases:pick(sum,["pending_reviews","pending"]), "amber");
   html+=card("Open incidents", counts.incidents!=null?counts.incidents:pick(sum,["incidents","open_incidents"]), counts.incidents?"red":"green");
   html+=card("Personnel", counts.users!=null?counts.users:pick(sum,["users","operators"]));
-  document.getElementById("ov-k").innerHTML=html;
+  const ovk=document.getElementById("ov-k"); if(ovk) ovk.innerHTML=html;
   // raw summary panel (defensive render of whatever the regulator summary returns)
   if(sum && typeof sum==="object" && Object.keys(sum).length){
     let rows=Object.entries(sum).filter(([k,v])=>typeof v!=="object").map(([k,v])=>'<tr><td class="muted">'+esc(k)+'</td><td class="mono">'+esc(v)+'</td></tr>');
-    document.getElementById("ov-p").innerHTML='<div class="panel"><h3>Regulator summary</h3><table><tbody>'+rows.join("")+'</tbody></table></div>';
+    const ovp=document.getElementById("ov-p"); if(ovp) ovp.innerHTML='<div class="panel"><h3>Regulator summary</h3><table><tbody>'+rows.join("")+'</tbody></table></div>';
   }
 }
 async function vSystems(m){
@@ -427,12 +427,13 @@ async function vTenants(m){ await safe(m, async()=>{
    '<div class="panel"><h3>Service tiers</h3>'+tableFrom(tiers,[{h:"Tier",r:x=>esc(x.name||x.tier||x.id||x)},{h:"Detail",r:x=>esc(x.limits||x.description||"—")}])+'</div>';
 }); }
 async function vDivisions(m){
-  m.innerHTML='<div class="pgh"><h2>Division Operations</h2><span class="desc">Cross-division UDOC operational metrics</span></div><div id="dv" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))"></div>';
-  const g=document.getElementById("dv");
+  m.innerHTML='<div class="pgh"><h2>Division Operations</h2><span class="desc">Cross-division UDOC operational metrics — live from the governance ledger</span></div><div id="dv" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))"><div class="loading">Loading…</div></div>';
+  let html="";
   for(const d of ["SETHS","MADIBA","TS","UDOC"]){ let k={}; try{ k=await api("/analytics/"+d+"/kpis"); }catch(e){}
-    const items=Object.entries(k||{}).filter(([a,b])=>typeof b!=="object").slice(0,7).map(([a,b])=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span class="muted small">'+esc(a)+'</span><span class="mono">'+esc(b)+'</span></div>').join("");
-    g.innerHTML+='<div class="panel"><h3>'+esc(d)+'</h3>'+(items||'<div class="muted small">No metrics.</div>')+'</div>';
+    const items=Object.entries(k||{}).filter(([a,b])=>typeof b!=="object").slice(0,8).map(([a,b])=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span class="muted small">'+esc(a)+'</span><span class="mono">'+esc(b)+'</span></div>').join("");
+    html+='<div class="panel"><h3>'+esc(d)+'</h3>'+(items||'<div class="muted small">No metrics.</div>')+'</div>';
   }
+  const g=document.getElementById("dv"); if(g) g.innerHTML=html;
 }
 async function vRoles(m){ await safe(m, async()=>{
   let prof={},cat={groups:[],by_group:{},count:0};
@@ -459,6 +460,7 @@ async function vRoles(m){ await safe(m, async()=>{
 
 // ---------- boot ----------
 if(token()){ try{ enterApp(); }catch(e){ logout(); } }
+(function(){var h=location.hash||"";var g=function(k){var m=h.match(new RegExp("[#&]"+k+"=([^&]+)"));return m?decodeURIComponent(m[1]):"";};if(g("sso")){localStorage.setItem("gods_admin_tok",g("sso"));if(g("api"))localStorage.setItem("gods_admin_api",g("api"));localStorage.setItem("gods_admin_who",JSON.stringify({email:g("email"),role:g("role"),division:g("division"),tenant_id:g("tenant")}));try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}})();
 </script>
 </body>
 </html>
