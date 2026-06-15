@@ -1,0 +1,5 @@
+<!-- Merge into android/app/src/main/AndroidManifest.xml after `cap add android`.
+     INTERNET: reach the G.O.D.S surfaces. ACCESS_NETWORK_STATE: @capacitor/network. -->
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<!-- In <application ...> add:  android:networkSecurityConfig="@xml/network_security_config" -->

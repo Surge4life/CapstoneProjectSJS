@@ -8,10 +8,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.db.session import get_db
-from app.db.models import AIModel, Decision, EvaCertificate, Tenant
+from app.db.models import AIModel, Decision, EvaCertificate, Tenant, OversightCase
 from app.core.dependencies import current_user, principal, scope_pk
 from app.core.config import settings
-import json, hashlib
+import json, hashlib, uuid
 from app.services.governance_bridge import verify_payload, Evidence, evaluate, seal_payload
 from app.services.audit_writer import append_audit
 from app.services import policy_engine as pe
@@ -101,6 +101,18 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
                  classification="GOVERNANCE", actor_class=user.get("role", "SYSTEM"))
     bus.emit("decisions", {"model_id": req.model_id, "decision": final_decision, "svs": v.svs})
 
+    # End-to-end flow: a BLOCKED decision opens a human-oversight (HITL) case automatically,
+    # so blocked AI decisions surface in the Oversight queue for COB review instead of being lost.
+    oversight_case = None
+    if final_decision == "BLOCK":
+        reason = (all_reasons[0] if all_reasons else "EVA governance block")
+        case = OversightCase(case_ref=f"COB-{uuid.uuid4().hex[:8]}", model_id=req.model_id,
+                             reason=f"Auto: decision {d.id} blocked — {reason}"[:200], state="OPEN")
+        db.add(case); db.commit(); db.refresh(case)
+        oversight_case = case.case_ref
+        append_audit(db, "OVERSIGHT_OPEN", {"case": case.case_ref, "model": req.model_id,
+                     "decision": d.id, "auto": True}, classification="GOVERNANCE", actor_class="SYSTEM")
+
     return {
         "model_id": v.model_id, "decision": final_decision, "base_decision": v.decision,
         "svs": v.svs, "risk": v.risk,
@@ -115,6 +127,7 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
         "validity": v.validity, "reliability": v.reliability, "impact": v.impact,
         "certificate_id": certificate_id, "content_sha3": content_sha3,
         "policy_version": policy_version, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
+        "oversight_case": oversight_case,
     }
 
 @router.get("")

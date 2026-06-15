@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0A1628"/>
+<title>G.O.D.S UDOC</title>
+<meta name="x-gods-status" content="pre-registration forecast — proposed entity, not yet registered; IP vests in Sashin J. Singh"/>
+<style>
+  html,body{margin:0;height:100%;background:radial-gradient(900px 500px at 50% -10%,#10224a 0,#0A1628 60%);color:#EDE7D6;font-family:'IBM Plex Mono',Consolas,monospace}
+  .notice{background:#0A1628;color:#C9A84C;font:10px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-align:center;padding:5px 8px;border-bottom:1px solid rgba(201,168,76,.28)}
+  .wrap{height:calc(100% - 28px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px}
+  svg{width:74px;height:74px}
+  h1{font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:700;letter-spacing:.06em;font-size:30px;color:#C9A84C;margin:14px 0 2px}
+  .sub{letter-spacing:.26em;color:#00C2D4;font-size:11px}
+  .msg{color:#8A9BB0;font-size:12px;margin-top:18px;max-width:300px;line-height:1.5}
+  a{display:inline-block;margin-top:18px;color:#00E5FF;border:1px solid rgba(0,194,212,.4);border-radius:8px;padding:9px 16px;text-decoration:none;font-size:13px;letter-spacing:.06em}
+  .spin{width:30px;height:30px;border:3px solid rgba(201,168,76,.2);border-top-color:#00C2D4;border-radius:50%;margin:18px auto 0;animation:s .9s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <div class="notice">PRE-REGISTRATION FORECAST · G.O.D.S HOLDINGS (PTY) LTD (PROPOSED) · NOT YET REGISTERED</div>
+  <div class="wrap">
+    <svg viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
+    <h1>G.O.D.S UDOC</h1><div class="sub">SOVEREIGN SIGN-ON</div>
+    <div class="spin"></div>
+    <div class="msg">Connecting to the UDOC sign-on gateway… You'll be routed to your console automatically.</div>
+    <a href="https://gods-udoc-gateway.onrender.com" id="go">Open sign-on</a>
+  </div>
+<script>
+  // OTA shell normally loads server.url directly. This bundled splash only shows if offline / first paint;
+  // route to the live gateway as soon as we can.
+  var URL="https://gods-udoc-gateway.onrender.com";
+  setTimeout(function(){ try{ location.replace(URL); }catch(e){} }, 1200);
+</script>
+</body>
+</html>

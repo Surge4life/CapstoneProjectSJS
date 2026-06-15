@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 import json
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
-from app.db.models import DivisionRecord
+from app.db.models import DivisionRecord, Decision, EvaCertificate
 
 
 def record(db: Session, division: str, event_type: str, entity_ref: str = "",
@@ -26,8 +26,44 @@ def record(db: Session, division: str, event_type: str, entity_ref: str = "",
     return r
 
 
+def _udoc_kpis(db: Session) -> dict:
+    """UDOC division KPIs computed LIVE from the real decision tables (end-to-end source of truth)."""
+    total = db.execute(select(func.count(Decision.id))).scalar() or 0
+    blocked = db.execute(select(func.count(Decision.id)).where(Decision.decision == "BLOCK")).scalar() or 0
+    review = db.execute(select(func.count(Decision.id)).where(Decision.decision == "REVIEW")).scalar() or 0
+    avg_eva = db.execute(select(func.avg(EvaCertificate.composite_eva))).scalar()
+    avg_lat = db.execute(select(func.avg(Decision.latency_ms))).scalar()
+    certs = db.execute(select(func.count(EvaCertificate.id))).scalar() or 0
+    return {"decisions": total, "blocked": blocked, "review": review, "allowed": max(0, total - blocked - review),
+            "block_rate": round(blocked / total, 3) if total else 0.0,
+            "avg_eva": round(float(avg_eva), 3) if avg_eva is not None else 0.0,
+            "avg_latency_ms": round(float(avg_lat), 2) if avg_lat is not None else 0.0,
+            "certificates": certs}
+
+
+def _udoc_recent(db: Session, limit: int) -> list[dict]:
+    rows = db.execute(select(Decision).order_by(Decision.id.desc()).limit(limit)).scalars().all()
+    return [{"id": r.id, "event_type": "DECISION", "entity_ref": r.certificate_id or "",
+             "metric_name": r.decision, "metric_value": r.svs,
+             "period": r.created_at.strftime("%Y-%m"), "created_at": r.created_at.isoformat()} for r in rows]
+
+
+def _udoc_timeseries(db: Session, metric: str) -> list[dict]:
+    rows = db.execute(select(Decision.created_at, Decision.decision)).all()
+    buckets: dict[str, float] = defaultdict(float)
+    for created, decision in rows:
+        per = created.strftime("%Y-%m")
+        if metric == "blocked":
+            buckets[per] += 1.0 if decision == "BLOCK" else 0.0
+        else:
+            buckets[per] += 1.0
+    return [{"period": p, "value": round(v, 2)} for p, v in sorted(buckets.items())]
+
+
 def timeseries(db: Session, division: str, metric_name: str) -> list[dict]:
     """Monthly time-series of a metric (sum per period)."""
+    if division == "UDOC":
+        return _udoc_timeseries(db, metric_name)
     rows = db.execute(
         select(DivisionRecord.period, func.sum(DivisionRecord.metric_value))
         .where(DivisionRecord.division == division, DivisionRecord.metric_name == metric_name)
@@ -38,6 +74,12 @@ def timeseries(db: Session, division: str, metric_name: str) -> list[dict]:
 
 def totals(db: Session, division: str) -> dict:
     """Totals + event counts per metric/event for a division."""
+    if division == "UDOC":
+        k = _udoc_kpis(db)
+        return {"division": "UDOC",
+                "metrics": {"decisions": {"sum": k["decisions"], "count": k["decisions"]},
+                            "blocked": {"sum": k["blocked"], "count": k["blocked"]}},
+                "events": {"DECISION": k["decisions"]}, "total_records": k["decisions"]}
     metric_rows = db.execute(
         select(DivisionRecord.metric_name, func.sum(DivisionRecord.metric_value),
                func.count(DivisionRecord.id))
@@ -58,6 +100,8 @@ def totals(db: Session, division: str) -> dict:
 
 
 def recent(db: Session, division: str, limit: int = 50) -> list[dict]:
+    if division == "UDOC":
+        return _udoc_recent(db, limit)
     rows = db.execute(
         select(DivisionRecord).where(DivisionRecord.division == division)
         .order_by(DivisionRecord.id.desc()).limit(limit)
@@ -69,6 +113,8 @@ def recent(db: Session, division: str, limit: int = 50) -> list[dict]:
 
 def kpis(db: Session, division: str) -> dict:
     """Division-specific KPIs derived from the record store."""
+    if division == "UDOC":
+        return _udoc_kpis(db)
     t = totals(db, division)
     m = t["metrics"]
     if division == "SETHS":

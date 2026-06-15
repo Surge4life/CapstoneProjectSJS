@@ -212,6 +212,7 @@ async function genKey(btn){ btn.disabled=true; const mg=document.getElementById(
   try{ const d=await api("/tenants/me/apikeys",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}); mg.textContent="created — copy now: "+esc((d.api_key||d.key||d.secret||JSON.stringify(d)).toString().slice(0,48)); }
   catch(e){ mg.textContent=e.message; } finally{ btn.disabled=false; } }
 if(token()){ try{ enterApp(); }catch(e){ logout(); } }
+(function(){var h=location.hash||"";var g=function(k){var m=h.match(new RegExp("[#&]"+k+"=([^&]+)"));return m?decodeURIComponent(m[1]):"";};if(g("sso")){localStorage.setItem("udoc_client_tok",g("sso"));if(g("api"))localStorage.setItem("udoc_client_api",g("api"));localStorage.setItem("udoc_client_who",JSON.stringify({email:g("email"),role:g("role"),tenant_id:g("tenant")}));try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}})();
 </script>
 </body>
 </html>

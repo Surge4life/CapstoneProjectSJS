@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">G.O.D.S UDOC</string>
+    <string name="title_activity_main">G.O.D.S UDOC</string>
+    <string name="package_name">za.gods.udoc.gateway</string>
+    <string name="custom_url_scheme">za.gods.udoc.gateway</string>
+</resources>
