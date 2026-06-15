@@ -77,7 +77,7 @@
 <div id="app">
   <header>
     <svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/></svg>
-    <span class="wm">UDOC</span><span class="tag" id="org-tag">CLIENT</span><span class="pill" id="hb">· checking</span>
+    <span class="wm">UDOC</span><span class="tag" id="org-tag">CLIENT</span><span class="pill" id="sector-badge" style="display:none"></span><span class="pill" id="hb">· checking</span>
     <span class="spacer"></span><div class="who"><b id="who-email">—</b><br><span class="mono" style="font-size:10px" id="who-tenant"></span></div>
     <button class="btn sm" onclick="logout()">Sign out</button>
   </header>
@@ -115,11 +115,18 @@ async function doLogin(){ const e=document.getElementById("li-err"); e.textConte
     enterApp();
   }catch(err){ e.textContent=err.message; } finally{ btn.disabled=false; btn.textContent="Sign in"; } }
 function logout(){ localStorage.removeItem("udoc_client_tok"); document.getElementById("app").style.display="none"; document.getElementById("login").style.display="flex"; }
-function enterApp(){ const w=JSON.parse(localStorage.getItem("udoc_client_who")||"{}");
+let SECTOR=null;
+function applySector(){ if(!SECTOR)return; const b=document.getElementById("sector-badge");
+  if(b){ b.textContent=SECTOR.label+" · "+SECTOR.audience; b.style.display="inline-block"; b.style.color=SECTOR.accent; b.style.borderColor=SECTOR.accent; }
+  document.getElementById("org-tag").textContent=(SECTOR.tenant||"CLIENT").toUpperCase(); }
+async function ensureSector(){ if(!SECTOR){ try{ SECTOR=await api("/sector/profile"); applySector(); }catch(e){} } return SECTOR; }
+async function enterApp(){ const w=JSON.parse(localStorage.getItem("udoc_client_who")||"{}");
   document.getElementById("login").style.display="none"; document.getElementById("app").style.display="grid";
   document.getElementById("who-email").textContent=w.email||"—"; document.getElementById("who-tenant").textContent=w.tenant_id||"";
   document.getElementById("org-tag").textContent=(w.tenant_id||"CLIENT").toUpperCase();
-  heartbeat(); nav("dash"); }
+  heartbeat();
+  try{ SECTOR=await api("/sector/profile"); applySector(); }catch(e){ SECTOR=null; }
+  nav("dash"); }
 async function heartbeat(){ const el=document.getElementById("hb"); try{ await fetch(apiBase()+"/health"); el.textContent="· online"; el.className="pill up"; }catch{ el.textContent="· offline"; el.className="pill down"; } }
 function nav(v){ document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active",n.dataset.view===v));
   const m=document.getElementById("main"); m.innerHTML='<div class="loading">Loading…</div>';
@@ -133,15 +140,21 @@ function tableFrom(rows,cols){ if(!rows.length) return '<div class="muted small"
 async function safe(host,fn){ try{ return await fn(); }catch(e){ host.innerHTML='<div class="panel"><div class="t-bad small">⚠ '+esc(e.message)+'</div></div>'; } }
 
 async function vDash(m){
-  let sys=[],dec=[],plan={},fw=[];
+  await ensureSector();
+  let sys=[],dec=[],plan={},ov=null;
   try{ sys=asArray(await api("/registry/models")); }catch(e){}
   try{ dec=asArray(await api("/decisions")); }catch(e){}
   try{ plan=await api("/tenants/me"); }catch(e){}
-  try{ fw=asArray(await api("/compliance/frameworks")); }catch(e){}
+  try{ ov=await api("/sector/overview"); }catch(e){}
+  const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
   const card=(k,v,cls)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v '+(cls||"")+'">'+(v==null?"—":esc(v))+'</div></div>';
-  m.innerHTML='<div class="pgh"><h2>Governance Dashboard</h2><span class="desc">Your AI systems under UDOC oversight</span></div>'+
-   '<div class="grid kpis">'+card("My AI systems",sys.length,"cyan")+card("Decisions evaluated",dec.length)+card("Compliance frameworks",fw.length,"green")+card("Plan tier",(plan&&(plan.tier||plan.plan))||"—","amber")+'</div>'+
-   '<div class="panel"><h3>Welcome</h3><div class="small muted">Register your AI systems, run them through the EVA 6-dimension governance engine, track compliance against the SA AI Policy and international frameworks, and (soon) ground your operations in your private company knowledge base.</div></div>';
+  const tiles = (ov&&ov.tiles&&ov.tiles.length) ? ov.tiles.map((t,i)=>card(t.k,t.v,i===0?"cyan":"")).join("")
+              : (card("My AI systems",sys.length,"cyan")+card("Decisions evaluated",dec.length));
+  m.innerHTML='<div class="pgh"><h2>'+esc(S.label||"Governance")+' Dashboard</h2><span class="desc">'+esc(S.tagline||"Your AI systems under UDOC oversight")+'</span></div>'+
+   '<div class="grid kpis">'+tiles+'</div>'+
+   (S.summary?'<div class="panel" style="border-left:3px solid '+esc(acc)+'"><h3>'+esc(S.label)+' governance scope</h3><div class="small muted">'+esc(S.summary)+'</div>'+
+     '<div class="small" style="margin-top:12px;letter-spacing:.08em;color:'+esc(acc)+'">OVERSIGHT MODEL</div><div class="small muted" style="margin-top:3px">'+esc(S.oversight_model)+'</div></div>':'')+
+   '<div class="panel"><h3>Your systems</h3><div class="small muted">'+sys.length+' AI system(s) registered · '+dec.length+' decision(s) evaluated through the EVA engine · plan tier '+esc((plan&&(plan.tier||plan.plan))||"—")+'.</div></div>';
 }
 async function vSystems(m){ await safe(m, async()=>{
   const rows=asArray(await api("/registry/models"));
@@ -161,21 +174,36 @@ async function registerSystem(){ const e=document.getElementById("ns-err"); e.te
   if(!body.model_id||!body.name){ e.textContent="System ID and name are required."; return; }
   try{ await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); nav("systems"); }
   catch(err){ e.textContent=err.message; } }
+function sectorChip(s){ if(!s)return '<span class="muted small">—</span>'; var col={PUBLIC:"#00C2D4",PRIVATE:"#C9A84C",GENERAL:"#8A9BB0"}[s]||"#8A9BB0"; return '<span style="font-family:monospace;font-size:10px;padding:2px 6px;border-radius:5px;border:1px solid '+col+'55;color:'+col+'">'+esc(s)+'</span>'; }
 async function vDecisions(m){ await safe(m, async()=>{
+  await ensureSector();
   let rows=[],certs=[]; try{ rows=asArray(await api("/decisions")); }catch(e){} try{ certs=asArray(await api("/decisions/certificates")); }catch(e){}
-  m.innerHTML='<div class="pgh"><h2>Decisions · EVA Engine</h2><span class="desc">6-dimension governance verdicts for your systems</span></div>'+
+  const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
+  const banner = S.label ? '<div class="panel" style="border-left:3px solid '+esc(acc)+'"><div class="small muted">Decisions are evaluated under your <b style="color:'+esc(acc)+'">'+esc(S.label)+'</b> regulatory frameworks ('+esc(S.audience||"")+'). Each signed certificate records which frameworks were in force at decision time.</div></div>' : '';
+  m.innerHTML='<div class="pgh"><h2>Decisions · EVA Engine</h2><span class="desc">6-dimension governance verdicts for your systems</span></div>'+banner+
    '<div class="panel"><h3>Decisions · '+rows.length+'</h3>'+tableFrom(rows.slice(0,80),[
      {h:"Ref",r:x=>'<span class="mono">'+esc(x.decision_id||x.id||"—")+'</span>'},{h:"System",r:x=>esc(x.model_id||"—")},
      {h:"EVA",r:x=>esc(x.composite_eva!=null?x.composite_eva:(x.eva!=null?x.eva:"—"))},{h:"Verdict",r:x=>statusTag(x.verdict||x.status||x.outcome)},
    ])+'</div>'+
    '<div class="panel"><h3>Signed certificates · '+certs.length+'</h3>'+tableFrom(certs.slice(0,40),[
-     {h:"Cert",r:x=>'<span class="mono">'+esc(x.cert_id||x.id||"—")+'</span>'},{h:"Decision",r:x=>esc(x.decision_id||"—")},{h:"Seal",r:x=>statusTag(x.signed!==false?"SIGNED":"UNSIGNED")},
+     {h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.cert_id||x.id||"—")+'</span>'},{h:"Verdict",r:x=>statusTag(x.decision||"—")},
+     {h:"Sector",r:x=>sectorChip(x.sector)},{h:"Frameworks",r:x=>'<span class="muted small">'+(((x.frameworks_cited||[]).length)||0)+' cited</span>'},
+     {h:"Seal",r:x=>statusTag(x.signed!==false?"SIGNED":"UNSIGNED")},
    ])+'</div>';
 }); }
 async function vCompliance(m){ await safe(m, async()=>{
+  await ensureSector();
+  let sfw={frameworks:[]}; try{ sfw=await api("/sector/frameworks"); }catch(e){}
   let fw=[]; try{ fw=asArray(await api("/compliance/frameworks")); }catch(e){}
-  m.innerHTML='<div class="pgh"><h2>Compliance</h2><span class="desc">Your conformance — SA AI Policy + international frameworks</span></div>'+
-   '<div class="panel"><h3>Frameworks · '+fw.length+'</h3>'+tableFrom(fw,[{h:"Framework",r:x=>'<b>'+esc(x.name||x.framework||x.id||x)+'</b>'},{h:"Coverage",r:x=>esc(x.coverage||x.status||"—")}])+'</div>';
+  const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
+  const cards=(sfw.frameworks||[]).map(f=>'<div class="panel" style="border-left:3px solid '+esc(acc)+';margin:0">'+
+     '<h3 style="font-size:14px;margin:0 0 4px">'+esc(f.name)+'</h3>'+
+     '<div class="mono" style="font-size:10.5px;color:'+esc(acc)+'">'+esc(f.basis)+'</div>'+
+     '<div class="small muted" style="margin-top:7px">'+esc(f.focus)+'</div>'+
+     '<div class="small" style="margin-top:7px;color:var(--muted)"><b>Applies to:</b> '+esc(f.applies_to)+'</div></div>').join("");
+  m.innerHTML='<div class="pgh"><h2>Compliance — '+esc(S.label||"")+'</h2><span class="desc">The regulatory frameworks that apply to your sector ('+esc(S.audience||"")+')</span></div>'+
+   '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px">'+(cards||'<div class="muted small">No sector frameworks resolved.</div>')+'</div>'+
+   (fw.length?'<div class="panel" style="margin-top:16px"><h3>Additional tracked frameworks · '+fw.length+'</h3>'+tableFrom(fw,[{h:"Framework",r:x=>'<b>'+esc(x.name||x.framework||x.id||x)+'</b>'},{h:"Coverage",r:x=>esc(x.coverage||x.status||"—")}])+'</div>':'');
 }); }
 async function vKnowledge(m){ await safe(m, async()=>{
   let st={},docs=[];

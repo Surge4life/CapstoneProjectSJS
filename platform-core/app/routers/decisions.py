@@ -16,6 +16,7 @@ from app.services.governance_bridge import verify_payload, Evidence, evaluate, s
 from app.services.audit_writer import append_audit
 from app.services import policy_engine as pe
 from app.services.event_bus import bus
+from app.services import sectors as sec
 
 router = APIRouter(prefix="/decisions", tags=["UDOC decisions"])
 
@@ -87,11 +88,14 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
     payload = f"{v.model_id}|{v.composite_eva}|{final_decision}|{issued}|{content_sha3}"
     certificate_id = "EVA-" + hashlib.sha3_256(payload.encode()).hexdigest()[:12].upper()
     merkle_leaf = hashlib.sha3_256((v.seal or payload).encode()).hexdigest()
+    # Sector context in force for this decision (drives which regulatory frameworks are cited on the record)
+    sector_key = (tenant.sector if tenant else "GENERAL") or "GENERAL"
+    frameworks_cited = [f["name"] for f in sec.get(sector_key)["frameworks"]]
     db.add(EvaCertificate(certificate_id=certificate_id, model_id=v.model_id, tenant_pk=model.tenant_pk,
                           decision=final_decision, composite_eva=v.composite_eva, dimensions_json=dims_str,
                           policy_pack=("active" if pol["policy_enforced"] else ""), seal=seal_payload(payload),
                           content_sha3=content_sha3, policy_version=policy_version, merkle_leaf=merkle_leaf,
-                          issued_at=d.created_at))
+                          issued_at=d.created_at, sector=sector_key, frameworks_cited=json.dumps(frameworks_cited)))
     d.certificate_id = certificate_id
     db.commit()
 
@@ -128,6 +132,7 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
         "certificate_id": certificate_id, "content_sha3": content_sha3,
         "policy_version": policy_version, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
         "oversight_case": oversight_case,
+        "sector": sector_key, "frameworks_cited": frameworks_cited,
     }
 
 @router.get("")
@@ -154,7 +159,9 @@ def list_certificates(db: Session = Depends(get_db), user: dict = Depends(princi
         q = q.where(EvaCertificate.tenant_pk == scope)
     rows = db.execute(q).scalars().all()
     return [{"certificate_id": c.certificate_id, "model_id": c.model_id, "decision": c.decision,
-             "composite_eva": c.composite_eva, "issued_at": c.issued_at.isoformat()} for c in rows]
+             "composite_eva": c.composite_eva, "issued_at": c.issued_at.isoformat(),
+             "sector": getattr(c, "sector", "GENERAL"),
+             "frameworks_cited": json.loads(getattr(c, "frameworks_cited", None) or "[]")} for c in rows]
 
 
 @router.get("/certificates/{cid}/verify")
@@ -168,4 +175,6 @@ def verify_certificate(cid: str, db: Session = Depends(get_db), _: dict = Depend
             "dimensions": json.loads(c.dimensions_json), "decision": c.decision,
             "content_sha3": c.content_sha3, "policy_version": c.policy_version,
             "merkle_leaf": c.merkle_leaf, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
-            "issued_at": c.issued_at.isoformat()}
+            "issued_at": c.issued_at.isoformat(),
+            "sector": getattr(c, "sector", "GENERAL"),
+            "frameworks_cited": json.loads(getattr(c, "frameworks_cited", None) or "[]")}

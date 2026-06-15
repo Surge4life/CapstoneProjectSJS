@@ -379,6 +379,8 @@ class EvaCertificate(Base):
     policy_version: Mapped[str] = mapped_column(String(120), default="")
     merkle_leaf: Mapped[str] = mapped_column(String(64), default="")
     issued_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    sector: Mapped[str] = mapped_column(String(20), default="GENERAL")          # PUBLIC|PRIVATE|GENERAL in force
+    frameworks_cited: Mapped[str] = mapped_column(Text, default="[]")           # JSON list of sector framework names
 
 
 # ─── SaaS multi-tenancy + commercial layer ───
