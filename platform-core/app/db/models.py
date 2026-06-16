@@ -124,6 +124,25 @@ class OversightCase(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 
+class OperatorAction(Base):
+    """Structured, inspectable record of a Sovereign-Operator action: which profile did what, the
+    operation type it resolved to, the artifact it produced/affected, and the outcome. Complements the
+    immutable audit chain with a queryable operator-activity history."""
+    __tablename__ = "operator_actions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ref: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    actor_email: Mapped[str] = mapped_column(String(120), index=True)
+    profile_key: Mapped[str] = mapped_column(String(60), index=True)
+    capability: Mapped[str] = mapped_column(String(80))
+    op_type: Mapped[str] = mapped_column(String(20))                 # CASE|REGISTRY|DIRECTIVE|EVALUATE|REPORT|RECORD
+    target: Mapped[str] = mapped_column(String(120), default="")     # affected artifact id (case ref, model id, …)
+    result_ref: Mapped[str] = mapped_column(String(60), default="")  # produced artifact id
+    result_summary: Mapped[str] = mapped_column(Text, default="")
+    detail_json: Mapped[str] = mapped_column(Text, default="{}")     # structured result (metrics, note, etc.)
+    status: Mapped[str] = mapped_column(String(24), default="DONE")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
 # ─── UDOC data-record-and-analytics: every division event is recorded here ───
 class DivisionRecord(Base):
     """Immutable-ish event record UDOC keeps for each division — the analytics source."""
