@@ -153,7 +153,8 @@ async function api(path, opts={}){
   const h = Object.assign({}, opts.headers||{});
   if(token()) h["Authorization"]="Bearer "+token();
   const r = await fetch(apiBase()+path, Object.assign({}, opts, {headers:h}));
-  if(r.status===401||r.status===403){ if(token()){ logout(); } throw new Error("Not authorised ("+r.status+")"); }
+  if(r.status===401){ if(token()){ logout(); } throw new Error("Session expired (401)"); }
+  if(r.status===403){ throw new Error("Not authorised (403)"); }
   const ct=r.headers.get("content-type")||""; const body = ct.includes("json")? await r.json().catch(()=>null) : await r.text();
   if(!r.ok) throw new Error((body&&body.detail)|| (typeof body==="string"?body:("HTTP "+r.status)));
   return body;
@@ -177,14 +178,22 @@ async function doLogin(){
   }catch(err){ e.textContent=err.message; } finally { btn.disabled=false; btn.textContent="Authenticate"; }
 }
 function logout(){ localStorage.removeItem("gods_admin_tok"); document.getElementById("app").style.display="none"; document.getElementById("login").style.display="flex"; }
-function enterApp(){
+let PERMS=null;
+function canView(v){ return !PERMS || (PERMS.views||[]).includes(v); }
+function can(a){ return !!PERMS && (PERMS.actions||[]).includes(a); }
+function applyNav(){ document.querySelectorAll("#nav .navitem").forEach(n=>{ n.style.display = canView(n.dataset.view)?"":"none"; }); }
+async function enterApp(){
   const who=JSON.parse(localStorage.getItem("gods_admin_who")||"{}");
   document.getElementById("login").style.display="none";
   document.getElementById("app").style.display="grid";
   document.getElementById("who-email").textContent=who.email||"—";
   document.getElementById("who-role").textContent=(who.role||"")+(who.division&&who.division!=="GODS"?(" · "+who.division):"");
   document.getElementById("api-label").textContent=apiBase().replace(/^https?:\/\//,"");
-  heartbeat(); nav("overview");
+  heartbeat();
+  try{ PERMS=await api("/rbac/me"); }catch(e){ PERMS=null; }
+  if(PERMS){ document.getElementById("who-role").textContent=PERMS.label+(who.division&&who.division!=="GODS"?(" · "+who.division):"")+(PERMS.read_only?" · read-only":""); }
+  applyNav();
+  nav(canView("overview")?"overview":(((PERMS&&PERMS.views)||["overview"])[0]||"overview"));
 }
 async function heartbeat(){
   const el=document.getElementById("hb");
@@ -194,6 +203,8 @@ async function heartbeat(){
 // ---------- nav ----------
 function nav(view){
   document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active", n.dataset.view===view));
+  if(!canView(view)){ document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.remove("active"));
+    const m=document.getElementById("main"); if(m) m.innerHTML='<div class="pgh"><h2>Access restricted</h2></div><div class="panel"><div class="muted small">Your role ('+esc((PERMS&&PERMS.label)||myRole()||"—")+') does not have access to this section. Contact an administrator if you need it.</div></div>'; return; }
   const m=document.getElementById("main"); if(!m) return; m.innerHTML='<div class="loading">Loading…</div>';
   ({overview:vOverview,systems:vSystems,decisions:vDecisions,policy:vPolicy,oversight:vOversight,audit:vAudit,governance:vGovernance,compliance:vCompliance,sovereignty:vSovereignty,incidents:vIncidents,intelligence:vIntelligence,tenants:vTenants,divisions:vDivisions,access:vAccess,roles:vRoles,sectors:vSectors}[view]||vOverview)(m);
 }
@@ -245,8 +256,8 @@ async function vSystems(m){
   });
 }
 function myRole(){ try{ return (JSON.parse(localStorage.getItem("gods_admin_who")||"{}").role)||""; }catch(e){ return ""; } }
-function isCOB(){ return ["gov","admin","exec"].includes(myRole()); }
-function isResolver(){ return ["auditor","admin","exec"].includes(myRole()); }
+function isCOB(){ return PERMS? can("policy.decide") : ["gov","admin","exec"].includes(myRole()); }
+function isResolver(){ return PERMS? can("oversight.act") : ["auditor","admin","exec"].includes(myRole()); }
 async function vOversight(m){
   await safe(m, async()=>{
     const rows=asArray(await api("/oversight/cases"));
@@ -448,7 +459,13 @@ async function vRoles(m){ await safe(m, async()=>{
   try{ prof=await api("/access/profile"); }catch(e){}
   try{ cat=await api("/access/profiles"); }catch(e){}
   const gc={GOVERNANCE:"t-bad",OPERATIONS:"t-info",PEOPLE:"t-ok",BUSINESS:"t-warn"};
-  let html='<div class="pgh"><h2>Roles &amp; Profiles</h2><span class="desc">The 24 Sovereign-Operator profiles · capability matrix · server-enforced by base role + division</span></div>';
+  let mx=null; try{ mx=await api("/rbac/matrix"); }catch(e){}
+  let html='<div class="pgh"><h2>Roles &amp; Access</h2><span class="desc">Role permission matrix · the 24 Sovereign-Operator profiles · server-enforced</span></div>';
+  if(mx){ const yes='<span style="color:var(--green)">●</span>', no='<span class="muted">—</span>';
+    html+='<div class="panel"><h3>Role → permission matrix</h3><div style="overflow-x:auto"><table><thead><tr><th>Role</th>'+(mx.actions||[]).map(a=>'<th style="font-size:9px;white-space:nowrap" title="'+esc((mx.action_labels||{})[a]||a)+'">'+esc(a)+'</th>').join("")+'<th>Views</th></tr></thead><tbody>'+
+      (mx.roles||[]).map(r=>'<tr><td><b>'+esc(r.label)+'</b>'+(r.read_only?' <span class="tag2 t-warn" style="font-size:9px">read-only</span>':'')+'</td>'+(mx.actions||[]).map(a=>'<td style="text-align:center">'+(r.actions.includes(a)?yes:no)+'</td>').join("")+'<td class="mono" style="text-align:center">'+r.views.length+'/'+mx.views.length+'</td></tr>').join("")+
+      '</tbody></table></div><div class="muted small" style="margin-top:8px">Signed in as <b style="color:var(--gold-l)">'+esc((PERMS&&PERMS.label)||myRole())+'</b>'+((PERMS&&PERMS.read_only)?' · read-only':'')+' · ● = permitted action category.</div></div>';
+  }
   html+='<div class="panel"><h3>Your access</h3><table><tbody>'+Object.entries(prof||{}).filter(([k,v])=>typeof v!=="object").map(([k,v])=>'<tr><td class="muted">'+esc(k)+'</td><td class="mono">'+esc(v)+'</td></tr>').join("")+
     (Array.isArray(prof.systems)?'<tr><td class="muted">systems</td><td>'+prof.systems.map(s=>'<span class="tag2 t-info">'+esc(s.key||s)+'</span>').join(" ")+'</td></tr>':'')+'</tbody></table></div>';
   html+='<div class="panel"><h3>Sovereign-Operator profiles · '+(cat.count||0)+'</h3>';
@@ -477,7 +494,9 @@ async function vSectors(m){
   const trows=rows.map(t=>{ const opt=v=>'<option'+(t.sector===v?" selected":"")+'>'+v+'</option>';
     return '<tr><td><b>'+esc(t.name)+'</b><br><span class="muted mono" style="font-size:10px">'+esc(t.tenant_id)+'</span></td>'+
      '<td>'+sectorTag(t.sector)+'</td><td class="mono">'+t.decisions+'</td><td class="mono">'+t.blocked+'</td>'+
-     '<td><select id="sa-'+esc(t.tenant_id)+'">'+opt("PUBLIC")+opt("PRIVATE")+opt("GENERAL")+'</select> <button class="btn sm" onclick="assignSector(\''+esc(t.tenant_id)+'\')">Set</button></td></tr>'; }).join("");
+     '<td>'+(can("sector.assign")
+        ? '<select id="sa-'+esc(t.tenant_id)+'">'+opt("PUBLIC")+opt("PRIVATE")+opt("GENERAL")+'</select> <button class="btn sm" onclick="assignSector(\''+esc(t.tenant_id)+'\')">Set</button>'
+        : '<span class="muted small">🔒 view only</span>')+'</td></tr>'; }).join("");
   const out='<div class="pgh"><h2>Sector Portfolio</h2><span class="desc">Public vs Private governance across all tenants · '+bd.open_oversight+' open oversight</span></div>'+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">'+cards+'</div>'+
     '<div class="panel" style="margin-top:16px"><h3>Tenants by sector</h3><table><thead><tr><th>Tenant</th><th>Sector</th><th>Decisions</th><th>Blocked</th><th>Reclassify</th></tr></thead><tbody>'+(trows||'<tr><td colspan="5" class="muted small">No tenants.</td></tr>')+'</tbody></table></div>';
