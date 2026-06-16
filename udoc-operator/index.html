@@ -51,6 +51,13 @@
   .act{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#091022;border:1px solid var(--bd2);border-radius:10px;padding:12px 14px}
   .act .lab{font-weight:600}.act .tk{font-family:var(--fm);font-size:9.5px;letter-spacing:.06em;color:var(--muted)}
   .tag2{display:inline-block;font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--bd2)}.t-ov{color:var(--amber);border-color:rgba(245,158,11,.4)}.t-au{color:var(--cyan-b);border-color:rgba(0,194,212,.4)}
+  select,.mo-body input[type=text]{width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:9px 11px;font-family:var(--fb);font-size:13px}
+  select:focus,.mo-body input:focus{outline:none;border-color:var(--gold)}
+  #op-modal{position:fixed;inset:0;background:rgba(4,8,18,.72);display:none;align-items:center;justify-content:center;z-index:60;padding:18px}
+  #op-modal .mo-card{width:420px;max-width:94vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:14px;padding:22px 22px 18px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  #op-modal .mo-title{font-family:var(--fc);font-weight:700;letter-spacing:.03em;font-size:20px;color:var(--gold-l)}
+  #op-modal .mo-sub{color:var(--muted);font-size:12px;margin:2px 0 16px}
+  #op-modal .mo-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
   #toast{position:fixed;right:18px;bottom:18px;max-width:380px;background:linear-gradient(180deg,var(--navy3),var(--navy2));border:1px solid var(--bd);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--txt);box-shadow:0 16px 40px rgba(0,0,0,.5);display:none}
   #toast.show{display:block}
 </style>
@@ -77,6 +84,7 @@
   </header>
   <main id="main"><div class="muted">Loading workspace…</div></main>
 </div>
+<div id="op-modal"><div class="mo-card"><div class="mo-title">Action</div><div class="mo-sub"></div><div class="mo-body"></div><div class="mo-foot"><button class="btn sm" onclick="closeModal()">Cancel</button><button class="btn sm cyan mo-go">Run action</button></div></div></div>
 <div id="toast"></div>
 <script>
 const PROD_API="https://gods-platform-core.onrender.com";
@@ -113,15 +121,52 @@ async function loadWorkspace(){ const m=document.getElementById("main");
   let html='<div class="phead"><h2>'+esc(p.title||"Operator")+'</h2><span class="pill '+gcls+'">'+esc(p.group||"")+'</span></div>'+
     '<div class="sub">Division '+esc(p.division||"—")+' · base role '+esc(p.base_role||"—")+' · live Sovereign-Operator workspace</div>';
   html+='<div class="kpis">'+(w.tiles||[]).map(t=>'<div class="kpi"><div class="k">'+esc(t.k)+'</div><div class="v">'+esc(t.v)+'</div></div>').join("")+'</div>';
-  html+='<div class="panel"><h3>Authorised actions</h3><div class="acts">'+(w.actions||[]).map(a=>
-     '<div class="act"><div><div class="lab">'+esc(a.capability)+'</div><div class="tk">'+(a.kind==="oversight"?'<span class="tag2 t-ov">opens COB case</span>':'<span class="tag2 t-au">audited</span>')+'</div></div>'+
-     '<button class="btn sm cyan" onclick="runAction(this,&#39;'+esc(a.capability).replace(/'/g,"\\'")+'&#39;)">Run</button></div>').join("")+'</div></div>';
+  window._WS=w;
+  const kindTag={"case.open":"opens case","case.review":"review case","case.resolve":"resolve case","model.status":"model status","model.drift":"drift report","bias.scan":"fairness scan","report.generate":"governance report","directive.issue":"audited directive","verify.check":"verification","approve.transaction":"transaction"};
+  html+='<div class="panel"><h3>Authorised actions</h3><div class="acts">'+(w.actions||[]).map((a,i)=>
+     '<div class="act"><div style="min-width:0"><div class="lab">'+esc(a.capability)+'</div><div class="tk">'+esc(a.verb||"")+' · <span style="color:var(--cyan-b)">'+esc(kindTag[a.kind]||a.kind)+'</span></div></div>'+
+     '<button class="btn sm cyan" onclick="openAction('+i+')">Run</button></div>').join("")+'</div></div>';
+  html+='<div class="panel"><h3>Recent activity</h3><div id="op-activity"><div class="muted small">Loading…</div></div></div>';
   m.innerHTML=html;
+  loadActivity();
 }
-async function runAction(btn,cap){ btn.disabled=true; const old=btn.textContent; btn.textContent="…";
-  try{ const r=await api("/workspace/action",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({capability:cap})});
-    toast("✓ "+esc(r.message||"Done"),true); loadWorkspace();
-  }catch(e){ toast("⚠ "+esc(e.message),false); btn.disabled=false; btn.textContent=old; } }
+const OPCOL={CASE:"#F59E0B",REGISTRY:"#00C2D4",DIRECTIVE:"#C9A84C",EVALUATE:"#10B981",REPORT:"#00E5FF",VERIFY:"#10B981",APPROVE:"#C9A84C",RECORD:"#8A9BB0"};
+async function loadActivity(){ const el=document.getElementById("op-activity"); if(!el)return;
+  let hist=[]; try{ hist=(await api("/workspace/actions?limit=20")).actions||[]; }catch(e){}
+  if(!el.isConnected)return;
+  if(!hist.length){ el.innerHTML='<div class="muted small">No actions yet — run an authorised action above and it will be logged here.</div>'; return; }
+  el.innerHTML=hist.map(a=>{ const c=OPCOL[a.op_type]||"#8A9BB0";
+    return '<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">'+
+      '<span style="font-family:monospace;font-size:9.5px;padding:2px 6px;border-radius:5px;border:1px solid '+c+'55;color:'+c+';white-space:nowrap;align-self:flex-start">'+esc(a.op_type)+'</span>'+
+      '<div style="min-width:0;flex:1"><div style="font-size:12.5px"><b>'+esc(a.capability)+'</b> <span class="muted" style="font-size:10px">· '+esc(a.status)+'</span></div>'+
+      '<div class="muted" style="font-size:11px;margin-top:2px">'+esc(a.summary||"")+'</div>'+
+      (a.result_ref&&a.result_ref!==a.ref?'<div class="mono" style="font-size:9.5px;color:'+c+';margin-top:2px">'+esc(a.result_ref)+'</div>':'')+'</div>'+
+      '<span class="muted" style="font-size:10px;white-space:nowrap">'+esc((a.at||"").slice(11,16))+'</span></div>'; }).join("");
+}
+let _OPTS=null;
+async function loadOpts(){ if(_OPTS)return _OPTS; try{ _OPTS=await api("/workspace/options"); }catch(e){ _OPTS={cases:[],models:[]}; } return _OPTS; }
+function field(label,ctrl){ return '<div style="margin-bottom:12px"><label style="display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">'+esc(label)+'</label>'+ctrl+'</div>'; }
+async function openAction(i){ const a=(window._WS&&window._WS.actions||[])[i]; if(!a)return;
+  if(!a.inputs||!a.inputs.length){ return execAction(a.capability,{}); }
+  const opts=await loadOpts();
+  const fields=a.inputs.map(inp=>{ const id="f_"+inp.name;
+    if(inp.type==="select"){ const src=(opts[inp.source]||[]); return field(inp.label,'<select id="'+id+'">'+(inp.optional?'<option value="">— any —</option>':'')+src.map(o=>'<option value="'+esc(o.value)+'">'+esc(o.label)+'</option>').join("")+'</select>'+(src.length?'':'<div class="muted" style="font-size:10px;margin-top:4px">none available</div>')); }
+    if(inp.type==="choice"){ return field(inp.label,'<select id="'+id+'">'+inp.options.map(o=>'<option>'+esc(o)+'</option>').join("")+'</select>'); }
+    if(inp.type==="bool"){ return '<div style="margin-bottom:12px"><label style="font-size:12px;color:var(--txt2)"><input type="checkbox" id="'+id+'" style="width:auto;margin-right:8px">'+esc(inp.label)+'</label></div>'; }
+    return field(inp.label,'<input id="'+id+'" type="text" placeholder="'+esc(inp.label)+'">');
+  }).join("");
+  showModal(a.capability,a.verb,fields,function(){ const params={}; a.inputs.forEach(inp=>{ const el=document.getElementById("f_"+inp.name); if(el) params[inp.name]=(inp.type==="bool")?el.checked:el.value; }); execAction(a.capability,params); });
+}
+async function execAction(cap,params){ closeModal();
+  try{ const r=await api("/workspace/action",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({capability:cap,params:params})});
+    if(r&&r.ok===false){ toast("⚠ "+esc(r.message),false); return; }
+    toast("✓ "+esc(r.message||"Done"),true); _OPTS=null; loadWorkspace();
+  }catch(e){ toast("⚠ "+esc(e.message),false); } }
+function showModal(title,subtitle,fieldsHtml,onSubmit){ const mo=document.getElementById("op-modal");
+  mo.querySelector(".mo-title").textContent=title; mo.querySelector(".mo-sub").textContent=subtitle||"";
+  mo.querySelector(".mo-body").innerHTML=fieldsHtml||'<div class="muted small">No inputs.</div>';
+  mo.querySelector(".mo-go").onclick=onSubmit; mo.style.display="flex"; }
+function closeModal(){ const mo=document.getElementById("op-modal"); if(mo)mo.style.display="none"; }
 (function(){var h=location.hash||"";var g=function(k){var m=h.match(new RegExp("[#&]"+k+"=([^&]+)"));return m?decodeURIComponent(m[1]):"";};if(g("sso")){localStorage.setItem("udoc_op_tok",g("sso"));if(g("api"))localStorage.setItem("udoc_op_api",g("api"));localStorage.setItem("udoc_op_email",g("email"));try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}})();
 if(token()){ try{ enterApp(); }catch(e){ logout(); } }
 </script>

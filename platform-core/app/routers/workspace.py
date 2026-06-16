@@ -12,6 +12,7 @@ from app.services import workspace as ws
 
 router = APIRouter(prefix="/workspace", tags=["Sovereign-Operator workspace"])
 
+
 @router.get("")
 def get_workspace(db: Session = Depends(get_db), user: dict = Depends(current_user)):
     p = ws.resolve_profile(db, user)
@@ -21,8 +22,23 @@ def get_workspace(db: Session = Depends(get_db), user: dict = Depends(current_us
         "actions": ws.actions_for(p),
     }
 
+
 class ActionReq(BaseModel):
     capability: str
+    params: dict | None = None
+
+
+@router.get("/options")
+def get_options(db: Session = Depends(get_db), user: dict = Depends(current_user)):
+    """Select-source data (open cases, AI systems) for parameterised actions."""
+    return ws.options(db, user)
+
+
+@router.get("/actions")
+def get_actions(limit: int = 30, db: Session = Depends(get_db), user: dict = Depends(current_user)):
+    """The caller's recent operator-action history (structured + inspectable)."""
+    return {"actions": ws.op_history(db, user.get("sub", ""), min(max(limit, 1), 100))}
+
 
 @router.post("/action")
 def post_action(body: ActionReq, db: Session = Depends(get_db), user: dict = Depends(current_user)):
@@ -30,4 +46,4 @@ def post_action(body: ActionReq, db: Session = Depends(get_db), user: dict = Dep
     allowed = {c.lower() for c in p["capabilities"]}
     if (body.capability or "").lower() not in allowed:
         raise HTTPException(403, f"capability '{body.capability}' is not authorised for the {p['title']} profile")
-    return ws.run_action(db, user, p, body.capability)
+    return ws.run_action(db, user, p, body.capability, body.params)
