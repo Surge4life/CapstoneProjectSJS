@@ -10,7 +10,7 @@ from app.routers import (health, auth, registry, decisions, audit, oversight,
                          intelligence, admin, analytics,
                          portal_student, portal_employer, portal_employee,
                          documents, saas, madiba_engage, ts_submit, access, policy, intel, tenants, admin_udoc,
-                         system_backup, users_admin, client_knowledge, workspace, sectors, rbac, portal_ops)
+                         system_backup, users_admin, client_knowledge, workspace, sectors, rbac, portal_ops, conformance)
 
 app = FastAPI(title=settings.app_name, version="1.0.0",
               description="Sovereign AI governance backend for the G.O.D.S ecosystem.")
@@ -45,6 +45,11 @@ def _startup():
         _ensure_bootstrap_admin()
     except Exception as e:
         print(f"[startup] bootstrap-admin skipped: {e}")
+    try:
+        from app.services.conformance_scanner import start_scheduler
+        start_scheduler()
+    except Exception as e:
+        print(f"[startup] conformance scanner not started: {e}")
 
 
 def _heal_schema():
@@ -153,5 +158,5 @@ for r in (health.router, auth.router, registry.router, decisions.router, audit.r
           portal_student.router, portal_employer.router, portal_employee.router,
           documents.router, saas.router, madiba_engage.router, ts_submit.router,
           access.router, policy.router, intel.router, tenants.router, admin_udoc.router,
-          system_backup.router, users_admin.router, client_knowledge.router, workspace.router, sectors.router, rbac.router, portal_ops.router):
+          system_backup.router, users_admin.router, client_knowledge.router, workspace.router, sectors.router, rbac.router, portal_ops.router, conformance.router):
     app.include_router(r)

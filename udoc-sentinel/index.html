@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UDOC · Sentinel — 24/7 Conformance</title>
+<style>
+:root{--navy:#0A1628;--navy2:#0D1F3C;--navy3:#112A52;--line:rgba(201,168,76,.18);--gold:#C9A84C;--gold-l:#E8C97A;
+--cyan:#00C2D4;--green:#10B981;--amber:#F59E0B;--red:#EF5350;--ink:#EAF0F8;--mut:#8FA3BE;--mut2:#5E7290}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:14.5px}
+button{font-family:inherit;cursor:pointer;border:0}.serif{font-family:Georgia,serif}.mono{font-family:ui-monospace,Menlo,monospace}
+#login{max-width:360px;margin:10vh auto;padding:0 22px;text-align:center}
+#login svg{width:76px;height:76px;margin-bottom:12px}#login h1{font-size:26px;letter-spacing:4px;color:var(--gold-l);margin:0}
+#login .sub{color:var(--mut);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:24px}
+.in{width:100%;background:var(--navy2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;color:var(--ink);font-size:15px;margin-bottom:10px}
+.in:focus{outline:none;border-color:var(--gold)}
+.btn{background:var(--gold);color:#1a1305;border-radius:10px;padding:11px 16px;font-weight:700;font-size:14px}
+.btn:active{background:var(--gold-l)}.btn.sm{padding:8px 13px;font-size:13px}.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gold-l);font-weight:600}
+.btn[disabled]{opacity:.5}.err{color:var(--red);font-size:13px;min-height:18px}
+#app{display:none}
+.top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:14px 22px;background:rgba(10,22,40,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top svg{width:28px;height:28px}.top .ttl{font-size:17px;font-weight:700;flex:1}.top .ttl b{color:var(--gold-l)}
+.wrap{max-width:1140px;margin:0 auto;padding:20px}
+.hb{display:flex;flex-wrap:wrap;align-items:center;gap:18px;background:linear-gradient(135deg,var(--navy2),var(--navy3));border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+.hb .pulse{width:13px;height:13px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(16,185,129,.6);animation:p 2s infinite}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}70%{box-shadow:0 0 0 12px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+.hb .lbl{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--mut)}.hb .v{font-size:15px;font-weight:600}
+.hb .grow{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:18px}
+.kpi{background:var(--navy2);border:1px solid var(--line);border-radius:13px;padding:14px}
+.kpi .v{font-size:26px;font-weight:700;line-height:1}.kpi .l{font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);margin-top:7px}
+.v.green{color:#5ee9bf}.v.amber{color:#fbc36a}.v.red{color:#ff8a85}.v.mut{color:var(--mut2)}.v.gold{color:var(--gold-l)}
+h3{font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin:22px 2px 9px}
+table{width:100%;border-collapse:collapse;background:var(--navy2);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:13px}
+th{background:var(--navy3);color:var(--gold-l);text-align:left;padding:9px 12px;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase}
+td{padding:9px 12px;border-top:1px solid rgba(255,255,255,.05);vertical-align:middle}
+.pill{font-size:10px;font-weight:700;letter-spacing:.4px;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.pill.ok{background:rgba(16,185,129,.16);color:#5ee9bf}.pill.warn{background:rgba(245,158,11,.16);color:#fbc36a}
+.pill.fail{background:rgba(239,83,80,.16);color:#ff8a85}.pill.stale{background:rgba(94,114,144,.2);color:#aab8cc}
+.muted{color:var(--mut)}.small{font-size:12px}.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#0a1c34;border:1px solid var(--gold);color:var(--gold-l);padding:11px 18px;border-radius:11px;font-size:13.5px;z-index:90}
+</style></head><body>
+<div id="login">
+  <svg viewBox="0 0 108 108"><circle cx="54" cy="54" r="30" fill="none" stroke="#C9A84C" stroke-width="3.4"/><circle cx="54" cy="50" r="10" fill="#C9A84C"/><path d="M49 57 L45.5 75 L62.5 75 L59 57 Z" fill="#C9A84C"/></svg>
+  <h1 class="serif">SENTINEL</h1><div class="sub">24/7 Conformance Watch</div>
+  <input class="in" id="li-email" placeholder="email"><input class="in" id="li-pass" type="password" placeholder="password">
+  <button class="btn" style="width:100%" id="li-btn" onclick="login()">Sign in</button><div class="err" id="li-err"></div>
+  <details style="margin-top:14px;color:var(--mut2);font-size:12px"><summary>API endpoint</summary><input class="in" id="li-api" style="margin-top:8px" placeholder="https://gods-platform-core.onrender.com"></details>
+</div>
+<div id="app">
+  <div class="top"><svg viewBox="0 0 108 108"><circle cx="54" cy="54" r="30" fill="none" stroke="#C9A84C" stroke-width="4"/><circle cx="54" cy="50" r="10.5" fill="#C9A84C"/><path d="M49 57 L45 75 L63 75 L59 57 Z" fill="#C9A84C"/></svg>
+    <div class="ttl serif"><b>UDOC Sentinel</b> · continuous AI-system conformance</div>
+    <button class="btn ghost sm" onclick="refresh()">Refresh</button><button class="btn sm" onclick="runScan()" id="scanBtn">▶ Run scan now</button></div>
+  <div class="wrap">
+    <div class="hb" id="hb"></div>
+    <div class="kpis" id="kpis"></div>
+    <h3>Registered systems — current conformance</h3><div id="systems"></div>
+    <h3>Recent findings</h3><div id="findings"></div>
+    <h3>Scan history — the auditable heartbeat log</h3><div id="scans"></div>
+  </div>
+</div>
+<script>
+const API_DEFAULT="https://gods-platform-core.onrender.com";
+const base=()=>localStorage.getItem("udoc_s_api")||API_DEFAULT, tok=()=>localStorage.getItem("udoc_s_tok")||"";
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
+async function api(p,o={}){const h=Object.assign({},o.headers||{});if(tok())h.Authorization="Bearer "+tok();
+  const r=await fetch(base()+p,Object.assign({},o,{headers:h}));const ct=r.headers.get("content-type")||"";
+  const b=ct.includes("json")?await r.json().catch(()=>null):await r.text();
+  if(r.status===401){logout();throw new Error("Session expired");}if(!r.ok)throw new Error((b&&b.detail)||("HTTP "+r.status));return b;}
+async function login(){const e=document.getElementById("li-err");e.textContent="";
+  const a=document.getElementById("li-api").value.trim();if(a)localStorage.setItem("udoc_s_api",a.replace(/\/+$/,""));
+  const btn=document.getElementById("li-btn");btn.disabled=true;
+  try{const f=new URLSearchParams();f.set("username",document.getElementById("li-email").value.trim().toLowerCase());f.set("password",document.getElementById("li-pass").value);
+    const r=await fetch(base()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
+    if(!r.ok)throw new Error(r.status===401?"Invalid credentials":"Login failed");
+    localStorage.setItem("udoc_s_tok",(await r.json()).access_token);enter();
+  }catch(err){e.textContent=err.message;}finally{btn.disabled=false;}}
+function logout(){localStorage.removeItem("udoc_s_tok");document.getElementById("app").style.display="none";document.getElementById("login").style.display="block";}
+function enter(){document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";refresh();}
+const PV={PASS:"ok",WARN:"warn",FAIL:"fail",STALE:"stale","—":"stale"};
+const SV={CONFORMANT:"ok",REVIEW:"warn",NON_CONFORMANT:"fail",UNVERIFIED:"stale"};
+async function refresh(){
+  let st;try{st=await api("/conformance/status");}catch(e){document.getElementById("hb").innerHTML='<span class="muted">'+esc(e.message)+'</span>';return;}
+  const live=st.scanner_enabled;
+  document.getElementById("hb").innerHTML=
+    '<span class="pulse" style="'+(live?'':'background:#5E7290;animation:none')+'"></span>'+
+    '<div><div class="lbl">Scanner</div><div class="v">'+(live?"ACTIVE — watching":"idle")+'</div></div>'+
+    '<div><div class="lbl">Cadence</div><div class="v">every '+esc(st.interval_min)+' min</div></div>'+
+    '<div><div class="lbl">Last scan</div><div class="v small">'+esc((st.last_scan_at||"—").replace("T"," ").slice(0,19))+'</div></div>'+
+    '<div><div class="lbl">Next scan</div><div class="v small">'+esc((st.next_scan_at||"—").replace("T"," ").slice(0,19))+'</div></div>'+
+    '<div class="grow"></div><div style="text-align:right"><div class="lbl">Coverage</div><div class="v" style="font-size:24px;color:var(--gold-l)">'+esc(st.coverage_pct!=null?st.coverage_pct+"%":"—")+'</div></div>';
+  const kpi=(v,l,c)=>'<div class="kpi"><div class="v '+(c||"")+'">'+(v==null?"—":v)+'</div><div class="l">'+l+'</div></div>';
+  document.getElementById("kpis").innerHTML=
+    kpi(st.registered_systems,"Registered","gold")+kpi(st.conformant,"Conformant","green")+
+    kpi(st.review,"Review","amber")+kpi(st.non_conformant,"Non-conformant","red")+kpi(st.unverified,"Unverified","mut");
+  // systems
+  let sys=[];try{sys=await api("/conformance/systems");}catch(e){}
+  document.getElementById("systems").innerHTML='<table><tr><th>System</th><th>Tier</th><th>Verdict</th><th>State</th><th>SVS</th><th>Status</th><th>Reason</th><th>Verified</th></tr>'+
+    (sys.length?sys.map(m=>'<tr><td><b>'+esc(m.name||m.model_id)+'</b><br><span class="mono muted small">'+esc(m.model_id)+'</span></td>'+
+      '<td class="small">'+esc(m.risk_tier||"")+'</td><td><span class="pill '+(PV[m.verdict]||"stale")+'">'+esc(m.verdict)+'</span></td>'+
+      '<td><span class="pill '+(SV[m.state]||"stale")+'">'+esc(m.state)+'</span></td><td class="mono">'+(m.last_svs!=null?esc(m.last_svs):"—")+'</td>'+
+      '<td class="small '+(m.status==="SUSPENDED"||m.status==="BLOCKED"?"":"muted")+'">'+esc(m.status)+'</td>'+
+      '<td class="small muted">'+esc((m.reason||"").slice(0,52))+'</td><td class="small muted">'+esc((m.verified_at||"—").replace("T"," ").slice(0,16))+'</td></tr>').join("")
+      :'<tr><td colspan="8" class="muted" style="text-align:center;padding:22px">No registered systems.</td></tr>')+'</table>';
+  // findings
+  let fn=[];try{fn=await api("/conformance/findings?limit=12");}catch(e){}
+  document.getElementById("findings").innerHTML='<table><tr><th>System</th><th>Verdict</th><th>Reason</th><th>Remediation</th><th>When</th></tr>'+
+    (fn.length?fn.map(f=>'<tr><td class="small"><b>'+esc(f.model_id)+'</b></td><td><span class="pill '+(PV[f.verdict]||"stale")+'">'+esc(f.verdict)+'</span></td>'+
+      '<td class="small">'+esc(f.reason)+'</td><td class="small muted">'+esc(f.remediation||"—")+'</td><td class="small muted">'+esc((f.at||"").replace("T"," ").slice(0,16))+'</td></tr>').join("")
+      :'<tr><td colspan="5" class="muted" style="text-align:center;padding:18px">No findings yet — run a scan.</td></tr>')+'</table>';
+  // scans
+  let sc=[];try{sc=await api("/conformance/scans?limit=8");}catch(e){}
+  document.getElementById("scans").innerHTML='<table><tr><th>Scan</th><th>Trigger</th><th>Systems</th><th>Conformant</th><th>Flagged</th><th>Coverage</th><th>Audit seq</th><th>When</th></tr>'+
+    (sc.length?sc.map(s=>'<tr><td class="mono small">'+esc(s.scan_ref)+'</td><td class="small">'+esc(s.trigger)+'</td><td>'+esc(s.total)+'</td>'+
+      '<td style="color:#5ee9bf">'+esc(s.conformant)+'</td><td style="color:#ff8a85">'+esc(s.non_conformant+s.review+s.unverified)+'</td>'+
+      '<td>'+esc(s.coverage_pct)+'%</td><td class="mono small muted">#'+esc(s.audit_seq)+'</td><td class="small muted">'+esc((s.at||"").replace("T"," ").slice(0,16))+'</td></tr>').join("")
+      :'<tr><td colspan="8" class="muted" style="text-align:center;padding:18px">No scans recorded.</td></tr>')+'</table>';
+}
+async function runScan(){const b=document.getElementById("scanBtn");b.disabled=true;b.textContent="Scanning…";
+  try{const r=await api("/conformance/scan",{method:"POST"});toast("✓ "+r.scan_ref+" — "+r.total+" systems · sealed #"+r.audit_seq);await refresh();}
+  catch(e){toast("✕ "+e.message);}finally{b.disabled=false;b.textContent="▶ Run scan now";}}
+if(tok())enter();
+</script></body></html>
