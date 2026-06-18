@@ -468,3 +468,38 @@ class ClientKBDoc(Base):
     added_by: Mapped[str] = mapped_column(String(120), default="")
     active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+
+
+# ─── UDOC: 24/7 continuous conformance scanner — scan runs + per-system findings ───
+
+class ConformanceScan(Base):
+    __tablename__ = "conformance_scans"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    scan_ref: Mapped[str] = mapped_column(String(40), unique=True, index=True)
+    trigger: Mapped[str] = mapped_column(String(20), default="SCHEDULED")
+    total: Mapped[int] = mapped_column(Integer, default=0)
+    conformant: Mapped[int] = mapped_column(Integer, default=0)
+    review: Mapped[int] = mapped_column(Integer, default=0)
+    non_conformant: Mapped[int] = mapped_column(Integer, default=0)
+    unverified: Mapped[int] = mapped_column(Integer, default=0)
+    coverage_pct: Mapped[float] = mapped_column(Float, default=0.0)
+    duration_ms: Mapped[float] = mapped_column(Float, default=0.0)
+    audit_seq: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
+
+
+class ConformanceFinding(Base):
+    __tablename__ = "conformance_findings"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    scan_ref: Mapped[str] = mapped_column(String(40), index=True)
+    model_id: Mapped[str] = mapped_column(String(80), index=True)
+    name: Mapped[str] = mapped_column(String(160), default="")
+    verdict: Mapped[str] = mapped_column(String(20))
+    state: Mapped[str] = mapped_column(String(20))
+    reason: Mapped[str] = mapped_column(String(240), default="")
+    last_svs: Mapped[float] = mapped_column(Float, default=0.0)
+    sovereign: Mapped[bool] = mapped_column(Boolean, default=True)
+    block_rate: Mapped[float] = mapped_column(Float, default=0.0)
+    recent_count: Mapped[int] = mapped_column(Integer, default=0)
+    remediation: Mapped[str] = mapped_column(String(120), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
