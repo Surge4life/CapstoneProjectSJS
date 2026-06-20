@@ -185,3 +185,34 @@ def start_scheduler():
         print(f"[conformance] 24/7 scanner started — every {INTERVAL_MIN} min")
     except Exception as e:
         print(f"[conformance] scheduler not started: {e}")
+
+
+# -- live control surface (pause / resume / cadence) --
+def set_enabled(on: bool) -> dict:
+    HEARTBEAT["enabled"] = bool(on)
+    if _scheduler is not None:
+        try:
+            if on:
+                _scheduler.resume_job("conformance_scan")
+                HEARTBEAT["next_scan_at"] = (_now() + timedelta(minutes=INTERVAL_MIN)).isoformat()
+            else:
+                _scheduler.pause_job("conformance_scan"); HEARTBEAT["next_scan_at"] = None
+        except Exception as e:
+            return {"enabled": HEARTBEAT["enabled"], "error": str(e)}
+    return {"enabled": HEARTBEAT["enabled"], "next_scan_at": HEARTBEAT["next_scan_at"]}
+
+
+def set_interval(minutes) -> dict:
+    global INTERVAL_MIN
+    try:
+        minutes = max(1, min(1440, int(minutes)))
+    except Exception:
+        return {"error": "interval_min must be an integer (minutes)"}
+    INTERVAL_MIN = minutes; HEARTBEAT["interval_min"] = minutes
+    if _scheduler is not None and HEARTBEAT["enabled"]:
+        try:
+            _scheduler.reschedule_job("conformance_scan", trigger="interval", minutes=minutes)
+            HEARTBEAT["next_scan_at"] = (_now() + timedelta(minutes=minutes)).isoformat()
+        except Exception as e:
+            return {"interval_min": minutes, "error": str(e)}
+    return {"interval_min": minutes, "next_scan_at": HEARTBEAT["next_scan_at"]}
