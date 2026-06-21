@@ -30,11 +30,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
-import time, hashlib
+import time, hashlib, json
 
+from sqlalchemy import select
 from app.db.session import get_db
+from app.db.models import EvaCertificate
 from app.core.dependencies import principal
-from app.services.governance_bridge import Evidence, evaluate, seal_payload
+from app.services.governance_bridge import Evidence, evaluate, seal_payload, verify_payload
 from app.services.audit_writer import append_audit
 
 router = APIRouter(prefix="/engine", tags=["UDOC sovereign engine"])
@@ -152,6 +154,7 @@ class EnforceReq(BaseModel):
     traceroute: float = 1.0
     dnssec: float = 1.0
     storage: float = 1.0
+    issue_certificate: bool = Field(False, description="On PERMIT, issue a signed EVA deployment certificate and return its ID.")
 
 class JurisdictionReq(BaseModel):
     source: str = Field("ZA-GP", description="Origin jurisdiction code.")
@@ -277,6 +280,32 @@ def enforce(req: EnforceReq, db: Session = Depends(get_db), user: dict = Depends
     seal = seal_payload(f"{req.action}:{req.model_id}:{v.decision}:{v.svs:.6f}:{relay}")
     stage(12, detail=f"seal {seal[:16]}…")
 
+    # Optional: issue a signed EVA deployment certificate on PERMIT (whitepaper §4.3). Uses the
+    # same EvaCertificate object + sovereign seal as /decisions, so engine-issued certificates
+    # verify through the same path. Only issued when the gate PERMITS (fail-closed: a DENY never
+    # produces a certificate).
+    certificate_id = None
+    if req.issue_certificate and verdict_word.startswith("PERMIT"):
+        dims_str = json.dumps(v.dimensions, sort_keys=True)
+        content_sha3 = hashlib.sha3_256(f"{req.model_id}|{req.action}|{dims_str}".encode()).hexdigest()
+        cert = EvaCertificate(
+            certificate_id="PENDING", model_id=req.model_id, tenant_pk=None,
+            decision=v.decision, composite_eva=v.composite_eva, dimensions_json=dims_str,
+            policy_pack="engine-gate", content_sha3=content_sha3,
+            policy_version="engine@14-stage-claim15", issued_at=datetime.now(timezone.utc))
+        try:
+            db.add(cert); db.commit(); db.refresh(cert)
+            # Seal over the DB-PERSISTED timestamp so verification recomputes the same payload.
+            issued = cert.issued_at.isoformat()
+            cert_payload = f"{req.model_id}|{v.composite_eva}|{v.decision}|{issued}|{content_sha3}"
+            certificate_id = "EVA-" + hashlib.sha3_256(cert_payload.encode()).hexdigest()[:12].upper()
+            cert.certificate_id = certificate_id
+            cert.seal = seal_payload(cert_payload)
+            cert.merkle_leaf = hashlib.sha3_256((seal or cert_payload).encode()).hexdigest()
+            db.commit()
+        except Exception:
+            db.rollback(); certificate_id = None
+
     # Stage 14: relay control.
     stage(13, "OPEN" if verdict_word.startswith("PERMIT") else "DISCONNECT", relay)
 
@@ -297,11 +326,38 @@ def enforce(req: EnforceReq, db: Session = Depends(get_db), user: dict = Depends
         },
         "block_reasons": v.block_reasons,
         "seal_hmac_sha256": seal,
+        "certificate_id": certificate_id,
         "audit_ref": audit_ref,
         "stage_trace": trace,
         "engine_latency_ms": latency_ms,
         "note": "Software enforcement; FPGA relay & HSM emulated. Execution is only permitted "
                 "when g_sov_verify is true (fail-closed).",
+        "generated_at": _now(),
+    }
+
+@router.get("/certificate/{cid}/verify")
+def engine_certificate_verify(cid: str, db: Session = Depends(get_db),
+                              user: dict = Depends(principal)):
+    """Verify a signed EVA deployment certificate issued by the gate (or by /decisions).
+    Recomputes the sealed payload and checks it against the stored sovereign seal."""
+    c = db.execute(select(EvaCertificate).where(EvaCertificate.certificate_id == cid)).scalar_one_or_none()
+    if not c:
+        raise HTTPException(404, f"certificate {cid} not found")
+    payload = f"{c.model_id}|{c.composite_eva}|{c.decision}|{c.issued_at.isoformat()}|{c.content_sha3}"
+    return {
+        "certificate_id": c.certificate_id,
+        "valid": verify_payload(payload, c.seal),
+        "model_id": c.model_id,
+        "decision": c.decision,
+        "composite_eva": c.composite_eva,
+        "dimensions": json.loads(c.dimensions_json or "{}"),
+        "policy_pack": c.policy_pack,
+        "policy_version": c.policy_version,
+        "content_sha3": c.content_sha3,
+        "merkle_leaf": c.merkle_leaf,
+        "issued_at": c.issued_at.isoformat() if c.issued_at else None,
+        "signature_alg": "PQC/Dilithium-ref (HMAC-SHA256 emulated)",
+        "note": "Real SHA-3 content hash + sovereign seal; PQC signature is the production path.",
         "generated_at": _now(),
     }
 
