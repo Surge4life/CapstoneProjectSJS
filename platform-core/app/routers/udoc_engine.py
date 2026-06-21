@@ -94,6 +94,36 @@ DEGRADED_MODES = [
     {"mode": "M4-FAIL_CLOSED",      "trigger": "Unrecoverable / multi-plane fault","policy": "Full lockdown; all relays DISCONNECT; G_lock_out; admin recovery required."},
 ]
 
+# ── 13-state FSM transition table (Part 6.1) — deterministic, fail-closed ──
+# Module-level live state (best-effort; not persisted across restart/workers — emulated).
+_FSM = {"state": "S0", "mode": "M0-NOMINAL"}
+
+# Valid transitions {from_state: {event: to_state}}. Any event not listed for the current
+# state is treated as a fault: the machine fails closed toward DEGRADED/LOCK_OUT — never
+# toward a more-permissive state.
+TRANSITIONS = {
+    "S0":  {"request": "S1"},
+    "S1":  {"verify_start": "S2"},
+    "S2":  {"verify_ok": "S3", "verify_fault": "S11"},
+    "S3":  {"scored": "S4"},
+    "S4":  {"sov_ok": "S6", "review": "S7", "sov_breach": "S5"},
+    "S5":  {"override_fired": "S8"},
+    "S6":  {"complete": "S0"},
+    "S7":  {"hitl_resolve": "S0"},
+    "S8":  {"halted": "S9"},
+    "S9":  {"recover": "S12"},
+    "S10": {"admin_unlock": "S12"},     # locked-out only exits via admin
+    "S11": {"recover": "S12", "fail_closed": "S10"},
+    "S12": {"nominal": "S0"},
+}
+# Fault events that also drive a degraded operating mode.
+FAULT_MODE = {"verify_fault": "M1-TELEMETRY_LOSS", "telemetry_fault": "M1-TELEMETRY_LOSS",
+              "sov_breach": "M2-SOVEREIGN_ISOLATE", "key_fault": "M3-KEY_CUSTODY",
+              "fail_closed": "M4-FAIL_CLOSED"}
+_STATE_NAME = {s["code"]: s["state"] for s in FSM_STATES}
+# Terminal states that cannot be left except by their one explicit recovery/unlock event.
+_LOCKED_STATES = {"S10"}
+
 # Federated mesh treaty logic (Emb. 23 & 30). 1.0 = clean signal expected.
 JURISDICTIONS = {
     "ZA": "South Africa (national sovereign)", "ZA-GP": "Gauteng", "ZA-WC": "Western Cape",
@@ -128,6 +158,10 @@ class JurisdictionReq(BaseModel):
     destination: str = Field("ZA", description="Destination jurisdiction code.")
     data_class: str = Field("PERSONAL", description="PUBLIC | INTERNAL | PERSONAL | SPECIAL | STATE")
     action: str = Field("process", description="process | store | transit | replicate")
+
+class StateTransitionReq(BaseModel):
+    event: str = Field(..., description="FSM event: request, verify_start, verify_ok, verify_fault, scored, sov_ok, sov_breach, review, override_fired, complete, hitl_resolve, halted, recover, admin_unlock, nominal, fail_closed, telemetry_fault, key_fault.")
+    from_state: str | None = Field(None, description="Override the from-state (default: the engine's live state).")
 
 # ───────────────────────── helpers ─────────────────────────
 
@@ -274,16 +308,66 @@ def enforce(req: EnforceReq, db: Session = Depends(get_db), user: dict = Depends
 @router.get("/state")
 def engine_state():
     """Public: the 13-state fail-closed FSM (Part 6.1), the 5 degraded modes (Part 6.2),
-    and the current operating state of this engine instance."""
+    and the current LIVE operating state of this engine instance."""
     return {
-        "current_state": "S0",
-        "current_mode": "M0-NOMINAL",
-        "armed": True,
+        "current_state": _FSM["state"],
+        "current_state_name": _STATE_NAME.get(_FSM["state"], _FSM["state"]),
+        "current_mode": _FSM["mode"],
+        "armed": _FSM["state"] not in _LOCKED_STATES,
+        "locked_out": _FSM["state"] in _LOCKED_STATES,
         "fail_closed_fsm": {"count": len(FSM_STATES), "states": FSM_STATES},
         "degraded_modes": DEGRADED_MODES,
         "opcodes": OPCODES,
         "note": "Fail-closed by construction: any unrecoverable fault transitions to "
-                "M4-FAIL_CLOSED / S10 with all relays DISCONNECT.",
+                "M4-FAIL_CLOSED / S10 with all relays DISCONNECT. Live state is in-memory "
+                "(emulated; not persisted across restart/workers).",
+        "generated_at": _now(),
+    }
+
+@router.post("/state/transition")
+def state_transition(req: StateTransitionReq, db: Session = Depends(get_db),
+                     user: dict = Depends(principal)):
+    """Drive the fail-closed FSM. A valid event for the current state advances normally; any
+    unrecognised event for that state is a FAULT and the machine fails closed toward DEGRADED
+    (or to G_LOCK_OUT from DEGRADED). Locked-out states only exit via their explicit unlock
+    event. Every transition is written to the StayChain audit chain."""
+    frm = (req.from_state or _FSM["state"]).upper()
+    if frm not in TRANSITIONS:
+        raise HTTPException(400, f"unknown from_state '{frm}'; valid: {list(TRANSITIONS)}")
+    event = req.event.strip()
+
+    allowed = TRANSITIONS[frm]
+    if event in allowed:
+        to = allowed[event]
+        fail_closed = event in FAULT_MODE
+    else:
+        # FAULT: fail closed. From a locked state we stay locked; otherwise go DEGRADED.
+        to = frm if frm in _LOCKED_STATES else "S11"
+        fail_closed = True
+
+    mode = FAULT_MODE.get(event, _FSM["mode"])
+    if to == "S0":
+        mode = "M0-NOMINAL"          # full recovery clears the degraded mode
+
+    _FSM["state"], _FSM["mode"] = to, mode
+
+    ref = append_audit(db, "ENGINE_FSM_TRANSITION", {
+        "from": frm, "event": event, "to": to, "mode": mode, "fail_closed": fail_closed,
+        "actor": user.get("email") if isinstance(user, dict) else str(user),
+    }, classification="INTERNAL", actor_class="SYSTEM")
+    audit_ref = getattr(ref, "seq", None) or getattr(ref, "id", None)
+
+    return {
+        "from_state": frm, "from_name": _STATE_NAME.get(frm, frm),
+        "event": event,
+        "to_state": to, "to_name": _STATE_NAME.get(to, to),
+        "valid_transition": event in allowed,
+        "fail_closed": fail_closed,
+        "current_mode": mode,
+        "locked_out": to in _LOCKED_STATES,
+        "armed": to not in _LOCKED_STATES,
+        "audit_ref": audit_ref,
+        "note": "Unrecognised events fail closed to DEGRADED (S11); from S10 they stay locked.",
         "generated_at": _now(),
     }
 
