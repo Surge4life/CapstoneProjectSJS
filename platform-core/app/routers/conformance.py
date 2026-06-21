@@ -1,5 +1,5 @@
 """24/7 Continuous Conformance API — heartbeat, trigger, findings, per-system state, scan log."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body, HTTPException
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from app.core.dependencies import current_user, require_role
@@ -68,3 +68,13 @@ def scans(limit: int = 30, db: Session = Depends(get_db), user: dict = Depends(c
              "review": r.review, "non_conformant": r.non_conformant, "unverified": r.unverified,
              "coverage_pct": r.coverage_pct, "duration_ms": r.duration_ms, "audit_seq": r.audit_seq,
              "at": r.created_at.isoformat() if r.created_at else None} for r in rows]
+
+
+@router.post("/control", summary="Control the 24/7 scanner: scan | pause | resume | set_interval")
+def control(payload: dict = Body(...), db: Session = Depends(get_db), user: dict = Depends(require_role("admin","exec"))):
+    a = (payload.get("action") or "").lower()
+    if a == "scan": return {"action": "scan", **cs.scan_all(db, trigger="MANUAL")}
+    if a == "pause": return {"action": "pause", **cs.set_enabled(False)}
+    if a == "resume": return {"action": "resume", **cs.set_enabled(True)}
+    if a == "set_interval": return {"action": "set_interval", **cs.set_interval(payload.get("interval_min", 15))}
+    raise HTTPException(400, "action must be scan|pause|resume|set_interval")
