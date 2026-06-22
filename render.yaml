@@ -8,11 +8,11 @@
 #   `fromDatabase` block and set DATABASE_URL to an external DSN (e.g. a Neon/Supabase free DB,
 #   which does not auto-delete). Either way, preserve GODS_SOV_KEY or past seals won't verify.
 
-databases:
-  - name: gods-db
-    plan: free                 # ⚠ free tier is deleted ~30 days after creation; upgrade for permanence
-    region: oregon
-    postgresMajorVersion: "18"
+# databases:                      # gods-db REMOVED — DATABASE_URL now points at an EXTERNAL Neon DB that never expires.
+#   - name: gods-db               #   This Blueprint no longer provisions a Render free Postgres (which is deleted ~30 days
+#     plan: free                  #   after creation). Delete the orphaned gods-db in the Render dashboard once Neon is live.
+#     region: oregon
+#     postgresMajorVersion: "18"
 
 services:
   # ---- UDOC governance API (FastAPI) — the core; ALL data lives in gods-db ----
@@ -31,10 +31,9 @@ services:
         value: production
       - key: GODS_SOV_KEY        # sovereign signing key — Render generates it ONCE and keeps it.
         generateValue: true      #   PRESERVE this value across redeploys or certificate/version seals stop verifying.
-      - key: DATABASE_URL        # auto-wired from gods-db; re-populates automatically if the DB is recreated.
-        fromDatabase:
-          name: gods-db
-          property: connectionString
+      - key: DATABASE_URL        # EXTERNAL Neon pooled DSN — set manually, never overwritten by the Blueprint.
+        sync: false              #   Render dashboard → gods-platform-core → Environment → DATABASE_URL = Neon connection string.
+                                 #   App normalises postgresql:// → postgresql+psycopg:// automatically (no code change).
       # GODS_BOOTSTRAP_PASSWORD (optional) overrides the empty-database bootstrap admin password.
       # RENDER_GIT_COMMIT / RENDER_GIT_BRANCH / RENDER_RELEASE_CREATED_AT are injected by Render
       # and surfaced at GET /version so the mobile app can detect new deploys.
