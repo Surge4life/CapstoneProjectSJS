@@ -6,15 +6,24 @@ from app.db.session import get_db
 from app.db.models import User
 from app.core.security import verify_password, hash_password, create_token
 from app.core.dependencies import current_user
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, field_validator
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 class RegisterReq(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     role: str = "viewer"
     division: str = "GODS"
+
+    @field_validator("email")
+    @classmethod
+    def _normalise_email(cls, v: str) -> str:
+        v = (v or "").strip().lower()
+        local, _, domain = v.partition("@")
+        if not local or "@" in domain or "." not in domain:
+            raise ValueError("invalid email address")
+        return v
 
 @router.post("/register")
 def register(req: RegisterReq, db: Session = Depends(get_db)):
