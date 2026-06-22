@@ -1,19 +1,17 @@
-"""Auth: bcrypt password hashing + JWT issue/verify. Real, not stubbed."""
+"""Auth: bcrypt password hashing + JWT issue/verify. Uses bcrypt directly (passlib breaks on bcrypt>=4.1)."""
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import jwt, JWTError
-from passlib.context import CryptContext
+import bcrypt
 from app.core.config import settings
-
-_pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(p: str) -> str:
-    return _pwd.hash(p)
+    return bcrypt.hashpw(p.encode(), bcrypt.gensalt()).decode()
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return _pwd.verify(plain, hashed)
+    return bcrypt.checkpw(plain.encode(), hashed.encode())
 
 
 def create_token(subject: str, role: str, extra: Optional[dict] = None) -> str:
