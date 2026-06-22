@@ -1,17 +1,25 @@
-"""Auth: bcrypt password hashing + JWT issue/verify. Uses bcrypt directly (passlib breaks on bcrypt>=4.1)."""
+"""Auth: bcrypt password hashing + JWT issue/verify. Real, not stubbed."""
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import jwt, JWTError
 import bcrypt
 from app.core.config import settings
 
+# Password hashing uses bcrypt DIRECTLY (not via passlib) so it is immune to the
+# passlib<->bcrypt version clash: passlib 1.7.4 throws on bcrypt >= 4.1
+# ("module 'bcrypt' has no attribute '__about__'"), which 500s every login.
+# bcrypt.checkpw still verifies existing passlib-created $2b$ hashes unchanged.
 
 def hash_password(p: str) -> str:
-    return bcrypt.hashpw(p.encode(), bcrypt.gensalt()).decode()
+    # bcrypt has a hard 72-byte limit on the input; truncate defensively.
+    return bcrypt.hashpw(p.encode("utf-8")[:72], bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return bcrypt.checkpw(plain.encode(), hashed.encode())
+    try:
+        return bcrypt.checkpw(plain.encode("utf-8")[:72], hashed.encode("utf-8"))
+    except Exception:
+        return False
 
 
 def create_token(subject: str, role: str, extra: Optional[dict] = None) -> str:
