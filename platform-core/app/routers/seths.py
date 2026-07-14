@@ -12,7 +12,7 @@ import uuid
 router = APIRouter(prefix="/seths", tags=["SETHS"])
 
 class EnrolReq(BaseModel):
-    qualification: str = "Software Developer 118707"
+    qualification: str = "Digital Operations & AI Literacy"
     nqf_level: int = 5
     count: int = 1
 

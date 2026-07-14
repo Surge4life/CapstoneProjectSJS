@@ -83,7 +83,7 @@ SVS = {"name": "Sovereignty Verification Score (SVS)",
 
 DIVISIONS = [
     {"key": "UDOC", "name": "UDOC", "role": "Sovereign AI-governance SaaS — the technical & IP centrepiece."},
-    {"key": "SETHS", "name": "S.E.T.H.S", "role": "Workforce reintegration programme (SAQA 118707, NQF5)."},
+    {"key": "SETHS", "name": "S.E.T.H.S", "role": "Workforce reintegration programme (SAQA-aligned unit standards pending GBS-SETHS-specific registration)."},
     {"key": "TS", "name": "T.S Industries", "role": "Production & infrastructure SPVs."},
     {"key": "MADIBA", "name": "M.A.D.I.B.A Capital", "role": "Impact investment & capital recycling (>50% per Constitutional Pillar 2)."},
 ]

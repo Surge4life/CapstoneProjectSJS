@@ -66,3 +66,7 @@ tamper). The demo issues a signed APPROVE token and shows a tamper attempt faili
 Production path: re-implemented in Rust (#![no_std]) → eBPF/XDP kernel enforcement → FPGA
 fail-closed interrupts, per the UDOC Sovereign Data Plane spec. State rule:
 Σ(n+1) = H(Σ(n) ‖ F_EVA(x) ‖ K_SOV).
+
+GIS (`/gis`) issues its decisions *via* this orchestrator, not around it — GIS is a new
+decision-origin layer, not a second audit/orchestration path. See
+`governance-engines/gis/README.md`.

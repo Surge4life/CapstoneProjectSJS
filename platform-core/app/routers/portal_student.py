@@ -14,7 +14,7 @@ router = APIRouter(prefix="/portal/student", tags=["Portal · Student"])
 class StudentReg(BaseModel):
     full_name: str
     email: EmailStr
-    qualification: str = "Software Developer 118707"
+    qualification: str = "Digital Operations & AI Literacy"
     nqf_level: int = 5
 
 @router.post("/register")

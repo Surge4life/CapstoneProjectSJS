@@ -57,3 +57,7 @@ HMAC seal over its canonical score vector; `verifyEVASeal()` confirms it in cons
 and detects any forgery. In production the key is TPM-injected and the seal becomes a
 BLAKE3 keyed hash in the Rust/eBPF data plane. Run the file to see a sealed APPROVE and a
 detected forgery.
+
+**Superseded, not deleted, by GIS (`/gis`).** Per GBS-SETHS v2.0, the G.O.D.S. Intelligence
+System is now the institution-facing AI backbone; EVA's 6-D scoring remains available as one
+input a GIS decision can draw on. See `governance-engines/gis/README.md`.

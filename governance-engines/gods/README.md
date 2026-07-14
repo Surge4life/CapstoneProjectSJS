@@ -69,4 +69,8 @@ EVA ✅ → UDOC ✅ → **G.O.D.S ✅**
 The EVA engine (`/eva`) is the scoring core. The UDOC orchestrator (`/udoc`)
 is the non-bypassable governance pipeline that wraps it. This G.O.D.S platform
 (`/gods`) is the institution that the UDOC division sits inside — the closed
-economic loop that funds human reintegration and compounds it.
+economic loop that funds human reintegration and compounds it. GIS (`/gis`)
+is the newer, institution-facing AI backbone superseding EVA per GBS-SETHS
+v2.0 — it issues decisions via UDOC, drawing on EVA's scoring where relevant,
+and is what actually governs S.E.T.H.S. participant journeys, franchise
+nodes, and Skills Passports. See `governance-engines/gis/README.md`.

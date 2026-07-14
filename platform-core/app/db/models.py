@@ -77,10 +77,20 @@ class Learner(Base):
     __tablename__ = "seths_learners"
     id: Mapped[int] = mapped_column(primary_key=True)
     ref: Mapped[str] = mapped_column(String(40), unique=True, index=True)
-    qualification: Mapped[str] = mapped_column(String(120), default="Software Developer 118707")
+    qualification: Mapped[str] = mapped_column(String(120), default="Digital Operations & AI Literacy")
     nqf_level: Mapped[int] = mapped_column(Integer, default=5)
     status: Mapped[str] = mapped_column(String(20), default="ENROLLED")  # ENROLLED|COMPLETED|PLACED
     monthly_value: Mapped[float] = mapped_column(Float, default=0.0)
+    # --- CET/CTE + cohort fields added for GBS-SETHS alignment (Document 00 Part III §7.1, §9) ---
+    # Additive only — existing `status` above is untouched and still drives the SETHS/TS/MADIBA
+    # closed-loop simulation exactly as before. These fields add the institution-specific depth
+    # (cohort, stream, CET/CTE stage) that "status" alone does not capture.
+    cohort: Mapped[str] = mapped_column(String(4), default="COHORT_1")
+    # COHORT_1 Reintegration | COHORT_2 AI Displacement | COHORT_3 Workforce Evolution | COHORT_4 Future Workforce
+    stream: Mapped[str] = mapped_column(String(24), default="DIGITAL_OPERATIONS")
+    # CONSTRUCTION | DIGITAL_OPERATIONS | AGRICULTURE | COMMUNITY_HEALTH — Document 00 vocational streams
+    cetcte_stage: Mapped[str] = mapped_column(String(24), default="STABILISATION")
+    self_affirmation_json: Mapped[str] = mapped_column(Text, default="{}")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 
@@ -89,7 +99,14 @@ class TSProject(Base):
     __tablename__ = "ts_projects"
     id: Mapped[int] = mapped_column(primary_key=True)
     spv_id: Mapped[str] = mapped_column(String(60), unique=True, index=True)
-    sector: Mapped[str] = mapped_column(String(30))  # ENERGY|HOUSING|AGRITECH|WATER|LOGISTICS
+    sector: Mapped[str] = mapped_column(String(30))  # legacy free-text field, kept for backward compatibility
+    # --- corrected + extended for GBS-SETHS alignment (Document 00 Part I §1.2 note; T.S. Industries =
+    # "The Technological Sector", 7 subsidiaries). The old sector comment listed 5 items including
+    # "HOUSING", which is not one of the seven documented subsidiaries — corrected below, `sector` is
+    # left untouched for any existing caller/data, `subsidiary` is the new, GBS-aligned, authoritative field.
+    subsidiary: Mapped[str] = mapped_column(String(24), default="ENERGY")
+    # ENERGY|CONSTRUCTION|AGRITECH|WATER|DIGITAL_INFRASTRUCTURE|MANUFACTURING|LOGISTICS
+    equity_pct: Mapped[float] = mapped_column(Float, default=0.30)  # SPV co-ownership, 0.20-0.60 per M.A.D.I.B.A model
     name: Mapped[str] = mapped_column(String(160))
     workers_deployed: Mapped[int] = mapped_column(Integer, default=0)
     monthly_revenue: Mapped[float] = mapped_column(Float, default=0.0)
@@ -98,7 +115,36 @@ class TSProject(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 
+class TSWorkerAssignment(Base):
+    """Real FK link closing the SETHS→TS loop: a specific PLACED Learner
+    assigned to a specific TSProject, rather than two independent counters.
+    workers_deployed on TSProject remains as a fast aggregate; this table is
+    the source of truth it is derived from."""
+    __tablename__ = "ts_worker_assignments"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ts_project_pk: Mapped[int] = mapped_column(ForeignKey("ts_projects.id"), index=True)
+    learner_pk: Mapped[int] = mapped_column(ForeignKey("seths_learners.id"), index=True)
+    role: Mapped[str] = mapped_column(String(80), default="")
+    monthly_wage: Mapped[float] = mapped_column(Float, default=0.0)
+    assigned_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    ts_project: Mapped["TSProject"] = relationship()
+    learner: Mapped["Learner"] = relationship()
+
+
 # ─── MADIBA: capital allocations (the loop-closer) ───
+class InstitutionalMilestone(Base):
+    """Manually-recorded institutional milestones that have no natural
+    transactional trace in this schema — e.g. a signed government Letter of
+    Intent. Used by the M.A.D.I.B.A Series A trigger check (Document 00 §13;
+    live-site-confirmed 4 conditions) alongside real DB-derived signals."""
+    __tablename__ = "institutional_milestones"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    key: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    achieved: Mapped[bool] = mapped_column(Boolean, default=False)
+    evidence_note: Mapped[str] = mapped_column(Text, default="")
+    achieved_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+
+
 class CapitalCycle(Base):
     __tablename__ = "madiba_cycles"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -167,7 +213,7 @@ class Student(Base):
     student_ref: Mapped[str] = mapped_column(String(40), unique=True, index=True)
     full_name: Mapped[str] = mapped_column(String(160))
     email: Mapped[str] = mapped_column(String(255), index=True)
-    qualification: Mapped[str] = mapped_column(String(120), default="Software Developer 118707")
+    qualification: Mapped[str] = mapped_column(String(120), default="Digital Operations & AI Literacy")
     nqf_level: Mapped[int] = mapped_column(Integer, default=5)
     progress_pct: Mapped[float] = mapped_column(Float, default=0.0)
     status: Mapped[str] = mapped_column(String(20), default="ENROLLED")  # ENROLLED|IN_PROGRESS|COMPLETED|PLACED
@@ -502,4 +548,131 @@ class ConformanceFinding(Base):
     block_rate: Mapped[float] = mapped_column(Float, default=0.0)
     recent_count: Mapped[int] = mapped_column(Integer, default=0)
     remediation: Mapped[str] = mapped_column(String(120), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# G.O.D.S. Intelligence System (GIS) — added to align the live backend with
+# GBS-SETHS v2.0 / the GBS-SETHS Institutional Readiness Package (Document 00
+# §3, Document 04, Document 06). GIS supersedes EVA as the institutional AI
+# backbone; its decisions are issued through this same audit-writer/AuditRef
+# chain that EVA/UDOC already use (see app/services/gis_engine.py).
+#
+# Naming bridge (documented, not silently resolved): the GBS-SETHS documents
+# and the standalone gods-intelligence-system reference package use
+# "Participant". This backend's existing S.E.T.H.S. table is `Learner`
+# (seths_learners). Rather than introduce a second, competing participant
+# concept, GIS decisions and Skills Passports here reference `Learner.id`
+# directly — "Participant" (institutional docs) == "Learner" (this schema).
+# ═══════════════════════════════════════════════════════════════════════════
+
+class GISDecision(Base):
+    """A GIS decision: constitutional-pillar-gated, fail-closed by default.
+    Mirrors governance-engines/gis/src/services/gis.service.ts's GISDecision
+    record exactly (decision_type enum, pillar_checks, fail_closed) so the TS
+    reference implementation and this live Python engine stay traceable to
+    each other."""
+    __tablename__ = "gis_decisions"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    decision_ref: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    decision_type: Mapped[str] = mapped_column(String(40))
+    # CAREER_NAVIGATION|CERTIFICATION_VERIFICATION|EMPLOYMENT_VERIFICATION|COMPLIANCE_CHECK|
+    # GOVERNANCE_DECISION|OUTCOME_AUDIT|FRANCHISE_INTELLIGENCE|AI_ADAPTATION|RESEARCH_INSIGHT|MENTOR_MATCHING
+    domain: Mapped[str] = mapped_column(String(40), default="SETHS")
+    learner_pk: Mapped[int] = mapped_column(ForeignKey("seths_learners.id"), nullable=True, index=True)
+    input_json: Mapped[str] = mapped_column(Text, default="{}")
+    output_json: Mapped[str] = mapped_column(Text, default="{}")
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    reasoning: Mapped[str] = mapped_column(Text, default="")
+    pillar_checks_json: Mapped[str] = mapped_column(Text, default="[]")
+    all_pillars_passed: Mapped[bool] = mapped_column(Boolean, default=False)
+    governance_gate: Mapped[bool] = mapped_column(Boolean, default=False)
+    blocked: Mapped[bool] = mapped_column(Boolean, default=False)
+    fail_closed: Mapped[bool] = mapped_column(Boolean, default=True)
+    cob_reviewed: Mapped[bool] = mapped_column(Boolean, default=False)
+    cob_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    audit_seq: Mapped[int] = mapped_column(Integer, default=0)  # links to AuditRef.seq
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
+    learner: Mapped["Learner"] = relationship()
+
+
+class Certification(Base):
+    """Bronze/Silver/Gold/Platinum/Specialist tiers per Document 00 §11.1."""
+    __tablename__ = "gis_certifications"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    cert_ref: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    learner_pk: Mapped[int] = mapped_column(ForeignKey("seths_learners.id"), index=True)
+    tier: Mapped[str] = mapped_column(String(20))  # BRONZE|SILVER|GOLD|PLATINUM|SPECIALIST
+    name: Mapped[str] = mapped_column(String(160))
+    stream: Mapped[str] = mapped_column(String(4), default="")  # A|B|C|D — Document 00 vocational streams
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    gis_decision_ref: Mapped[str] = mapped_column(String(60), default="")
+    issued_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    learner: Mapped["Learner"] = relationship()
+
+
+class SkillsPassport(Base):
+    """One per Learner/Participant — Document 04, Skills Passport Technical Standard."""
+    __tablename__ = "gis_skills_passports"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    learner_pk: Mapped[int] = mapped_column(ForeignKey("seths_learners.id"), unique=True, index=True)
+    ai_readiness_stage: Mapped[int] = mapped_column(Integer, default=1)  # 1-5, Document 00 §10
+    ai_readiness_json: Mapped[str] = mapped_column(Text, default="{}")
+    skills_json: Mapped[str] = mapped_column(Text, default="[]")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    verified_hash: Mapped[str] = mapped_column(String(64), default="")
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    learner: Mapped["Learner"] = relationship()
+
+
+class WorldPledge(Base):
+    """The pledge register — d-24 World Pledge Document; pledge-before-capital strategy."""
+    __tablename__ = "gis_world_pledges"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    pledge_ref: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    first_name: Mapped[str] = mapped_column(String(80))
+    last_name: Mapped[str] = mapped_column(String(80))
+    email: Mapped[str] = mapped_column(String(255), index=True)
+    country: Mapped[str] = mapped_column(String(80), default="South Africa")
+    role_interest: Mapped[str] = mapped_column(String(160), default="")
+    message: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
+
+
+class FranchiseNode(Base):
+    """The five-layer GBS franchise architecture (Document 00 Part II §6;
+    Document 03, Franchise Licensing Handbook) as real, queryable data —
+    not just documentation. Layer 1 (GBS Global / G.O.D.S Holdings itself)
+    is not a row here; it is the implicit root every node licenses from."""
+    __tablename__ = "gbs_franchise_nodes"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    node_ref: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    layer: Mapped[int] = mapped_column(Integer)  # 2 National | 3 Regional | 4 Delivery Operator | 5 Employer Ecosystem
+    name: Mapped[str] = mapped_column(String(160))
+    territory: Mapped[str] = mapped_column(String(120), default="South Africa")
+    parent_node_ref: Mapped[str] = mapped_column(String(60), default="")  # "" == licensed directly from Layer 1
+    licence_status: Mapped[str] = mapped_column(String(20), default="PENDING")
+    # PENDING|ACTIVE|PROBATION|SUSPENDED|REVOKED — Document 03 §5
+    compliance_score: Mapped[float] = mapped_column(Float, default=1.0)  # 0.0-1.0, Document 06 §4.3 risk scoring
+    curriculum_fidelity_pct: Mapped[float] = mapped_column(Float, default=1.0)  # Document 00 §11.2, min 0.90
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)
+
+
+class ComplianceViolation(Base):
+    """Node/employer-level violations — Document 08, Risk & Failure Framework;
+    Document 05 §6.3, the Absorption Commitment Clause."""
+    __tablename__ = "gis_compliance_violations"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    violation_ref: Mapped[str] = mapped_column(String(60), unique=True, index=True)
+    employer_id: Mapped[str] = mapped_column(String(80), default="")
+    franchise_node_id: Mapped[str] = mapped_column(String(80), default="")
+    violation_type: Mapped[str] = mapped_column(String(40))
+    # OUTCOME_DATA_MANIPULATION|LEARNERSHIP_CREDIT_ABUSE|CONSTITUTIONAL_VIOLATION|
+    # ABSORPTION_COMMITMENT_BREACH|GOVERNANCE_VIOLATION|ANTI_CORRUPTION_VIOLATION|
+    # TRANSPARENCY_VIOLATION|HUMAN_DIGNITY_VIOLATION|AI_PRIMACY_VIOLATION
+    description: Mapped[str] = mapped_column(Text, default="")
+    severity: Mapped[str] = mapped_column(String(20), default="MEDIUM")  # LOW|MEDIUM|HIGH|CRITICAL
+    status: Mapped[str] = mapped_column(String(24), default="REPORTED")
+    # REPORTED|UNDER_INVESTIGATION|CONFIRMED|REMEDIATED|RESOLVED|APPEALED
+    gis_decision_ref: Mapped[str] = mapped_column(String(60), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=_now, index=True)

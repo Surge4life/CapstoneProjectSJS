@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Participant {
+  id                    String            @id @default(cuid())
+  gbsId                 String            @unique
+  firstName             String
+  lastName              String
+  email                 String            @unique
+  phone                 String?
+  dateOfBirth           DateTime
+  nationalId            String?           @unique
+  country               String            @default("South Africa")
+  cohortId              String?
+  targetCohort          Int               @default(1)
+  displacementCause     String?
+  status                ParticipantStatus @default(INTAKE)
+  stage                 Int               @default(0)
+  phase                 String            @default("Intake")
+  selfAffirmationContract Json?
+  vocationalStream      String?
+  vocationalPathway     String?
+  employerId            String?
+  employmentDate        DateTime?
+  employmentVerified    Boolean           @default(false)
+  isMentor              Boolean           @default(false)
+  mentorCertificationDate DateTime?
+  mentorId              String?
+  phase6Active          Boolean           @default(false)
+  phase6ReEntryDate     DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  certifications        Certification[]
+  employmentRecords     EmploymentRecord[]
+  gisDecisions          GISDecision[]
+
+  @@map("participants")
+}
+
+enum ParticipantStatus {
+  INTAKE
+  ACTIVE
+  PLACED
+  EMPLOYED
+  ALUMNI
+  MENTOR
+  RE_ENTRY
+  COMPLETED
+}
+
+model Certification {
+  id               String           @id @default(cuid())
+  participantId    String
+  tier             CertificationTier
+  name             String
+  description      String?
+  stream           String?
+  issuedDate       DateTime         @default(now())
+  expiryDate       DateTime?
+  verified         Boolean          @default(false)
+  verifiedBy       String?
+  verificationHash String?
+  gisVerified      Boolean          @default(false)
+  gisDecisionId    String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  participant      Participant      @relation(fields: [participantId], references: [id])
+
+  @@map("certifications")
+}
+
+enum CertificationTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  SPECIALIST
+}
+
+model EmploymentRecord {
+  id             String     @id @default(cuid())
+  participantId  String
+  employerId     String
+  role           String
+  startDate      DateTime
+  endDate        DateTime?
+  isCurrent      Boolean    @default(true)
+  verified       Boolean    @default(false)
+  verifiedBy     String?
+  verificationDate DateTime?
+  verificationHash String?
+  salary         Float?
+  salaryCurrency String    @default("ZAR")
+  employmentType String
+  gisVerified    Boolean    @default(false)
+  gisDecisionId  String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  participant    Participant @relation(fields: [participantId], references: [id])
+
+  @@map("employment_records")
+}
+
+model GISDecision {
+  id               String          @id @default(cuid())
+  decisionId       String          @unique
+  decisionType     GISDecisionType
+  domain           String
+  inputData        Json
+  context          Json?
+  output           Json
+  confidence       Float?
+  reasoning        String?
+  pillarChecks     Json?
+  allPillarsPassed Boolean         @default(false)
+  governanceGate   Boolean         @default(false)
+  coBReviewed      Boolean         @default(false)
+  coBApproved      Boolean         @default(false)
+  coBReviewerId    String?
+  gisVersion       String          @default("1.0")
+  failClosed       Boolean         @default(true)
+  auditHash        String?
+  participantId    String?
+  createdAt        DateTime        @default(now())
+
+  participant      Participant?    @relation(fields: [participantId], references: [id])
+
+  @@map("gis_decisions")
+}
+
+enum GISDecisionType {
+  CAREER_NAVIGATION
+  CERTIFICATION_VERIFICATION
+  EMPLOYMENT_VERIFICATION
+  COMPLIANCE_CHECK
+  GOVERNANCE_DECISION
+  OUTCOME_AUDIT
+  FRANCHISE_INTELLIGENCE
+  AI_ADAPTATION
+  RESEARCH_INSIGHT
+  MENTOR_MATCHING
+}
+
+model AuditRecord {
+  id               String     @id @default(cuid())
+  recordId         String     @unique
+  domain           String
+  entityId         String
+  entityType       String
+  action           String
+  performedBy      String
+  performedAt      DateTime   @default(now())
+  beforeState      Json?
+  afterState       Json?
+  isSealed         Boolean    @default(false)
+  sealedAt         DateTime?
+  sealedBy         String?
+  sealHash         String?
+  pillarId         String?
+  pillarCompliant  Boolean?
+  gisDecisionId    String?
+  createdAt        DateTime   @default(now())
+
+  @@map("audit_records")
+}
+
+model ComplianceViolation {
+  id               String            @id @default(cuid())
+  violationId      String            @unique
+  employerId       String
+  franchiseId      String?
+  pillarId         String?
+  violationType    ViolationType
+  description      String
+  severity         ViolationSeverity
+  evidence         Json?
+  status           ViolationStatus   @default(REPORTED)
+  reportedAt       DateTime          @default(now())
+  reviewedAt       DateTime?
+  reviewedBy       String?
+  resolution       String?
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  gisDecisionId    String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@map("compliance_violations")
+}
+
+enum ViolationType {
+  OUTCOME_DATA_MANIPULATION
+  LEARNERSHIP_CREDIT_ABUSE
+  CONSTITUTIONAL_VIOLATION
+  ABSORPTION_COMMITMENT_BREACH
+  GOVERNANCE_VIOLATION
+  ANTI_CORRUPTION_VIOLATION
+  TRANSPARENCY_VIOLATION
+  HUMAN_DIGNITY_VIOLATION
+  AI_PRIMACY_VIOLATION
+}
+
+enum ViolationSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ViolationStatus {
+  REPORTED
+  UNDER_INVESTIGATION
+  CONFIRMED
+  REMEDIATED
+  RESOLVED
+  APPEALED
+}
+
+model WorldPledge {
+  id               String     @id @default(cuid())
+  pledgeId         String     @unique
+  firstName        String
+  lastName         String
+  email            String
+  country          String
+  message          String?
+  count            Int        @default(1)
+  createdAt        DateTime   @default(now())
+
+  @@map("world_pledges")
+}
+
+model SkillsPassport {
+  id                 String     @id @default(cuid())
+  participantId      String     @unique
+  certifications     Json?
+  aiReadinessScore   Json?
+  employmentHistory  Json?
+  skills             Json?
+  version            Int        @default(1)
+  lastUpdated        DateTime   @default(now())
+  verifiedHash       String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@map("skills_passports")
+}
