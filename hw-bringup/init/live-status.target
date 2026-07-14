@@ -1,0 +1,5 @@
+[Unit]
+Description=UDOC Node LIVE Status
+Requires=udoc-selftest.service udoc-platform.service
+After=udoc-selftest.service udoc-platform.service
+AllowIsolate=yes

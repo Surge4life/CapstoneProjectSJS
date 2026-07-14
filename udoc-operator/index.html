@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>UDOC Operator Console · G.O.D.S</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0A1628">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UDOC Operator">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#0A1628;--navy2:#0D1F3C;--navy3:#112040;--gold:#C9A84C;--gold-l:#E8C97A;--gold-d:#8B6914;
+    --cyan:#00C2D4;--cyan-b:#00E5FF;--txt:#EDE7D6;--txt2:#A9B6CC;--muted:#8A9BB0;--green:#10B981;--red:#EF4444;--amber:#F59E0B;
+    --bd:rgba(201,168,76,.22);--bd2:rgba(201,168,76,.12);--fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'IBM Plex Mono',monospace;}
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:var(--navy);color:var(--txt);font-family:var(--fb);font-size:14px;line-height:1.45}
+  .mono{font-family:var(--fm)} .muted{color:var(--muted)}
+  #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%)}
+  .card{width:380px;max-width:92vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:14px;padding:28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .bm{display:flex;align-items:center;gap:12px}.shield{width:40px;height:40px;flex:none}
+  .bm h1{font-family:var(--fc);font-weight:700;letter-spacing:.06em;font-size:22px;margin:0;color:var(--gold)}
+  .bm .sub{font-family:var(--fc);letter-spacing:.26em;color:var(--cyan);font-size:11px}
+  label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 5px}
+  input{width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:10px 12px;font-family:var(--fb);font-size:14px}
+  input:focus{outline:none;border-color:var(--gold)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:1px solid var(--gold);background:linear-gradient(180deg,rgba(201,168,76,.18),rgba(201,168,76,.06));color:var(--gold-l);font-family:var(--fc);font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:8px;padding:10px 16px;font-size:13px}
+  .btn:hover{background:rgba(201,168,76,.22)}.btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.sm{padding:6px 12px;font-size:12px}.btn.cyan{border-color:var(--cyan);color:var(--cyan-b);background:rgba(0,194,212,.1)}
+  .err{color:#fda4a4;font-size:12.5px;margin-top:10px;min-height:16px}
+  .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);justify-content:center;margin-top:14px}.apibar input{width:230px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
+  .classbar{margin-top:16px;text-align:center;font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;color:var(--gold-d)}
+  #app{display:none;min-height:100%}
+  header{display:flex;align-items:center;gap:14px;padding:0 20px;height:56px;background:linear-gradient(90deg,var(--navy2),var(--navy));border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
+  header .shield{width:30px;height:30px}header .wm{font-family:var(--fc);font-weight:700;letter-spacing:.05em;color:var(--gold);font-size:17px}
+  header .spacer{flex:1}header .who{font-size:12px;color:var(--txt2);text-align:right}header .who b{color:var(--gold-l)}
+  .pill{font-family:var(--fm);font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--bd2)}
+  .gov{color:#fda4a4;border-color:rgba(239,68,68,.4)}.ops{color:var(--cyan-b);border-color:rgba(0,194,212,.4)}.ppl{color:var(--green);border-color:rgba(16,185,129,.4)}.bus{color:var(--amber);border-color:rgba(245,158,11,.4)}
+  main{padding:22px 24px;max-width:1100px;margin:0 auto}
+  .phead{display:flex;align-items:center;gap:12px;margin-bottom:6px}.phead h2{font-family:var(--fc);font-weight:700;letter-spacing:.03em;font-size:26px;margin:0}
+  .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
+  .kpis{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));margin-bottom:8px}
+  .kpi{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px}
+  .kpi .k{font-family:var(--fc);letter-spacing:.12em;text-transform:uppercase;font-size:10.5px;color:var(--muted)}.kpi .v{font-family:var(--fc);font-weight:700;font-size:30px;color:var(--gold-l);line-height:1.1;margin-top:6px}
+  .panel{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:18px;margin-top:18px}.panel h3{font-family:var(--fc);font-weight:600;letter-spacing:.06em;font-size:15px;margin:0 0 14px;color:var(--gold)}
+  .acts{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+  .act{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#091022;border:1px solid var(--bd2);border-radius:10px;padding:12px 14px}
+  .act .lab{font-weight:600}.act .tk{font-family:var(--fm);font-size:9.5px;letter-spacing:.06em;color:var(--muted)}
+  .tag2{display:inline-block;font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--bd2)}.t-ov{color:var(--amber);border-color:rgba(245,158,11,.4)}.t-au{color:var(--cyan-b);border-color:rgba(0,194,212,.4)}
+  select,.mo-body input[type=text]{width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:9px 11px;font-family:var(--fb);font-size:13px}
+  select:focus,.mo-body input:focus{outline:none;border-color:var(--gold)}
+  #op-modal{position:fixed;inset:0;background:rgba(4,8,18,.72);display:none;align-items:center;justify-content:center;z-index:60;padding:18px}
+  #op-modal .mo-card{width:420px;max-width:94vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:14px;padding:22px 22px 18px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  #op-modal .mo-title{font-family:var(--fc);font-weight:700;letter-spacing:.03em;font-size:20px;color:var(--gold-l)}
+  #op-modal .mo-sub{color:var(--muted);font-size:12px;margin:2px 0 16px}
+  #op-modal .mo-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+  #toast{position:fixed;right:18px;bottom:18px;max-width:380px;background:linear-gradient(180deg,var(--navy3),var(--navy2));border:1px solid var(--bd);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--txt);box-shadow:0 16px 40px rgba(0,0,0,.5);display:none}
+  #toast.show{display:block}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="card">
+    <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg><div><h1>UDOC</h1><div class="sub">OPERATOR CONSOLE</div></div></div>
+    <p class="muted" style="font-size:12.5px;margin:10px 0 0">Sign in to your Sovereign-Operator workspace. Your profile determines your live operations and authorised actions.</p>
+    <label>Email</label><input id="li-email" type="email" placeholder="you@org" value=""/>
+    <label>Password</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div style="margin-top:16px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
+    <div class="err" id="li-err"></div>
+    <div class="apibar"><span>API</span><input id="li-api" class="mono"/></div>
+    <div class="classbar">© G.O.D.S HOLDINGS (PTY) LTD · UDOC™ SOVEREIGN AI GOVERNANCE</div>
+  </div>
+</div>
+<div id="app">
+  <header>
+    <svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/></svg>
+    <span class="wm">UDOC</span><span class="pill" id="hb">· checking</span>
+    <span class="spacer"></span><div class="who"><b id="who-email">—</b><br><span class="mono" style="font-size:10px" id="who-prof"></span></div>
+    <button class="btn sm" onclick="logout()">Sign out</button>
+  </header>
+  <main id="main"><div class="muted">Loading workspace…</div></main>
+</div>
+<div id="op-modal"><div class="mo-card"><div class="mo-title">Action</div><div class="mo-sub"></div><div class="mo-body"></div><div class="mo-foot"><button class="btn sm" onclick="closeModal()">Cancel</button><button class="btn sm cyan mo-go">Run action</button></div></div></div>
+<div id="toast"></div>
+<script>
+const PROD_API="https://gods-platform-core.onrender.com";
+function apiBase(){ return localStorage.getItem("udoc_op_api")||PROD_API; }
+function setApiBase(v){ localStorage.setItem("udoc_op_api", v.replace(/\/+$/,"")); }
+function token(){ return localStorage.getItem("udoc_op_tok")||""; }
+async function api(path,opts={}){ const h=Object.assign({},opts.headers||{}); if(token())h["Authorization"]="Bearer "+token();
+  const r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));
+  if(r.status===401){ if(token())logout(); throw new Error("Session expired"); }
+  const ct=r.headers.get("content-type")||""; const body=ct.includes("json")?await r.json().catch(()=>null):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail)||(typeof body==="string"?body:("HTTP "+r.status))); return body; }
+document.getElementById("li-api").value=apiBase();
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function toast(msg,ok){ const t=document.getElementById("toast"); t.innerHTML=msg; t.style.borderColor=ok===false?"rgba(239,68,68,.5)":"var(--bd)"; t.classList.add("show"); clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove("show"),4200); }
+async function doLogin(){ const e=document.getElementById("li-err"); e.textContent="";
+  const a=document.getElementById("li-api").value.trim(); if(a)setApiBase(a);
+  const btn=document.getElementById("li-btn"); btn.disabled=true; btn.textContent="Signing in…";
+  try{ const f=new URLSearchParams(); f.set("username",document.getElementById("li-email").value.trim().toLowerCase()); f.set("password",document.getElementById("li-pass").value);
+    const r=await fetch(apiBase()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
+    if(!r.ok) throw new Error(r.status===401?"Invalid credentials":("Login failed ("+r.status+")"));
+    const d=await r.json(); localStorage.setItem("udoc_op_tok",d.access_token); localStorage.setItem("udoc_op_email",document.getElementById("li-email").value.trim().toLowerCase());
+    enterApp();
+  }catch(err){ e.textContent=err.message; } finally{ btn.disabled=false; btn.textContent="Sign in"; } }
+function logout(){ localStorage.removeItem("udoc_op_tok"); document.getElementById("app").style.display="none"; document.getElementById("login").style.display="flex"; }
+async function enterApp(){ document.getElementById("login").style.display="none"; document.getElementById("app").style.display="block";
+  document.getElementById("who-email").textContent=localStorage.getItem("udoc_op_email")||"—";
+  try{ await fetch(apiBase()+"/health"); const hb=document.getElementById("hb"); hb.textContent="· online"; hb.className="pill"; hb.style.color="var(--green)"; }catch{}
+  loadWorkspace(); }
+const GROUPCLS={GOVERNANCE:"gov",OPERATIONS:"ops",PEOPLE:"ppl",BUSINESS:"bus"};
+async function loadWorkspace(){ const m=document.getElementById("main");
+  let w; try{ w=await api("/workspace"); }catch(e){ m.innerHTML='<div class="panel"><div style="color:#fda4a4">⚠ '+esc(e.message)+'</div></div>'; return; }
+  const p=w.profile||{}; document.getElementById("who-prof").textContent=p.title||"";
+  const gcls=GROUPCLS[p.group]||"ops";
+  let html='<div class="phead"><h2>'+esc(p.title||"Operator")+'</h2><span class="pill '+gcls+'">'+esc(p.group||"")+'</span></div>'+
+    '<div class="sub">Division '+esc(p.division||"—")+' · base role '+esc(p.base_role||"—")+' · live Sovereign-Operator workspace</div>';
+  html+='<div class="kpis">'+(w.tiles||[]).map(t=>'<div class="kpi"><div class="k">'+esc(t.k)+'</div><div class="v">'+esc(t.v)+'</div></div>').join("")+'</div>';
+  window._WS=w;
+  const kindTag={"case.open":"opens case","case.review":"review case","case.resolve":"resolve case","model.status":"model status","model.drift":"drift report","bias.scan":"fairness scan","report.generate":"governance report","directive.issue":"audited directive","verify.check":"verification","approve.transaction":"transaction"};
+  html+='<div class="panel"><h3>Authorised actions</h3><div class="acts">'+(w.actions||[]).map((a,i)=>
+     '<div class="act"><div style="min-width:0"><div class="lab">'+esc(a.capability)+'</div><div class="tk">'+esc(a.verb||"")+' · <span style="color:var(--cyan-b)">'+esc(kindTag[a.kind]||a.kind)+'</span></div></div>'+
+     '<button class="btn sm cyan" onclick="openAction('+i+')">Run</button></div>').join("")+'</div></div>';
+  html+='<div class="panel"><h3>Recent activity</h3><div id="op-activity"><div class="muted small">Loading…</div></div></div>';
+  m.innerHTML=html;
+  loadActivity();
+}
+const OPCOL={CASE:"#F59E0B",REGISTRY:"#00C2D4",DIRECTIVE:"#C9A84C",EVALUATE:"#10B981",REPORT:"#00E5FF",VERIFY:"#10B981",APPROVE:"#C9A84C",RECORD:"#8A9BB0"};
+async function loadActivity(){ const el=document.getElementById("op-activity"); if(!el)return;
+  let hist=[]; try{ hist=(await api("/workspace/actions?limit=20")).actions||[]; }catch(e){}
+  if(!el.isConnected)return;
+  if(!hist.length){ el.innerHTML='<div class="muted small">No actions yet — run an authorised action above and it will be logged here.</div>'; return; }
+  el.innerHTML=hist.map(a=>{ const c=OPCOL[a.op_type]||"#8A9BB0";
+    return '<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)">'+
+      '<span style="font-family:monospace;font-size:9.5px;padding:2px 6px;border-radius:5px;border:1px solid '+c+'55;color:'+c+';white-space:nowrap;align-self:flex-start">'+esc(a.op_type)+'</span>'+
+      '<div style="min-width:0;flex:1"><div style="font-size:12.5px"><b>'+esc(a.capability)+'</b> <span class="muted" style="font-size:10px">· '+esc(a.status)+'</span></div>'+
+      '<div class="muted" style="font-size:11px;margin-top:2px">'+esc(a.summary||"")+'</div>'+
+      (a.result_ref&&a.result_ref!==a.ref?'<div class="mono" style="font-size:9.5px;color:'+c+';margin-top:2px">'+esc(a.result_ref)+'</div>':'')+'</div>'+
+      '<span class="muted" style="font-size:10px;white-space:nowrap">'+esc((a.at||"").slice(11,16))+'</span></div>'; }).join("");
+}
+let _OPTS=null;
+async function loadOpts(){ if(_OPTS)return _OPTS; try{ _OPTS=await api("/workspace/options"); }catch(e){ _OPTS={cases:[],models:[]}; } return _OPTS; }
+function field(label,ctrl){ return '<div style="margin-bottom:12px"><label style="display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">'+esc(label)+'</label>'+ctrl+'</div>'; }
+async function openAction(i){ const a=(window._WS&&window._WS.actions||[])[i]; if(!a)return;
+  if(!a.inputs||!a.inputs.length){ return execAction(a.capability,{}); }
+  const opts=await loadOpts();
+  const fields=a.inputs.map(inp=>{ const id="f_"+inp.name;
+    if(inp.type==="select"){ const src=(opts[inp.source]||[]); return field(inp.label,'<select id="'+id+'">'+(inp.optional?'<option value="">— any —</option>':'')+src.map(o=>'<option value="'+esc(o.value)+'">'+esc(o.label)+'</option>').join("")+'</select>'+(src.length?'':'<div class="muted" style="font-size:10px;margin-top:4px">none available</div>')); }
+    if(inp.type==="choice"){ return field(inp.label,'<select id="'+id+'">'+inp.options.map(o=>'<option>'+esc(o)+'</option>').join("")+'</select>'); }
+    if(inp.type==="bool"){ return '<div style="margin-bottom:12px"><label style="font-size:12px;color:var(--txt2)"><input type="checkbox" id="'+id+'" style="width:auto;margin-right:8px">'+esc(inp.label)+'</label></div>'; }
+    return field(inp.label,'<input id="'+id+'" type="text" placeholder="'+esc(inp.label)+'">');
+  }).join("");
+  showModal(a.capability,a.verb,fields,function(){ const params={}; a.inputs.forEach(inp=>{ const el=document.getElementById("f_"+inp.name); if(el) params[inp.name]=(inp.type==="bool")?el.checked:el.value; }); execAction(a.capability,params); });
+}
+async function execAction(cap,params){ closeModal();
+  try{ const r=await api("/workspace/action",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({capability:cap,params:params})});
+    if(r&&r.ok===false){ toast("⚠ "+esc(r.message),false); return; }
+    toast("✓ "+esc(r.message||"Done"),true); _OPTS=null; loadWorkspace();
+  }catch(e){ toast("⚠ "+esc(e.message),false); } }
+function showModal(title,subtitle,fieldsHtml,onSubmit){ const mo=document.getElementById("op-modal");
+  mo.querySelector(".mo-title").textContent=title; mo.querySelector(".mo-sub").textContent=subtitle||"";
+  mo.querySelector(".mo-body").innerHTML=fieldsHtml||'<div class="muted small">No inputs.</div>';
+  mo.querySelector(".mo-go").onclick=onSubmit; mo.style.display="flex"; }
+function closeModal(){ const mo=document.getElementById("op-modal"); if(mo)mo.style.display="none"; }
+(function(){var h=location.hash||"";var g=function(k){var m=h.match(new RegExp("[#&]"+k+"=([^&]+)"));return m?decodeURIComponent(m[1]):"";};if(g("sso")){localStorage.setItem("udoc_op_tok",g("sso"));if(g("api"))localStorage.setItem("udoc_op_api",g("api"));localStorage.setItem("udoc_op_email",g("email"));try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}})();
+if(token()){ try{ enterApp(); }catch(e){ logout(); } }
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});}</script>
+</body>
+</html>

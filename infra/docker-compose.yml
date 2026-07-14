@@ -1,0 +1,45 @@
+# G.O.D.S Ecosystem — full local stack.
+# Dev brings up platform-core + web on SQLite/in-memory; the prod profile adds
+# Postgres/Redis/Redpanda/OpenSearch (interfaces identical, config-swapped).
+version: "3.9"
+
+services:
+  platform-core:
+    build: ../platform-core
+    environment:
+      GODS_ENVIRONMENT: development
+      GODS_DATABASE_URL: sqlite:////data/gods_core.db
+    volumes: ["core-data:/data"]
+    ports: ["8000:8000"]
+    command: bash -c "python seed.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  platform-web:
+    build: ../platform-web
+    environment:
+      VITE_API_BASE: http://localhost:8000
+    ports: ["5173:80"]
+    depends_on: [platform-core]
+
+  # ── production datastores (enable with: docker compose --profile prod up) ──
+  postgres:
+    image: postgres:16
+    profiles: ["prod"]
+    environment: { POSTGRES_DB: gods, POSTGRES_PASSWORD: gods }
+    volumes: ["pg:/var/lib/postgresql/data"]
+    ports: ["5432:5432"]
+  redis:
+    image: redis:7
+    profiles: ["prod"]
+    ports: ["6379:6379"]
+  redpanda:
+    image: redpandadata/redpanda:latest
+    profiles: ["prod"]
+    command: redpanda start --smp 1 --overprovisioned --node-id 0 --check=false
+    ports: ["9092:9092"]
+  opensearch:
+    image: opensearchproject/opensearch:2.15.0
+    profiles: ["prod"]
+    environment: { discovery.type: single-node, DISABLE_SECURITY_PLUGIN: "true" }
+    ports: ["9200:9200"]
+
+volumes: { core-data: {}, pg: {} }

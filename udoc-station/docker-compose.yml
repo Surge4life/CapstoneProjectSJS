@@ -1,0 +1,14 @@
+# UDOC client station — containerised test/prod deployment.
+services:
+  udoc-station:
+    build: { context: .., dockerfile: udoc-station/Dockerfile.station }
+    ports: ["8077:8077"]
+    environment:
+      - ENVIRONMENT=production
+    restart: unless-stopped
+  station-selftest:
+    image: python:3.11-slim
+    depends_on: [udoc-station]
+    volumes: ["./:/station"]
+    environment: [ "UDOC_API=http://udoc-station:8077" ]
+    command: ["sh","-c","sleep 10 && python3 /station/bringup_selftest.py"]

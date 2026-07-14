@@ -1,0 +1,8 @@
+{
+  "name": "gods-udoc-mobile",
+  "version": "1.0.0",
+  "description": "Unified G.O.D.S UDOC mobile gateway (OTA -> gods-udoc-gateway; routes to admin/client/operator by role).",
+  "scripts": { "sync": "cap sync", "open:android": "cap open android" },
+  "dependencies": { "@capacitor/core": "^6.1.2", "@capacitor/android": "^6.1.2", "@capacitor/app": "^6.0.1", "@capacitor/network": "^6.0.2" },
+  "devDependencies": { "@capacitor/cli": "^6.1.2" }
+}

@@ -1,0 +1,12 @@
+[Unit]
+Description=UDOC Live Status Banner
+Requires=live-status.target
+After=udoc-platform.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -c 'echo "════════ UDOC SOVEREIGN NODE: LIVE ════════" > /dev/console'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=live-status.target

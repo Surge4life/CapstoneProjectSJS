@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.db
+storage/
+.venv/
+venv/
+# Node
+node_modules/
+dist/
+.vite/
+# Render/local
+.env
+_packages/
+*.log

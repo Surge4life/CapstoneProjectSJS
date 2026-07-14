@@ -1,0 +1,27 @@
+:root{ --navy:#060E1C; --navy2:#0C1A2E; --gold:#C9A84C; --accent:#3FA7D6;
+  --text:#D0C8B0; --white:#F5F0E8; --rule:#1d3050; --ok:#2EA043; --bad:#C0392B; --f1:'Segoe UI',system-ui,sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--navy);color:var(--text);font-family:var(--f1);line-height:1.6}
+.shell{max-width:1080px;margin:0 auto;padding:24px}
+.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--accent);padding-bottom:16px;margin-bottom:24px}
+.hdr .brand h1{color:var(--white);font-size:1.5rem}
+.hdr .brand .gods{color:var(--gold);font-size:.62rem;letter-spacing:.24em;text-transform:uppercase}
+.hdr .brand .sub{color:var(--accent);font-size:.8rem;letter-spacing:.1em}
+.pill{font-size:.68rem;padding:5px 12px;border-radius:20px;background:rgba(127,127,127,.12);color:var(--accent);border:1px solid var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--navy2);border:1px solid var(--rule);border-radius:12px;padding:18px}
+.card h3{color:var(--accent);font-size:.66rem;text-transform:uppercase;letter-spacing:.14em;margin-bottom:10px}
+.metric{font-size:1.9rem;color:var(--white);font-weight:600}
+.metric small{font-size:.66rem;color:var(--text);font-weight:400;display:block;margin-top:4px}
+.panel{background:var(--navy2);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-bottom:20px}
+.panel h2{color:var(--white);font-size:1rem;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{text-align:left;color:var(--accent);border-bottom:1px solid var(--rule);padding:8px;font-size:.66rem;text-transform:uppercase}
+td{padding:8px;border-bottom:1px solid rgba(29,48,80,.5)}
+.btn{background:var(--accent);color:var(--navy);border:none;padding:10px 18px;border-radius:7px;font-weight:600;cursor:pointer;font-size:.84rem}
+.btn:hover{filter:brightness(1.1)}
+.login{max-width:360px;margin:14vh auto;background:var(--navy2);border:1px solid var(--rule);border-radius:14px;padding:34px}
+.login h1{color:var(--accent)}.login .gods{color:var(--gold);font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;margin-bottom:18px;display:block}
+.login input{width:100%;margin-bottom:12px;background:var(--navy);border:1px solid var(--rule);color:var(--white);padding:9px;border-radius:6px}
+.login .btn{width:100%}.err{color:var(--bad);font-size:.78rem;margin-top:8px}
+.foot{text-align:center;color:var(--rule);font-size:.66rem;margin-top:30px;letter-spacing:.1em}

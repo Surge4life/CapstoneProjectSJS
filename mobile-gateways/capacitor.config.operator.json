@@ -1,0 +1,12 @@
+{
+  "appId": "za.gods.udoc.operator",
+  "appName": "UDOC Operator · G.O.D.S",
+  "webDir": "www",
+  "server": {
+    "url": "https://gods-udoc-operator.onrender.com",
+    "androidScheme": "https",
+    "cleartext": false,
+    "allowNavigation": ["gods-udoc-operator.onrender.com", "gods-platform-core.onrender.com"]
+  },
+  "android": { "allowMixedContent": false }
+}

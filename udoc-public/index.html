@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>UDOC — Client Governance Platform · G.O.D.S</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0A1628">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UDOC Client">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0A1628;--navy2:#0D1F3C;--navy3:#112040;--gold:#C9A84C;--gold-l:#E8C97A;--gold-d:#8B6914;
+    --cyan:#00C2D4;--cyan-b:#00E5FF;--indigo:#6366F1;--txt:#EDE7D6;--txt2:#A9B6CC;--muted:#8A9BB0;
+    --green:#10B981;--red:#EF4444;--amber:#F59E0B;--bd:rgba(201,168,76,.22);--bd2:rgba(201,168,76,.12);
+    --fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:var(--navy);color:var(--txt);font-family:var(--fb);font-size:14px;line-height:1.45}
+  .mono{font-family:var(--fm)} .muted{color:var(--muted)} a{color:var(--cyan)}
+  #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%)}
+  .card{width:380px;max-width:92vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:14px;padding:28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .bm{display:flex;align-items:center;gap:12px} .shield{width:40px;height:40px;flex:none}
+  .bm h1{font-family:var(--fc);font-weight:700;letter-spacing:.06em;font-size:22px;margin:0;color:var(--gold)}
+  .bm .sub{font-family:var(--fc);letter-spacing:.30em;color:var(--cyan);font-size:11px}
+  label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 5px}
+  input,select{width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:10px 12px;font-family:var(--fb);font-size:14px}
+  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:1px solid var(--gold);background:linear-gradient(180deg,rgba(201,168,76,.18),rgba(201,168,76,.06));color:var(--gold-l);font-family:var(--fc);font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:8px;padding:10px 16px;font-size:13px}
+  .btn:hover{background:rgba(201,168,76,.22)} .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.sm{padding:5px 10px;font-size:11px} .btn.cyan{border-color:var(--cyan);color:var(--cyan-b);background:rgba(0,194,212,.1)}
+  .err{color:#fda4a4;font-size:12.5px;margin-top:10px;min-height:16px}
+  .classbar{margin-top:16px;text-align:center;font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;color:var(--gold-d)}
+  .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)} .apibar input{width:230px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
+  #app{display:none;grid-template-columns:222px 1fr;grid-template-rows:54px 1fr;height:100%}
+  header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:linear-gradient(90deg,var(--navy2),var(--navy));border-bottom:1px solid var(--bd)}
+  header .shield{width:30px;height:30px} header .wm{font-family:var(--fc);font-weight:700;letter-spacing:.05em;color:var(--gold);font-size:17px}
+  header .tag{font-family:var(--fc);letter-spacing:.22em;color:var(--cyan);font-size:10px;border:1px solid var(--bd2);padding:3px 8px;border-radius:5px}
+  header .spacer{flex:1} header .who{font-size:12px;color:var(--txt2);text-align:right} header .who b{color:var(--gold-l)}
+  .pill{font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid var(--bd2)} .pill.up{color:var(--green)} .pill.down{color:#fda4a4}
+  nav{grid-row:2;background:var(--navy);border-right:1px solid var(--bd2);padding:12px 8px;overflow:auto}
+  nav .navitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt2);font-size:13.5px;margin-bottom:2px}
+  nav .navitem:hover{background:var(--navy3)} nav .navitem.active{background:linear-gradient(90deg,rgba(201,168,76,.16),transparent);color:var(--gold-l);border-left:2px solid var(--gold)}
+  nav .navitem .ico{width:18px;text-align:center;color:var(--cyan)} nav .sech{font-family:var(--fc);letter-spacing:.2em;font-size:10px;color:var(--muted);padding:14px 12px 6px}
+  main{grid-row:2;overflow:auto;padding:20px 24px}
+  .pgh{display:flex;align-items:baseline;gap:12px;margin-bottom:16px} .pgh h2{font-family:var(--fc);font-weight:700;letter-spacing:.04em;font-size:24px;margin:0} .pgh .desc{color:var(--muted);font-size:12.5px}
+  .grid{display:grid;gap:14px} .kpis{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .kpi{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px}
+  .kpi .k{font-family:var(--fc);letter-spacing:.14em;text-transform:uppercase;font-size:10.5px;color:var(--muted)} .kpi .v{font-family:var(--fc);font-weight:700;font-size:30px;color:var(--gold-l);line-height:1.1;margin-top:6px}
+  .kpi .v.cyan{color:var(--cyan-b)} .kpi .v.green{color:var(--green)} .kpi .v.amber{color:var(--amber)}
+  .panel{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px;margin-top:14px} .panel h3{font-family:var(--fc);font-weight:600;letter-spacing:.06em;font-size:15px;margin:0 0 12px;color:var(--gold)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px} th{font-family:var(--fc);letter-spacing:.08em;text-transform:uppercase;font-size:10.5px;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd2)}
+  td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top} tr:hover td{background:rgba(255,255,255,.02)}
+  .tag2{display:inline-block;font-family:var(--fm);font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--bd2)} .t-ok{color:var(--green);border-color:rgba(16,185,129,.4)} .t-warn{color:var(--amber);border-color:rgba(245,158,11,.4)} .t-bad{color:#fda4a4;border-color:rgba(239,68,68,.4)} .t-info{color:var(--cyan-b);border-color:rgba(0,194,212,.4)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end} .row .f{flex:1;min-width:130px} .row .f label{margin-top:0}
+  .small{font-size:11.5px} .loading{color:var(--muted);font-size:12px;padding:10px 0} .note{background:rgba(0,194,212,.06);border:1px dashed rgba(0,194,212,.3);border-radius:8px;padding:12px 14px;color:var(--txt2);font-size:12.5px}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="card">
+    <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg><div><h1>UDOC</h1><div class="sub">CLIENT GOVERNANCE PLATFORM</div></div></div>
+    <p class="muted small" style="margin:10px 0 0">Govern your AI systems — registration, EVA evaluation, compliance &amp; private knowledge. Powered by G.O.D.S UDOC.</p>
+    <label>Email</label><input id="li-email" type="email" placeholder="you@yourcompany" value="client.dsd@gods.local"/>
+    <label>Password</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div style="margin-top:16px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
+    <div class="err" id="li-err"></div>
+    <div class="apibar" style="margin-top:14px;justify-content:center"><span>API</span><input id="li-api" class="mono"/></div>
+    <div class="classbar">© G.O.D.S HOLDINGS (PTY) LTD · UDOC™ SOVEREIGN AI GOVERNANCE</div>
+  </div>
+</div>
+<div id="app">
+  <header>
+    <svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/></svg>
+    <span class="wm">UDOC</span><span class="tag" id="org-tag">CLIENT</span><span class="pill" id="sector-badge" style="display:none"></span><span class="pill" id="hb">· checking</span>
+    <span class="spacer"></span><div class="who"><b id="who-email">—</b><br><span class="mono" style="font-size:10px" id="who-tenant"></span></div>
+    <button class="btn sm" onclick="logout()">Sign out</button>
+  </header>
+  <nav id="nav">
+    <div class="sech">GOVERNANCE</div>
+    <div class="navitem active" data-view="dash"><span class="ico">◎</span> Dashboard</div>
+    <div class="navitem" data-view="systems"><span class="ico">▤</span> My AI Systems</div>
+    <div class="navitem" data-view="decisions"><span class="ico">⚡</span> Decisions · EVA</div>
+    <div class="navitem" data-view="compliance"><span class="ico">✓</span> Compliance</div>
+    <div class="sech">PRIVATE</div>
+    <div class="navitem" data-view="knowledge"><span class="ico">◈</span> Company Knowledge</div>
+    <div class="sech">ACCOUNT</div>
+    <div class="navitem" data-view="settings"><span class="ico">⚙</span> Plan &amp; API Keys</div>
+  </nav>
+  <main id="main"><div class="loading">Loading…</div></main>
+</div>
+<script>
+const PROD_API="https://gods-platform-core.onrender.com";
+function apiBase(){ return localStorage.getItem("udoc_client_api")||PROD_API; }
+function setApiBase(v){ localStorage.setItem("udoc_client_api", v.replace(/\/+$/,"")); }
+function token(){ return localStorage.getItem("udoc_client_tok")||""; }
+async function api(path,opts={}){ const h=Object.assign({},opts.headers||{}); if(token())h["Authorization"]="Bearer "+token();
+  const r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));
+  if(r.status===401){ if(token())logout(); throw new Error("Session expired"); }
+  const ct=r.headers.get("content-type")||""; const body=ct.includes("json")?await r.json().catch(()=>null):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail)||(typeof body==="string"?body:("HTTP "+r.status))); return body; }
+document.getElementById("li-api").value=apiBase();
+async function doLogin(){ const e=document.getElementById("li-err"); e.textContent="";
+  const a=document.getElementById("li-api").value.trim(); if(a)setApiBase(a);
+  const btn=document.getElementById("li-btn"); btn.disabled=true; btn.textContent="Signing in…";
+  try{ const f=new URLSearchParams(); f.set("username",document.getElementById("li-email").value.trim().toLowerCase()); f.set("password",document.getElementById("li-pass").value);
+    const r=await fetch(apiBase()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
+    if(!r.ok) throw new Error(r.status===401?"Invalid credentials":("Login failed ("+r.status+")"));
+    const d=await r.json(); localStorage.setItem("udoc_client_tok",d.access_token); localStorage.setItem("udoc_client_who",JSON.stringify({email:document.getElementById("li-email").value.trim().toLowerCase(),role:d.role,tenant_id:d.tenant_id}));
+    enterApp();
+  }catch(err){ e.textContent=err.message; } finally{ btn.disabled=false; btn.textContent="Sign in"; } }
+function logout(){ localStorage.removeItem("udoc_client_tok"); document.getElementById("app").style.display="none"; document.getElementById("login").style.display="flex"; }
+let SECTOR=null;
+function applySector(){ if(!SECTOR)return; const b=document.getElementById("sector-badge");
+  if(b){ b.textContent=SECTOR.label+" · "+SECTOR.audience; b.style.display="inline-block"; b.style.color=SECTOR.accent; b.style.borderColor=SECTOR.accent; }
+  document.getElementById("org-tag").textContent=(SECTOR.tenant||"CLIENT").toUpperCase(); }
+async function ensureSector(){ if(!SECTOR){ try{ SECTOR=await api("/sector/profile"); applySector(); }catch(e){} } return SECTOR; }
+async function enterApp(){ const w=JSON.parse(localStorage.getItem("udoc_client_who")||"{}");
+  document.getElementById("login").style.display="none"; document.getElementById("app").style.display="grid";
+  document.getElementById("who-email").textContent=w.email||"—"; document.getElementById("who-tenant").textContent=w.tenant_id||"";
+  document.getElementById("org-tag").textContent=(w.tenant_id||"CLIENT").toUpperCase();
+  heartbeat();
+  try{ SECTOR=await api("/sector/profile"); applySector(); }catch(e){ SECTOR=null; }
+  nav("dash"); }
+async function heartbeat(){ const el=document.getElementById("hb"); try{ await fetch(apiBase()+"/health"); el.textContent="· online"; el.className="pill up"; }catch{ el.textContent="· offline"; el.className="pill down"; } }
+function nav(v){ document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active",n.dataset.view===v));
+  const m=document.getElementById("main"); m.innerHTML='<div class="loading">Loading…</div>';
+  ({dash:vDash,systems:vSystems,decisions:vDecisions,compliance:vCompliance,knowledge:vKnowledge,settings:vSettings}[v]||vDash)(m); }
+document.querySelectorAll("#nav .navitem").forEach(n=>n.addEventListener("click",()=>nav(n.dataset.view)));
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function asArray(d){ if(Array.isArray(d))return d; if(d&&typeof d==="object"){ for(const k of ["items","records","models","results","data","keys","apikeys"]) if(Array.isArray(d[k]))return d[k]; } return []; }
+function riskTag(v){ v=String(v||"").toUpperCase(); const c=v.includes("CRIT")||v==="HIGH"||v==="UNACCEPTABLE"?"t-bad":(v==="MEDIUM"||v==="NOTABLE"?"t-warn":"t-ok"); return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>'; }
+function statusTag(v){ const u=String(v||"").toUpperCase(); const c=u.includes("ACTIVE")||u.includes("APPROVED")||u.includes("VERIFIED")?"t-ok":(u.includes("PEND")||u.includes("REVIEW")?"t-warn":(u.includes("SUSP")||u.includes("DENIED")||u.includes("BLOCK")?"t-bad":"t-info")); return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>'; }
+function tableFrom(rows,cols){ if(!rows.length) return '<div class="muted small">No records.</div>'; let h='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c.h)+'</th>').join("")+'</tr></thead><tbody>'; rows.forEach(r=>{ h+='<tr>'+cols.map(c=>'<td>'+(c.r?c.r(r):esc(r[c.k]))+'</td>').join("")+'</tr>'; }); return h+'</tbody></table>'; }
+async function safe(host,fn){ try{ return await fn(); }catch(e){ host.innerHTML='<div class="panel"><div class="t-bad small">⚠ '+esc(e.message)+'</div></div>'; } }
+
+async function vDash(m){
+  await ensureSector();
+  let sys=[],dec=[],plan={},ov=null;
+  try{ sys=asArray(await api("/registry/models")); }catch(e){}
+  try{ dec=asArray(await api("/decisions")); }catch(e){}
+  try{ plan=await api("/tenants/me"); }catch(e){}
+  try{ ov=await api("/sector/overview"); }catch(e){}
+  const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
+  const card=(k,v,cls)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v '+(cls||"")+'">'+(v==null?"—":esc(v))+'</div></div>';
+  const tiles = (ov&&ov.tiles&&ov.tiles.length) ? ov.tiles.map((t,i)=>card(t.k,t.v,i===0?"cyan":"")).join("")
+              : (card("My AI systems",sys.length,"cyan")+card("Decisions evaluated",dec.length));
+  m.innerHTML='<div class="pgh"><h2>'+esc(S.label||"Governance")+' Dashboard</h2><span class="desc">'+esc(S.tagline||"Your AI systems under UDOC oversight")+'</span></div>'+
+   '<div class="grid kpis">'+tiles+'</div>'+
+   (S.summary?'<div class="panel" style="border-left:3px solid '+esc(acc)+'"><h3>'+esc(S.label)+' governance scope</h3><div class="small muted">'+esc(S.summary)+'</div>'+
+     '<div class="small" style="margin-top:12px;letter-spacing:.08em;color:'+esc(acc)+'">OVERSIGHT MODEL</div><div class="small muted" style="margin-top:3px">'+esc(S.oversight_model)+'</div></div>':'')+
+   '<div class="panel"><h3>Your systems</h3><div class="small muted">'+sys.length+' AI system(s) registered · '+dec.length+' decision(s) evaluated through the EVA engine · plan tier '+esc((plan&&(plan.tier||plan.plan))||"—")+'.</div></div>';
+}
+async function vSystems(m){ await safe(m, async()=>{
+  const rows=asArray(await api("/registry/models"));
+  m.innerHTML='<div class="pgh"><h2>My AI Systems</h2><span class="desc">Systems registered under your UDOC tenant</span></div>'+
+   '<div class="panel"><h3>Register a system</h3><div class="row">'+
+     '<div class="f"><label>System ID</label><input id="ns-id" placeholder="e.g. credit-scorer-v2"></div>'+
+     '<div class="f"><label>Name</label><input id="ns-name" placeholder="Credit Scorer"></div>'+
+     '<div class="f"><label>Risk tier</label><select id="ns-risk"><option>MINIMAL</option><option>NOTABLE</option><option>HIGH</option><option>UNACCEPTABLE</option></select></div>'+
+     '<button class="btn cyan" onclick="registerSystem()">Register</button></div><div class="err small" id="ns-err"></div></div>'+
+   '<div class="panel"><h3>Registered · '+rows.length+'</h3>'+tableFrom(rows,[
+     {h:"System",r:x=>'<b>'+esc(x.name||x.model_id||x.id)+'</b><br><span class="mono muted small">'+esc(x.model_id||"")+'</span>'},
+     {h:"Risk",r:x=>riskTag(x.risk_tier||x.risk_level)},{h:"Status",r:x=>statusTag(x.status)},
+   ])+'</div>';
+}); }
+async function registerSystem(){ const e=document.getElementById("ns-err"); e.textContent="";
+  const body={model_id:document.getElementById("ns-id").value.trim(),name:document.getElementById("ns-name").value.trim(),risk_tier:document.getElementById("ns-risk").value};
+  if(!body.model_id||!body.name){ e.textContent="System ID and name are required."; return; }
+  try{ await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); nav("systems"); }
+  catch(err){ e.textContent=err.message; } }
+function sectorChip(s){ if(!s)return '<span class="muted small">—</span>'; var col={PUBLIC:"#00C2D4",PRIVATE:"#C9A84C",GENERAL:"#8A9BB0"}[s]||"#8A9BB0"; return '<span style="font-family:monospace;font-size:10px;padding:2px 6px;border-radius:5px;border:1px solid '+col+'55;color:'+col+'">'+esc(s)+'</span>'; }
+async function vDecisions(m){ await safe(m, async()=>{
+  await ensureSector();
+  let rows=[],certs=[]; try{ rows=asArray(await api("/decisions")); }catch(e){} try{ certs=asArray(await api("/decisions/certificates")); }catch(e){}
+  const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
+  const banner = S.label ? '<div class="panel" style="border-left:3px solid '+esc(acc)+'"><div class="small muted">Decisions are evaluated under your <b style="color:'+esc(acc)+'">'+esc(S.label)+'</b> regulatory frameworks ('+esc(S.audience||"")+'). Each signed certificate records which frameworks were in force at decision time.</div></div>' : '';
+  m.innerHTML='<div class="pgh"><h2>Decisions · EVA Engine</h2><span class="desc">6-dimension governance verdicts for your systems</span></div>'+banner+
+   '<div class="panel"><h3>Decisions · '+rows.length+'</h3>'+tableFrom(rows.slice(0,80),[
+     {h:"Ref",r:x=>'<span class="mono">'+esc(x.decision_id||x.id||"—")+'</span>'},{h:"System",r:x=>esc(x.model_id||"—")},
+     {h:"EVA",r:x=>esc(x.composite_eva!=null?x.composite_eva:(x.eva!=null?x.eva:"—"))},{h:"Verdict",r:x=>statusTag(x.verdict||x.status||x.outcome)},
+   ])+'</div>'+
+   '<div class="panel"><h3>Signed certificates · '+certs.length+'</h3>'+tableFrom(certs.slice(0,40),[
+     {h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.cert_id||x.id||"—")+'</span>'},{h:"Verdict",r:x=>statusTag(x.decision||"—")},
+     {h:"Sector",r:x=>sectorChip(x.sector)},{h:"Frameworks",r:x=>'<span class="muted small">'+(((x.frameworks_cited||[]).length)||0)+' cited</span>'},
+     {h:"Seal",r:x=>statusTag(x.signed!==false?"SIGNED":"UNSIGNED")},
+   ])+'</div>';
+}); }
+async function vCompliance(m){ await safe(m, async()=>{
+  await ensureSector();
+  let sfw={frameworks:[]}; try{ sfw=await api("/sector/frameworks"); }catch(e){}
+  let fw=[]; try{ fw=asArray(await api("/compliance/frameworks")); }catch(e){}
+  const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
+  const cards=(sfw.frameworks||[]).map(f=>'<div class="panel" style="border-left:3px solid '+esc(acc)+';margin:0">'+
+     '<h3 style="font-size:14px;margin:0 0 4px">'+esc(f.name)+'</h3>'+
+     '<div class="mono" style="font-size:10.5px;color:'+esc(acc)+'">'+esc(f.basis)+'</div>'+
+     '<div class="small muted" style="margin-top:7px">'+esc(f.focus)+'</div>'+
+     '<div class="small" style="margin-top:7px;color:var(--muted)"><b>Applies to:</b> '+esc(f.applies_to)+'</div></div>').join("");
+  m.innerHTML='<div class="pgh"><h2>Compliance — '+esc(S.label||"")+'</h2><span class="desc">The regulatory frameworks that apply to your sector ('+esc(S.audience||"")+')</span></div>'+
+   '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px">'+(cards||'<div class="muted small">No sector frameworks resolved.</div>')+'</div>'+
+   (fw.length?'<div class="panel" style="margin-top:16px"><h3>Additional tracked frameworks · '+fw.length+'</h3>'+tableFrom(fw,[{h:"Framework",r:x=>'<b>'+esc(x.name||x.framework||x.id||x)+'</b>'},{h:"Coverage",r:x=>esc(x.coverage||x.status||"—")}])+'</div>':'');
+}); }
+async function vKnowledge(m){ await safe(m, async()=>{
+  let st={},docs=[];
+  try{ st=await api("/client/knowledge/state"); }catch(e){}
+  try{ docs=asArray(await api("/client/knowledge/docs")); }catch(e){}
+  m.innerHTML='<div class="pgh"><h2>Company Knowledge</h2><span class="desc">Private, tenant-isolated knowledge base — grounded answers for your team</span></div>'+
+   '<div class="grid kpis"><div class="kpi"><div class="k">Documents</div><div class="v cyan">'+(st.docs!=null?st.docs:docs.length)+'</div></div>'+
+     '<div class="kpi"><div class="k">Indexed characters</div><div class="v">'+(st.chars!=null?Number(st.chars).toLocaleString():"—")+'</div></div>'+
+     '<div class="kpi"><div class="k">Isolation</div><div class="v green" style="font-size:18px">TENANT-PRIVATE</div></div></div>'+
+   '<div class="panel"><h3>Ask your knowledge base</h3><div class="row"><div class="f"><input id="kb-q" placeholder="e.g. how many leave days do staff get?" onkeydown="if(event.key===\'Enter\')kbAsk()"></div><button class="btn cyan" onclick="kbAsk()">Ask</button></div><div id="kb-ans" style="margin-top:12px"></div></div>'+
+   '<div class="panel"><h3>Add a document</h3><div class="row"><div class="f"><label>Title</label><input id="kb-t" placeholder="Leave Policy"></div><div class="f"><label>Category</label><select id="kb-cat"><option>POLICY</option><option>SOP</option><option>HR</option><option>FINANCE</option><option>LEGAL</option><option>GENERAL</option></select></div></div>'+
+     '<label>Text</label><textarea id="kb-text" rows="4" style="width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:10px 12px;font-family:var(--fb);font-size:13.5px;resize:vertical"></textarea>'+
+     '<div style="margin-top:8px"><button class="btn" onclick="kbIngest()">Add to knowledge base</button> <span id="kb-msg" class="small muted"></span></div></div>'+
+   '<div class="panel"><h3>Documents · '+docs.length+'</h3>'+tableFrom(docs,[
+     {h:"Title",r:x=>'<b>'+esc(x.title)+'</b>'},{h:"Category",r:x=>'<span class="tag2 t-info">'+esc(x.category||"—")+'</span>'},
+     {h:"Chars",r:x=>esc(Number(x.char_len||0).toLocaleString())},{h:"Added",r:x=>'<span class="mono small">'+esc((x.created_at||"").slice(0,10))+'</span>'},
+     {h:"",r:x=>'<button class="btn sm" onclick="kbDelete('+x.id+')">remove</button>'},
+   ])+'</div>';
+}); }
+async function kbAsk(){ const a=document.getElementById("kb-ans"); const q=document.getElementById("kb-q").value.trim(); if(!q)return; a.innerHTML='<span class="muted small">Searching your documents…</span>';
+  try{ const r=await api("/client/knowledge/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q})});
+    let h='<div class="note">'+esc(r.answer||"")+'</div>';
+    if(r.citations&&r.citations.length){ h+='<div class="small muted" style="margin:10px 0 4px">Sources · coverage '+Math.round((r.coverage||0)*100)+'%</div>';
+      r.citations.forEach(c=>{ h+='<div class="panel" style="margin-top:6px;padding:10px 12px"><b>'+esc(c.title)+'</b> <span class="tag2 t-info">'+esc(c.category||"")+'</span><div class="small" style="margin-top:4px;color:var(--txt2)">'+esc(c.snippet||"")+'</div></div>'; }); }
+    a.innerHTML=h;
+  }catch(e){ a.innerHTML='<div class="t-bad small">'+esc(e.message)+'</div>'; } }
+async function kbIngest(){ const mg=document.getElementById("kb-msg"); const body={title:document.getElementById("kb-t").value.trim(),text:document.getElementById("kb-text").value,category:document.getElementById("kb-cat").value};
+  if(!body.title||!body.text){ mg.textContent="Title and text required."; return; } mg.textContent="adding…";
+  try{ await api("/client/knowledge/ingest-text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); nav("knowledge"); }
+  catch(e){ mg.textContent=e.message; } }
+async function kbDelete(id){ try{ await api("/client/knowledge/docs/"+id,{method:"DELETE"}); nav("knowledge"); }catch(e){ alert(e.message); } }
+async function vSettings(m){ await safe(m, async()=>{
+  let plan={},keys=[]; try{ plan=await api("/tenants/me"); }catch(e){} try{ keys=asArray(await api("/tenants/me/apikeys")); }catch(e){}
+  const rows=Object.entries(plan||{}).filter(([k,v])=>typeof v!=="object").map(([k,v])=>'<tr><td class="muted">'+esc(k)+'</td><td class="mono">'+esc(v)+'</td></tr>');
+  m.innerHTML='<div class="pgh"><h2>Plan &amp; API Keys</h2><span class="desc">Your subscription &amp; programmatic access</span></div>'+
+   '<div class="panel"><h3>Subscription</h3>'+(rows.length?'<table><tbody>'+rows.join("")+'</tbody></table>':'<div class="muted small">No plan data.</div>')+'</div>'+
+   '<div class="panel"><h3>API keys · '+keys.length+'</h3><div style="margin-bottom:10px"><button class="btn cyan sm" onclick="genKey(this)">Generate new key</button> <span id="key-msg" class="small muted"></span></div>'+
+     tableFrom(keys,[{h:"Key / label",r:x=>'<span class="mono">'+esc(x.label||x.key_id||x.prefix||x.id||(typeof x==="string"?x:"key"))+'</span>'},{h:"Created",r:x=>esc(x.created_at||x.created||"—")},{h:"Status",r:x=>statusTag(x.status||(x.active===false?"revoked":"active"))}])+'</div>';
+}); }
+async function genKey(btn){ btn.disabled=true; const mg=document.getElementById("key-msg"); mg.textContent="generating…";
+  try{ const d=await api("/tenants/me/apikeys",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}); mg.textContent="created — copy now: "+esc((d.api_key||d.key||d.secret||JSON.stringify(d)).toString().slice(0,48)); }
+  catch(e){ mg.textContent=e.message; } finally{ btn.disabled=false; } }
+(function(){var h=location.hash||"";var g=function(k){var m=h.match(new RegExp("[#&]"+k+"=([^&]+)"));return m?decodeURIComponent(m[1]):"";};if(g("sso")){localStorage.setItem("udoc_client_tok",g("sso"));if(g("api"))localStorage.setItem("udoc_client_api",g("api"));localStorage.setItem("udoc_client_who",JSON.stringify({email:g("email"),role:g("role"),tenant_id:g("tenant")}));try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}}})();
+if(token()){ try{ enterApp(); }catch(e){ logout(); } }
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});}</script>
+</body>
+</html>

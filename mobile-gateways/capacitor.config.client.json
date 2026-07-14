@@ -1,0 +1,12 @@
+{
+  "appId": "za.gods.udoc.client",
+  "appName": "UDOC Client · G.O.D.S",
+  "webDir": "www",
+  "server": {
+    "url": "https://gods-udoc-client.onrender.com",
+    "androidScheme": "https",
+    "cleartext": false,
+    "allowNavigation": ["gods-udoc-client.onrender.com", "gods-platform-core.onrender.com"]
+  },
+  "android": { "allowMixedContent": false }
+}

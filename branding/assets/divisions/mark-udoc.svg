@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="UDOC — Digital Governance Division">
+  <title>UDOC — Digital Governance Division</title>
+  <circle cx="60" cy="58" r="40" fill="none" stroke="#6366F1" stroke-width="2.4"/>
+  <line x1="100.00" y1="58.00" x2="106.00" y2="58.00" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="106.00" cy="58.00" r="2.2" fill="#00C2D4"/>
+  <line x1="88.28" y1="86.28" x2="92.53" y2="90.53" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="92.53" cy="90.53" r="2.2" fill="#00C2D4"/>
+  <line x1="60.00" y1="98.00" x2="60.00" y2="104.00" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="60.00" cy="104.00" r="2.2" fill="#00C2D4"/>
+  <line x1="31.72" y1="86.28" x2="27.47" y2="90.53" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="27.47" cy="90.53" r="2.2" fill="#00C2D4"/>
+  <line x1="20.00" y1="58.00" x2="14.00" y2="58.00" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="14.00" cy="58.00" r="2.2" fill="#00C2D4"/>
+  <line x1="31.72" y1="29.72" x2="27.47" y2="25.47" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="27.47" cy="25.47" r="2.2" fill="#00C2D4"/>
+  <line x1="60.00" y1="18.00" x2="60.00" y2="12.00" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="60.00" cy="12.00" r="2.2" fill="#00C2D4"/>
+  <line x1="88.28" y1="29.72" x2="92.53" y2="25.47" stroke="#6366F1" stroke-width="1.6"/>
+  <circle cx="92.53" cy="25.47" r="2.2" fill="#00C2D4"/>
+  <path d="M 44 40 L 76 40 C 76 40 77 58 72 68 C 68 76 64 80 60 82 C 56 80 52 76 48 68 C 43 58 44 40 44 40 Z"
+        fill="#1A3A5C" stroke="#C9A84C" stroke-width="2.4" stroke-linejoin="round"/>
+  <rect x="52" y="56" width="16" height="14" rx="2" fill="#C9A84C"/>
+  <path d="M 55 56 L 55 51 A 5 5 0 0 1 65 51 L 65 56" fill="none" stroke="#C9A84C" stroke-width="2.2"/>
+  <circle cx="60" cy="62" r="2.2" fill="#060E1C"/><rect x="59" y="62" width="2" height="5" fill="#060E1C"/>
+</svg>

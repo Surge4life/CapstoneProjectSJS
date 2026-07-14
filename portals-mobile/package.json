@@ -1,0 +1,17 @@
+{
+  "name": "gods-portals-mobile",
+  "version": "1.0.0",
+  "description": "Capacitor wrapper that compiles the G.O.D.S portals PWA into a native Android .apk",
+  "scripts": {
+    "sync": "cap sync",
+    "open:android": "cap open android",
+    "build:web": "cd ../portals-web && npm run build && cp -r dist/* ../portals-mobile/www/"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/network": "^6.0.2"
+  },
+  "devDependencies": { "@capacitor/cli": "^6.1.2" }
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SETHS</string>
+    <string name="title_activity_main">SETHS</string>
+    <string name="package_name">za.gods.seths</string>
+    <string name="custom_url_scheme">za.gods.seths</string>
+</resources>

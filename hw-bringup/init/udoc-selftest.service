@@ -1,0 +1,18 @@
+[Unit]
+Description=UDOC Node Boot-Time Hardware Self-Test (FPGA, HSM, NIC)
+DefaultDependencies=no
+After=local-fs.target
+Before=udoc-platform.service udoc-public.service udoc-internal.service live-status.target
+# This unit MUST succeed for the node to reach live status.
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/usr/bin/mkdir -p /run/udoc
+ExecStart=/usr/bin/python3 /opt/udoc/hw-bringup/selftest/udoc_selftest.py
+# On real hardware drop --emulate; the same probes hit the real devices.
+StandardOutput=journal+console
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target

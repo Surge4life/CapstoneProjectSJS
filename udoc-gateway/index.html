@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · UDOC Sign-On</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0A1628">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UDOC">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#0A1628;--navy2:#0D1F3C;--navy3:#112040;--gold:#C9A84C;--gold-l:#E8C97A;--gold-d:#8B6914;
+    --cyan:#00C2D4;--cyan-b:#00E5FF;--txt:#EDE7D6;--txt2:#A9B6CC;--muted:#8A9BB0;--green:#10B981;
+    --bd:rgba(201,168,76,.22);--bd2:rgba(201,168,76,.12);--fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'IBM Plex Mono',monospace;}
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%);color:var(--txt);font-family:var(--fb);font-size:14px;min-height:100%;display:flex;align-items:center;justify-content:center}
+  .mono{font-family:var(--fm)}.muted{color:var(--muted)}
+  .card{width:420px;max-width:93vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:16px;padding:32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .bm{display:flex;align-items:center;gap:14px}.shield{width:46px;height:46px;flex:none}
+  .bm h1{font-family:var(--fc);font-weight:700;letter-spacing:.05em;font-size:26px;margin:0;color:var(--gold)}
+  .bm .sub{font-family:var(--fc);letter-spacing:.24em;color:var(--cyan);font-size:11px}
+  .intro{color:var(--txt2);font-size:12.5px;margin:14px 0 4px}
+  label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:16px 0 5px}
+  input{width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:11px 13px;font-family:var(--fb);font-size:14px}
+  input:focus{outline:none;border-color:var(--gold)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:1px solid var(--gold);background:linear-gradient(180deg,rgba(201,168,76,.18),rgba(201,168,76,.06));color:var(--gold-l);font-family:var(--fc);font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:8px;padding:11px 16px;font-size:13px;width:100%}
+  .btn:hover{background:rgba(201,168,76,.22)}.btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.cyan{border-color:var(--cyan);color:var(--cyan-b);background:rgba(0,194,212,.1)}
+  .err{color:#fda4a4;font-size:12.5px;margin-top:10px;min-height:16px}
+  .surfaces{display:flex;gap:8px;margin-top:18px}
+  .surf{flex:1;text-align:center;border:1px solid var(--bd2);border-radius:9px;padding:9px 6px;font-family:var(--fc);letter-spacing:.06em;font-size:11px;color:var(--muted)}
+  .surf b{display:block;color:var(--txt2);font-size:12px;letter-spacing:.04em}
+  .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);justify-content:center;margin-top:16px}.apibar input{width:240px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
+  .classbar{margin-top:18px;text-align:center;font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;color:var(--gold-d)}
+  #route{display:none;text-align:center}
+  #route .big{font-family:var(--fc);font-weight:700;font-size:22px;color:var(--gold-l);margin:8px 0}
+  .spin{width:34px;height:34px;border:3px solid var(--bd2);border-top-color:var(--cyan);border-radius:50%;margin:18px auto;animation:sp 0.9s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div id="signin">
+      <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
+        <div><h1>G.O.D.S</h1><div class="sub">UDOC SOVEREIGN SIGN-ON</div></div></div>
+      <p class="intro">One sign-on for the entire ecosystem. You'll be routed to your console automatically — administration, a client tenant, or your Sovereign-Operator workspace.</p>
+      <label>Email</label><input id="li-email" type="email" placeholder="you@org"/>
+      <label>Password</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <div style="margin-top:18px"><button class="btn" id="li-btn" onclick="doLogin()">Sign in</button></div>
+      <div class="err" id="li-err"></div>
+      <div class="surfaces"><div class="surf"><b>Admin</b>mainframe</div><div class="surf"><b>Client</b>governance</div><div class="surf"><b>Operator</b>workspace</div></div>
+      <div class="apibar"><span>API</span><input id="li-api" class="mono"/></div>
+      <div class="classbar">© G.O.D.S HOLDINGS (PTY) LTD · UDOC™ — CONFIDENTIAL · IP TRUST PROTECTED</div>
+    </div>
+    <div id="route">
+      <div class="bm" style="justify-content:center"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/></svg></div>
+      <div class="spin"></div>
+      <div class="muted" style="font-size:12.5px">Signed in as <span id="r-email" class="mono"></span></div>
+      <div class="big" id="r-target">Routing…</div>
+      <div style="margin-top:8px"><button class="btn cyan" id="r-go" onclick="goNow()">Continue to your console</button></div>
+      <div class="muted" style="font-size:11px;margin-top:12px">If you are not redirected automatically, use the button above.</div>
+    </div>
+  </div>
+<script>
+const PROD_API="https://gods-platform-core.onrender.com";
+// Console destinations (override per-deployment via localStorage gw_url_admin / gw_url_client / gw_url_operator)
+const CONSOLES={
+  admin:    localStorage.getItem("gw_url_admin")    || "https://gods-udoc-admin.onrender.com",
+  client:   localStorage.getItem("gw_url_client")   || "https://gods-udoc-client.onrender.com",
+  operator: localStorage.getItem("gw_url_operator") || "https://gods-udoc-operator.onrender.com",
+};
+const LABEL={admin:"Administration Mainframe",client:"Client Governance Platform",operator:"Operator Workspace"};
+function apiBase(){ return localStorage.getItem("gw_api")||PROD_API; }
+function setApiBase(v){ localStorage.setItem("gw_api", v.replace(/\/+$/,"")); }
+document.getElementById("li-api").value=apiBase();
+function routeFor(role){ role=(role||"").toLowerCase(); if(role==="admin"||role==="exec") return "admin"; if(role==="client") return "client"; return "operator"; }
+let _dest="";
+function buildDest(d){ const t=encodeURIComponent; const target=CONSOLES[routeFor(d.role)];
+  return target.replace(/\/+$/,"")+"/#sso="+t(d.access_token)+"&api="+t(apiBase())+"&email="+t(d.email)+"&role="+t(d.role||"")+"&division="+t(d.division||"")+"&tenant="+t(d.tenant_id||""); }
+function goNow(){ if(_dest) location.href=_dest; }
+async function doLogin(){ const e=document.getElementById("li-err"); e.textContent="";
+  const a=document.getElementById("li-api").value.trim(); if(a)setApiBase(a);
+  const btn=document.getElementById("li-btn"); btn.disabled=true; btn.textContent="Signing in…";
+  try{ const f=new URLSearchParams(); const email=document.getElementById("li-email").value.trim().toLowerCase();
+    f.set("username",email); f.set("password",document.getElementById("li-pass").value);
+    const r=await fetch(apiBase()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
+    if(!r.ok) throw new Error(r.status===401?"Invalid credentials":("Sign-on failed ("+r.status+")"));
+    const d=await r.json(); d.email=email;
+    const which=routeFor(d.role); _dest=buildDest(d);
+    document.getElementById("signin").style.display="none";
+    document.getElementById("route").style.display="block";
+    document.getElementById("r-email").textContent=email;
+    document.getElementById("r-target").textContent=LABEL[which];
+    setTimeout(goNow, 900);
+  }catch(err){ e.textContent=err.message; btn.disabled=false; btn.textContent="Sign in"; } }
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});}</script>
+</body>
+</html>

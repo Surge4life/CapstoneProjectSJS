@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="S.E.T.H.S — Human Capital Division">
+  <title>S.E.T.H.S — Human Capital Division</title>
+  <polygon points="60.00,16.00 94.64,36.00 94.64,76.00 60.00,96.00 25.36,76.00 25.36,36.00" fill="none" stroke="#00C2D4" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="60.00,26.00 85.98,41.00 85.98,71.00 60.00,86.00 34.02,71.00 34.02,41.00" fill="none" stroke="#00C2D4" stroke-width="1" stroke-opacity="0.35"/>
+  <path d="M 42 50 A 18 18 0 0 1 78 50" fill="none" stroke="#00C2D4" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="60" cy="50" r="7.5" fill="#C9A84C"/>
+  <path d="M 60 59 C 50 62 47 76 48 84 L 72 84 C 73 76 70 62 60 59 Z" fill="#C9A84C"/>
+  <line x1="60" y1="63" x2="60" y2="80" stroke="#060E1C" stroke-width="1" opacity="0.25"/>
+</svg>
