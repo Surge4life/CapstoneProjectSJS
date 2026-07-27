@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>UDOC · Sector Governance Console</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0A1628">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0A1628;--navy2:#0D1F3C;--navy3:#112040;
+    --gold:#C9A84C;--gold-l:#E8C97A;--cyan:#00C2D4;--cyan-b:#00E5FF;
+    --txt:#EDE7D6;--txt2:#A9B6CC;--muted:#8A9BB0;
+    --green:#10B981;--red:#EF4444;--amber:#F59E0B;
+    --bd:rgba(201,168,76,.22);--bd2:rgba(201,168,76,.12);
+    --acc:#00C2D4;--acc-l:#00E5FF;
+    --fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:var(--navy);color:var(--txt);font-family:var(--fb);font-size:14px;line-height:1.45}
+  .mono{font-family:var(--fm)} .muted{color:var(--muted)} a{color:var(--acc)}
+  #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%)}
+  .card{width:400px;max-width:92vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:14px;padding:28px 26px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .bm{display:flex;align-items:center;gap:12px}.shield{width:40px;height:40px}
+  h1{font-family:var(--fc);font-size:28px;margin:0;letter-spacing:.04em;color:var(--gold-l)}
+  .sub{font-size:11px;letter-spacing:.18em;color:var(--muted);margin-top:2px}
+  label{display:block;font-size:11px;letter-spacing:.08em;color:var(--muted);margin:12px 0 4px}
+  input,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--bd2);background:#091022;color:var(--txt);font-family:var(--fb);font-size:14px}
+  .btn{background:linear-gradient(180deg,var(--cyan),#0099a8);color:#041018;border:none;border-radius:8px;padding:10px 16px;font-family:var(--fc);font-weight:600;letter-spacing:.06em;cursor:pointer;font-size:13px}
+  .btn:hover{filter:brightness(1.08)}.btn.sm{padding:6px 10px;font-size:11px}.btn.gold{background:linear-gradient(180deg,var(--gold),#a8872e);color:#1a1200}
+  .err{color:var(--red);font-size:12px;margin-top:8px;min-height:16px}
+  .apibar{display:flex;gap:8px;align-items:center;margin-top:14px;font-size:11px;color:var(--muted)}
+  .apibar input{flex:1;padding:6px 8px;font-size:11px;font-family:var(--fm)}
+  .classbar{margin-top:18px;font-size:10px;color:var(--muted);letter-spacing:.12em;text-align:center}
+  #app{display:none;height:100%;grid-template-columns:220px 1fr;grid-template-rows:56px 1fr}
+  #app.on{display:grid}
+  header{grid-column:1/3;display:flex;align-items:center;gap:14px;padding:0 16px;background:linear-gradient(90deg,var(--navy2),var(--navy));border-bottom:1px solid var(--bd)}
+  header .shield{width:28px;height:28px}
+  .wm{font-family:var(--fc);font-weight:700;letter-spacing:.12em;color:var(--gold-l);font-size:18px}
+  .tag{font-size:10px;letter-spacing:.14em;padding:3px 8px;border-radius:20px;border:1px solid var(--bd);color:var(--acc-l)}
+  .pill{font-size:11px;color:var(--muted)}.spacer{flex:1}
+  .who{text-align:right;font-size:12px;line-height:1.3}.who b{color:var(--txt)}
+  nav{grid-row:2;background:var(--navy);border-right:1px solid var(--bd2);padding:12px 8px;overflow:auto}
+  nav .navitem{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt2);font-size:13.5px;margin-bottom:2px}
+  nav .navitem:hover{background:var(--navy3)} nav .navitem.active{background:linear-gradient(90deg,rgba(0,194,212,.14),transparent);color:var(--acc-l);border-left:2px solid var(--acc)}
+  nav .navitem .ico{width:18px;text-align:center;color:var(--acc)} nav .sech{font-family:var(--fc);letter-spacing:.2em;font-size:10px;color:var(--muted);padding:14px 12px 6px}
+  main{grid-row:2;overflow:auto;padding:20px 22px}
+  .pgh{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .pgh h2{font-family:var(--fc);font-size:22px;margin:0;letter-spacing:.04em;color:var(--gold-l)}
+  .pgh .desc{font-size:13px;color:var(--muted)}
+  .grid.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+  .kpi{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px}
+  .kpi .k{font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}.kpi .v{font-family:var(--fc);font-size:26px;font-weight:700;color:var(--txt);margin-top:4px}.kpi .v.acc{color:var(--acc-l)}
+  .panel{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px;margin-top:14px}
+  .panel h3{font-family:var(--fc);font-size:15px;margin:0 0 10px;letter-spacing:.06em;color:var(--gold-l)}
+  .panel.acc-border{border-color:rgba(0,194,212,.35)}
+  table{width:100%;border-collapse:collapse;font-size:13px} th{text-align:left;font-size:10px;letter-spacing:.1em;color:var(--muted);padding:8px 6px;border-bottom:1px solid var(--bd2)} td{padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.04)}
+  .tag2{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;letter-spacing:.04em}.t-ok{background:rgba(16,185,129,.15);color:var(--green)}.t-warn{background:rgba(245,158,11,.15);color:var(--amber)}.t-bad{background:rgba(239,68,68,.15);color:var(--red)}.t-info{background:rgba(0,194,212,.12);color:var(--acc)}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}.f{flex:1;min-width:120px}
+  .note{font-size:12.5px;color:var(--txt2);margin-top:10px;line-height:1.5}
+  .fw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .fw-card{background:#091022;border:1px solid var(--bd2);border-radius:10px;padding:14px}
+  .fw-card h4{margin:0;font-family:var(--fc);font-size:14px;color:var(--gold-l);letter-spacing:.03em}
+  .fw-card .basis{font-family:var(--fm);font-size:10.5px;color:var(--acc)}
+  .fw-card .focus{font-size:12.5px;color:var(--txt2);margin-top:8px}.fw-card .applies{font-size:11px;color:var(--muted);margin-top:6px}
+  .honesty{font-size:11px;color:var(--muted);border-top:1px solid var(--bd2);padding-top:10px;margin-top:18px}
+  .seg{display:flex;gap:6px;margin-bottom:14px}
+  .seg button{padding:6px 12px;border-radius:20px;border:1px solid var(--bd2);background:transparent;color:var(--muted);font-family:var(--fc);font-size:12px;letter-spacing:.06em;cursor:pointer}
+  .seg button.on{border-color:var(--acc);color:var(--acc-l);background:rgba(0,194,212,.1)}
+  .dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+  .dim{background:#091022;border:1px solid var(--bd2);border-radius:8px;padding:8px;text-align:center}
+  .dim .dl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.dim .dv{font-family:var(--fc);font-weight:700;font-size:16px;color:var(--gold-l)}
+  .loading{color:var(--muted);padding:40px;text-align:center}
+  .small{font-size:12px}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="card">
+    <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
+      <div><h1>UDOC</h1><div class="sub">SECTOR GOVERNANCE</div></div></div>
+    <p class="muted small" style="margin:10px 0 0">Public vs Private sector experience — frameworks, oversight model and KPIs tailored to your classification.</p>
+    <label>Email</label><input id="li-email" type="email" value="client.dsd@gods.local"/>
+    <label>Password</label><input id="li-pass" type="password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div style="margin-top:16px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
+    <div class="err" id="li-err"></div>
+    <div class="apibar"><span>API</span><input id="li-api" class="mono"/></div>
+    <div class="classbar">© G.O.D.S HOLDINGS (PTY) LTD · UDOC™</div>
+  </div>
+</div>
+<div id="app">
+  <header>
+    <svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/></svg>
+    <span class="wm">UDOC</span><span class="tag" id="sec-tag">SECTOR</span>
+    <span class="pill" id="hb">· checking</span>
+    <span class="spacer"></span>
+    <div class="who"><b id="who-email">—</b><br><span class="mono" style="font-size:10px" id="who-tenant"></span></div>
+    <button class="btn sm gold" onclick="logout()">Sign out</button>
+  </header>
+  <nav id="nav">
+    <div class="sech">SECTOR</div>
+    <div class="navitem active" data-view="overview"><span class="ico">◎</span> Overview</div>
+    <div class="navitem" data-view="frameworks"><span class="ico">§</span> Frameworks</div>
+    <div class="navitem" data-view="decisions"><span class="ico">⚡</span> Decisions · EVA</div>
+    <div class="navitem" data-view="systems"><span class="ico">▤</span> AI Systems</div>
+    <div class="navitem" data-view="oversight"><span class="ico">⚖</span> Oversight</div>
+    <div class="sech">INSPECT</div>
+    <div class="navitem" data-view="switch"><span class="ico">⇄</span> Switch sector</div>
+  </nav>
+  <main id="main"><div class="loading">Loading…</div></main>
+</div>
+<script>
+const PROD_API="https://gods-platform-core.onrender.com";
+function apiBase(){ return localStorage.getItem("udoc_sec_api")||PROD_API; }
+function setApiBase(v){ localStorage.setItem("udoc_sec_api", v.replace(/\/+$/,"")); }
+function token(){ return localStorage.getItem("udoc_sec_tok")||""; }
+let SECTOR=null, FORCE=null;
+async function api(path,opts={}){
+  const h=Object.assign({},opts.headers||{}); if(token())h["Authorization"]="Bearer "+token();
+  const r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));
+  if(r.status===401){ if(token())logout(); throw new Error("Session expired"); }
+  const ct=r.headers.get("content-type")||""; const body=ct.includes("json")?await r.json().catch(()=>null):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail)||(typeof body==="string"?body:("HTTP "+r.status))); return body;
+}
+document.getElementById("li-api").value=apiBase();
+(function(){const q=new URLSearchParams(location.search); if(q.get("sector")) FORCE=q.get("sector").toUpperCase();})();
+async function doLogin(){
+  const e=document.getElementById("li-err"); e.textContent="";
+  const a=document.getElementById("li-api").value.trim(); if(a) setApiBase(a);
+  const email=document.getElementById("li-email").value.trim(), pass=document.getElementById("li-pass").value;
+  try{
+    const r=await api("/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass})});
+    localStorage.setItem("udoc_sec_tok", r.access_token||r.token||"");
+    enterApp();
+  }catch(err){ e.textContent=err.message; }
+}
+function logout(){ localStorage.removeItem("udoc_sec_tok"); document.getElementById("app").classList.remove("on"); document.getElementById("login").style.display="flex"; }
+function applyAccent(){
+  if(!SECTOR) return;
+  const a=SECTOR.accent||"#00C2D4";
+  document.documentElement.style.setProperty("--acc",a);
+  document.documentElement.style.setProperty("--acc-l",a);
+  const tag=document.getElementById("sec-tag"); if(tag) tag.textContent=(SECTOR.label||"SECTOR").toUpperCase();
+}
+async function loadSector(){
+  const q=FORCE?("?sector="+encodeURIComponent(FORCE)):"";
+  try{ SECTOR=await api("/sector/profile"+q); applyAccent(); }catch(e){ SECTOR={key:"GENERAL",label:"General",accent:"#8A9BB0"}; }
+}
+async function enterApp(){
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").classList.add("on");
+  try{ const me=await api("/auth/me"); document.getElementById("who-email").textContent=me.email||me.sub||"—"; document.getElementById("who-tenant").textContent=me.tenant_id||me.tenant||""; }catch(e){}
+  document.getElementById("hb").textContent="· live";
+  await loadSector(); nav("overview");
+}
+function nav(v){
+  document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active",n.dataset.view===v));
+  const m=document.getElementById("main"); m.innerHTML='<div class="loading">Loading…</div>';
+  const map={overview:vOverview,frameworks:vFrameworks,decisions:vDecisions,systems:vSystems,oversight:vOversight,switch:vSwitch};
+  (map[v]||vOverview)(m);
+}
+document.querySelectorAll("#nav .navitem").forEach(n=>n.addEventListener("click",()=>nav(n.dataset.view)));
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;'}[c])); }
+function asArray(d){ if(Array.isArray(d))return d; if(d&&typeof d==="object"){ for(const k of ["items","records","models","results","data","cases"]) if(Array.isArray(d[k]))return d[k]; } return []; }
+function statusTag(v){ const u=String(v||"").toUpperCase(); const c=u.includes("ACTIVE")||u.includes("APPROVE")||u.includes("RESOLVED")?"t-ok":(u.includes("PEND")||u.includes("REVIEW")||u.includes("OPEN")?"t-warn":(u.includes("BLOCK")||u.includes("DENY")||u.includes("SUSP")?"t-bad":"t-info")); return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>'; }
+function tableFrom(rows,cols){ if(!rows.length) return '<div class="muted small">No records.</div>'; let h='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c.h)+'</th>').join("")+'</tr></thead><tbody>';
+  rows.forEach(r=>{ h+='<tr>'+cols.map(c=>'<td>'+(c.r?c.r(r):esc(r[c.k]))+'</td>').join("")+'</tr>'; }); return h+'</tbody></table>'; }
+function honesty(){ return '<div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33. Sector frameworks reflect standing SA instruments as of mid-2026.</div>'; }
+function dimsHtml(dims){ if(!dims||typeof dims!=="object") return ""; const keys=["Validity","Confidence","Risk","Compliance","Stability","Impact"];
+  let h='<div class="dims">'; keys.forEach(k=>{ const v=dims[k]!=null?dims[k]:(dims[k.toLowerCase()]!=null?dims[k.toLowerCase()]:null); if(v==null)return;
+    h+='<div class="dim"><div class="dl">'+esc(k)+'</div><div class="dv">'+esc(v)+'</div></div>'; }); return h+'</div>'; }
+async function safe(host,fn){ try{ return await fn(); }catch(e){ host.innerHTML='<div class="panel"><div class="t-bad small">⚠ '+esc(e.message)+'</div></div>'; } }
+
+async function vOverview(m){
+  await loadSector();
+  const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
+  let ov=null, fw={frameworks:[]};
+  const q=FORCE?("?sector="+encodeURIComponent(FORCE)):"";
+  try{ ov=await api("/sector/overview"+q); }catch(e){}
+  try{ fw=await api("/sector/frameworks"+q); }catch(e){}
+  const card=(k,v,cls)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v '+(cls||"")+'">'+(v==null?"—":esc(v))+'</div></div>';
+  const tiles=(ov&&ov.tiles&&ov.tiles.length)?ov.tiles.map((t,i)=>card(t.k,t.v,i===0?"acc":"")).join(""):
+    card("Decisions","—","acc")+card("Blocked","—")+card("Oversight","—")+card("Frameworks",(fw.frameworks||[]).length);
+  m.innerHTML='<div class="pgh"><h2>'+esc(S.label||"Sector")+' Overview</h2><span class="desc">'+esc(S.tagline||"")+'</span></div>'+
+    '<div class="panel acc-border"><div class="small muted">'+esc(S.summary||"")+'</div>'+
+      '<div class="small" style="margin-top:12px;letter-spacing:.08em;color:'+esc(acc)+'">OVERSIGHT MODEL</div>'+
+      '<div class="small muted" style="margin-top:3px">'+esc(S.oversight_model||"")+'</div>'+
+      (S.terminology?'<div class="small" style="margin-top:10px">Subjects: <b>'+esc(S.terminology.subjects||"")+'</b> · Org: <b>'+esc(S.terminology.org||"")+'</b> · Risk frame: <b>'+esc(S.terminology.risk||"")+'</b></div>':"")+
+    '</div>'+
+    '<div class="grid kpis" style="margin-top:14px">'+tiles+'</div>'+
+    '<div class="panel"><h3>Frameworks in scope · '+(fw.frameworks||[]).length+'</h3>'+
+      '<div class="fw-grid">'+(fw.frameworks||[]).slice(0,4).map(f=>'<div class="fw-card"><h4>'+esc(f.name)+'</h4><div class="basis">'+esc(f.basis)+'</div><div class="focus">'+esc(f.focus)+'</div></div>').join("")+'</div>'+
+      '<div style="margin-top:10px"><button class="btn sm" onclick="nav(\'frameworks\')">All frameworks →</button></div></div>'+honesty();
+}
+async function vFrameworks(m){
+  await loadSector();
+  const q=FORCE?("?sector="+encodeURIComponent(FORCE)):"";
+  let fw={frameworks:[]}; try{ fw=await api("/sector/frameworks"+q); }catch(e){}
+  const S=SECTOR||{};
+  m.innerHTML='<div class="pgh"><h2>Regulatory frameworks</h2><span class="desc">'+esc(S.label||"")+' · instruments that apply to this sector</span></div>'+
+    '<div class="fw-grid">'+(fw.frameworks||[]).map(f=>'<div class="fw-card"><h4>'+esc(f.name)+'</h4><div class="basis">'+esc(f.basis)+'</div>'+
+      '<div class="focus">'+esc(f.focus)+'</div><div class="applies"><b>Applies to:</b> '+esc(f.applies_to)+'</div></div>').join("")+'</div>'+honesty();
+}
+async function vDecisions(m){ await safe(m, async()=>{
+  await loadSector();
+  let rows=[],certs=[]; try{ rows=asArray(await api("/decisions")); }catch(e){} try{ certs=asArray(await api("/decisions/certificates")); }catch(e){}
+  const S=SECTOR||{}; const term=(S.terminology&&S.terminology.subjects)||"subjects";
+  m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2><span class="desc">Governed decisions affecting '+esc(term)+'</span></div>'+
+    '<div class="panel"><h3>Run evaluation</h3><div class="row">'+
+      '<div class="f"><label>Model ID</label><input id="ev-mid" value="model-001"></div>'+
+      '<div class="f"><label>Confidence</label><input id="ev-conf" value="0.92"></div>'+
+      '<div class="f"><label>Compliance</label><input id="ev-comp" value="1.0"></div>'+
+      '<div class="f"><label>Sample</label><select id="ev-fair"><option value="fair">fair</option><option value="biased">biased</option></select></div>'+
+      '<button class="btn" onclick="runEval()">Evaluate</button></div><div id="ev-out" style="margin-top:12px"></div></div>'+
+    '<div class="panel"><h3>Recent · '+rows.length+'</h3>'+tableFrom(rows.slice(0,50),[
+      {h:"Ref",r:x=>'<span class="mono">'+esc(x.decision_id||x.id||"—")+'</span>'},
+      {h:"System",r:x=>esc(x.model_id||"—")},
+      {h:"EVA",r:x=>esc(x.composite_eva!=null?x.composite_eva:"—")},
+      {h:"Verdict",r:x=>statusTag(x.decision||x.verdict||x.outcome)},
+    ])+'</div>'+
+    '<div class="panel"><h3>Certificates · '+certs.length+'</h3>'+tableFrom(certs.slice(0,30),[
+      {h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.cert_id||x.id||"—")+'</span>'},
+      {h:"Composite",r:x=>esc(x.composite_eva!=null?x.composite_eva:"—")},
+      {h:"Sector",r:x=>esc(x.sector||"—")},
+      {h:"",r:x=>{const cid=esc(x.certificate_id||x.cert_id||x.id||""); return cid?'<button class="btn sm" onclick="verifyCert(\''+cid+'\')">Verify</button>':'';}},
+    ])+'</div>'+honesty();
+}); }
+async function runEval(){
+  const o=document.getElementById("ev-out"); o.innerHTML='<div class="muted small">Evaluating…</div>';
+  try{
+    const body={model_id:document.getElementById("ev-mid").value.trim(), confidence:parseFloat(document.getElementById("ev-conf").value)||0.9,
+      compliance:parseFloat(document.getElementById("ev-comp").value)||1, sample:document.getElementById("ev-fair").value};
+    const d=await api("/eva/evaluate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    o.innerHTML='<div class="small">Composite <b style="color:var(--gold-l)">'+(d.composite_eva!=null?d.composite_eva:"—")+'</b> · '+statusTag(d.decision||d.verdict)+'</div>'+
+      dimsHtml(d.dimensions)+
+      (d.certificate_id?'<div class="small" style="margin-top:8px">Cert <span class="mono">'+esc(d.certificate_id)+'</span> <button class="btn sm" onclick="verifyCert(\''+esc(d.certificate_id)+'\')">Verify</button></div>':"");
+  }catch(e){ o.innerHTML='<div class="t-bad small">'+esc(e.message)+'</div>'; }
+}
+async function verifyCert(cid){
+  try{ const r=await api("/decisions/certificates/"+encodeURIComponent(cid)+"/verify");
+    alert("Certificate "+cid+"\nValid: "+(r.valid!==false)+"\nComposite: "+(r.composite_eva!=null?r.composite_eva:"—")+"\n"+(r.message||"")); }
+  catch(e){ alert("Verify failed: "+e.message); }
+}
+async function vSystems(m){ await safe(m, async()=>{
+  await loadSector();
+  let rows=[]; try{ rows=asArray(await api("/registry/models")); }catch(e){}
+  const S=SECTOR||{};
+  m.innerHTML='<div class="pgh"><h2>AI Systems</h2><span class="desc">Registered models in this '+esc(S.label||"sector")+' scope</span></div>'+
+    '<div class="panel"><h3>Register system</h3><div class="row">'+
+      '<div class="f"><label>Model ID</label><input id="ns-id" placeholder="model-xxx"></div>'+
+      '<div class="f"><label>Name</label><input id="ns-name" placeholder="Display name"></div>'+
+      '<div class="f"><label>Risk tier</label><select id="ns-risk"><option>LOW</option><option>MEDIUM</option><option selected>HIGH</option><option>CRITICAL</option></select></div>'+
+      '<button class="btn" onclick="registerSystem()">Register</button></div><div class="err small" id="ns-err"></div></div>'+
+    '<div class="panel"><h3>Registry · '+rows.length+'</h3>'+tableFrom(rows,[
+      {h:"ID",r:x=>'<span class="mono">'+esc(x.model_id||x.id||"—")+'</span>'},
+      {h:"Name",r:x=>esc(x.name||"—")},
+      {h:"Risk",r:x=>statusTag(x.risk_tier||x.risk_level)},
+      {h:"Status",r:x=>statusTag(x.status)},
+    ])+'</div>'+honesty();
+}); }
+async function registerSystem(){
+  const e=document.getElementById("ns-err"); e.textContent="";
+  const body={model_id:document.getElementById("ns-id").value.trim(),name:document.getElementById("ns-name").value.trim(),risk_tier:document.getElementById("ns-risk").value};
+  if(!body.model_id||!body.name){ e.textContent="ID and name required."; return; }
+  try{ await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); nav("systems"); }
+  catch(err){ e.textContent=err.message; }
+}
+async function vOversight(m){ await safe(m, async()=>{
+  const rows=asArray(await api("/oversight/cases"));
+  const S=SECTOR||{};
+  m.innerHTML='<div class="pgh"><h2>Oversight</h2><span class="desc">'+esc(S.oversight_model||"Human-in-the-loop review")+'</span></div>'+
+    '<div class="panel"><h3>Cases · '+rows.length+'</h3>'+tableFrom(rows,[
+      {h:"Case",r:x=>'<span class="mono">'+esc(x.case_ref||x.id||"—")+'</span>'},
+      {h:"Subject",r:x=>esc(x.subject||x.model_id||"—")},
+      {h:"Reason",r:x=>esc(x.reason||x.kind||"—")},
+      {h:"Status",r:x=>statusTag(x.state||x.status)},
+    ])+'</div>'+honesty();
+}); }
+async function vSwitch(m){
+  const cur=FORCE||(SECTOR&&SECTOR.sector)||"GENERAL";
+  m.innerHTML='<div class="pgh"><h2>Inspect sector</h2><span class="desc">Staff may inspect PUBLIC or PRIVATE experience; tenants see their assigned sector</span></div>'+
+    '<div class="panel"><h3>Active view</h3><div class="seg">'+
+      '<button class="'+(cur==="PUBLIC"?"on":"")+'" onclick="setForce(\'PUBLIC\')">Public Sector</button>'+
+      '<button class="'+(cur==="PRIVATE"?"on":"")+'" onclick="setForce(\'PRIVATE\')">Private Sector</button>'+
+      '<button class="'+(cur==="GENERAL"||!FORCE?"on":"")+'" onclick="setForce(null)">My tenant sector</button>'+
+    '</div><div class="note">Switching reloads profile, frameworks and KPIs for that sector classification. Tenant users remain bound to their organisation\'s assigned sector on the backend.</div></div>'+honesty();
+}
+function setForce(s){ FORCE=s; const url=new URL(location.href); if(s) url.searchParams.set("sector",s); else url.searchParams.delete("sector");
+  history.replaceState(null,"",url.pathname+url.search); loadSector().then(()=>nav("overview")); }
+
+if(token()){ try{ enterApp(); }catch(e){ logout(); } }
+</script>
+</body>
+</html>

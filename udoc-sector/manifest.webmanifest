@@ -1,0 +1,19 @@
+{
+  "name": "UDOC Sector · G.O.D.S",
+  "short_name": "UDOC Sector",
+  "description": "Public vs Private sector governance console — G.O.D.S UDOC",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A1628",
+  "theme_color": "#0A1628",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
