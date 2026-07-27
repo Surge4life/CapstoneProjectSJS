@@ -29,3 +29,4 @@ See `UDOC_v93_MVP_ECOSYSTEM_BLUEPRINT.md` at repo root for full architecture.
 - Session 10: v7-eva + architecture lineage
 - Session 11: sovereign-console / platform-ui density on udoc-internal
 - Session 12: Sales packaging + client onboarding flows
+- Session 13: GIS access control + approved open-source path
