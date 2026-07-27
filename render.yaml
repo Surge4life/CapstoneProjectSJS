@@ -157,3 +157,17 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  # ---- UDOC Sector Governance Console — Public vs Private differentiated experience (static) ----
+  - type: web
+    name: gods-udoc-sector
+    runtime: static
+    rootDir: udoc-sector
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
