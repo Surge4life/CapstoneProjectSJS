@@ -19,8 +19,6 @@ body{background:var(--navy);color:var(--ink);font-family:-apple-system,BlinkMacS
 .serif{font-family:Georgia,"Times New Roman",serif}
 button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
-
-/* ---------- Login ---------- */
 #login{position:fixed;inset:0;display:flex;flex-direction:column;justify-content:center;padding:32px 26px;
   padding-top:calc(32px + var(--safe-t));
   background:radial-gradient(120% 60% at 50% -8%,#12244c 0,var(--navy) 58%)}
@@ -43,8 +41,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .adv{margin-top:18px;text-align:center}
 .adv summary{color:var(--mut2);font-size:12px;list-style:none}
 .adv input{margin-top:8px}
-
-/* ---------- App frame ---------- */
 #app{display:none;flex-direction:column;height:100%}
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;
   padding:calc(11px + var(--safe-t)) 16px 11px;background:rgba(10,22,40,.92);backdrop-filter:blur(12px);
@@ -57,11 +53,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .view{display:none;animation:fade .22s ease}
 .view.on{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-/* ---------- Cards / bits ---------- */
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:12px}
-.card.tap{transition:transform .08s}
-.card.tap:active{transform:scale(.985);background:var(--navy3)}
 .hero{background:linear-gradient(135deg,var(--navy2),var(--navy3));border:1px solid var(--line);border-radius:16px;
   padding:17px;margin-bottom:14px}
 .hero .role{display:inline-block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:#1a1305;
@@ -97,8 +89,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 @keyframes sh{to{background-position:-200% 0}}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px}
 .kv:last-child{border-bottom:0}.kv .k{color:var(--mut)}.kv .val{font-weight:600;text-align:right}
-
-/* ---------- Bottom nav ---------- */
 #nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;
   height:calc(var(--bn) + var(--safe-b));padding-bottom:var(--safe-b);
   background:rgba(11,24,44,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
@@ -107,8 +97,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 #nav button.on{color:var(--gold-l)}
 #nav svg{width:23px;height:23px}
 #nav button.on svg{filter:drop-shadow(0 0 6px rgba(201,168,76,.5))}
-
-/* ---------- Sheet (modal) ---------- */
 .sheet-wrap{position:fixed;inset:0;z-index:50;display:none}
 .sheet-wrap.on{display:block}
 .sheet-bg{position:absolute;inset:0;background:rgba(2,7,15,.66);animation:fade .2s}
@@ -124,7 +112,6 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 select.in{appearance:none}
 .lab{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--mut);margin-top:13px;display:block}
 .range{width:100%;margin-top:9px;accent-color:var(--gold)}
-.rowin{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .verdict{text-align:center;padding:20px;border-radius:15px;margin-top:6px}
 .verdict.ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.4)}
 .verdict.block{background:rgba(239,83,80,.1);border:1px solid rgba(239,83,80,.4)}
@@ -132,11 +119,14 @@ select.in{appearance:none}
 .toast{position:fixed;left:50%;bottom:calc(var(--bn) + var(--safe-b) + 16px);transform:translateX(-50%);
   background:#0a1c34;border:1px solid var(--gold);color:var(--gold-l);padding:11px 18px;border-radius:12px;
   font-size:13.5px;z-index:80;max-width:90%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.dims{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.dim{background:var(--navy);border:1px solid var(--line);border-radius:10px;padding:10px 8px;text-align:center}
+.dim .dl{font-size:9.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--mut)}
+.dim .dv{font-size:16px;font-weight:700;color:var(--gold-l);margin-top:3px}
+.honesty{font-size:11px;color:var(--mut2);border-top:1px solid var(--line);padding-top:12px;margin-top:16px;line-height:1.5}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div id="login">
   <div class="brand">
     <svg class="mark" viewBox="0 0 108 108"><circle cx="54" cy="54" r="30" fill="none" stroke="#C9A84C" stroke-width="3.4"/>
@@ -151,8 +141,6 @@ select.in{appearance:none}
   <details class="adv"><summary>Advanced · API endpoint</summary>
     <input id="li-api" class="in" placeholder="https://gods-platform-core.onrender.com"></details>
 </div>
-
-<!-- APP -->
 <div id="app">
   <div class="topbar"><svg class="tmark" viewBox="0 0 108 108"><circle cx="54" cy="54" r="30" fill="none" stroke="#C9A84C" stroke-width="4"/>
       <circle cx="54" cy="50" r="10.5" fill="#C9A84C"/><path d="M49 57 L45 75 L63 75 L59 57 Z" fill="#C9A84C"/></svg>
@@ -162,22 +150,18 @@ select.in{appearance:none}
     <div class="view" id="v-portals"></div>
     <div class="view" id="v-decisions"></div>
     <div class="view" id="v-oversight"></div>
-    <div class="view" id="v-operator"></div>
     <div class="view" id="v-more"></div>
   </div>
   <div id="nav"></div>
 </div>
-
 <div class="sheet-wrap" id="sheet"><div class="sheet-bg" onclick="closeSheet()"></div>
   <div class="sheet"><div class="grab"></div><div id="sheet-body"></div></div></div>
-
 <script>
 const API_DEFAULT="https://gods-platform-core.onrender.com";
 function apiBase(){return localStorage.getItem("udoc_m_api")||API_DEFAULT;}
 function tok(){return localStorage.getItem("udoc_m_tok")||"";}
 function who(){try{return JSON.parse(localStorage.getItem("udoc_m_who")||"{}");}catch(e){return{};}}
-let PERMS=null, NAV=[], CURRENT="home", APPVER=(window.UDOC_APP_VERSION||"25.1.0");
-
+let PERMS=null, NAV=[], CURRENT="home", APPVER="9.3.0";
 async function api(path,opts={}){
   const h=Object.assign({},opts.headers||{}); if(tok())h["Authorization"]="Bearer "+tok();
   const r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));
@@ -189,14 +173,17 @@ async function api(path,opts={}){
   return b;
 }
 function setNet(ok){const d=document.getElementById("netdot");if(d)d.className="dot"+(ok?"":" off");}
-const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&","<":"<",">":">",'"':"""}[c]));
 const arr=x=>Array.isArray(x)?x:(x&&Array.isArray(x.items)?x.items:(x&&Array.isArray(x.results)?x.results:(x&&Array.isArray(x.data)?x.data:[])));
 const num=x=>x==null||isNaN(x)?"—":(Math.round(x*1000)/1000);
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
 function sheet(html){document.getElementById("sheet-body").innerHTML=html;document.getElementById("sheet").classList.add("on");}
 function closeSheet(){document.getElementById("sheet").classList.remove("on");}
+function dimsHtml(dims){if(!dims||typeof dims!=="object")return"";const keys=["Validity","Confidence","Risk","Compliance","Stability","Impact"];
+  let h='<div class="dims">';keys.forEach(k=>{const v=dims[k]!=null?dims[k]:(dims[k.toLowerCase()]!=null?dims[k.toLowerCase()]:null);if(v==null)return;
+    h+='<div class="dim"><div class="dl">'+esc(k)+'</div><div class="dv">'+esc(v)+'</div></div>';});return h+'</div>';}
+function honesty(){return '<div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Basis: POPIA s71 + Constitution ss 9/16/33.</div>';}
 
-/* ---------------- auth ---------------- */
 async function doLogin(){
   const e=document.getElementById("li-err");e.textContent="";
   const apiIn=document.getElementById("li-api").value.trim();if(apiIn)localStorage.setItem("udoc_m_api",apiIn.replace(/\/+$/,""));
@@ -215,7 +202,6 @@ async function doLogin(){
 }
 function logout(){localStorage.removeItem("udoc_m_tok");localStorage.removeItem("udoc_m_who");PERMS=null;
   document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";}
-
 async function enter(){
   document.getElementById("login").style.display="none";
   document.getElementById("app").style.display="flex";
@@ -224,16 +210,13 @@ async function enter(){
 }
 function canView(v){return !PERMS||(PERMS.views||[]).includes(v);}
 function can(a){return !!PERMS&&(PERMS.actions||[]).includes(a);}
-
-/* ---------------- nav ---------------- */
 const IC={
  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg>',
  decisions:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>',
  oversight:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18"/><path d="M5 7l-3 6h6z"/><path d="M19 7l-3 6h6z"/><path d="M4 21h16"/><path d="M8 7h8"/></svg>',
- operator:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
  portals:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
  more:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>'};
-const TITLES={home:"Overview",portals:"Portals",decisions:"Decisions",oversight:"Oversight",operator:"Workspace",more:"More"};
+const TITLES={home:"Overview",portals:"Portals",decisions:"Decisions",oversight:"Oversight",more:"More"};
 function buildNav(){
   const role=(who().role||"").toLowerCase();
   NAV=[{id:"home",label:"Home"},{id:"portals",label:"Portals"},{id:"decisions",label:"Decisions"}];
@@ -253,7 +236,6 @@ function go(id){
 }
 const sk=n=>'<div class="skel"></div>'.repeat(n||3);
 
-/* ---------------- HOME ---------------- */
 async function vHome(el){
   const w=who();const role=(PERMS&&PERMS.label)||w.role||"—";
   el.innerHTML='<div class="hero"><span class="role">'+esc(role)+'</span><h3 class="serif">Sovereign posture</h3>'+
@@ -261,7 +243,6 @@ async function vHome(el){
     '<div class="kpis" id="h-kpi">'+'<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>'+
     '<div class="sect"><h4>Recent decisions</h4><span class="tiny muted" onclick="go(\'decisions\')">View all ›</span></div>'+
     '<div class="card" id="h-dec">'+sk(3)+'</div>';
-  // KPIs
   let summary={};
   try{summary=await api("/udoc/regulator/summary")||{};}catch(e){}
   const D=summary.decisions||{},O=summary.oversight||{},S=summary.systems||{};
@@ -271,7 +252,6 @@ async function vHome(el){
     kpi(D.blocked!=null?D.blocked:"—","Blocked","red")+
     kpi(O.open!=null?O.open:"—","Open oversight","cyan")+
     kpi(S.total!=null?S.total:"—","AI systems","green");
-  // recent decisions
   let recent=[];try{recent=arr(await api("/decisions")).slice(0,5);}catch(e){}
   const dd=document.getElementById("h-dec");
   if(!recent.length){dd.innerHTML='<div class="empty">No decisions recorded yet.</div>';}
@@ -281,69 +261,81 @@ function decVerdict(d){return (d.decision||d.verdict||d.result||"").toUpperCase(
 function decRow(d){
   const v=decVerdict(d);const blk=v==="BLOCK"||v==="BLOCKED"||v==="DENY";
   const id=d.id??d.decision_id??d.certificate_id;
-  return '<div class="row" onclick="decDetail('+JSON.stringify(JSON.stringify(d)).replace(/"/g,"&quot;")+')">'+
+  const eva=d.composite_eva!=null?d.composite_eva:(d.eva!=null?d.eva:null);
+  return '<div class="row" onclick=\'decDetail('+JSON.stringify(JSON.stringify(d))+')\'>'+
     '<div class="main"><div class="t">'+esc(d.model_id||("Decision #"+(id??"")))+'</div>'+
-    '<div class="s">SVS '+num(d.svs)+(d.sovereign!=null?' · sov '+num(d.sovereign):"")+(d.created_at?' · '+esc(String(d.created_at).slice(0,10)):"")+'</div></div>'+
+    '<div class="s">'+(eva!=null?'EVA '+num(eva)+' · ':"")+(d.created_at?esc(String(d.created_at).slice(0,10)):"")+'</div></div>'+
     '<span class="pill '+(blk?"block":"ok")+'">'+(v||"—")+'</span></div>';
 }
 function decDetail(js){let d={};try{d=JSON.parse(js);}catch(e){}
   const v=decVerdict(d);const blk=v==="BLOCK"||v==="BLOCKED";
+  const cid=d.certificate_id||"";
   sheet('<h3 class="serif">'+esc(d.model_id||("Decision #"+(d.id??"")))+'</h3>'+
     '<div class="sh-sub">'+(v?('<span class="pill '+(blk?"block":"ok")+'">'+v+'</span>'):"")+'</div>'+
-    '<div class="kv"><span class="k">Sovereign Validation (SVS)</span><span class="val">'+num(d.svs)+'</span></div>'+
-    (d.sovereign!=null?'<div class="kv"><span class="k">Sovereignty</span><span class="val">'+num(d.sovereign)+'</span></div>':"")+
-    (d.risk!=null?'<div class="kv"><span class="k">Risk</span><span class="val">'+num(d.risk)+'</span></div>':"")+
-    (d.compliance!=null?'<div class="kv"><span class="k">Compliance</span><span class="val">'+num(d.compliance)+'</span></div>':"")+
-    (d.latency_ms!=null?'<div class="kv"><span class="k">Latency</span><span class="val">'+num(d.latency_ms)+' ms</span></div>':"")+
-    (d.certificate_id?'<div class="kv"><span class="k">Certificate</span><span class="val mono">'+esc(d.certificate_id)+'</span></div>':"")+
+    (d.composite_eva!=null?'<div class="kv"><span class="k">Composite EVA</span><span class="val" style="color:var(--cyan)">'+num(d.composite_eva)+'</span></div>':"")+
+    dimsHtml(d.dimensions)+
+    (d.svs!=null?'<div class="kv"><span class="k">SVS</span><span class="val">'+num(d.svs)+'</span></div>':"")+
+    (cid?'<div class="kv"><span class="k">Certificate</span><span class="val mono">'+esc(cid)+'</span></div><button class="btn ghost" style="margin-top:10px" onclick="verifyCert(\''+esc(cid)+'\')">Verify certificate</button><div id="vout" class="small muted" style="margin-top:8px"></div>':"")+
     (d.created_at?'<div class="kv"><span class="k">When</span><span class="val">'+esc(String(d.created_at).replace("T"," ").slice(0,16))+'</span></div>':""));
 }
+async function verifyCert(cid){
+  const el=document.getElementById("vout"); if(el) el.textContent="Verifying…";
+  try{const v=await api("/decisions/certificates/"+encodeURIComponent(cid)+"/verify");
+    if(el) el.innerHTML='<b style="color:'+(v.valid?'var(--green)':'var(--red)')+'">'+(v.valid?"VALID":"INVALID")+'</b> · '+esc(v.signature_alg||"");
+  }catch(e){if(el) el.textContent=e.message;}
+}
 
-/* ---------------- DECISIONS ---------------- */
 async function vDecisions(el){
-  const mayRun=can("policy.decide")||can("system.control")||["admin","exec","gov","operator"].includes((who().role||"").toLowerCase());
-  el.innerHTML=(mayRun?'<button class="btn" style="margin-bottom:14px" onclick="evalSheet()">＋ Run EVA evaluation</button>':"")+
+  const mayRun=can("policy.decide")||can("system.control")||["admin","exec","gov","operator","client"].includes((who().role||"").toLowerCase());
+  el.innerHTML=(mayRun?'<div style="display:flex;gap:8px;margin-bottom:14px"><button class="btn" style="flex:1" onclick="evalSheet()">＋ Evaluate</button><button class="btn ghost" style="flex:1" onclick="regSheet()">＋ Register</button></div>':"")+
     '<div class="sect"><h4>Decision ledger</h4><span class="tiny muted" id="d-count"></span></div><div id="d-list">'+sk(5)+'</div>';
   let list=[];try{list=arr(await api("/decisions"));}catch(e){document.getElementById("d-list").innerHTML='<div class="empty">'+esc(e.message)+'</div>';return;}
   document.getElementById("d-count").textContent=list.length+" total";
   document.getElementById("d-list").innerHTML=list.length?'<div class="card">'+list.slice(0,60).map(decRow).join("")+'</div>':'<div class="empty">No decisions yet.</div>';
 }
+function regSheet(){
+  sheet('<h3 class="serif">Register AI system</h3><div class="sh-sub">Register under your tenant before evaluation.</div>'+
+    '<label class="lab">Model ID</label><input class="in" id="r-id" placeholder="e.g. credit-scorer-v2">'+
+    '<label class="lab">Name</label><input class="in" id="r-name" placeholder="Credit Scorer">'+
+    '<label class="lab">Risk tier</label><select class="in" id="r-risk"><option>MINIMAL</option><option selected>NOTABLE</option><option>HIGH</option><option>UNACCEPTABLE</option></select>'+
+    '<button class="btn" style="margin-top:16px" id="r-btn" onclick="doRegister()">Register</button><div class="err" id="r-err"></div>');
+}
+async function doRegister(){
+  const body={model_id:document.getElementById("r-id").value.trim(),name:document.getElementById("r-name").value.trim(),risk_tier:document.getElementById("r-risk").value};
+  if(!body.model_id||!body.name){document.getElementById("r-err").textContent="ID and name required.";return;}
+  const b=document.getElementById("r-btn");b.disabled=true;b.textContent="Registering…";
+  try{await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    closeSheet();toast("✓ Registered "+body.model_id);go("decisions");
+  }catch(e){document.getElementById("r-err").textContent=e.message;b.disabled=false;b.textContent="Register";}
+}
 function evalSheet(){
-  sheet('<h3 class="serif">EVA evaluation</h3><div class="sh-sub">Run a sovereign AI decision through the 6-dimension engine.</div>'+
+  sheet('<h3 class="serif">EVA evaluation</h3><div class="sh-sub">6-dimension sovereign governance engine.</div>'+
    '<label class="lab">Model ID</label><input class="in" id="e-model" value="model-001">'+
-   '<label class="lab">Risk tier</label><select class="in" id="e-risk"><option selected>LOW</option><option>MEDIUM</option><option>HIGH</option></select>'+
-   '<label class="lab">Raw confidence · <span id="e-rcv">0.85</span></label><input class="range" type="range" min="0" max="1" step="0.01" value="0.85" id="e-rc" oninput="document.getElementById(\'e-rcv\').textContent=this.value">'+
-   '<label class="lab">Compliance · <span id="e-cmv">0.9</span></label><input class="range" type="range" min="0" max="1" step="0.01" value="0.9" id="e-cm" oninput="document.getElementById(\'e-cmv\').textContent=this.value">'+
-   '<label class="lab">Fairness — favourable / total</label><div class="rowin"><input class="in" id="e-pf" inputmode="numeric" placeholder="priv fav" value="80"><input class="in" id="e-pt" inputmode="numeric" placeholder="priv total" value="100"></div>'+
-   '<div class="rowin"><input class="in" id="e-uf" inputmode="numeric" placeholder="unpriv fav" value="78"><input class="in" id="e-ut" inputmode="numeric" placeholder="unpriv total" value="100"></div>'+
-   '<label class="lab">Sovereignty signals (ECS · BGP · traceroute · DNSSEC · storage)</label>'+
-   '<div class="rowin"><input class="in" id="e-ecs" value="0.95"><input class="in" id="e-bgp" value="0.95"></div>'+
-   '<div class="rowin"><input class="in" id="e-tr" value="0.95"><input class="in" id="e-dns" value="0.95"></div>'+
-   '<input class="in" id="e-st" value="0.95" style="margin-top:10px" placeholder="storage">'+
+   '<label class="lab">Risk tier</label><select class="in" id="e-risk"><option>MINIMAL</option><option selected>NOTABLE</option><option>HIGH</option><option>UNACCEPTABLE</option></select>'+
+   '<label class="lab">Raw confidence · <span id="e-rcv">0.92</span></label><input class="range" type="range" min="0" max="1" step="0.01" value="0.92" id="e-rc" oninput="document.getElementById(\'e-rcv\').textContent=this.value">'+
+   '<label class="lab">Compliance · <span id="e-cmv">1.0</span></label><input class="range" type="range" min="0" max="1" step="0.01" value="1.0" id="e-cm" oninput="document.getElementById(\'e-cmv\').textContent=this.value">'+
+   '<label class="lab">Fairness sample</label><select class="in" id="e-fair"><option value="fair">fair</option><option value="biased">biased (triggers block)</option></select>'+
    '<button class="btn" style="margin-top:16px" id="e-run" onclick="runEval()">Evaluate</button><div class="err" id="e-err"></div>');
 }
 async function runEval(){
-  const g=id=>document.getElementById(id).value;const gn=id=>parseFloat(g(id));const gi=id=>parseInt(g(id),10);
-  const body={model_id:g("e-model"),risk_tier:g("e-risk"),raw_confidence:gn("e-rc"),compliance:gn("e-cm"),
-    priv_favorable:gi("e-pf"),priv_total:gi("e-pt"),unpriv_favorable:gi("e-uf"),unpriv_total:gi("e-ut"),
-    ecs:gn("e-ecs"),bgp:gn("e-bgp"),traceroute:gn("e-tr"),dnssec:gn("e-dns"),storage:gn("e-st")};
+  const g=id=>document.getElementById(id).value;const gn=id=>parseFloat(g(id));
+  const body={model_id:g("e-model"),risk_tier:g("e-risk"),raw_confidence:gn("e-rc"),compliance:gn("e-cm")};
+  if(g("e-fair")==="biased"){body.priv_favorable=900;body.priv_total=1000;body.unpriv_favorable=120;body.unpriv_total=1000;}
   const b=document.getElementById("e-run");b.disabled=true;b.textContent="Evaluating…";
   try{
     const r=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     const v=decVerdict(r);const blk=v==="BLOCK"||v==="BLOCKED";
+    const cid=r.certificate_id||"";
     sheet('<h3 class="serif">Evaluation result</h3><div class="verdict '+(blk?"block":"ok")+'">'+
       '<div class="big" style="color:'+(blk?"#ff8a85":"#5ee9bf")+'">'+(v||"—")+'</div>'+
-      '<div class="muted small" style="margin-top:6px">'+esc(r.model_id||body.model_id)+'</div></div>'+
-      '<div class="kv"><span class="k">Sovereign Validation</span><span class="val">'+num(r.svs)+'</span></div>'+
-      '<div class="kv"><span class="k">Risk</span><span class="val">'+num(r.risk)+'</span></div>'+
-      '<div class="kv"><span class="k">Compliance</span><span class="val">'+num(r.compliance)+'</span></div>'+
-      (r.certificate_id?'<div class="kv"><span class="k">Certificate</span><span class="val mono">'+esc(r.certificate_id)+'</span></div>':"")+
-      (r.oversight_case||r.oversight_case_ref?'<div class="card" style="margin-top:12px;border-color:rgba(245,158,11,.4)"><span class="pill warn">OVERSIGHT OPENED</span> <span class="mono small">'+esc(r.oversight_case||r.oversight_case_ref)+'</span></div>':"")+
+      '<div class="muted small" style="margin-top:6px">'+esc(r.model_id||body.model_id)+(r.composite_eva!=null?" · EVA "+num(r.composite_eva):"")+'</div></div>'+
+      dimsHtml(r.dimensions)+
+      (cid?'<div class="kv"><span class="k">Certificate</span><span class="val mono">'+esc(cid)+'</span></div><button class="btn ghost" style="margin-top:8px" onclick="verifyCert(\''+esc(cid)+'\')">Verify</button><div id="vout" class="small muted" style="margin-top:6px"></div>':"")+
+      (r.block_reasons&&r.block_reasons.length?'<div class="err" style="margin-top:10px">'+esc(Array.isArray(r.block_reasons)?r.block_reasons.join(" · "):r.block_reasons)+'</div>':"")+
       '<button class="btn ghost" style="margin-top:16px" onclick="closeSheet();go(\'decisions\')">Back to ledger</button>');
   }catch(e){document.getElementById("e-err").textContent=e.message;}finally{b.disabled=false;b.textContent="Evaluate";}
 }
 
-/* ---------------- OVERSIGHT ---------------- */
 async function vOversight(el){
   const mayAct=can("oversight.act")||["admin","exec","gov","operator","auditor"].includes((who().role||"").toLowerCase());
   el.innerHTML='<div class="sect"><h4>Oversight cases</h4><span class="tiny muted" id="o-count"></span></div><div id="o-list">'+sk(4)+'</div>';
@@ -352,7 +344,7 @@ async function vOversight(el){
   if(!list.length){document.getElementById("o-list").innerHTML='<div class="empty">No oversight cases. Clean posture.</div>';return;}
   document.getElementById("o-list").innerHTML='<div class="card">'+list.map(c=>{
     const st=(c.state||c.status||"OPEN").toUpperCase();const cls=st==="RESOLVED"?"ok":(st==="REVIEWING"?"cyan":"warn");
-    return '<div class="row" onclick="caseDetail('+JSON.stringify(JSON.stringify({c:c,act:mayAct})).replace(/"/g,"&quot;")+')">'+
+    return '<div class="row" onclick=\'caseDetail('+JSON.stringify(JSON.stringify({c:c,act:mayAct}))+')\'>'+
      '<div class="main"><div class="t">'+esc(c.case_ref||c.ref||("Case "+(c.id||"")))+'</div>'+
      '<div class="s">'+esc((c.reason||c.summary||"").slice(0,60))+'</div></div><span class="pill '+cls+'">'+st+'</span></div>';
   }).join("")+'</div>';
@@ -362,12 +354,10 @@ function caseDetail(js){let o={};try{o=JSON.parse(js);}catch(e){}const c=o.c||{}
     '<div class="sh-sub"><span class="pill '+(st==="RESOLVED"?"ok":"warn")+'">'+st+'</span></div>'+
     '<div class="kv"><span class="k">Reason</span><span class="val" style="max-width:62%">'+esc(c.reason||c.summary||"—")+'</span></div>'+
     (c.model_id?'<div class="kv"><span class="k">Subject</span><span class="val mono">'+esc(c.model_id)+'</span></div>':"")+
-    (c.assigned_to?'<div class="kv"><span class="k">Assigned</span><span class="val">'+esc(c.assigned_to)+'</span></div>':"")+
-    (c.resolution?'<div class="kv"><span class="k">Resolution</span><span class="val" style="max-width:62%">'+esc(c.resolution)+'</span></div>':"")+
     (o.act&&st!=="RESOLVED"?
       '<label class="lab">Resolution note</label><input class="in" id="c-res" placeholder="How was this resolved?">'+
       '<button class="btn" style="margin-top:14px" id="c-btn" onclick="resolveCase(\''+esc(c.case_ref||c.ref)+'\')">Resolve case</button><div class="err" id="c-err"></div>'
-      :(o.act?'':'<div class="tiny muted" style="margin-top:14px">Read-only — your role can view but not act on cases.</div>')));
+      :(o.act?'':'<div class="tiny muted" style="margin-top:14px">Read-only.</div>')));
 }
 async function resolveCase(ref){const b=document.getElementById("c-btn");b.disabled=true;b.textContent="Resolving…";
   try{await api("/oversight/cases/"+encodeURIComponent(ref)+"/resolve",{method:"POST",headers:{"Content-Type":"application/json"},
@@ -375,11 +365,9 @@ async function resolveCase(ref){const b=document.getElementById("c-btn");b.disab
     closeSheet();toast("✓ "+ref+" resolved");go("oversight");
   }catch(e){document.getElementById("c-err").textContent=e.message;b.disabled=false;b.textContent="Resolve case";}}
 
-/* ---------------- PORTALS (the 24 sovereign-operator consoles) ---------------- */
-let __WS=null,__CAT=[];
+let __CAT=[];
 async function vPortals(el){
   el.innerHTML='<div class="sect"><h4>Sovereign-operator portals</h4><span class="tiny muted" id="p-ct"></span></div><div id="p-list">'+sk(5)+'</div>';
-  try{__WS=await api("/workspace");}catch(e){__WS=null;}
   let data;try{data=await api("/access/profiles");}catch(e){document.getElementById("p-list").innerHTML='<div class="empty">'+esc(e.message)+'</div>';return;}
   __CAT=data.profiles||[];const byg=data.by_group||{};const order=["GOVERNANCE","OPERATIONS","PEOPLE","BUSINESS"];
   document.getElementById("p-ct").textContent=__CAT.length+" portals";
@@ -388,7 +376,7 @@ async function vPortals(el){
     html+='<div class="sect"><h4>'+g+'</h4><span class="tiny muted">'+list.length+'</span></div><div class="card">'+
       list.map(p=>{const i=__CAT.indexOf(p);
         return '<div class="row" onclick="portalSheet('+i+')"><div class="main"><div class="t">'+esc(p.title)+'</div>'+
-          '<div class="s">'+esc(p.base_role)+' · '+(p.capabilities||[]).length+' controls · '+(p.systems||[]).length+' systems</div></div>'+
+          '<div class="s">'+esc(p.base_role)+' · '+(p.capabilities||[]).length+' controls</div></div>'+
           '<span class="pill '+(p.division==="GODS"?"gold":(p.division==="UDOC"?"cyan":"ok"))+'">'+esc(p.division)+'</span></div>';}).join("")+'</div>';});
   document.getElementById("p-list").innerHTML=html;
 }
@@ -398,94 +386,43 @@ async function portalSheet(i){const base=__CAT[i];if(!base)return;__PKEY=base.ke
   let d;try{d=await api("/portal/"+encodeURIComponent(base.key));}catch(e){sheet('<div class="empty">'+esc(e.message)+'</div>');return;}
   renderPortalSheet(d);}
 function renderPortalSheet(d){const p=d.portal,may=d.may_operate;
-  const ctrls=(p.controls||[]).map(c=>'<button class="ctrl-row" onclick="mOperate(\''+esc(c.name).replace(/'/g,"\\'")+'\')" style="display:flex;width:100%;text-align:left;justify-content:space-between;align-items:center;background:var(--navy);border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin-bottom:8px;color:var(--ink)">'+
+  const ctrls=(p.controls||[]).map(c=>'<button onclick="mOperate(\''+esc(c.name).replace(/'/g,"\\'")+'\')" style="display:flex;width:100%;text-align:left;justify-content:space-between;align-items:center;background:var(--navy);border:1px solid var(--line);border-radius:11px;padding:12px 13px;margin-bottom:8px;color:var(--ink)">'+
     '<span style="min-width:0"><span style="font-size:14px;font-weight:600">'+esc(c.name)+'</span><br><span style="font-size:11.5px;color:var(--mut)">'+esc(c.desc||"")+'</span></span>'+
     (may?'<span style="color:var(--gold-l);font-size:15px">▶</span>':'<span class="pill warn">role-gated</span>')+'</button>').join("");
-  const act=d.activity||[];
-  const feed=act.length?act.map(a=>'<div class="row" style="padding:9px 0"><div class="main"><div class="t" style="font-size:13px">'+esc(a.control)+'</div><div class="s mono" style="font-size:10.5px">'+esc(a.ref)+' · '+esc((a.at||"").replace("T"," ").slice(0,16))+'</div></div><span class="pill ok">'+esc(a.status)+'</span></div>').join(""):'<div class="tiny muted">No operations recorded yet — run a control above.</div>';
   sheet('<div class="tiny" style="color:var(--gold);letter-spacing:1px;text-transform:uppercase;font-weight:700">'+esc(p.group)+'</div>'+
-    '<h3 class="serif">'+esc(p.title)+'</h3><div class="sh-sub">'+esc(p.base_role)+' · '+esc(p.division)+' division</div>'+
+    '<h3 class="serif">'+esc(p.title)+'</h3><div class="sh-sub">'+esc(p.base_role)+' · '+esc(p.division)+'</div>'+
     '<p style="color:var(--mut);font-size:13px;line-height:1.55;margin:0 0 4px">'+esc(p.desc||"")+'</p>'+
-    (may?'':'<div class="card" style="border-style:dashed"><div class="small muted">You are <b>'+esc(d.operator_role)+'</b>. These controls are authorised to the <b>'+esc(p.base_role)+'</b> role and enforced server-side.</div></div>')+
-    '<label class="lab">Controls'+(may?' · live':'')+'</label>'+(ctrls||'<div class="tiny muted">No controls.</div>')+
-    '<label class="lab">Systems this portal may open</label><div>'+((p.systems||[]).length?p.systems.map(x=>'<span class="chip">'+esc(x)+'</span>').join(""):'<span class="chip off">none</span>')+'</div>'+
-    '<label class="lab">Recent activity</label>'+feed);}
+    (may?'':'<div class="card" style="border-style:dashed"><div class="small muted">Role-gated — server enforces '+esc(p.base_role)+'.</div></div>')+
+    '<label class="lab">Controls</label>'+(ctrls||'<div class="tiny muted">No controls.</div>'));}
 async function mOperate(control){if(!__PKEY)return;
   try{const r=await api("/portal/"+encodeURIComponent(__PKEY)+"/control",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({control})});
-    toast("✓ "+r.ref+" · "+control);const d=await api("/portal/"+encodeURIComponent(__PKEY));renderPortalSheet(d);
+    toast("✓ "+(r.ref||"")+" · "+control);const d=await api("/portal/"+encodeURIComponent(__PKEY));renderPortalSheet(d);
   }catch(e){toast("✕ "+e.message);}}
 
-/* ---------------- OPERATOR WORKSPACE ---------------- */
-async function vOperator(el){
-  el.innerHTML='<div id="op-head">'+sk(1)+'</div><div class="sect"><h4>Authorised actions</h4></div><div id="op-acts">'+sk(3)+'</div>'+
-    '<div class="sect"><h4>Recent activity</h4></div><div class="card" id="op-act"></div>';
-  let w={};try{w=await api("/workspace");}catch(e){el.innerHTML='<div class="empty">'+esc(e.message)+'</div>';return;}
-  const p=w.profile||{};
-  document.getElementById("op-head").innerHTML='<div class="hero"><span class="role">'+esc(p.division||"OPERATOR")+'</span>'+
-    '<h3 class="serif">'+esc(p.title||"Operator")+'</h3><div class="meta">'+esc((w.tiles||[]).length)+' live metrics · '+esc((w.actions||[]).length)+' actions</div></div>'+
-    ((w.tiles||[]).length?'<div class="kpis">'+w.tiles.slice(0,4).map(t=>'<div class="kpi"><div class="v">'+esc(t.value!=null?t.value:"—")+'</div><div class="l">'+esc(t.label||"")+'</div></div>').join("")+'</div>':"");
-  const acts=w.actions||[];
-  document.getElementById("op-acts").innerHTML=acts.length?'<div class="card">'+acts.map((a,i)=>
-    '<div class="row"><div class="main"><div class="t">'+esc(a.capability)+'</div><div class="s">'+esc(a.verb||a.kind||"")+'</div></div>'+
-    '<button class="btn sm" onclick="opAction('+i+')">Run</button></div>').join("")+'</div>':'<div class="empty">No actions for this profile.</div>';
-  window.__OPS=acts;
-  loadOpActivity();
-}
-async function loadOpActivity(){let h=[];try{h=arr(await api("/workspace/actions"));}catch(e){}
-  const el=document.getElementById("op-act");if(!el)return;
-  if(!h.length){el.innerHTML='<div class="empty">No actions yet.</div>';return;}
-  const col={CASE:"warn",REGISTRY:"cyan",DIRECTIVE:"gold",EVALUATE:"ok",REPORT:"cyan",VERIFY:"ok",APPROVE:"gold",RECORD:"gold"};
-  el.innerHTML=h.slice(0,15).map(a=>'<div class="row"><div class="main"><div class="t">'+esc(a.capability)+'</div>'+
-    '<div class="s">'+esc((a.summary||"").slice(0,52))+'</div></div><span class="pill '+(col[a.op_type]||"gold")+'">'+esc(a.op_type||"")+'</span></div>').join("");
-}
-async function opAction(i){const a=(window.__OPS||[])[i];if(!a)return;
-  let opts={};try{opts=await api("/workspace/options");}catch(e){}
-  const inputs=a.inputs||[];
-  let form=inputs.map(f=>{
-    if(f.type==="select"){const src=(opts[f.source]||opts[f.name]||[]);
-      return '<label class="lab">'+esc(f.label||f.name)+'</label><select class="in" id="of-'+f.name+'">'+
-        src.map(o=>'<option value="'+esc(o.id||o.value||o)+'">'+esc(o.label||o.id||o)+'</option>').join("")+'</select>';}
-    if(f.type==="choice"){return '<label class="lab">'+esc(f.label||f.name)+'</label><select class="in" id="of-'+f.name+'">'+
-        (f.options||[]).map(o=>'<option>'+esc(o)+'</option>').join("")+'</select>';}
-    return '<label class="lab">'+esc(f.label||f.name)+'</label><input class="in" id="of-'+f.name+'"'+(f.optional?'':' ')+'>';
-  }).join("");
-  sheet('<h3 class="serif">'+esc(a.capability)+'</h3><div class="sh-sub">'+esc(a.verb||"")+'</div>'+form+
-    '<button class="btn" style="margin-top:16px" id="op-run" onclick="runOp('+i+')">Run action</button><div class="err" id="op-err"></div>');
-}
-async function runOp(i){const a=(window.__OPS||[])[i];const params={};(a.inputs||[]).forEach(f=>{const el=document.getElementById("of-"+f.name);if(el)params[f.name]=el.value;});
-  const b=document.getElementById("op-run");b.disabled=true;b.textContent="Running…";
-  try{const r=await api("/workspace/action",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({capability:a.capability,params:params})});
-    closeSheet();toast("✓ "+(r.message||r.status||"done").slice(0,60));go("operator");
-  }catch(e){document.getElementById("op-err").textContent=e.message;b.disabled=false;b.textContent="Run action";}}
-
-/* ---------------- MORE ---------------- */
 async function vMore(el){
   const w=who();const isAdmin=["admin","exec"].includes((w.role||"").toLowerCase());
   el.innerHTML='<div class="hero"><span class="role">'+esc((PERMS&&PERMS.label)||w.role||"—")+(PERMS&&PERMS.read_only?" · read-only":"")+'</span>'+
     '<h3 class="serif">'+esc(w.email||"Account")+'</h3><div class="meta">'+esc(w.division&&w.division!=="GODS"?w.division:"G.O.D.S")+(w.tenant_id?" · "+esc(w.tenant_id):"")+'</div></div>'+
     '<div class="card"><div class="sect" style="margin:0 0 6px"><h4>Your permissions</h4></div>'+
-      '<div class="small muted" style="margin-bottom:8px">Sections you can open:</div><div id="m-views">'+(PERMS?(PERMS.views||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join(""):'<span class="chip off">—</span>')+'</div>'+
-      '<div class="small muted" style="margin:12px 0 8px">Actions you may perform:</div><div>'+(PERMS&&(PERMS.actions||[]).length?PERMS.actions.map(a=>'<span class="chip">'+esc(a)+'</span>').join(""):'<span class="chip off">read-only</span>')+'</div></div>'+
+      '<div class="small muted" style="margin-bottom:8px">Sections:</div><div>'+(PERMS?(PERMS.views||[]).map(v=>'<span class="chip">'+esc(v)+'</span>').join(""):'<span class="chip off">—</span>')+'</div>'+
+      '<div class="small muted" style="margin:12px 0 8px">Actions:</div><div>'+(PERMS&&(PERMS.actions||[]).length?PERMS.actions.map(a=>'<span class="chip">'+esc(a)+'</span>').join(""):'<span class="chip off">read-only</span>')+'</div></div>'+
     '<div class="card" id="m-sector"><div class="sect" style="margin:0 0 6px"><h4>Sector</h4></div><div class="small muted">Loading…</div></div>'+
     (isAdmin?'<div class="card" id="m-admin"><div class="sect" style="margin:0 0 6px"><h4>Administration</h4></div><div class="small muted">Loading…</div></div>':"")+
     '<div class="card"><div class="kv"><span class="k">App version</span><span class="val mono">UDOC '+esc(APPVER)+'</span></div>'+
       '<div class="kv"><span class="k">Endpoint</span><span class="val mono tiny">'+esc(apiBase().replace(/^https?:\/\//,""))+'</span></div></div>'+
-    '<button class="btn ghost" style="margin-top:6px" onclick="logout()">Sign out</button>';
-  // sector
+    honesty()+
+    '<button class="btn ghost" style="margin-top:12px" onclick="logout()">Sign out</button>';
   try{const s=await api("/sector/profile");const sd=document.getElementById("m-sector");
     sd.innerHTML='<div class="sect" style="margin:0 0 6px"><h4>Sector</h4></div>'+
       '<div class="kv"><span class="k">Classification</span><span class="val">'+esc(s.sector||s.label||"—")+'</span></div>'+
-      (s.audience?'<div class="kv"><span class="k">Audience</span><span class="val">'+esc(s.audience)+'</span></div>':"")+
-      '<div class="kv"><span class="k">Frameworks</span><span class="val">'+esc((s.frameworks||[]).length||s.framework_count||"—")+'</span></div>';
-  }catch(e){const sd=document.getElementById("m-sector");if(sd)sd.innerHTML='<div class="sect" style="margin:0"><h4>Sector</h4></div><div class="empty" style="padding:12px">Not available for your role.</div>';}
-  // admin
+      (s.audience?'<div class="kv"><span class="k">Audience</span><span class="val">'+esc(s.audience)+'</span></div>':"");
+  }catch(e){const sd=document.getElementById("m-sector");if(sd)sd.innerHTML='<div class="sect" style="margin:0"><h4>Sector</h4></div><div class="empty" style="padding:12px">Not available.</div>';}
   if(isAdmin){try{const tens=arr(await api("/tenants"));const md=document.getElementById("m-admin");
     md.innerHTML='<div class="sect" style="margin:0 0 6px"><h4>Tenants ('+tens.length+')</h4></div>'+
       tens.slice(0,8).map(t=>'<div class="kv"><span class="k">'+esc(t.name||t.tenant_id)+'</span><span class="val"><span class="pill '+((t.sector||"")==="PUBLIC"?"cyan":((t.sector||"")==="PRIVATE"?"gold":"ok"))+'">'+esc(t.sector||t.tier||"—")+'</span></span></div>').join("");
   }catch(e){}}
 }
 
-/* ---------------- boot ---------------- */
 if(tok()){enter();}
 </script>
 </body>
