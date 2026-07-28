@@ -33,7 +33,6 @@ async def enforce_https(request: Request, call_next):
 
 @app.on_event("startup")
 def _startup():
-    # Each step is guarded so a database/schema problem can NEVER crash boot — a dead app helps no one.
     try:
         init_db()
     except Exception as e:
@@ -54,20 +53,16 @@ def _startup():
 
 
 def _heal_schema():
-    """Additively reconcile existing tables with the ORM models: ADD any columns the models declare
-    that are missing from the live database. Idempotent; never drops or retypes a column. Lets a
-    database created under an OLDER schema work without a manual migration and without data loss.
-    (This is what was missing: a live table created before new columns were added.)"""
     from sqlalchemy import inspect as sa_inspect, text
     from app.db.session import engine, Base
-    from app.db import models  # noqa: F401 — ensure all tables are registered on Base.metadata
+    from app.db import models  # noqa: F401
     insp = sa_inspect(engine)
     existing = set(insp.get_table_names())
     dialect = engine.dialect.name
     added = 0
     for table in Base.metadata.sorted_tables:
         if table.name not in existing:
-            continue  # brand-new table — create_all already built it with every column
+            continue
         have = {c["name"] for c in insp.get_columns(table.name)}
         for col in table.columns:
             if col.name in have:
@@ -79,7 +74,7 @@ def _heal_schema():
             ine = "IF NOT EXISTS " if dialect == "postgresql" else ""
             ddl = f'ALTER TABLE "{table.name}" ADD COLUMN {ine}"{col.name}" {coltype}'
             d = getattr(col, "default", None)
-            if d is not None and getattr(d, "is_scalar", False):  # backfill existing rows when sensible
+            if d is not None and getattr(d, "is_scalar", False):
                 val = d.arg
                 if isinstance(val, bool):
                     ddl += f" DEFAULT {'TRUE' if val else 'FALSE'}"
@@ -88,7 +83,7 @@ def _heal_schema():
                 elif isinstance(val, str):
                     ddl += " DEFAULT '" + val.replace("'", "''") + "'"
             try:
-                with engine.begin() as conn:   # isolate each DDL so one failure can't abort the rest
+                with engine.begin() as conn:
                     conn.execute(text(ddl))
                 added += 1
                 print(f"[schema-heal] added {table.name}.{col.name}")
@@ -99,9 +94,6 @@ def _heal_schema():
 
 
 def _ensure_bootstrap_admin():
-    """On a brand-new EMPTY database (e.g. just after a DB migration), create one admin so the
-    operator can log in and run a restore. No-op the moment any user exists. A restore then
-    replaces this with the real users from the backup bundle. Override creds via GODS_BOOTSTRAP_*."""
     from app.db.session import SessionLocal
     from app.db.models import User
     from app.core.security import hash_password
@@ -120,14 +112,20 @@ def _ensure_bootstrap_admin():
 
 @app.get("/admin", tags=["root"], include_in_schema=False)
 def admin_console():
-    """Serve the live G.O.D.S Admin cockpit (HTML UI wired to this API, same-origin)."""
+    """GODS Admin — overall constitutional governance (platform-core static)."""
     return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "admin.html"))
 
 
 @app.get("/udoc-admin", tags=["root"], include_in_schema=False)
 def udoc_admin_console():
-    """Serve the self-contained UDOC v9.3 admin console (same-origin, wired to this API)."""
+    """Internal UDOC controller console (platform-core static)."""
     return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "udoc_admin_v93.html"))
+
+
+@app.get("/portals", tags=["root"], include_in_schema=False)
+def portals_console():
+    """24 Sovereign-Operator portal selector + UI controller (same host as /admin)."""
+    return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "portals.html"))
 
 
 @app.get("/", tags=["root"])
@@ -135,6 +133,7 @@ def root():
     return {"system": "G.O.D.S Platform Core", "status": "live",
             "environment": settings.environment,
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
+            "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "portals": "/portals"},
             "governance": "EVA 6-D + UDOC sovereignty, fail-closed for critical"}
 
 
@@ -146,7 +145,6 @@ def system_crypto():
 
 @app.get("/version", tags=["root"])
 def version():
-    """Build identity — commit/branch come from Render's git env on deploy (GitHub main -> Render)."""
     return {"service": "platform-core", "environment": settings.environment,
             "commit": os.environ.get("RENDER_GIT_COMMIT", "dev")[:12],
             "branch": os.environ.get("RENDER_GIT_BRANCH", "local"),
