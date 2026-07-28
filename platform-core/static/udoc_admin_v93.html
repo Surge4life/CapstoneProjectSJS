@@ -8,10 +8,11 @@
         --ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--bad:#d4504f}
   *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);
     font:14px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;
+  header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap;
     background:linear-gradient(180deg,#08122400,#0a142880),var(--navy)}
   .brand{font-weight:700;letter-spacing:.5px}.brand b{color:var(--gold)}
   .tag{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:20px;padding:2px 10px}
+  header a{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
   .wrap{max-width:1040px;margin:0 auto;padding:18px 22px}
   .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   input{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px}
@@ -41,8 +42,11 @@
 <header>
   <span class="dot" id="conn"></span>
   <span class="brand">G.O.D.S &middot; <b>UDOC</b> v9.3 Admin</span>
-  <span class="tag">Sovereign AI Governance</span>
-  <span class="tag" style="border-color:var(--udoc);color:#cdb8f0">PROPOSED &middot; pre-registration demo</span>
+  <span class="tag">Internal UDOC controller</span>
+  <span class="tag" style="border-color:var(--udoc);color:#cdb8f0">PROPOSED &middot; pre-registration</span>
+  <span style="flex:1"></span>
+  <a href="/admin">GODS Admin</a>
+  <a href="/portals">24 Portals</a>
 </header>
 <div class="wrap">
   <div class="bar">
@@ -55,10 +59,8 @@
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
   <div class="note">
-    UDOC is a <b>proposed</b> sovereign-AI-governance platform; this console is wired to the live governance
-    core over the same origin. Cryptographic signing runs in software mode (HMAC, PQC/Dilithium-reference) unless
-    liboqs and an HSM are provisioned. SA Draft National AI Policy GG54477 was <b>withdrawn 2026-04-26</b>;
-    compliance basis is POPIA s71 + Constitution ss 9/16/33.
+    Internal UDOC controller on platform-core. <b>/admin</b> = GODS constitutional governance.
+    <b>/portals</b> = 24 Sovereign-Operator select + control. GG54477 withdrawn 2026-04-26; POPIA s71 + Constitution ss 9/16/33.
   </div>
 </div>
 <script>
@@ -83,7 +85,7 @@ async function login(){
     $("conn").className="dot live"; render();
   }catch(e){$("who").innerHTML=`<span class="err">${e.message}</span>`;}
 }
-const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&","<":"<",">":">",'"':"""}[c]));
 function pill(s){return `<span class="pill ${esc(s)}">${esc(s)}</span>`;}
 function kv(o){return Object.entries(o).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${typeof v==="object"?esc(JSON.stringify(v)):esc(v)}</span></div>`).join("");}
 
