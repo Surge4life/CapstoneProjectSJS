@@ -5,17 +5,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>G.O.D.S · 24 Sovereign Portals</title>
 <style>
-:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--udoc:#7C5CBF}
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--udoc:#7C5CBF;--amber:#E8A13A}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
-header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(180deg,#0a1428,var(--navy))}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:20px;padding:2px 10px}
 a{color:var(--cyan);text-decoration:none}
-.wrap{max-width:1100px;margin:0 auto;padding:18px 20px}
+.wrap{max-width:1120px;margin:0 auto;padding:18px 20px}
 .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-input,select{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px}
+input,select,textarea{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
 button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
 button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.cyan{background:rgba(0,194,212,.15);color:var(--cyan);border:1px solid rgba(0,194,212,.4)}
 button:disabled{opacity:.5;cursor:not-allowed}
 .groups{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .groups button{background:transparent;color:var(--mut);border:1px solid var(--line)}
@@ -28,39 +29,49 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .card p{margin:0;font-size:12.5px;color:var(--mut);line-height:1.4}
 .pill{font-size:10px;padding:2px 8px;border-radius:12px;border:1px solid var(--line);color:var(--cyan);margin-right:4px;display:inline-block;margin-top:6px}
 #controller{display:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}.kpi .v{font-size:20px;font-weight:700;color:var(--gold);margin-top:4px}
 .ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:720px){.ctrl-grid{grid-template-columns:1fr}}
 .ctrl{background:#091022;border:1px solid var(--line);border-radius:10px;padding:12px}
-.ctrl b{display:block;margin-bottom:4px}
-.ctrl .d{font-size:12px;color:var(--mut);margin-bottom:8px}
+.ctrl b{display:block;margin-bottom:4px}.ctrl .d{font-size:12px;color:var(--mut);margin-bottom:8px}
+.ctrl .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ctrl input{flex:1;min-width:100px;padding:6px 8px;font-size:12px}
+.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#9fb4dd;min-height:120px;max-height:280px;overflow:auto;white-space:pre-wrap}
 .act{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);padding:6px 0;border-bottom:1px dashed var(--line)}
 .err{color:var(--bad)}.ok{color:var(--ok)}
 .note{font-size:12px;color:var(--mut);margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
+.side{display:grid;grid-template-columns:1fr 320px;gap:14px}
+@media(max-width:900px){.side{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <span class="brand">G.O.D.S · <b>24 Portals</b></span>
   <span class="tag">Sovereign-Operator access</span>
-  <span class="tag" style="border-color:var(--udoc);color:#cdb8f0">same host as /admin · /udoc-admin</span>
+  <span class="tag" style="border-color:var(--udoc);color:#cdb8f0">/portals on platform-core</span>
   <span style="flex:1"></span>
   <a href="/admin">GODS Admin</a>
   <a href="/udoc-admin">UDOC Controller</a>
-  <a href="/citizen" id="cit-link" style="display:none">Citizen</a>
 </header>
 <div class="wrap">
   <div id="login">
     <div class="bar">
       <input id="api" placeholder="API (blank = same origin)" style="width:220px"/>
       <input id="email" value="admin@gods.local" style="width:180px"/>
-      <input id="pass" type="password" value="admin123" style="width:120px"/>
+      <input id="pass" type="password" value="admin123" style="width:120px" onkeydown="if(event.key==='Enter')login()"/>
       <button type="button" onclick="login()">Sign in</button>
       <span id="who" style="color:var(--mut)"></span>
     </div>
-    <p style="color:var(--mut);font-size:13px">Select a Sovereign-Operator portal, then operate its UI controls. Server-enforced by base role. Not 24 Render services — one surface on platform-core.</p>
+    <p style="color:var(--mut);font-size:13px">Select a portal → open controller → run ≥4 live controls. Server-enforced roles. One surface — not 24 Render services.</p>
   </div>
 
   <div id="catalog" style="display:none">
+    <div class="bar">
+      <input id="q" placeholder="Search portals…" style="width:220px" oninput="renderCards(window._g||'ALL')"/>
+      <span style="color:var(--mut);font-size:12px" id="count"></span>
+    </div>
     <div class="groups" id="groups"></div>
     <div class="grid" id="cards"></div>
   </div>
@@ -71,23 +82,35 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <strong id="c-title">Portal</strong>
       <span class="tag" id="c-group"></span>
       <span id="c-may" class="tag"></span>
+      <button class="cyan" type="button" id="btn-refresh" onclick="refreshPortal()">Refresh</button>
+      <button class="ghost" type="button" id="btn-run4" onclick="runFour()">Run 4 controls</button>
     </div>
     <p id="c-desc" style="color:var(--mut);font-size:13px"></p>
-    <div class="ctrl-grid" id="c-controls"></div>
-    <div style="margin-top:16px">
-      <h4 style="color:var(--gold);margin:0 0 8px">Recent activity</h4>
-      <div id="c-act"></div>
+    <div class="kpis" id="c-kpis"></div>
+    <div class="side">
+      <div>
+        <h4 style="color:var(--gold);margin:0 0 10px">Controls</h4>
+        <div class="ctrl-grid" id="c-controls"></div>
+      </div>
+      <div>
+        <h4 style="color:var(--gold);margin:0 0 10px">Terminal · live returns</h4>
+        <div class="term" id="term">Ready. Execute a control.</div>
+        <h4 style="color:var(--gold);margin:14px 0 8px">Activity log</h4>
+        <div id="c-act"></div>
+      </div>
     </div>
-    <div id="c-msg" style="margin-top:10px"></div>
   </div>
 
-  <div class="note">Architecture: <b>/admin</b> = GODS constitutional governance · <b>/udoc-admin</b> = internal UDOC controller · <b>/portals</b> = 24-operator select + control · Citizen stays public on Client host. No extra fabricated environments required for portal selection.</div>
+  <div class="note"><b>/admin</b> GODS constitutional · <b>/udoc-admin</b> internal UDOC controller · <b>/portals</b> 24-operator select+control · Citizen on Client host.</div>
 </div>
 <script>
-let API="", TOK="", CATALOG=[], ACTIVE=null;
+let API="", TOK="", CATALOG=[], ACTIVE=null, MAY=false, LAST_KEY="";
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&","<":"<",">":">",'"':""","'":"&#39;"}[c]));
-
+function term(line){
+  const t=$("term"); const ts=new Date().toISOString().slice(11,19);
+  t.textContent="["+ts+"] "+line+"\n"+t.textContent.split("\n").slice(0,40).join("\n");
+}
 async function api(path, opts={}){
   const h=Object.assign({}, opts.headers||{});
   if(TOK) h.Authorization="Bearer "+TOK;
@@ -97,7 +120,6 @@ async function api(path, opts={}){
   if(!r.ok) throw new Error((body&&body.detail)||("HTTP "+r.status));
   return body;
 }
-
 async function login(){
   API=($("api").value||"").trim().replace(/\/$/,"");
   try{
@@ -110,66 +132,89 @@ async function login(){
     await loadCatalog();
   }catch(e){$("who").innerHTML='<span class="err">'+esc(e.message)+'</span>';}
 }
-
 async function loadCatalog(){
   const d=await api("/access/profiles");
   CATALOG=d.profiles||[];
   const groups=d.groups||["GOVERNANCE","OPERATIONS","PEOPLE","BUSINESS"];
-  $("groups").innerHTML='<button type="button" class="on" data-g="ALL" onclick="filterG(this,\'ALL\')">ALL '+CATALOG.length+'</button>'+
-    groups.map(g=>'<button type="button" data-g="'+esc(g)+'" onclick="filterG(this,\''+esc(g)+'\')">'+esc(g)+'</button>').join("");
-  renderCards("ALL");
+  $("groups").innerHTML='<button type="button" class="on" onclick="filterG(this,\'ALL\')">ALL '+CATALOG.length+'</button>'+
+    groups.map(g=>'<button type="button" onclick="filterG(this,\''+esc(g)+'\')">'+esc(g)+'</button>').join("");
+  window._g="ALL"; renderCards("ALL");
   $("catalog").style.display="block";
   $("controller").style.display="none";
 }
-
 function filterG(el,g){
   document.querySelectorAll("#groups button").forEach(b=>b.classList.remove("on"));
-  el.classList.add("on");
-  renderCards(g);
+  el.classList.add("on"); window._g=g; renderCards(g);
 }
-
 function renderCards(g){
-  const list=g==="ALL"?CATALOG:CATALOG.filter(p=>p.group===g);
+  const q=(($("q")&&$("q").value)||"").toLowerCase().trim();
+  let list=g==="ALL"?CATALOG:CATALOG.filter(p=>p.group===g);
+  if(q) list=list.filter(p=>(p.title+" "+p.key+" "+(p.desc||"")).toLowerCase().includes(q));
+  $("count").textContent=list.length+" portals";
   $("cards").innerHTML=list.map(p=>{
     const caps=(p.capabilities||[]).slice(0,4).map(c=>'<span class="pill">'+esc(c)+'</span>').join("");
-    return '<div class="card" onclick="openPortal(\''+esc(p.key)+'\')"><div class="g">'+esc(p.group)+'</div><h4>'+esc(p.title)+'</h4><p>'+esc((p.desc||"").slice(0,140))+'</p>'+caps+'</div>';
-  }).join("")||'<div class="card">No portals in group.</div>';
+    return '<div class="card" onclick="openPortal(\''+esc(p.key)+'\')"><div class="g">'+esc(p.group)+' · '+esc(p.base_role)+'</div><h4>'+esc(p.title)+'</h4><p>'+esc((p.desc||"").slice(0,160))+'</p>'+caps+'</div>';
+  }).join("")||'<div class="card">No match.</div>';
 }
-
 async function openPortal(key){
+  LAST_KEY=key;
   const d=await api("/portal/"+encodeURIComponent(key));
-  ACTIVE=d.portal;
+  ACTIVE=d.portal; MAY=!!d.may_operate;
   $("catalog").style.display="none";
   $("controller").style.display="block";
   $("c-title").textContent=ACTIVE.title;
   $("c-group").textContent=ACTIVE.group;
-  $("c-may").textContent=d.may_operate?"OPERATE":"VIEW / ROLE-LOCKED";
-  $("c-may").style.color=d.may_operate?"var(--ok)":"var(--bad)";
+  $("c-may").textContent=MAY?"OPERATE":"VIEW / ROLE-LOCKED";
+  $("c-may").style.color=MAY?"var(--ok)":"var(--bad)";
   $("c-desc").textContent=ACTIVE.desc||"";
-  const can=!!d.may_operate;
-  $("c-controls").innerHTML=(ACTIVE.controls||[]).map(c=>{
+  const ctrls=ACTIVE.controls||[];
+  const syss=ACTIVE.systems||[];
+  const act=d.activity||[];
+  $("c-kpis").innerHTML=
+    '<div class="kpi"><div class="k">Controls</div><div class="v">'+ctrls.length+'</div></div>'+
+    '<div class="kpi"><div class="k">Activity</div><div class="v">'+act.length+'</div></div>'+
+    '<div class="kpi"><div class="k">Base role</div><div class="v" style="font-size:14px">'+esc(ACTIVE.base_role)+'</div></div>'+
+    '<div class="kpi"><div class="k">Systems</div><div class="v" style="font-size:14px">'+(syss.length||"—")+'</div></div>';
+  $("c-controls").innerHTML=ctrls.map((c,i)=>{
+    const id="tg_"+i;
     return '<div class="ctrl"><b>'+esc(c.name)+'</b><div class="d">'+esc(c.desc||c.op_type||"")+'</div>'+
-      (can?('<button type="button" onclick="runControl(\''+esc(ACTIVE.key)+'\',\''+esc(c.name).replace(/'/g,"\\'")+'\')">Execute</button>'):'<span class="err">Requires role: '+esc(ACTIVE.base_role)+'</span>')+
+      (MAY?('<div class="row"><input id="'+id+'_t" placeholder="target (optional)"/><input id="'+id+'_n" placeholder="note"/><button type="button" onclick="runControl(\''+esc(ACTIVE.key)+'\',\''+esc(c.name).replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\','+i+')">Execute</button></div>'):'<span class="err">Requires role: '+esc(ACTIVE.base_role)+'</span>')+
       '</div>';
   }).join("");
-  const act=d.activity||[];
-  $("c-act").innerHTML=act.length?act.map(a=>'<div class="act">'+esc(a.at||"")+' · <b>'+esc(a.control)+'</b> · '+esc(a.ref)+' · '+esc(a.summary||"")+'</div>').join(""):'<div class="act">No activity yet.</div>';
-  $("c-msg").textContent="";
+  $("c-act").innerHTML=act.length?act.map(a=>'<div class="act">'+esc((a.at||"").slice(0,19))+' · <b>'+esc(a.control)+'</b> · '+esc(a.ref)+'</div>').join(""):'<div class="act">No activity yet.</div>';
+  term("Opened "+ACTIVE.key+" · "+(MAY?"operate":"view")+" · "+ctrls.length+" controls");
 }
-
-async function runControl(key, control){
-  const note=prompt("Note for "+control+" (optional):","")||"";
-  $("c-msg").textContent="Executing…";
+function refreshPortal(){ if(LAST_KEY) openPortal(LAST_KEY); }
+async function runControl(key, control, idx){
+  let target="", note="";
+  if(idx!=null){
+    const t=$("tg_"+idx+"_t"), n=$("tg_"+idx+"_n");
+    if(t) target=t.value.trim(); if(n) note=n.value.trim();
+  }
+  term("POST /portal/"+key+"/control · "+control+(target?" · target="+target:""));
   try{
     const r=await api("/portal/"+encodeURIComponent(key)+"/control",{
       method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({control:control, note:note})
+      body:JSON.stringify({control:control, note:note, target:target})
     });
-    $("c-msg").innerHTML='<span class="ok">✓ '+esc(r.message)+' · ref '+esc(r.ref)+'</span>';
+    term("✓ "+r.status+" · ref "+r.ref+" · "+r.message);
     openPortal(key);
-  }catch(e){$("c-msg").innerHTML='<span class="err">'+esc(e.message)+'</span>';}
+  }catch(e){ term("✗ "+e.message); }
 }
-
+async function runFour(){
+  if(!ACTIVE||!MAY){ term("Cannot batch — role locked or no portal"); return; }
+  const names=(ACTIVE.controls||[]).slice(0,4).map(c=>c.name);
+  for(const c of names){
+    try{
+      const r=await api("/portal/"+encodeURIComponent(ACTIVE.key)+"/control",{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({control:c, note:"batch demo", target:"demo"})
+      });
+      term("✓ "+c+" → "+r.ref);
+    }catch(e){ term("✗ "+c+" · "+e.message); }
+  }
+  openPortal(ACTIVE.key);
+}
 function backCatalog(){
   $("controller").style.display="none";
   $("catalog").style.display="block";
