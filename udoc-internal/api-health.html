@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UDOC Admin · API Health</title>
+<style>
+:root{--navy:#0A1628;--navy2:#0D1F3C;--gold:#C9A84C;--gold-l:#E8C97A;--cyan:#00C2D4;--txt:#EDE7D6;--mut:#8A9BB0;--green:#10B981;--red:#EF4444;--bd:rgba(201,168,76,.2);--fm:ui-monospace,Menlo,monospace;--fc:system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--txt);font-family:var(--fc);font-size:14px}
+header{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--bd);background:var(--navy2)}
+header b{color:var(--gold-l)}a{color:var(--cyan);text-decoration:none}
+main{padding:20px 24px;max-width:1100px;margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.kpi{background:var(--navy2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px}
+.kpi .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}.kpi .v{font-size:22px;font-weight:700;color:var(--gold-l);margin-top:6px}
+.panel{background:var(--navy2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-top:14px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:15px}
+.mono{font-family:var(--fm);font-size:12px}pre{white-space:pre-wrap;word-break:break-all;background:#091022;border-radius:8px;padding:12px;font-family:var(--fm);font-size:11.5px;color:var(--mut)}
+.ok{color:var(--green)}.bad{color:#fda4a4}.btn{cursor:pointer;border:1px solid var(--gold);background:rgba(201,168,76,.12);color:var(--gold-l);border-radius:8px;padding:8px 14px;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <b>G.O.D.S · UDOC ADMIN</b>
+  <span style="color:var(--mut)">API Health · demo parity</span>
+  <span style="flex:1"></span>
+  <a href="/">← Mainframe</a>
+  <button class="btn" type="button" onclick="refresh()">Refresh</button>
+</header>
+<main>
+  <div class="grid" id="kpis"><div class="kpi"><div class="k">Status</div><div class="v">…</div></div></div>
+  <div class="panel"><h3>Live probes (existing platform-core)</h3><pre id="out">Running…</pre></div>
+  <div class="panel"><h3>Honesty</h3><div style="font-size:12px;color:var(--mut)">Same host as Admin mainframe (gods-udoc-admin). No new Render service. Auth token from Admin login when present.</div></div>
+</main>
+<script>
+const API=localStorage.getItem('gods_admin_api')||'https://gods-platform-core.onrender.com';
+const tok=()=>localStorage.getItem('gods_admin_tok')||'';
+async function probe(path){
+  const t0=performance.now();
+  try{
+    const h={}; if(tok()) h.Authorization='Bearer '+tok();
+    const r=await fetch(API+path,{headers:h,cache:'no-store'});
+    const ms=Math.round(performance.now()-t0);
+    const ct=r.headers.get('content-type')||'';
+    const body=ct.includes('json')?await r.json().catch(()=>({})):await r.text();
+    return {path, ok:r.ok, status:r.status, ms, body};
+  }catch(e){ return {path, ok:false, status:0, ms:Math.round(performance.now()-t0), body:String(e.message||e)}; }
+}
+async function refresh(){
+  const paths=['/health','/version','/system/crypto','/citizen/health','/'];
+  const results=await Promise.all(paths.map(probe));
+  const health=results[0];
+  document.getElementById('kpis').innerHTML=
+    '<div class="kpi"><div class="k">Core health</div><div class="v '+(health.ok?'ok':'bad')+'">'+(health.ok?'ONLINE':'DOWN')+'</div></div>'+
+    '<div class="kpi"><div class="k">/health latency</div><div class="v">'+health.ms+'ms</div></div>'+
+    '<div class="kpi"><div class="k">API host</div><div class="v" style="font-size:13px">'+API.replace(/^https?:\/\//,'')+'</div></div>'+
+    '<div class="kpi"><div class="k">Auth token</div><div class="v" style="font-size:14px">'+(tok()?'PRESENT':'none')+'</div></div>';
+  document.getElementById('out').textContent=results.map(r=>{
+    const b=typeof r.body==='object'?JSON.stringify(r.body,null,2):String(r.body);
+    return r.path+' → HTTP '+r.status+' · '+r.ms+'ms\n'+b.slice(0,800);
+  }).join('\n\n────────────────────\n\n');
+}
+refresh();
+</script>
+</body>
+</html>
