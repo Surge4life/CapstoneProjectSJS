@@ -1,1 +1,161 @@
-SEE_YAML
+# Render Blueprint — G.O.D.S / UDOC stack
+# DATABASE_URL = external Neon (manual). Preserve GODS_SOV_KEY.
+
+services:
+  - type: web
+    name: gods-platform-core
+    runtime: python
+    rootDir: platform-core
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: GODS_SOV_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+
+  - type: web
+    name: gods-udoc-web
+    runtime: static
+    rootDir: udoc-app
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-platform-internal
+    runtime: static
+    rootDir: platform-internal
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-portals
+    runtime: static
+    rootDir: portals-web
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-udoc-admin
+    runtime: static
+    rootDir: udoc-internal
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-udoc-client
+    runtime: static
+    rootDir: udoc-public
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-udoc-operator
+    runtime: static
+    rootDir: udoc-operator
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-udoc-portals
+    runtime: static
+    rootDir: udoc-portals
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # UDOC Citizen Portal — AI Rights / Regte Portaal (from Netlify #demo=udoc-v7-platform)
+  - type: web
+    name: gods-udoc-citizen
+    runtime: static
+    rootDir: udoc-citizen
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-udoc-gateway
+    runtime: static
+    rootDir: udoc-gateway
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: gods-udoc-sector
+    runtime: static
+    rootDir: udoc-sector
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
