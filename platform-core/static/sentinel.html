@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UDOC · Sentinel — EVA + Policy Runtime</title>
+<style>
+:root{--navy:#0A1628;--navy2:#0D1F3C;--navy3:#112A52;--line:rgba(201,168,76,.18);--gold:#C9A84C;--gold-l:#E8C97A;
+--cyan:#00C2D4;--green:#10B981;--amber:#F59E0B;--red:#EF5350;--ink:#EAF0F8;--mut:#8FA3BE}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14.5px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
+button{font-family:inherit;cursor:pointer;border:0}.mono{font-family:ui-monospace,Menlo,monospace}
+#login{max-width:380px;margin:8vh auto;padding:0 20px;text-align:center}
+#login h1{font-size:26px;letter-spacing:4px;color:var(--gold-l);margin:0;font-family:Georgia,serif}
+#login .sub{color:var(--mut);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:8px 0 20px}
+.in{width:100%;background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);margin-bottom:9px}
+.btn{background:var(--gold);color:#1a1305;border-radius:10px;padding:11px 14px;font-weight:700}
+.btn.sm{padding:7px 12px;font-size:12px}.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gold-l)}
+.btn.cyan{background:rgba(0,194,212,.15);color:var(--cyan);border:1px solid rgba(0,194,212,.35)}
+.err{color:var(--red);font-size:13px;min-height:18px}#app{display:none}
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(10,22,40,.95);flex-wrap:wrap}
+.top .ttl{font-weight:700;flex:1}.top .ttl b{color:var(--gold-l)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line)}
+.tabs button{background:transparent;color:var(--mut);padding:8px 12px;border-bottom:2px solid transparent;font-weight:600}
+.tabs button.on{color:var(--gold-l);border-bottom-color:var(--gold)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpi .v{font-size:22px;font-weight:700;color:var(--gold-l)}.kpi .l{font-size:10px;text-transform:uppercase;color:var(--mut);margin-top:4px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.panel h3{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.row .f{flex:1;min-width:120px}.row label{display:block;font-size:10px;color:var(--mut);margin-bottom:4px}
+.dims{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.dim{background:#091022;border-radius:8px;padding:8px;text-align:center}.dim .dl{font-size:9px;color:var(--mut)}.dim .dv{font-size:16px;font-weight:700;color:var(--gold-l)}
+.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9fb4dd;min-height:80px;white-space:pre-wrap;max-height:220px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left}
+th{color:var(--mut);font-size:10px;text-transform:uppercase}
+.pill{font-size:10px;padding:2px 8px;border-radius:12px;font-weight:700}
+.ok{color:#5ee9bf}.bad{color:#ff8a85}.amber{color:#fbc36a}
+.note{font-size:12px;color:var(--mut);margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0a1c34;border:1px solid var(--gold);color:var(--gold-l);padding:10px 14px;border-radius:10px;z-index:50;font-size:13px}
+</style></head><body>
+<div id="login">
+  <h1>SENTINEL</h1>
+  <div class="sub">EVA · Policy-to-Code · Conformance</div>
+  <p style="color:var(--mut);font-size:13px">Client SaaS runtime governance on platform-core. Same host as API + Neon.</p>
+  <input class="in" id="li-email" value="admin@gods.local" placeholder="email"/>
+  <input class="in" id="li-pass" type="password" value="admin123" placeholder="password" onkeydown="if(event.key==='Enter')login()"/>
+  <button class="btn" style="width:100%" id="li-btn" type="button" onclick="login()">Sign in</button>
+  <div class="err" id="li-err"></div>
+  <details style="margin-top:12px;color:var(--mut);font-size:12px"><summary>API</summary>
+    <input class="in" id="li-api" style="margin-top:8px" placeholder="blank = same origin"/></details>
+</div>
+<div id="app">
+  <div class="top">
+    <div class="ttl"><b>UDOC Sentinel</b> · runtime governance</div>
+    <span id="who" style="font-size:12px;color:var(--mut)"></span>
+    <button class="btn ghost sm" type="button" onclick="logout()">Sign out</button>
+  </div>
+  <div class="tabs" id="tabs">
+    <button type="button" class="on" data-t="eva" onclick="go(this,'eva')">EVA Evaluate</button>
+    <button type="button" data-t="policy" onclick="go(this,'policy')">Policy-to-Code</button>
+    <button type="button" data-t="conf" onclick="go(this,'conf')">Conformance</button>
+    <button type="button" data-t="client" onclick="go(this,'client')">Client controls</button>
+  </div>
+  <div class="wrap" id="view"></div>
+  <div class="wrap note">Pre-registration client SaaS path · EVA 6-D + policy hot-reload into decision path · Conformance scanner · Render/Neon. GODS Admin / GIS / GBS after production smoke tests.</div>
+</div>
+<script>
+let API="", TOK="", TAB="eva";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&","<":"<",">":">",'"':"""}[c]));
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
+async function api(path,opts={}){
+  const h=Object.assign({},opts.headers||{}); if(TOK)h.Authorization="Bearer "+TOK;
+  const r=await fetch(API+path,Object.assign({},opts,{headers:h}));
+  const ct=r.headers.get("content-type")||""; const b=ct.includes("json")?await r.json().catch(()=>({})):await r.text();
+  if(r.status===401){logout();throw new Error("Session expired");}
+  if(!r.ok) throw new Error((b&&b.detail)||("HTTP "+r.status)); return b;
+}
+async function login(){
+  API=($("li-api").value||"").trim().replace(/\/$/,"");
+  const e=$("li-err"); e.textContent=""; const btn=$("li-btn"); btn.disabled=true;
+  try{
+    const f=new URLSearchParams({username:$("li-email").value.trim().toLowerCase(),password:$("li-pass").value});
+    const r=await fetch(API+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
+    if(!r.ok) throw new Error(r.status===401?"Invalid credentials":"Login failed");
+    const d=await r.json(); TOK=d.access_token;
+    localStorage.setItem("udoc_sent_tok",TOK); localStorage.setItem("udoc_sent_api",API);
+    $("who").textContent=$("li-email").value+" · "+(d.role||"");
+    $("login").style.display="none"; $("app").style.display="block"; render();
+  }catch(err){e.textContent=err.message;} finally{btn.disabled=false;}
+}
+function logout(){TOK=""; localStorage.removeItem("udoc_sent_tok"); $("app").style.display="none"; $("login").style.display="block";}
+function go(el,t){TAB=t; document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===t)); render();}
+function dimsHtml(d){if(!d)return""; const keys=["Validity","Confidence","Risk","Compliance","Stability","Impact"];
+  return '<div class="dims">'+keys.map(k=>{const v=d[k]!=null?d[k]:d[k.toLowerCase()]; return v==null?'':'<div class="dim"><div class="dl">'+esc(k)+'</div><div class="dv">'+esc(v)+'</div></div>';}).join("")+'</div>';}
+
+async function render(){
+  const v=$("view"); v.innerHTML="Loading…";
+  if(TAB==="eva") return renderEva(v);
+  if(TAB==="policy") return renderPolicy(v);
+  if(TAB==="conf") return renderConf(v);
+  return renderClient(v);
+}
+
+async function renderEva(v){
+  let models=[]; try{ models=await api("/registry/models"); if(!Array.isArray(models)) models=[]; }catch(e){}
+  const mid0=(models[0]&&(models[0].model_id||models[0].id))||"model-001";
+  v.innerHTML='<div class="panel"><h3>Run EVA evaluation (live decision path)</h3>
+    <div class="row">
+      <div class="f"><label>Model ID</label><input class="in" id="ev-mid" value="'+esc(mid0)+'" style="margin:0"/></div>
+      <div class="f"><label>Confidence 0–1</label><input class="in" id="ev-conf" value="0.92" style="margin:0"/></div>
+      <div class="f"><label>Compliance 0–1</label><input class="in" id="ev-comp" value="1.0" style="margin:0"/></div>
+      <div class="f"><label>Fairness sample</label><select class="in" id="ev-fair" style="margin:0"><option value="fair">fair</option><option value="biased">biased (block)</option><option value="highrisk">high-risk tier</option></select></div>
+      <button class="btn cyan" type="button" onclick="runEva()">Evaluate</button>
+    </div>
+    <div id="ev-out" style="margin-top:12px"></div>
+    <div class="term" id="ev-term">Ready — evaluate posts to /decisions (policy-enforced EVA).</div>
+  </div>
+  <div class="panel"><h3>Verify certificate</h3>
+    <div class="row"><div class="f"><label>Certificate ID</label><input class="in" id="cert-id" style="margin:0" placeholder="from last evaluate"/></div>
+    <button class="btn ghost sm" type="button" onclick="verifyCert()">Verify</button></div>
+    <div id="cert-out" style="margin-top:8px;font-size:13px"></div>
+  </div>';
+}
+async function runEva(){
+  const term=$("ev-term"); const o=$("ev-out");
+  const body={model_id:$("ev-mid").value.trim(),raw_confidence:parseFloat($("ev-conf").value)||0.9,compliance:parseFloat($("ev-comp").value)||1.0};
+  const fair=$("ev-fair").value;
+  if(fair==="biased"){ body.priv_favorable=900; body.priv_total=1000; body.unpriv_favorable=120; body.unpriv_total=1000; }
+  if(fair==="highrisk"){ body.risk_tier="HIGH"; }
+  term.textContent="POST /decisions …"; o.innerHTML="";
+  try{
+    const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const reasons=Array.isArray(d.block_reasons)?d.block_reasons.join(" · "):(d.block_reasons||"");
+    o.innerHTML='<div class="kpis"><div class="kpi"><div class="v">'+esc(d.decision||d.verdict||"—")+'</div><div class="l">Outcome</div></div>'+
+      '<div class="kpi"><div class="v">'+esc(d.composite_eva!=null?d.composite_eva:"—")+'</div><div class="l">Composite EVA</div></div></div>'+
+      dimsHtml(d.dimensions)+
+      (reasons?'<div class="err" style="margin-top:8px">'+esc(reasons)+'</div>':'')+
+      (d.certificate_id?'<div style="margin-top:8px;font-size:12px">Cert <span class="mono">'+esc(d.certificate_id)+'</span></div>':'');
+    if(d.certificate_id) $("cert-id").value=d.certificate_id;
+    term.textContent=JSON.stringify({decision:d.decision,composite_eva:d.composite_eva,certificate_id:d.certificate_id,policy_version:d.policy_version},null,2);
+  }catch(e){ term.textContent="✗ "+e.message; o.innerHTML='<span class="bad">'+esc(e.message)+'</span>'; }
+}
+async function verifyCert(){
+  const id=$("cert-id").value.trim(); if(!id) return;
+  try{
+    const v=await api("/decisions/certificates/"+encodeURIComponent(id)+"/verify");
+    $("cert-out").innerHTML='<span class="'+(v.valid?'ok':'bad')+'">'+(v.valid?'VALID':'INVALID')+'</span> · '+esc(v.signature_alg||"");
+  }catch(e){$("cert-out").innerHTML='<span class="bad">'+esc(e.message)+'</span>';}
+}
+
+async function renderPolicy(v){
+  let active={}, packs=[], hot={};
+  try{ active=await api("/policy/active"); }catch(e){}
+  try{ packs=await api("/policy/packs"); if(!Array.isArray(packs)) packs=[]; }catch(e){}
+  try{ hot=await api("/policy/hotreload"); }catch(e){}
+  v.innerHTML='<div class="kpis">
+    <div class="kpi"><div class="v">'+esc((active.active_packs||[]).length)+'</div><div class="l">Active packs</div></div>
+    <div class="kpi"><div class="v">'+esc(active.enforced_rules!=null?active.enforced_rules:"—")+'</div><div class="l">Enforced rules</div></div>
+    <div class="kpi"><div class="v" style="font-size:14px">'+esc(hot.last_reload_ms!=null?hot.last_reload_ms+"ms":"—")+'</div><div class="l">Hot-reload</div></div>
+  </div>
+  <div class="panel"><h3>Policy dry-run (no persist)</h3>
+    <div class="row">
+      <div class="f"><label>Model ID</label><input class="in" id="pt-mid" value="model-001" style="margin:0"/></div>
+      <div class="f"><label>Scenario</label><select class="in" id="pt-sc" style="margin:0"><option>healthy</option><option>biased</option><option>breach</option></select></div>
+      <button class="btn cyan" type="button" onclick="policyTest()">Test policy</button>
+    </div>
+    <div class="term" id="pt-out" style="margin-top:10px">POST /policy/test</div>
+  </div>
+  <div class="panel"><h3>Policy packs</h3>
+    <table><tr><th>Pack</th><th>Status</th><th>Rules</th><th>Sector</th></tr>'+
+    (packs.length?packs.slice(0,20).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.status)+'</td><td>'+esc(p.rule_count)+'</td><td>'+esc(p.sector||"")+'</td></tr>').join("")
+      :'<tr><td colspan="4" style="color:var(--mut)">No packs yet — upload via API /policy/upload</td></tr>')+'</table></div>';
+}
+async function policyTest(){
+  try{
+    const d=await api("/policy/test",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model_id:$("pt-mid").value.trim(),scenario:$("pt-sc").value})});
+    $("pt-out").textContent=JSON.stringify(d,null,2);
+  }catch(e){$("pt-out").textContent="✗ "+e.message;}
+}
+
+async function renderConf(v){
+  let st={}; try{ st=await api("/conformance/status"); }catch(e){ v.innerHTML='<div class="panel bad">'+esc(e.message)+'</div>'; return; }
+  let sys=[],fn=[],sc=[];
+  try{ sys=await api("/conformance/systems"); }catch(e){}
+  try{ fn=await api("/conformance/findings?limit=10"); }catch(e){}
+  try{ sc=await api("/conformance/scans?limit=6"); }catch(e){}
+  v.innerHTML='<div class="kpis">
+    <div class="kpi"><div class="v">'+(st.scanner_enabled?'ON':'OFF')+'</div><div class="l">Scanner</div></div>
+    <div class="kpi"><div class="v">'+esc(st.registered_systems)+'</div><div class="l">Systems</div></div>
+    <div class="kpi"><div class="v ok">'+esc(st.conformant)+'</div><div class="l">Conformant</div></div>
+    <div class="kpi"><div class="v bad">'+esc(st.non_conformant)+'</div><div class="l">Non-conformant</div></div>
+    <div class="kpi"><div class="v">'+esc(st.coverage_pct!=null?st.coverage_pct+"%":"—")+'</div><div class="l">Coverage</div></div>
+  </div>
+  <div class="row" style="margin-bottom:12px"><button class="btn cyan" type="button" onclick="runScan()">Run conformance scan</button>
+    <span style="font-size:12px;color:var(--mut)">Last: '+esc((st.last_scan_at||"—").replace("T"," ").slice(0,19))+'</span></div>
+  <div class="panel"><h3>Systems</h3><table><tr><th>System</th><th>Verdict</th><th>State</th><th>Status</th></tr>'+
+    (sys.length?sys.map(m=>'<tr><td>'+esc(m.name||m.model_id)+'</td><td>'+esc(m.verdict)+'</td><td>'+esc(m.state)+'</td><td>'+esc(m.status)+'</td></tr>').join("")
+      :'<tr><td colspan="4" style="color:var(--mut)">No systems</td></tr>')+'</table></div>
+  <div class="panel"><h3>Findings</h3><table><tr><th>Model</th><th>Verdict</th><th>Reason</th></tr>'+
+    (fn.length?fn.map(f=>'<tr><td>'+esc(f.model_id)+'</td><td>'+esc(f.verdict)+'</td><td>'+esc((f.reason||"").slice(0,80))+'</td></tr>').join("")
+      :'<tr><td colspan="3" style="color:var(--mut)">No findings</td></tr>')+'</table></div>';
+}
+async function runScan(){
+  try{ const r=await api("/conformance/scan",{method:"POST"}); toast("✓ "+r.scan_ref+" · "+r.total+" systems"); render(); }
+  catch(e){ toast("✕ "+e.message); }
+}
+
+async function renderClient(v){
+  let me={}, sum={};
+  try{ me=await api("/tenants/me"); }catch(e){ me={}; }
+  try{ sum=await api("/udoc/regulator/summary"); }catch(e){}
+  v.innerHTML='<div class="panel"><h3>Client / tenant posture</h3>
+    <div class="kpis">
+      <div class="kpi"><div class="v" style="font-size:14px">'+esc(me.tier_name||me.tier||"platform")+'</div><div class="l">Tier</div></div>
+      <div class="kpi"><div class="v" style="font-size:14px">'+esc(me.sector||"GENERAL")+'</div><div class="l">Sector</div></div>
+      <div class="kpi"><div class="v">'+esc(sum.systems&&sum.systems.total!=null?sum.systems.total:"—")+'</div><div class="l">Systems</div></div>
+      <div class="kpi"><div class="v">'+esc(sum.decisions&&sum.decisions.total!=null?sum.decisions.total:"—")+'</div><div class="l">Decisions</div></div>
+    </div>
+    <p style="color:var(--mut);font-size:13px">Client-specific governance: register models, run EVA, activate policy packs, verify certificates, run conformance. Distribution path = open-source SaaS on this Core; upgrade path = in-house infrastructure later.</p>
+    <div class="row">
+      <a class="btn ghost sm" href="/portals" style="text-decoration:none;display:inline-block">24 Portals</a>
+      <a class="btn ghost sm" href="/udoc-admin" style="text-decoration:none;display:inline-block">UDOC Controller</a>
+    </div>
+  </div>';
+}
+
+(function(){
+  const t=localStorage.getItem("udoc_sent_tok"); const a=localStorage.getItem("udoc_sent_api");
+  if(a!=null) API=a; if(t){ TOK=t; $("login").style.display="none"; $("app").style.display="block"; render(); }
+})();
+</script></body></html>
