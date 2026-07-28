@@ -1,18 +1,16 @@
 # Render Blueprint — G.O.D.S / UDOC stack
-# Capstone live env: free Render (~20 active services max) + Neon (~500MB).
-# Do NOT add parallel services for demo screens — fold into existing hosts.
-# DATABASE_URL = external Neon (manual). Preserve GODS_SOV_KEY.
+# Free Render (~20 services) + Neon (~500MB). NO new services for demo screens.
+# DATABASE_URL = Neon (manual). Preserve GODS_SOV_KEY.
 #
-# Service map (intentional):
-#   gods-platform-core     = API + Neon
-#   gods-udoc-admin        = GODS UDOC Admin mainframe (udoc-internal)
-#   gods-udoc-client       = Client console + Citizen Portal page (udoc-public)
-#   gods-udoc-gateway      = Sign-on / routing
-#   gods-udoc-operator     = Operator workspace
-#   gods-udoc-sector       = Sector PUBLIC/PRIVATE
-#   gods-udoc-web          = PWA / mobile OTA surface (udoc-app)
-#   gods-platform-internal = staff React internal
-#   gods-portals           = division portals-web
+# gods-platform-core     = API + Neon (password-protected auth on core)
+# gods-udoc-admin        = GODS UDOC Admin (udoc-internal)
+# gods-udoc-client       = Client console + Citizen Portal (udoc-public)
+# gods-udoc-gateway      = Sign-on
+# gods-udoc-operator     = Operator
+# gods-udoc-sector       = Sector
+# gods-udoc-web          = PWA / mobile OTA (udoc-app)
+# gods-platform-internal = staff internal
+# gods-portals           = portals-web
 
 services:
   - type: web
@@ -94,6 +92,7 @@ services:
         source: /*
         destination: /index.html
 
+  # Client + Citizen: citizen.html is a real static file — do not SPA-rewrite it
   - type: web
     name: gods-udoc-client
     runtime: static
@@ -110,7 +109,7 @@ services:
         source: /citizen/
         destination: /citizen.html
       - type: rewrite
-        source: /*
+        source: "/"
         destination: /index.html
 
   - type: web
