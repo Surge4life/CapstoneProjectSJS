@@ -1,21 +1,17 @@
-# Render Blueprint — the ENTIRE G.O.D.S / UDOC stack as code (4 web services + 1 database).
+# Render Blueprint — the ENTIRE G.O.D.S / UDOC stack as code.
 # Connect this repo in Render (New > Blueprint). Pushes to `main` auto-deploy.
 #
 # ⚠ FREE POSTGRES EXPIRES ~30 DAYS AFTER CREATION — Render DELETES it. See DB_EXPIRY_RUNBOOK.md.
-#   The core's DATABASE_URL is wired from gods-db below, so if the DB is recreated the connection
-#   re-populates automatically; you then restore your data with tools/db_restore.py.
-#   To make the database PERMANENT: change gods-db `plan:` to a paid tier, OR delete the
-#   `fromDatabase` block and set DATABASE_URL to an external DSN (e.g. a Neon/Supabase free DB,
-#   which does not auto-delete). Either way, preserve GODS_SOV_KEY or past seals won't verify.
+#   DATABASE_URL is external Neon (set manually). Preserve GODS_SOV_KEY across redeploys.
 
-# databases:                      # gods-db REMOVED — DATABASE_URL now points at an EXTERNAL Neon DB that never expires.
-#   - name: gods-db               #   This Blueprint no longer provisions a Render free Postgres (which is deleted ~30 days
-#     plan: free                  #   after creation). Delete the orphaned gods-db in the Render dashboard once Neon is live.
+# databases:                      # gods-db REMOVED — DATABASE_URL points at EXTERNAL Neon.
+#   - name: gods-db
+#     plan: free
 #     region: oregon
 #     postgresMajorVersion: "18"
 
 services:
-  # ---- UDOC governance API (FastAPI) — the core; ALL data lives in gods-db ----
+  # ---- UDOC governance API (FastAPI) — the core ----
   - type: web
     name: gods-platform-core
     runtime: python
@@ -29,16 +25,12 @@ services:
     envVars:
       - key: ENVIRONMENT
         value: production
-      - key: GODS_SOV_KEY        # sovereign signing key — Render generates it ONCE and keeps it.
-        generateValue: true      #   PRESERVE this value across redeploys or certificate/version seals stop verifying.
-      - key: DATABASE_URL        # EXTERNAL Neon pooled DSN — set manually, never overwritten by the Blueprint.
-        sync: false              #   Render dashboard → gods-platform-core → Environment → DATABASE_URL = Neon connection string.
-                                 #   App normalises postgresql:// → postgresql+psycopg:// automatically (no code change).
-      # GODS_BOOTSTRAP_PASSWORD (optional) overrides the empty-database bootstrap admin password.
-      # RENDER_GIT_COMMIT / RENDER_GIT_BRANCH / RENDER_RELEASE_CREATED_AT are injected by Render
-      # and surfaced at GET /version so the mobile app can detect new deploys.
+      - key: GODS_SOV_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
 
-  # ---- UDOC web app / PWA (the page the mobile WebView can point at for OTA UI) ----
+  # ---- UDOC web app / PWA ----
   - type: web
     name: gods-udoc-web
     runtime: static
@@ -54,19 +46,6 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-    headers:
-      - path: /*
-        name: Strict-Transport-Security
-        value: "max-age=63072000; includeSubDomains; preload"
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-      - path: /*
-        name: X-Frame-Options
-        value: SAMEORIGIN
-      - path: /*
-        name: Referrer-Policy
-        value: strict-origin-when-cross-origin
 
   # ---- Internal staff console (React/Vite static) ----
   - type: web
@@ -102,7 +81,7 @@ services:
         source: /*
         destination: /index.html
 
-  # ---- GODS Admin UDOC — internal sovereign operations mainframe (static; talks to gods-platform-core) ----
+  # ---- GODS Admin UDOC — internal sovereign operations mainframe ----
   - type: web
     name: gods-udoc-admin
     runtime: static
@@ -116,7 +95,7 @@ services:
         source: /*
         destination: /index.html
 
-  # ---- UDOC Client Platform — external tenant-scoped client governance console (static; talks to gods-platform-core) ----
+  # ---- UDOC Client Platform — external tenant-scoped client governance ----
   - type: web
     name: gods-udoc-client
     runtime: static
@@ -130,7 +109,7 @@ services:
         source: /*
         destination: /index.html
 
-  # ---- UDOC Operator Console — per-profile Sovereign-Operator workspace (static; talks to gods-platform-core) ----
+  # ---- UDOC Operator Console — per-profile Sovereign-Operator workspace ----
   - type: web
     name: gods-udoc-operator
     runtime: static
@@ -144,7 +123,22 @@ services:
         source: /*
         destination: /index.html
 
-  # ---- UDOC Sign-On Gateway — unified entry, routes to the right console by role (static) ----
+  # ---- UDOC 24-User / Citizen Portals — Sovereign-Operator portal catalog (demo → live) ----
+  # Source of truth: udoc-portals (24 profiles, open portal, run control, capability matrix)
+  - type: web
+    name: gods-udoc-portals
+    runtime: static
+    rootDir: udoc-portals
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # ---- UDOC Sign-On Gateway — unified entry ----
   - type: web
     name: gods-udoc-gateway
     runtime: static
@@ -158,7 +152,7 @@ services:
         source: /*
         destination: /index.html
 
-  # ---- UDOC Sector Governance Console — Public vs Private differentiated experience (static) ----
+  # ---- UDOC Sector Governance Console — Public vs Private ----
   - type: web
     name: gods-udoc-sector
     runtime: static
