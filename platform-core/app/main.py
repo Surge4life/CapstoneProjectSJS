@@ -11,7 +11,7 @@ from app.routers import (health, auth, registry, decisions, audit, oversight,
                          portal_student, portal_employer, portal_employee,
                          documents, saas, madiba_engage, ts_submit, access, policy, intel, tenants, admin_udoc,
                          system_backup, users_admin, client_knowledge, workspace, sectors, rbac, portal_ops, conformance, manifest, udoc_engine, staychain, enclave,
-                         gis)
+                         gis, citizen)
 
 app = FastAPI(title=settings.app_name, version="1.0.0",
               description="Sovereign AI governance backend for the G.O.D.S ecosystem.")
@@ -161,5 +161,5 @@ for r in (health.router, auth.router, registry.router, decisions.router, audit.r
           access.router, policy.router, intel.router, tenants.router, admin_udoc.router,
           system_backup.router, users_admin.router, client_knowledge.router, workspace.router, sectors.router, rbac.router, portal_ops.router, conformance.router,
           manifest.router, udoc_engine.router, staychain.router, enclave.router,
-          gis.router):
+          gis.router, citizen.router):
     app.include_router(r)
