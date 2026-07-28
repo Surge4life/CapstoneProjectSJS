@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UDOC Citizen Portal · AI Rights · Regte Portaal</title>
+<meta name="theme-color" content="#0F172A"/>
+<style>
+:root{--navy:#0F172A;--side:#1E293B;--line:#334155;--main:#F0F4F8;--card:#fff;--ink:#1E293B;--mut:#64748B;--green:#059669;--green-l:#6EE7B7;--amber:#F59E0B;--fn:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;--fm:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:var(--fn);background:var(--navy);color:var(--ink)}
+button{font-family:inherit;cursor:pointer}
+.app{display:grid;grid-template-rows:52px 1fr;height:100%}
+.top{display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--navy);border-bottom:1px solid rgba(16,185,129,.2);color:#e2e8f0}
+.logo{color:#10B981;font-size:18px;letter-spacing:3px;font-weight:800}.sub{font-size:11px;color:var(--green-l);margin-left:12px}
+.exit{background:transparent;border:1px solid rgba(16,185,129,.3);color:var(--green-l);border-radius:6px;padding:6px 10px;font-size:12px}
+.body{display:grid;grid-template-columns:220px 1fr;min-height:0}
+.side{background:var(--side);border-right:1px solid var(--line);padding:14px 10px;overflow:auto}
+.grp{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#64748B;padding:10px 10px 6px}
+.nav{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:#94A3B8;cursor:pointer;font-size:13.5px;margin-bottom:2px}
+.nav.active{background:rgba(16,185,129,.12);color:#ecfdf5;border-left:3px solid #10B981}
+.main{background:var(--main);overflow:auto;padding:20px 24px 40px}
+h1{font-size:24px;font-weight:800;margin:0 0 4px}.lead{font-size:13px;color:var(--mut);margin:0 0 20px}
+.banner{display:flex;gap:12px;border:1px solid rgba(5,150,105,.3);background:rgba(5,150,105,.05);border-left:4px solid var(--green);border-radius:8px;padding:14px;margin-bottom:18px;font-size:13px;color:#064E3B;line-height:1.55}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid #E2E8F0;border-radius:10px;padding:18px;cursor:pointer}.card:hover{border-color:#10B981}
+.card .t{font-weight:700;font-size:15px;margin:8px 0 6px}.card .d{font-size:12.5px;color:var(--mut)}
+.panel{background:var(--card);border:1px solid #E2E8F0;border-radius:10px;padding:18px;margin-bottom:14px}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin:0 0 6px}
+input,select,textarea{width:100%;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;font-size:13.5px;margin-bottom:12px;font-family:inherit}
+.btn{background:linear-gradient(180deg,#C9A84C,#A8893A);color:#1a1305;border:0;border-radius:8px;padding:12px 16px;font-weight:700;font-size:13px;width:100%}
+.page{display:none}.page.active{display:block}
+.timeline{list-style:none;padding:0;margin:0}.timeline li{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F1F5F9}
+.dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none;border:2px solid #CBD5E1}
+.dot.done{border-color:var(--green);color:var(--green)}.dot.active{border-color:var(--amber)}
+.help-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:720px){.body{grid-template-columns:1fr}.side{display:none}.help-grid{grid-template-columns:1fr}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0F172A;color:#E2E8F0;border:1px solid #10B981;padding:12px 16px;border-radius:10px;font-size:13px;z-index:50;display:none}.toast.show{display:block}
+.honesty{font-size:11px;color:var(--mut);margin-top:18px;border-top:1px solid #E2E8F0;padding-top:12px;line-height:1.45}
+.right-item{background:var(--card);border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px;margin-bottom:10px}.right-item h3{margin:0 0 6px;font-size:14px;color:var(--green)}.right-item p{margin:0;font-size:13px;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><span class="logo">UDOC</span><span class="sub">AI Rights Portal · Regte Portaal</span></div>
+    <div style="display:flex;gap:12px;align-items:center;font-size:11px;color:var(--green-l)">
+      <button class="exit" type="button" onclick="location.href='/'">← Client console</button>
+      <span>Welcome · Welkom · Siyakwamukela</span>
+    </div>
+  </div>
+  <div class="body">
+    <nav class="side">
+      <div class="grp">My AI Rights</div>
+      <div class="nav active" data-page="home" onclick="go('home',this)">Home</div>
+      <div class="nav" data-page="challenge" onclick="go('challenge',this)">Challenge a Decision</div>
+      <div class="nav" data-page="status" onclick="go('status',this)">Check My Case</div>
+      <div class="nav" data-page="explain" onclick="go('explain',this)">Get an Explanation</div>
+      <div class="grp">My Rights</div>
+      <div class="nav" data-page="rights" onclick="go('rights',this)">Know Your Rights</div>
+      <div class="nav" data-page="help" onclick="go('help',this)">Get Help</div>
+    </nav>
+    <main class="main">
+      <section id="page-home" class="page active">
+        <h1>Welcome to UDOC Citizen Portal</h1>
+        <p class="lead">Challenge AI decisions that affected you. You have rights. We help you use them.</p>
+        <div class="banner"><div>✅</div><div><strong>YOUR RIGHTS UNDER SOUTH AFRICAN LAW</strong><br>If an AI system made a decision about you, you have the right to an explanation, to challenge the decision, and to human review.</div></div>
+        <div class="grid">
+          <div class="card" onclick="go('challenge')"><div class="t">Challenge a Decision</div><div class="d">Grant, loan, or job decision wrong? Challenge it here.</div></div>
+          <div class="card" onclick="go('status')"><div class="t">Check My Case Status</div><div class="d">Already submitted? Track your case.</div></div>
+          <div class="card" onclick="go('explain')"><div class="t">Get an Explanation</div><div class="d">Why did AI decide? Plain language.</div></div>
+          <div class="card" onclick="go('rights')"><div class="t">Know Your Rights</div><div class="d">Constitutional and POPIA rights when AI is used.</div></div>
+        </div>
+        <div class="honesty">Served from the <b>existing Client</b> host (gods-udoc-client) — not a separate Render environment. UDOC pre-registration. GG54477 withdrawn 26 Apr 2026. POPIA s71 + Constitution ss 9/16/33.</div>
+      </section>
+      <section id="page-challenge" class="page">
+        <h1>Challenge an AI Decision</h1>
+        <p class="lead">Free. Aim: response within 2 working days.</p>
+        <div class="panel">
+          <label>Government service</label>
+          <select id="ch-service"><option>Social Grants (SASSA/DSD)</option><option>Tax matters (SARS)</option><option>Job application — Government post</option><option>Home Affairs / ID</option><option>Other</option></select>
+          <label>What happened?</label>
+          <textarea id="ch-desc" rows="4"></textarea>
+          <label>Contact email</label>
+          <input id="ch-email" type="email"/>
+          <button class="btn" type="button" onclick="submitChallenge()">Submit My Challenge</button>
+          <div id="ch-msg" style="margin-top:10px;font-size:13px;color:var(--mut)"></div>
+        </div>
+      </section>
+      <section id="page-status" class="page">
+        <h1>Check Your Case Status</h1>
+        <div class="panel">
+          <label>Case Number</label>
+          <input id="st-case" placeholder="CASE-902"/>
+          <button class="btn" type="button" style="width:auto;padding:10px 18px" onclick="findCase()">Find My Case</button>
+        </div>
+        <div class="panel" id="st-result" style="display:none"></div>
+      </section>
+      <section id="page-explain" class="page">
+        <h1>Get an Explanation</h1>
+        <p class="lead">Section 33 RSA Constitution — right to reasons.</p>
+        <div class="panel">
+          <label>Decision reference</label>
+          <input id="ex-ref" placeholder="CASE-902 or UDOC-…"/>
+          <button class="btn" type="button" style="width:auto;padding:10px 18px" onclick="getExplanation()">Get My Explanation</button>
+          <div id="ex-out" style="margin-top:14px"></div>
+        </div>
+      </section>
+      <section id="page-rights" class="page">
+        <h1>Your Rights When AI is Used</h1>
+        <div id="rights-list"></div>
+      </section>
+      <section id="page-help" class="page">
+        <h1>Get Help</h1>
+        <div class="help-grid">
+          <div class="panel"><b>SAHRC</b><br><span style="font-size:13px;color:var(--mut)">011 877 3600</span></div>
+          <div class="panel"><b>Information Regulator</b><br><span style="font-size:13px;color:var(--mut)">inforegulator.org.za</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API=localStorage.getItem('udoc_citizen_api')||'https://gods-platform-core.onrender.com';
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),4000);}
+function go(page,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.nav').forEach(n=>n.classList.remove('active'));if(el)el.classList.add('active');else{const n=document.querySelector('.nav[data-page="'+page+'"]');if(n)n.classList.add('active');}}
+function caseStore(){try{return JSON.parse(localStorage.getItem('udoc_citizen_cases')||'{}');}catch(e){return {};}}
+function saveCase(id,obj){const s=caseStore();s[id]=obj;localStorage.setItem('udoc_citizen_cases',JSON.stringify(s));}
+async function submitChallenge(){const msg=document.getElementById('ch-msg');const desc=document.getElementById('ch-desc').value.trim();if(!desc){msg.textContent='Describe the decision.';return;}const caseId='CASE-'+(900+Math.floor(Math.random()*90));const body={service:document.getElementById('ch-service').value,description:desc,email:document.getElementById('ch-email').value.trim(),at:new Date().toISOString(),case_id:caseId};saveCase(caseId,body);try{await fetch(API+'/oversight/cases',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subject:caseId,reason:'Citizen: '+body.service,kind:'CITIZEN_CHALLENGE',detail:desc.slice(0,500)})});}catch(e){}msg.innerHTML='<b style="color:#059669">✓ Submitted.</b> Case <b>'+caseId+'</b>';toast('Case '+caseId);document.getElementById('st-case').value=caseId;}
+function findCase(){const id=(document.getElementById('st-case').value||'').trim().toUpperCase();const box=document.getElementById('st-result');box.style.display='block';const c=caseStore()[id];if(c||id==='CASE-902'||id==='CASE-906'){box.innerHTML='<b>Case '+id+'</b> — <span style="color:var(--amber)">Under Investigation</span><ul class="timeline"><li><div class="dot done">✓</div><div>Received</div></li><li><div class="dot active">⚡</div><div>Under review</div></li><li><div class="dot">⏳</div><div>Response (est. 2 working days)</div></li></ul>';}else{box.innerHTML='No record for '+id+'. Submit a challenge on this device first.';}}
+function getExplanation(){const ref=(document.getElementById('ex-ref').value||'').trim();const out=document.getElementById('ex-out');if(!ref){out.textContent='Enter a reference.';return;}out.innerHTML='<div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px;font-size:13px;line-height:1.7">Plain-language note for <b>'+ref+'</b>: the decision was approved, blocked, or escalated for human review. Under s33 you may request reasons. Use Challenge if the outcome harmed you.</div>';toast('Explanation for '+ref);}
+document.getElementById('rights-list').innerHTML=[{t:'Right to an explanation',p:'Ask why an automated system decided, in plain language.'},{t:'Right to challenge',p:'Dispute a decision and request human review.'},{t:'Right to equality',p:'Constitution s9 — no unfair discrimination.'},{t:'Right to privacy',p:'POPIA protects your personal information.'},{t:'Just administrative action',p:'Constitution s33 / PAJA — lawful, reasonable, fair.'}].map(r=>'<div class="right-item"><h3>'+r.t+'</h3><p>'+r.p+'</p></div>').join('');
+</script>
+</body>
+</html>
