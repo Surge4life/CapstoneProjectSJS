@@ -1,5 +1,18 @@
 # Render Blueprint — G.O.D.S / UDOC stack
+# Capstone live env: free Render (~20 active services max) + Neon (~500MB).
+# Do NOT add parallel services for demo screens — fold into existing hosts.
 # DATABASE_URL = external Neon (manual). Preserve GODS_SOV_KEY.
+#
+# Service map (intentional):
+#   gods-platform-core     = API + Neon
+#   gods-udoc-admin        = GODS UDOC Admin mainframe (udoc-internal)
+#   gods-udoc-client       = Client console + Citizen Portal page (udoc-public)
+#   gods-udoc-gateway      = Sign-on / routing
+#   gods-udoc-operator     = Operator workspace
+#   gods-udoc-sector       = Sector PUBLIC/PRIVATE
+#   gods-udoc-web          = PWA / mobile OTA surface (udoc-app)
+#   gods-platform-internal = staff React internal
+#   gods-portals           = division portals-web
 
 services:
   - type: web
@@ -91,6 +104,12 @@ services:
     staticPublishPath: .
     routes:
       - type: rewrite
+        source: /citizen
+        destination: /citizen.html
+      - type: rewrite
+        source: /citizen/
+        destination: /citizen.html
+      - type: rewrite
         source: /*
         destination: /index.html
 
@@ -98,33 +117,6 @@ services:
     name: gods-udoc-operator
     runtime: static
     rootDir: udoc-operator
-    branch: main
-    autoDeploy: true
-    buildCommand: "echo static-no-build"
-    staticPublishPath: .
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
-  - type: web
-    name: gods-udoc-portals
-    runtime: static
-    rootDir: udoc-portals
-    branch: main
-    autoDeploy: true
-    buildCommand: "echo static-no-build"
-    staticPublishPath: .
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-
-  # UDOC Citizen Portal — AI Rights / Regte Portaal (from Netlify #demo=udoc-v7-platform)
-  - type: web
-    name: gods-udoc-citizen
-    runtime: static
-    rootDir: udoc-citizen
     branch: main
     autoDeploy: true
     buildCommand: "echo static-no-build"
