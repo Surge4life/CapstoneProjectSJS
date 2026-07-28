@@ -1,16 +1,17 @@
 # Render Blueprint — G.O.D.S / UDOC stack
-# Free Render (~20 services) + Neon (~500MB). NO new services for demo screens.
+# Free Render (~20 services) + Neon (~500MB).
 # DATABASE_URL = Neon (manual). Preserve GODS_SOV_KEY.
 #
-# gods-platform-core     = API + Neon (password-protected auth on core)
-# gods-udoc-admin        = GODS UDOC Admin (udoc-internal)
-# gods-udoc-client       = Client console + Citizen Portal (udoc-public)
+# gods-platform-core     = API + Neon
+# gods-udoc-admin        = GODS constitutional Admin (udoc-internal)
+# gods-udoc-client       = Client governance + Citizen
+# gods-udoc-portals      = Client SaaS portal access (role + sector + tier)
 # gods-udoc-gateway      = Sign-on
 # gods-udoc-operator     = Operator
-# gods-udoc-sector       = Sector
+# gods-udoc-sector       = Sector PUBLIC/PRIVATE console
 # gods-udoc-web          = PWA / mobile OTA (udoc-app)
 # gods-platform-internal = staff internal
-# gods-portals           = portals-web
+# gods-portals           = division portals-web (student/employer/employee)
 
 services:
   - type: web
@@ -79,6 +80,20 @@ services:
         source: /*
         destination: /index.html
 
+  # Client SaaS: role + PUBLIC/PRIVATE + tier (before GODS Admin)
+  - type: web
+    name: gods-udoc-portals
+    runtime: static
+    rootDir: udoc-portals
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
   - type: web
     name: gods-udoc-admin
     runtime: static
@@ -92,7 +107,6 @@ services:
         source: /*
         destination: /index.html
 
-  # Client + Citizen: citizen.html is a real static file — do not SPA-rewrite it
   - type: web
     name: gods-udoc-client
     runtime: static
