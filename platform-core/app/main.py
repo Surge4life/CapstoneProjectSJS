@@ -22,8 +22,6 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
 
 @app.middleware("http")
 async def enforce_https(request: Request, call_next):
-    """Redirect HTTP → HTTPS in production. Checks X-Forwarded-Proto set by Render's proxy;
-    health-check and internal traffic (no header) pass through unchanged."""
     if (os.environ.get("ENVIRONMENT") == "production"
             and request.headers.get("x-forwarded-proto") == "http"):
         https_url = str(request.url).replace("http://", "https://", 1)
@@ -104,28 +102,35 @@ def _ensure_bootstrap_admin():
             pw = os.environ.get("GODS_BOOTSTRAP_PASSWORD", "admin123")
             db.add(User(email=email, password_hash=hash_password(pw), role="admin", division="GODS"))
             db.commit()
-            print(f"[bootstrap] empty database detected — created bootstrap admin '{email}'. "
-                  f"Restore a backup or change this password immediately.")
+            print(f"[bootstrap] empty database detected — created bootstrap admin '{email}'.")
     finally:
         db.close()
 
 
+def _static(name: str) -> str:
+    return os.path.join(os.path.dirname(__file__), "..", "static", name)
+
+
 @app.get("/admin", tags=["root"], include_in_schema=False)
 def admin_console():
-    """GODS Admin — overall constitutional governance (platform-core static)."""
-    return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "admin.html"))
+    return FileResponse(_static("admin.html"))
 
 
 @app.get("/udoc-admin", tags=["root"], include_in_schema=False)
 def udoc_admin_console():
-    """Internal UDOC controller console (platform-core static)."""
-    return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "udoc_admin_v93.html"))
+    return FileResponse(_static("udoc_admin_v93.html"))
 
 
 @app.get("/portals", tags=["root"], include_in_schema=False)
 def portals_console():
-    """24 Sovereign-Operator portal selector + UI controller (same host as /admin)."""
-    return FileResponse(os.path.join(os.path.dirname(__file__), "..", "static", "portals.html"))
+    return FileResponse(_static("portals.html"))
+
+
+@app.get("/Sentinel", tags=["root"], include_in_schema=False)
+@app.get("/sentinel", tags=["root"], include_in_schema=False)
+def sentinel_console():
+    """Client SaaS runtime: EVA evaluate + policy-to-code + conformance (pre-registration path)."""
+    return FileResponse(_static("sentinel.html"))
 
 
 @app.get("/", tags=["root"])
@@ -133,8 +138,9 @@ def root():
     return {"system": "G.O.D.S Platform Core", "status": "live",
             "environment": settings.environment,
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
-            "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "portals": "/portals"},
-            "governance": "EVA 6-D + UDOC sovereignty, fail-closed for critical"}
+            "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin",
+                         "portals": "/portals", "sentinel": "/Sentinel"},
+            "governance": "EVA 6-D + policy-to-code + conformance, fail-closed for critical"}
 
 
 @app.get("/system/crypto", tags=["root"])
