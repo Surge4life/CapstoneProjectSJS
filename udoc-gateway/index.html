@@ -20,7 +20,7 @@
   *{box-sizing:border-box} html,body{margin:0;height:100%}
   body{background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%);color:var(--txt);font-family:var(--fb);font-size:14px;min-height:100%;display:flex;align-items:center;justify-content:center}
   .mono{font-family:var(--fm)}.muted{color:var(--muted)}
-  .card{width:460px;max-width:93vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:16px;padding:32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .card{width:440px;max-width:93vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:16px;padding:32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
   .bm{display:flex;align-items:center;gap:14px}.shield{width:46px;height:46px;flex:none}
   .bm h1{font-family:var(--fc);font-weight:700;letter-spacing:.05em;font-size:26px;margin:0;color:var(--gold)}
   .bm .sub{font-family:var(--fc);letter-spacing:.24em;color:var(--cyan);font-size:11px}
@@ -32,7 +32,7 @@
   .btn:hover{background:rgba(201,168,76,.22)}.btn:disabled{opacity:.5;cursor:not-allowed}
   .btn.cyan{border-color:var(--cyan);color:var(--cyan-b);background:rgba(0,194,212,.1)}
   .err{color:#fda4a4;font-size:12.5px;margin-top:10px;min-height:16px}
-  .surfaces{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:18px}
+  .surfaces{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:18px}
   .surf{text-align:center;border:1px solid var(--bd2);border-radius:9px;padding:8px 4px;font-family:var(--fc);letter-spacing:.05em;font-size:10px;color:var(--muted)}
   .surf b{display:block;color:var(--txt2);font-size:11.5px;letter-spacing:.04em}
   .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);justify-content:center;margin-top:16px}.apibar input{width:240px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
@@ -50,20 +50,19 @@
     <div id="signin">
       <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
         <div><h1>G.O.D.S</h1><div class="sub">UDOC SOVEREIGN SIGN-ON</div></div></div>
-      <p class="intro">One sign-on for the ecosystem. Route to Admin, Client, Sector, Operator workspace, or the <b>24-user Portals</b> catalog (Citizen / Sovereign-Operator portals from the UDOC demo, now live).</p>
+      <p class="intro">One sign-on for the existing UDOC surfaces. Admin is GODS UDOC (udoc-internal). Client hosts governance console and the <b>Citizen Portal</b> route. No extra fabricated environments.</p>
       <label>Email</label><input id="li-email" type="email" placeholder="you@org"/>
       <label>Password</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
       <div style="margin-top:18px"><button class="btn" id="li-btn" onclick="doLogin()">Sign in</button></div>
       <div class="err" id="li-err"></div>
       <div class="surfaces">
-        <div class="surf"><b>Admin</b>mainframe</div>
+        <div class="surf"><b>Admin</b>GODS UDOC</div>
         <div class="surf"><b>Client</b>governance</div>
         <div class="surf"><b>Sector</b>public/private</div>
         <div class="surf"><b>Operator</b>workspace</div>
-        <div class="surf"><b>Portals</b>24 users</div>
       </div>
       <div class="links">
-        <a id="lnk-portals" href="https://gods-udoc-portals.onrender.com" target="_blank" rel="noopener">Open 24-user Portals →</a>
+        <a href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener">Citizen Portal (AI Rights) →</a>
       </div>
       <div class="apibar"><span>API</span><input id="li-api" class="mono"/></div>
       <div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33.</div>
@@ -85,9 +84,8 @@ const CONSOLES={
   client:   localStorage.getItem("gw_url_client")   || "https://gods-udoc-client.onrender.com",
   operator: localStorage.getItem("gw_url_operator") || "https://gods-udoc-operator.onrender.com",
   sector:   localStorage.getItem("gw_url_sector")   || "https://gods-udoc-sector.onrender.com",
-  portals:  localStorage.getItem("gw_url_portals")  || "https://gods-udoc-portals.onrender.com",
 };
-const LABEL={admin:"Administration Mainframe",client:"Client Governance Platform",operator:"Operator Workspace",sector:"Sector Governance Console",portals:"24-User Sovereign Portals"};
+const LABEL={admin:"GODS UDOC Admin",client:"Client Governance Platform",operator:"Operator Workspace",sector:"Sector Governance Console"};
 function apiBase(){ return localStorage.getItem("gw_api")||PROD_API; }
 function setApiBase(v){ localStorage.setItem("gw_api", v.replace(/\/+$/,"")); }
 document.getElementById("li-api").value=apiBase();
