@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>G.O.D.S · 24 Sovereign Portals</title>
+<style>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--udoc:#7C5CBF}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
+header{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+.tag{font-size:11px;color:var(--mut);border:1px solid var(--line);border-radius:20px;padding:2px 10px}
+a{color:var(--cyan);text-decoration:none}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 20px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+input,select{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px}
+button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.groups{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.groups button{background:transparent;color:var(--mut);border:1px solid var(--line)}
+.groups button.on{color:var(--gold);border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--gold)}
+.card h4{margin:0 0 6px;font-size:15px;color:var(--gold)}
+.card .g{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.card p{margin:0;font-size:12.5px;color:var(--mut);line-height:1.4}
+.pill{font-size:10px;padding:2px 8px;border-radius:12px;border:1px solid var(--line);color:var(--cyan);margin-right:4px;display:inline-block;margin-top:6px}
+#controller{display:none}
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:720px){.ctrl-grid{grid-template-columns:1fr}}
+.ctrl{background:#091022;border:1px solid var(--line);border-radius:10px;padding:12px}
+.ctrl b{display:block;margin-bottom:4px}
+.ctrl .d{font-size:12px;color:var(--mut);margin-bottom:8px}
+.act{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);padding:6px 0;border-bottom:1px dashed var(--line)}
+.err{color:var(--bad)}.ok{color:var(--ok)}
+.note{font-size:12px;color:var(--mut);margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">G.O.D.S · <b>24 Portals</b></span>
+  <span class="tag">Sovereign-Operator access</span>
+  <span class="tag" style="border-color:var(--udoc);color:#cdb8f0">same host as /admin · /udoc-admin</span>
+  <span style="flex:1"></span>
+  <a href="/admin">GODS Admin</a>
+  <a href="/udoc-admin">UDOC Controller</a>
+  <a href="/citizen" id="cit-link" style="display:none">Citizen</a>
+</header>
+<div class="wrap">
+  <div id="login">
+    <div class="bar">
+      <input id="api" placeholder="API (blank = same origin)" style="width:220px"/>
+      <input id="email" value="admin@gods.local" style="width:180px"/>
+      <input id="pass" type="password" value="admin123" style="width:120px"/>
+      <button type="button" onclick="login()">Sign in</button>
+      <span id="who" style="color:var(--mut)"></span>
+    </div>
+    <p style="color:var(--mut);font-size:13px">Select a Sovereign-Operator portal, then operate its UI controls. Server-enforced by base role. Not 24 Render services — one surface on platform-core.</p>
+  </div>
+
+  <div id="catalog" style="display:none">
+    <div class="groups" id="groups"></div>
+    <div class="grid" id="cards"></div>
+  </div>
+
+  <div id="controller">
+    <div class="bar">
+      <button class="ghost" type="button" onclick="backCatalog()">← All portals</button>
+      <strong id="c-title">Portal</strong>
+      <span class="tag" id="c-group"></span>
+      <span id="c-may" class="tag"></span>
+    </div>
+    <p id="c-desc" style="color:var(--mut);font-size:13px"></p>
+    <div class="ctrl-grid" id="c-controls"></div>
+    <div style="margin-top:16px">
+      <h4 style="color:var(--gold);margin:0 0 8px">Recent activity</h4>
+      <div id="c-act"></div>
+    </div>
+    <div id="c-msg" style="margin-top:10px"></div>
+  </div>
+
+  <div class="note">Architecture: <b>/admin</b> = GODS constitutional governance · <b>/udoc-admin</b> = internal UDOC controller · <b>/portals</b> = 24-operator select + control · Citizen stays public on Client host. No extra fabricated environments required for portal selection.</div>
+</div>
+<script>
+let API="", TOK="", CATALOG=[], ACTIVE=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&","<":"<",">":">",'"':""","'":"&#39;"}[c]));
+
+async function api(path, opts={}){
+  const h=Object.assign({}, opts.headers||{});
+  if(TOK) h.Authorization="Bearer "+TOK;
+  const r=await fetch(API+path, Object.assign({}, opts, {headers:h}));
+  const ct=r.headers.get("content-type")||"";
+  const body=ct.includes("json")?await r.json().catch(()=>({})):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail)||("HTTP "+r.status));
+  return body;
+}
+
+async function login(){
+  API=($("api").value||"").trim().replace(/\/$/,"");
+  try{
+    const b=new URLSearchParams({username:$("email").value, password:$("pass").value});
+    const r=await fetch(API+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:b});
+    const d=await r.json();
+    if(!d.access_token) throw new Error("login failed");
+    TOK=d.access_token;
+    $("who").textContent=$("email").value+" · "+(d.role||"");
+    await loadCatalog();
+  }catch(e){$("who").innerHTML='<span class="err">'+esc(e.message)+'</span>';}
+}
+
+async function loadCatalog(){
+  const d=await api("/access/profiles");
+  CATALOG=d.profiles||[];
+  const groups=d.groups||["GOVERNANCE","OPERATIONS","PEOPLE","BUSINESS"];
+  $("groups").innerHTML='<button type="button" class="on" data-g="ALL" onclick="filterG(this,\'ALL\')">ALL '+CATALOG.length+'</button>'+
+    groups.map(g=>'<button type="button" data-g="'+esc(g)+'" onclick="filterG(this,\''+esc(g)+'\')">'+esc(g)+'</button>').join("");
+  renderCards("ALL");
+  $("catalog").style.display="block";
+  $("controller").style.display="none";
+}
+
+function filterG(el,g){
+  document.querySelectorAll("#groups button").forEach(b=>b.classList.remove("on"));
+  el.classList.add("on");
+  renderCards(g);
+}
+
+function renderCards(g){
+  const list=g==="ALL"?CATALOG:CATALOG.filter(p=>p.group===g);
+  $("cards").innerHTML=list.map(p=>{
+    const caps=(p.capabilities||[]).slice(0,4).map(c=>'<span class="pill">'+esc(c)+'</span>').join("");
+    return '<div class="card" onclick="openPortal(\''+esc(p.key)+'\')"><div class="g">'+esc(p.group)+'</div><h4>'+esc(p.title)+'</h4><p>'+esc((p.desc||"").slice(0,140))+'</p>'+caps+'</div>';
+  }).join("")||'<div class="card">No portals in group.</div>';
+}
+
+async function openPortal(key){
+  const d=await api("/portal/"+encodeURIComponent(key));
+  ACTIVE=d.portal;
+  $("catalog").style.display="none";
+  $("controller").style.display="block";
+  $("c-title").textContent=ACTIVE.title;
+  $("c-group").textContent=ACTIVE.group;
+  $("c-may").textContent=d.may_operate?"OPERATE":"VIEW / ROLE-LOCKED";
+  $("c-may").style.color=d.may_operate?"var(--ok)":"var(--bad)";
+  $("c-desc").textContent=ACTIVE.desc||"";
+  const can=!!d.may_operate;
+  $("c-controls").innerHTML=(ACTIVE.controls||[]).map(c=>{
+    return '<div class="ctrl"><b>'+esc(c.name)+'</b><div class="d">'+esc(c.desc||c.op_type||"")+'</div>'+
+      (can?('<button type="button" onclick="runControl(\''+esc(ACTIVE.key)+'\',\''+esc(c.name).replace(/'/g,"\\'")+'\')">Execute</button>'):'<span class="err">Requires role: '+esc(ACTIVE.base_role)+'</span>')+
+      '</div>';
+  }).join("");
+  const act=d.activity||[];
+  $("c-act").innerHTML=act.length?act.map(a=>'<div class="act">'+esc(a.at||"")+' · <b>'+esc(a.control)+'</b> · '+esc(a.ref)+' · '+esc(a.summary||"")+'</div>').join(""):'<div class="act">No activity yet.</div>';
+  $("c-msg").textContent="";
+}
+
+async function runControl(key, control){
+  const note=prompt("Note for "+control+" (optional):","")||"";
+  $("c-msg").textContent="Executing…";
+  try{
+    const r=await api("/portal/"+encodeURIComponent(key)+"/control",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({control:control, note:note})
+    });
+    $("c-msg").innerHTML='<span class="ok">✓ '+esc(r.message)+' · ref '+esc(r.ref)+'</span>';
+    openPortal(key);
+  }catch(e){$("c-msg").innerHTML='<span class="err">'+esc(e.message)+'</span>';}
+}
+
+function backCatalog(){
+  $("controller").style.display="none";
+  $("catalog").style.display="block";
+}
+</script>
+</body>
+</html>
