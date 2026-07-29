@@ -99,6 +99,40 @@ def constitutional_pillars(user: dict = Depends(principal)):
     return {"count": len(pillars), "status_summary": summary, "pillars": pillars}
 
 
+@router.get("/demo/ready")
+def demo_ready(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Boot-loader readiness for UDOC Sentinel showcase (Neon-light seed posture).
+    Checks model-001 + ACTIVE demo policy pack without writing rows."""
+    model = db.execute(select(AIModel).where(AIModel.model_id == "model-001")).scalar_one_or_none()
+    pack = db.execute(
+        select(PolicyPack).where(PolicyPack.name == "UDOC Demo · POPIA + Fairness")
+    ).scalar_one_or_none()
+    rules = pe.active_rules(db, tenant_pk=None)
+    ready = bool(model and model.status == "ACTIVE" and pack and pack.status == "ACTIVE" and len(rules) > 0)
+    missing = []
+    if not model:
+        missing.append("model-001 not seeded — wait for Core startup seed or register AI system")
+    elif model.status != "ACTIVE":
+        missing.append(f"model-001 status is {model.status}")
+    if not pack:
+        missing.append("demo policy pack not seeded")
+    elif pack.status != "ACTIVE":
+        missing.append(f"demo pack status is {pack.status}")
+    if not rules:
+        missing.append("no ACTIVE policy rules in engine")
+    return {
+        "ready": ready,
+        "model_001": ({"present": True, "status": model.status, "risk_tier": model.risk_tier}
+                      if model else {"present": False}),
+        "demo_pack": ({"present": True, "status": pack.status, "rule_count": pack.rule_count,
+                       "name": pack.name} if pack else {"present": False}),
+        "active_rules": len(rules),
+        "hot_reload": pe.hot_reload_stats(),
+        "missing": missing,
+        "note": "Fail-closed: evaluate without model-001 returns 404. Policy pack is platform-wide seed.",
+    }
+
+
 @router.get("/models/{model_id}/lifecycle")
 def model_lifecycle(model_id: str, db: Session = Depends(get_db), user: dict = Depends(principal)):
     scope = scope_pk(user)
