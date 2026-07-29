@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UDOC · Sentinel — EVA + Policy Runtime</title>
+<title>UDOC · Sentinel — EVA Runtime</title>
 <style>
 :root{--navy:#0A1628;--navy2:#0D1F3C;--line:rgba(201,168,76,.18);--gold:#C9A84C;--gold-l:#E8C97A;
 --cyan:#00C2D4;--green:#10B981;--amber:#F59E0B;--red:#EF5350;--ink:#EAF0F8;--mut:#8FA3BE}
@@ -21,30 +21,33 @@ select.in{appearance:auto}.btn{background:var(--gold);color:#1a1305;border-radiu
 .tabs button{background:transparent;color:var(--mut);padding:8px 12px;border-bottom:2px solid transparent;font-weight:600}
 .tabs button.on{color:var(--gold-l);border-bottom-color:var(--gold)}
 .wrap{max-width:1120px;margin:0 auto;padding:16px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:14px}
 .kpi{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
-.kpi .v{font-size:20px;font-weight:700;color:var(--gold-l)}.kpi .l{font-size:10px;text-transform:uppercase;color:var(--mut);margin-top:4px}
+.kpi .v{font-size:18px;font-weight:700;color:var(--gold-l)}.kpi .l{font-size:10px;text-transform:uppercase;color:var(--mut);margin-top:4px}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
 .panel h3{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
-.row .f{flex:1;min-width:110px}.row label{display:block;font-size:10px;color:var(--mut);margin-bottom:4px}
+.row .f{flex:1;min-width:100px}.row label{display:block;font-size:10px;color:var(--mut);margin-bottom:4px}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .chip{background:#091022;border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12px;color:var(--mut)}
 .chip.on{border-color:var(--gold);color:var(--gold-l)}
-.dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-top:10px}
+.dims{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:10px}
+@media(max-width:700px){.dims{grid-template-columns:repeat(3,1fr)}}
 .dim{background:#091022;border-radius:8px;padding:8px;text-align:center}.dim .dl{font-size:9px;color:var(--mut)}.dim .dv{font-size:15px;font-weight:700;color:var(--gold-l)}
-.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9fb4dd;min-height:72px;white-space:pre-wrap;max-height:240px;overflow:auto}
+.bar{height:4px;background:#1a2740;border-radius:2px;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--gold)}
+.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#9fb4dd;min-height:72px;white-space:pre-wrap;max-height:220px;overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.05);text-align:left;vertical-align:top}
 th{color:var(--mut);font-size:10px;text-transform:uppercase}
 .ok{color:#5ee9bf}.bad{color:#ff8a85}.amber{color:#fbc36a}
 .note{font-size:12px;color:var(--mut);margin-top:14px;border-top:1px solid var(--line);padding-top:10px;line-height:1.45}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0a1c34;border:1px solid var(--gold);color:var(--gold-l);padding:10px 14px;border-radius:10px;z-index:50;font-size:13px}
 .pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;background:rgba(201,168,76,.12);color:var(--gold-l)}
+.APPROVE{color:#5ee9bf}.BLOCK{color:#ff8a85}.REVIEW{color:#fbc36a}.ESCALATE{color:#d6a8ef}
 </style></head><body>
 <div id="login">
   <h1>SENTINEL</h1>
-  <div class="sub">EVA · Policy-to-Code · Client SaaS</div>
-  <p style="color:var(--mut);font-size:13px;line-height:1.45">Open-source distribution path: live EVA decision path + policy engine on Render/Neon. Pre-registration client runtime.</p>
+  <div class="sub">EVA 6-D · Policy-to-Code · Capstone runtime</div>
+  <p style="color:var(--mut);font-size:13px;line-height:1.45">UDOC showcase path: live EVA decision engine on Render + Neon (≤500MB). Existing operator login only — no new user registration.</p>
   <input class="in" id="li-email" value="admin@gods.local" placeholder="email" autocomplete="username"/>
   <input class="in" id="li-pass" type="password" value="admin123" placeholder="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
   <button class="btn" style="width:100%" id="li-btn" type="button" onclick="login()">Sign in</button>
@@ -54,23 +57,24 @@ th{color:var(--mut);font-size:10px;text-transform:uppercase}
 </div>
 <div id="app">
   <div class="top">
-    <div class="ttl"><b>UDOC Sentinel</b> · client runtime</div>
+    <div class="ttl"><b>UDOC Sentinel</b> · EVA whitepaper runtime</div>
     <span id="who" style="font-size:12px;color:var(--mut)"></span>
-    <button class="btn ghost sm" type="button" onclick="smoke()">Smoke test</button>
+    <button class="btn ghost sm" type="button" onclick="smoke()">Smoke</button>
     <button class="btn ghost sm" type="button" onclick="logout()">Sign out</button>
   </div>
   <div class="tabs" id="tabs">
     <button type="button" class="on" data-t="eva" onclick="go(this,'eva')">EVA Evaluate</button>
     <button type="button" data-t="policy" onclick="go(this,'policy')">Policy-to-Code</button>
+    <button type="button" data-t="pillars" onclick="go(this,'pillars')">12 Pillars</button>
     <button type="button" data-t="conf" onclick="go(this,'conf')">Conformance</button>
-    <button type="button" data-t="client" onclick="go(this,'client')">Client controls</button>
-    <button type="button" data-t="smoke" onclick="go(this,'smoke')">Smoke results</button>
+    <button type="button" data-t="systems" onclick="go(this,'systems')">Systems</button>
+    <button type="button" data-t="smoke" onclick="go(this,'smoke')">Smoke</button>
   </div>
   <div class="wrap" id="view"></div>
-  <div class="wrap note">Task 2 focus: client open-source SaaS on Core. EVA → policy-to-code → certificate → conformance. GODS Admin / GIS / GBS only after production smoke pass.</div>
+  <div class="wrap note">UDOC division first (capstone showcase). Neon free ≤500MB — lists capped, no new accounts. GODS Intelligence client data-upload and internal GIS text-path remain separate surfaces. GBS GIS / SETHS / MADIBA / TS after UDOC smoke-ready.</div>
 </div>
 <script>
-let API="", TOK="", TAB="eva", LAST_SMOKE=null;
+let API="", TOK="", TAB="eva", LAST_SMOKE=null, LAST_DID=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&","<":"<",">":">",'"':""","'":"&#39;"}[c]));
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
@@ -98,45 +102,55 @@ async function login(){
 }
 function logout(){TOK=""; ["udoc_sent_tok","udoc_sent_who"].forEach(k=>localStorage.removeItem(k)); $("app").style.display="none"; $("login").style.display="block";}
 function go(el,t){TAB=t; document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t===t)); render();}
-function dimsHtml(d){
+function dimBars(d){
   if(!d||typeof d!=="object") return "";
-  return '<div class="dims">'+Object.entries(d).map(([k,v])=>'<div class="dim"><div class="dl">'+esc(k)+'</div><div class="dv">'+esc(v)+'</div></div>').join("")+'</div>';
+  const order=["Validity","Confidence","Risk","Compliance","Stability","Impact"];
+  const keys=order.filter(k=>d[k]!=null).concat(Object.keys(d).filter(k=>!order.includes(k)));
+  return '<div class="dims">'+keys.map(k=>{const v=Number(d[k])||0; const pct=Math.min(100,Math.round(v*10));
+    return '<div class="dim"><div class="dl">'+esc(k)+'</div><div class="dv">'+esc(d[k])+'</div><div class="bar"><i style="width:'+pct+'%"></i></div></div>';}).join("")+'</div>';
 }
 async function render(){
   const v=$("view"); v.innerHTML="Loading…";
   if(TAB==="eva") return renderEva(v);
   if(TAB==="policy") return renderPolicy(v);
+  if(TAB==="pillars") return renderPillars(v);
   if(TAB==="conf") return renderConf(v);
-  if(TAB==="smoke") return renderSmoke(v);
-  return renderClient(v);
+  if(TAB==="systems") return renderSystems(v);
+  return renderSmoke(v);
 }
 
-/* ── EVA ── */
 async function renderEva(v){
   let models=[]; try{ models=await api("/registry/models"); if(!Array.isArray(models)) models=[]; }catch(e){}
   const mid0=(models[0]&&(models[0].model_id||models[0].id))||"model-001";
-  v.innerHTML='<div class="panel"><h3>EVA evaluate — live decision path</h3>
+  v.innerHTML='<div class="panel"><h3>EVA 6-D evaluate — non-bypassable decision path</h3>
     <div class="chips" id="sc-chips">
-      <button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair</button>
-      <button type="button" class="chip" data-s="biased" onclick="pickSc(this)">Biased → block</button>
+      <button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair → APPROVE</button>
+      <button type="button" class="chip" data-s="biased" onclick="pickSc(this)">Biased → BLOCK</button>
       <button type="button" class="chip" data-s="highrisk" onclick="pickSc(this)">High-risk</button>
+      <button type="button" class="chip" data-s="sov" onclick="pickSc(this)">Sovereignty breach</button>
     </div>
     <div class="row">
-      <div class="f"><label>Model ID</label><input class="in" id="ev-mid" value="'+esc(mid0)+'" style="margin:0"/></div>
+      <div class="f"><label>Model ID (existing registry)</label><input class="in" id="ev-mid" value="'+esc(mid0)+'" style="margin:0" list="mdl"/></div>
+      <datalist id="mdl">'+models.slice(0,30).map(m=>'<option value="'+esc(m.model_id)+'">').join("")+'</datalist>
       <div class="f"><label>Confidence</label><input class="in" id="ev-conf" value="0.92" style="margin:0"/></div>
       <div class="f"><label>Compliance</label><input class="in" id="ev-comp" value="1.0" style="margin:0"/></div>
       <button class="btn cyan" type="button" onclick="runEva()">Evaluate</button>
     </div>
     <div id="ev-out" style="margin-top:12px"></div>
-    <div class="term" id="ev-term">POST /decisions — EVA 6-D + active policy rules.</div>
+    <div class="term" id="ev-term">Whitepaper path: Evidence → 6-D EVA → policy-to-code → seal → certificate · fail-closed.</div>
   </div>
-  <div class="panel"><h3>Certificate verify</h3>
-    <div class="row"><div class="f"><label>Certificate ID</label><input class="in" id="cert-id" style="margin:0" placeholder="EVA-…"/></div>
-    <button class="btn ghost sm" type="button" onclick="verifyCert()">Verify</button></div>
+  <div class="panel"><h3>Certificate · Evidence · Replay</h3>
+    <div class="row">
+      <div class="f"><label>Certificate ID</label><input class="in" id="cert-id" style="margin:0" placeholder="EVA-…"/></div>
+      <button class="btn ghost sm" type="button" onclick="verifyCert()">Verify cert</button>
+      <div class="f"><label>Decision ID</label><input class="in" id="did" style="margin:0" placeholder="numeric id"/></div>
+      <button class="btn ghost sm" type="button" onclick="loadEvidence()">Evidence</button>
+      <button class="btn ghost sm" type="button" onclick="loadReplay()">Replay</button>
+    </div>
     <div id="cert-out" style="margin-top:8px;font-size:13px"></div>
+    <div class="term" id="er-term" style="margin-top:8px;display:none"></div>
   </div>
-  <div class="panel"><h3>Recent decisions</h3><div id="dec-list">…</div></div>
-  <div class="panel"><h3>Recent certificates</h3><div id="cert-list">…</div></div>';
+  <div class="panel"><h3>Recent decisions (≤8 · Neon light)</h3><div id="dec-list">…</div></div>';
   loadLists();
 }
 function pickSc(el){document.querySelectorAll("#sc-chips .chip").forEach(c=>c.classList.remove("on")); el.classList.add("on");}
@@ -147,24 +161,28 @@ async function runEva(){
   const fair=sc();
   if(fair==="biased"){ body.priv_favorable=900; body.priv_total=1000; body.unpriv_favorable=120; body.unpriv_total=1000; }
   if(fair==="highrisk"){ body.risk_tier="HIGH"; }
+  if(fair==="sov"){ body.bgp=0.4; body.traceroute=0.5; body.dnssec=0.6; body.storage=0.7; }
   term.textContent="POST /decisions …"; o.innerHTML="";
   try{
     const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     const reasons=Array.isArray(d.block_reasons)?d.block_reasons.join(" · "):(d.block_reasons||"");
-    const pol=(d.policy_findings||[]).map(f=>esc(f.code||"")+" "+esc(f.kind||"")).join(" · ");
+    const pol=(d.policy_findings||[]).map(f=>esc(f.code||"")+":"+esc(f.kind||"")).join(" · ");
+    const oc=esc(d.decision||"—");
     o.innerHTML='<div class="kpis">
-      <div class="kpi"><div class="v">'+esc(d.decision||"—")+'</div><div class="l">Outcome</div></div>
-      <div class="kpi"><div class="v">'+esc(d.composite_eva!=null?d.composite_eva:"—")+'</div><div class="l">Composite EVA</div></div>
+      <div class="kpi"><div class="v '+oc+'">'+oc+'</div><div class="l">Outcome</div></div>
+      <div class="kpi"><div class="v">'+esc(d.composite_eva!=null?d.composite_eva:"—")+'</div><div class="l">Composite EVA /10</div></div>
+      <div class="kpi"><div class="v">'+esc(d.svs!=null?d.svs:"—")+'</div><div class="l">SVS</div></div>
+      <div class="kpi"><div class="v" style="font-size:13px">'+(d.sovereign===false?'BREACH':(d.sovereign?'yes':'—'))+'</div><div class="l">Sovereign</div></div>
       <div class="kpi"><div class="v" style="font-size:13px">'+(d.policy_enforced?'YES':'no')+'</div><div class="l">Policy</div></div>
-      <div class="kpi"><div class="v" style="font-size:12px">'+esc(d.sector||"—")+'</div><div class="l">Sector</div></div>
-    </div>'+dimsHtml(d.dimensions)+
+      <div class="kpi"><div class="v" style="font-size:12px">'+esc(d.latency_ms!=null?d.latency_ms+"ms":"—")+'</div><div class="l">Latency</div></div>
+    </div>'+dimBars(d.dimensions)+
+      '<div style="margin-top:10px;font-size:12px;color:var(--mut)">DI '+esc(d.disparate_impact)+' · SPD '+esc(d.spd)+' · ECS '+esc(d.ecs)+' · seal <span class="mono">'+esc((d.seal||"").slice(0,16))+'…</span></div>'+
       (reasons?'<div class="err" style="margin-top:8px">'+esc(reasons)+'</div>':'')+
       (pol?'<div style="margin-top:6px;font-size:12px;color:var(--mut)">Policy fired: '+pol+'</div>':'')+
-      (d.oversight_case?'<div style="margin-top:6px;font-size:12px">Oversight <span class="pill">'+esc(d.oversight_case)+'</span></div>':'')+
-      (d.certificate_id?'<div style="margin-top:8px;font-size:12px">Cert <span class="mono">'+esc(d.certificate_id)+'</span> · '+esc(d.policy_version||"")+'</div>':'')+
-      ((d.frameworks_cited||[]).length?'<div style="margin-top:6px;font-size:11px;color:var(--mut)">Frameworks: '+esc(d.frameworks_cited.join(", "))+'</div>':'');
+      (d.oversight_case?'<div style="margin-top:6px;font-size:12px">HITL/COB case <span class="pill">'+esc(d.oversight_case)+'</span></div>':'')+
+      (d.certificate_id?'<div style="margin-top:8px;font-size:12px">Cert <span class="mono">'+esc(d.certificate_id)+'</span> · '+esc(d.policy_version||"")+'</div>':'');
     if(d.certificate_id) $("cert-id").value=d.certificate_id;
-    term.textContent=JSON.stringify({decision:d.decision,base:d.base_decision,composite_eva:d.composite_eva,certificate_id:d.certificate_id,policy_enforced:d.policy_enforced,policy_rules:d.policy_rules_evaluated,oversight_case:d.oversight_case,latency_ms:d.latency_ms},null,2);
+    term.textContent=JSON.stringify({decision:d.decision,base_decision:d.base_decision,composite_eva:d.composite_eva,svs:d.svs,dimensions:d.dimensions,certificate_id:d.certificate_id,policy_enforced:d.policy_enforced,within_budget:d.within_budget,oversight_case:d.oversight_case},null,2);
     loadLists();
   }catch(e){ term.textContent="✗ "+e.message; o.innerHTML='<span class="bad">'+esc(e.message)+'</span>'; }
 }
@@ -172,25 +190,34 @@ async function verifyCert(){
   const id=$("cert-id").value.trim(); if(!id) return;
   try{
     const v=await api("/decisions/certificates/"+encodeURIComponent(id)+"/verify");
-    $("cert-out").innerHTML='<span class="'+(v.valid?'ok':'bad')+'">'+(v.valid?'VALID':'INVALID')+'</span> · '+esc(v.signature_alg||"")+' · '+esc(v.decision||"")+' · EVA '+esc(v.composite_eva);
+    $("cert-out").innerHTML='<span class="'+(v.valid?'ok':'bad')+'">'+(v.valid?'VALID':'INVALID')+'</span> · '+esc(v.signature_alg||"")+' · '+esc(v.decision)+' · EVA '+esc(v.composite_eva)+' · merkle <span class="mono">'+esc((v.merkle_leaf||"").slice(0,16))+'…</span>';
   }catch(e){$("cert-out").innerHTML='<span class="bad">'+esc(e.message)+'</span>';}
+}
+async function loadEvidence(){
+  const id=parseInt($("did").value||LAST_DID||"",10); if(!id){toast("Need decision id");return;}
+  const t=$("er-term"); t.style.display="block"; t.textContent="Loading evidence…";
+  try{ const d=await api("/udoc/decisions/"+id+"/evidence"); t.textContent=JSON.stringify(d,null,2); }catch(e){t.textContent="✗ "+e.message;}
+}
+async function loadReplay(){
+  const id=parseInt($("did").value||LAST_DID||"",10); if(!id){toast("Need decision id");return;}
+  const t=$("er-term"); t.style.display="block"; t.textContent="Replaying…";
+  try{
+    const d=await api("/udoc/decisions/"+id+"/replay");
+    t.textContent=JSON.stringify(d,null,2);
+    $("cert-out").innerHTML=d.drift?'<span class="bad">DRIFT</span> vs sealed original':'<span class="ok">REPRODUCIBLE</span> — no drift';
+  }catch(e){t.textContent="✗ "+e.message;}
 }
 async function loadLists(){
   try{
     const dec=await api("/decisions");
+    const rows=(dec||[]).slice(0,8);
+    if(rows[0]) LAST_DID=rows[0].id;
     $("dec-list").innerHTML='<table><tr><th>ID</th><th>Decision</th><th>SVS</th><th>ms</th><th>When</th></tr>'+
-      (dec||[]).slice(0,12).map(d=>'<tr><td>'+esc(d.id)+'</td><td><b>'+esc(d.decision)+'</b></td><td>'+esc(d.svs)+'</td><td>'+esc(d.latency_ms)+'</td><td>'+esc((d.created_at||"").replace("T"," ").slice(0,19))+'</td></tr>').join("")+
+      rows.map(d=>'<tr style="cursor:pointer" onclick="$(\'did\').value='+d.id+'"><td>'+esc(d.id)+'</td><td class="'+esc(d.decision)+'"><b>'+esc(d.decision)+'</b></td><td>'+esc(d.svs)+'</td><td>'+esc(d.latency_ms)+'</td><td>'+esc((d.created_at||"").replace("T"," ").slice(0,19))+'</td></tr>').join("")+
       '</table>';
   }catch(e){if($("dec-list"))$("dec-list").textContent=e.message;}
-  try{
-    const cs=await api("/decisions/certificates");
-    $("cert-list").innerHTML='<table><tr><th>Certificate</th><th>Model</th><th>Decision</th><th>EVA</th><th>Sector</th></tr>'+
-      (cs||[]).slice(0,12).map(c=>'<tr><td class="mono">'+esc(c.certificate_id)+'</td><td>'+esc(c.model_id)+'</td><td>'+esc(c.decision)+'</td><td>'+esc(c.composite_eva)+'</td><td>'+esc(c.sector)+'</td></tr>').join("")+
-      '</table>';
-  }catch(e){if($("cert-list"))$("cert-list").textContent=e.message;}
 }
 
-/* ── Policy ── */
 async function renderPolicy(v){
   let active={}, packs=[], hot={};
   try{ active=await api("/policy/active"); }catch(e){}
@@ -202,20 +229,19 @@ async function renderPolicy(v){
     <div class="kpi"><div class="v">'+esc(active.enforced_rules!=null?active.enforced_rules:"—")+'</div><div class="l">Enforced rules</div></div>
     <div class="kpi"><div class="v" style="font-size:14px">'+esc(hot.last_reload_ms!=null?hot.last_reload_ms+" ms":"—")+'</div><div class="l">Hot-reload</div></div>
   </div>
-  <div class="panel"><h3>Policy dry-run (no persist)</h3>
+  <div class="panel"><h3>Policy dry-run (no DB write)</h3>
     <div class="row">
       <div class="f"><label>Model ID</label><input class="in" id="pt-mid" value="model-001" style="margin:0"/></div>
       <div class="f"><label>Scenario</label><select class="in" id="pt-sc" style="margin:0"><option>healthy</option><option>biased</option><option>breach</option></select></div>
       <button class="btn cyan" type="button" onclick="policyTest()">Test policy</button>
     </div>
-    <div class="term" id="pt-out" style="margin-top:10px">POST /policy/test</div>
+    <div class="term" id="pt-out" style="margin-top:10px">POST /policy/test — compiles against active packs without persisting.</div>
   </div>
-  <div class="panel"><h3>Policy packs — activate into live EVA path</h3>
+  <div class="panel"><h3>Packs (activate → live EVA path)</h3>
     <table><tr><th>Pack</th><th>Status</th><th>Rules</th><th>Sector</th><th></th></tr>'+
-    (packs.length?packs.slice(0,25).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.status)+'</td><td>'+esc(p.rule_count)+'</td><td>'+esc(p.sector||"")+'</td><td>'+
-      (p.status!=="ACTIVE"?'<button class="btn ghost sm" type="button" onclick="actPack('+p.id+')">Activate</button>':'')+
-      (p.status==="ACTIVE"?'<button class="btn ghost sm" type="button" onclick="archPack('+p.id+')">Archive</button>':'')+
-      '</td></tr>').join(""):'<tr><td colspan="5" style="color:var(--mut)">No packs — upload via API /policy/upload</td></tr>')+
+    (packs.length?packs.slice(0,15).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.status)+'</td><td>'+esc(p.rule_count)+'</td><td>'+esc(p.sector||"")+'</td><td>'+
+      (p.status!=="ACTIVE"?'<button class="btn ghost sm" type="button" onclick="actPack('+p.id+')">Activate</button>':'<span class="ok">live</span>')+
+      '</td></tr>').join(""):'<tr><td colspan="5" style="color:var(--mut)">No packs in DB yet</td></tr>')+
     '</table></div>';
 }
 async function policyTest(){
@@ -225,90 +251,97 @@ async function policyTest(){
     $("pt-out").textContent=JSON.stringify(d,null,2);
   }catch(e){$("pt-out").textContent="✗ "+e.message;}
 }
-async function actPack(id){try{const r=await api("/policy/packs/"+id+"/activate",{method:"POST"}); toast("✓ ACTIVE · rules "+r.active_rules); render();}catch(e){toast("✕ "+e.message);}}
-async function archPack(id){try{await api("/policy/packs/"+id+"/archive",{method:"POST"}); toast("Archived"); render();}catch(e){toast("✕ "+e.message);}}
+async function actPack(id){try{const r=await api("/policy/packs/"+id+"/activate",{method:"POST"}); toast("✓ ACTIVE · "+r.active_rules+" rules"); render();}catch(e){toast("✕ "+e.message);}}
 
-/* ── Conformance ── */
+async function renderPillars(v){
+  try{
+    const d=await api("/udoc/constitutional/pillars");
+    const sum=d.status_summary||{};
+    v.innerHTML='<div class="kpis">
+      <div class="kpi"><div class="v">'+esc(d.count)+'</div><div class="l">Pillars</div></div>
+      <div class="kpi"><div class="v ok">'+esc(sum.ENFORCED||0)+'</div><div class="l">Enforced</div></div>
+      <div class="kpi"><div class="v amber">'+esc(sum.PARTIAL||0)+'</div><div class="l">Partial</div></div>
+      <div class="kpi"><div class="v">'+esc(sum.DECLARED||0)+'</div><div class="l">Declared</div></div>
+    </div>
+    <div class="panel"><h3>G.O.D.S constitutional pillars (code-enforced)</h3>
+    <table><tr><th>#</th><th>Pillar</th><th>Enforcement</th><th>Status</th></tr>'+
+      (d.pillars||[]).map(p=>'<tr><td>'+esc(p.n)+'</td><td><b>'+esc(p.name)+'</b><div style="font-size:11px;color:var(--mut)">'+esc(p.principle)+'</div></td><td style="font-size:11px">'+esc(p.enforcement)+'</td><td class="'+(p.status==="ENFORCED"?'ok':(p.status==="PARTIAL"?'amber':''))+'">'+esc(p.status)+'</td></tr>').join("")+
+    '</table></div>';
+  }catch(e){v.innerHTML='<div class="panel bad">'+esc(e.message)+'</div>';}
+}
+
 async function renderConf(v){
   let st={}; try{ st=await api("/conformance/status"); }catch(e){ v.innerHTML='<div class="panel bad">'+esc(e.message)+'</div>'; return; }
   let sys=[],fn=[];
   try{ sys=await api("/conformance/systems"); if(!Array.isArray(sys))sys=[]; }catch(e){}
-  try{ fn=await api("/conformance/findings?limit=12"); if(!Array.isArray(fn))fn=[]; }catch(e){}
+  try{ fn=await api("/conformance/findings?limit=8"); if(!Array.isArray(fn))fn=[]; }catch(e){}
   v.innerHTML='<div class="kpis">
     <div class="kpi"><div class="v">'+(st.scanner_enabled?'ON':'OFF')+'</div><div class="l">Scanner</div></div>
     <div class="kpi"><div class="v">'+esc(st.registered_systems)+'</div><div class="l">Systems</div></div>
     <div class="kpi"><div class="v ok">'+esc(st.conformant)+'</div><div class="l">Conformant</div></div>
     <div class="kpi"><div class="v bad">'+esc(st.non_conformant)+'</div><div class="l">Non-conformant</div></div>
-    <div class="kpi"><div class="v">'+esc(st.coverage_pct!=null?st.coverage_pct+"%":"—")+'</div><div class="l">Coverage</div></div>
   </div>
-  <div class="row" style="margin-bottom:12px"><button class="btn cyan" type="button" onclick="runScan()">Run conformance scan</button>
+  <div class="row" style="margin-bottom:12px"><button class="btn cyan" type="button" onclick="runScan()">Run scan</button>
     <span style="font-size:12px;color:var(--mut)">Last: '+esc((st.last_scan_at||"—").replace("T"," ").slice(0,19))+'</span></div>
-  <div class="panel"><h3>Systems</h3><table><tr><th>System</th><th>Verdict</th><th>State</th><th>Status</th></tr>'+
-    (sys.length?sys.map(m=>'<tr><td>'+esc(m.name||m.model_id)+'</td><td>'+esc(m.verdict)+'</td><td>'+esc(m.state)+'</td><td>'+esc(m.status)+'</td></tr>').join("")
-      :'<tr><td colspan="4" style="color:var(--mut)">No systems</td></tr>')+'</table></div>
-  <div class="panel"><h3>Findings</h3><table><tr><th>Model</th><th>Verdict</th><th>Reason</th></tr>'+
-    (fn.length?fn.map(f=>'<tr><td>'+esc(f.model_id)+'</td><td>'+esc(f.verdict)+'</td><td>'+esc((f.reason||"").slice(0,90))+'</td></tr>').join("")
-      :'<tr><td colspan="3" style="color:var(--mut)">No findings</td></tr>')+'</table></div>';
+  <div class="panel"><h3>Systems (capped)</h3><table><tr><th>System</th><th>Verdict</th><th>Status</th></tr>'+
+    (sys.slice(0,12).map(m=>'<tr><td>'+esc(m.name||m.model_id)+'</td><td>'+esc(m.verdict)+'</td><td>'+esc(m.status)+'</td></tr>').join("")||'<tr><td colspan="3" style="color:var(--mut)">None</td></tr>')+'</table></div>';
 }
-async function runScan(){try{const r=await api("/conformance/scan",{method:"POST"}); toast("✓ "+(r.scan_ref||"scan")+" · "+(r.total!=null?r.total:"")+" systems"); render();}catch(e){toast("✕ "+e.message);}}
+async function runScan(){try{const r=await api("/conformance/scan",{method:"POST"}); toast("✓ "+(r.scan_ref||"scan")); render();}catch(e){toast("✕ "+e.message);}}
 
-/* ── Client ── */
-async function renderClient(v){
-  let me={}, sum={}, models=[];
-  try{ me=await api("/tenants/me"); }catch(e){ me={}; }
-  try{ sum=await api("/udoc/regulator/summary"); }catch(e){}
+async function renderSystems(v){
+  let models=[], sum={};
   try{ models=await api("/registry/models"); if(!Array.isArray(models)) models=[]; }catch(e){}
-  v.innerHTML='<div class="panel"><h3>Client / tenant posture</h3>
-    <div class="kpis">
-      <div class="kpi"><div class="v" style="font-size:13px">'+esc(me.tier_name||me.tier||"platform")+'</div><div class="l">Tier</div></div>
-      <div class="kpi"><div class="v" style="font-size:13px">'+esc(me.sector||"GENERAL")+'</div><div class="l">Sector</div></div>
-      <div class="kpi"><div class="v">'+esc(sum.systems&&sum.systems.total!=null?sum.systems.total:models.length)+'</div><div class="l">Systems</div></div>
-      <div class="kpi"><div class="v">'+esc(sum.decisions&&sum.decisions.total!=null?sum.decisions.total:"—")+'</div><div class="l">Decisions</div></div>
-    </div>
-    <p style="color:var(--mut);font-size:13px">Client-specific governance on this Core: register systems, run EVA, activate policy, verify certificates, conformance. Open-source SaaS distribution; in-house infrastructure is an upgrade path after production readiness.</p>
+  try{ sum=await api("/udoc/regulator/summary"); }catch(e){}
+  v.innerHTML='<div class="kpis">
+    <div class="kpi"><div class="v">'+esc(sum.systems&&sum.systems.total!=null?sum.systems.total:models.length)+'</div><div class="l">Systems</div></div>
+    <div class="kpi"><div class="v">'+esc(sum.decisions&&sum.decisions.total!=null?sum.decisions.total:"—")+'</div><div class="l">Decisions</div></div>
+    <div class="kpi"><div class="v bad">'+esc(sum.decisions&&sum.decisions.blocked!=null?sum.decisions.blocked:"—")+'</div><div class="l">Blocked</div></div>
   </div>
-  <div class="panel"><h3>Register system</h3>
+  <div class="panel"><h3>AI systems in registry</h3>
+    <p style="font-size:12px;color:var(--mut);margin:0 0 10px">Existing models only preferred (Neon 500MB). Optional register is for <b>AI systems</b>, not new human users.</p>
+    <table><tr><th>ID</th><th>Name</th><th>Risk</th><th>Status</th></tr>'+
+    (models.slice(0,20).map(m=>'<tr><td class="mono">'+esc(m.model_id)+'</td><td>'+esc(m.name||"")+'</td><td>'+esc(m.risk_tier)+'</td><td>'+esc(m.status)+'</td></tr>').join("")||'<tr><td colspan="4" style="color:var(--mut)">Empty registry</td></tr>')+
+    '</table></div>
+  <div class="panel"><h3>Optional: register AI system</h3>
     <div class="row">
-      <div class="f"><label>model_id</label><input class="in" id="r-id" style="margin:0" placeholder="client-model-1"/></div>
-      <div class="f"><label>name</label><input class="in" id="r-name" style="margin:0" placeholder="optional"/></div>
+      <div class="f"><label>model_id</label><input class="in" id="r-id" style="margin:0" placeholder="only if needed"/></div>
       <div class="f"><label>risk</label><select class="in" id="r-tier" style="margin:0"><option>MINIMAL</option><option selected>NOTABLE</option><option>HIGH</option></select></div>
-      <button class="btn cyan" type="button" onclick="doReg()">Register</button>
+      <button class="btn ghost sm" type="button" onclick="doReg()">Register system</button>
     </div>
     <div id="r-out" style="margin-top:8px;font-size:13px"></div>
-  </div>
-  <div class="panel"><h3>Registered models</h3><table><tr><th>ID</th><th>Name</th><th>Risk</th><th>Status</th></tr>'+
-    (models.length?models.slice(0,20).map(m=>'<tr><td class="mono">'+esc(m.model_id||m.id)+'</td><td>'+esc(m.name||"")+'</td><td>'+esc(m.risk_tier||"")+'</td><td>'+esc(m.status||"")+'</td></tr>').join("")
-      :'<tr><td colspan="4" style="color:var(--mut)">None yet</td></tr>')+'</table></div>';
+  </div>';
 }
 async function doReg(){
   const id=$("r-id").value.trim(); if(!id){ $("r-out").innerHTML='<span class="bad">model_id required</span>'; return; }
   try{
     const r=await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model_id:id,name:$("r-name").value||id,operator_id:"self",risk_tier:$("r-tier").value,use_case:"client-saas"})});
-    $("r-out").innerHTML='Registered <b>'+esc(r.model_id||id)+'</b> · '+esc(r.status||""); toast("✓ registered"); render();
+      body:JSON.stringify({model_id:id,name:id,operator_id:"self",risk_tier:$("r-tier").value,use_case:"udoc-showcase"})});
+    $("r-out").innerHTML='OK <b>'+esc(r.model_id||id)+'</b>'; toast("✓ system registered"); render();
   }catch(e){$("r-out").innerHTML='<span class="bad">'+esc(e.message)+'</span>';}
 }
 
-/* ── Smoke ── */
 async function smoke(){
   const steps=[]; const t0=Date.now();
   async function step(name,fn){ try{ const r=await fn(); steps.push({name,ok:true,detail:r}); }catch(e){ steps.push({name,ok:false,detail:String(e.message||e)}); } }
   await step("/health", async()=>{ const r=await fetch(API+"/health"); if(!r.ok)throw new Error("HTTP "+r.status); return await r.json().catch(()=>({})); });
   await step("/version", async()=>api("/version"));
+  await step("/udoc/constitutional/pillars", async()=>{ const p=await api("/udoc/constitutional/pillars"); return {count:p.count,enforced:(p.status_summary||{}).ENFORCED}; });
   await step("/policy/active", async()=>api("/policy/active"));
-  await step("/policy/hotreload", async()=>api("/policy/hotreload"));
-  await step("/conformance/status", async()=>api("/conformance/status"));
   await step("/registry/models", async()=>{ const m=await api("/registry/models"); return {count:Array.isArray(m)?m.length:0}; });
-  await step("POST /decisions (fair)", async()=>{
+  await step("POST /decisions fair", async()=>{
     let mid="model-001"; try{ const m=await api("/registry/models"); if(m&&m[0]) mid=m[0].model_id||mid; }catch(e){}
-    return api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:mid,raw_confidence:0.9,compliance:1.0})});
+    return api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:mid,raw_confidence:0.92,compliance:1.0})});
+  });
+  await step("POST /decisions biased", async()=>{
+    let mid="model-001"; try{ const m=await api("/registry/models"); if(m&&m[0]) mid=m[0].model_id||mid; }catch(e){}
+    return api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:mid,raw_confidence:0.9,compliance:1.0,priv_favorable:900,priv_total:1000,unpriv_favorable:120,unpriv_total:1000})});
   });
   LAST_SMOKE={at:new Date().toISOString(),ms:Date.now()-t0,steps};
   TAB="smoke"; document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t==="smoke"));
   render();
 }
 function renderSmoke(v){
-  if(!LAST_SMOKE){ v.innerHTML='<div class="panel">Run <b>Smoke test</b> from the header to probe health, policy, conformance, and EVA.</div>'; return; }
+  if(!LAST_SMOKE){ v.innerHTML='<div class="panel">Run <b>Smoke</b> in the header — health, pillars, policy, fair + biased EVA (boot-loader readiness).</div>'; return; }
   const ok=LAST_SMOKE.steps.filter(s=>s.ok).length;
   const bad=LAST_SMOKE.steps.length-ok;
   v.innerHTML='<div class="kpis">
@@ -316,8 +349,8 @@ function renderSmoke(v){
     <div class="kpi"><div class="v '+(bad?'bad':'ok')+'">'+bad+'</div><div class="l">Failed</div></div>
     <div class="kpi"><div class="v" style="font-size:14px">'+LAST_SMOKE.ms+' ms</div><div class="l">Duration</div></div>
   </div>
-  <div class="panel"><h3>Boot / runtime smoke</h3><table><tr><th>Check</th><th>Result</th><th>Detail</th></tr>'+
-    LAST_SMOKE.steps.map(s=>'<tr><td>'+esc(s.name)+'</td><td class="'+(s.ok?'ok':'bad')+'">'+(s.ok?'PASS':'FAIL')+'</td><td class="mono" style="font-size:11px">'+esc(typeof s.detail==='object'?JSON.stringify(s.detail).slice(0,120):String(s.detail).slice(0,120))+'</td></tr>').join("")+
+  <div class="panel"><h3>UDOC runtime smoke</h3><table><tr><th>Check</th><th>Result</th><th>Detail</th></tr>'+
+    LAST_SMOKE.steps.map(s=>'<tr><td>'+esc(s.name)+'</td><td class="'+(s.ok?'ok':'bad')+'">'+(s.ok?'PASS':'FAIL')+'</td><td class="mono" style="font-size:11px">'+esc(typeof s.detail==='object'?JSON.stringify(s.detail).slice(0,140):String(s.detail).slice(0,140))+'</td></tr>').join("")+
     '</table></div>';
 }
 
