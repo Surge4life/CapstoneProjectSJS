@@ -94,6 +94,7 @@ services:
         source: /*
         destination: /index.html
 
+  # Admin: preserve sibling pages (api-health, jobs, enhance) — no blanket /*
   - type: web
     name: gods-udoc-admin
     runtime: static
@@ -104,9 +105,16 @@ services:
     staticPublishPath: .
     routes:
       - type: rewrite
-        source: /*
+        source: /api-health
+        destination: /api-health.html
+      - type: rewrite
+        source: /jobs
+        destination: /jobs.html
+      - type: rewrite
+        source: /
         destination: /index.html
 
+  # Client: citizen first, then root only (not /*)
   - type: web
     name: gods-udoc-client
     runtime: static
@@ -123,7 +131,7 @@ services:
         source: /citizen/
         destination: /citizen.html
       - type: rewrite
-        source: "/"
+        source: /
         destination: /index.html
 
   - type: web
