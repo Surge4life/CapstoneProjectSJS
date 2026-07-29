@@ -1,15 +1,13 @@
 /* UDOC Admin P3 — v7-platform Command Centre parity
- * Fixes esc, relabels nav, Command Centre boot, infra links, denser EVA + HITL.
+ * Robust esc, relabels nav, Command Centre boot, infra links, denser EVA + HITL.
  */
 (function () {
   "use strict";
 
   window.esc = function (s) {
-    return String(s == null ? "" : s)
-      .replace(/&/g, "&")
-      .replace(/</g, "<")
-      .replace(/>/g, ">")
-      .replace(/"/g, """);
+    var d = document.createElement("div");
+    d.textContent = String(s == null ? "" : s);
+    return d.innerHTML;
   };
 
   function relabelNav() {
@@ -59,7 +57,8 @@
       '<div class="navitem" data-view="_sentinel"><span class="ico">◎</span> Sentinel runtime</div>' +
       '<div class="navitem" data-view="_apihealth"><span class="ico">⚡</span> API Health</div>' +
       '<div class="navitem" data-view="_jobs"><span class="ico">⏱</span> Scheduled Jobs</div>' +
-      '<div class="navitem" data-view="_portals"><span class="ico">▤</span> 24 Portals</div>';
+      '<div class="navitem" data-view="_portals"><span class="ico">▤</span> 24 Portals</div>' +
+      '<div class="navitem" data-view="_citizen"><span class="ico">✋</span> Citizen Portal</div>';
     nav.appendChild(div);
     div.querySelectorAll(".navitem").forEach(function (n) {
       n.addEventListener("click", function () {
@@ -72,6 +71,10 @@
         else if (v === "_apihealth") window.location.href = "/api-health.html";
         else if (v === "_jobs") window.location.href = "/jobs.html";
         else if (v === "_portals") window.open(base + "/portals", "_blank");
+        else if (v === "_citizen") {
+          var clientHost = "https://gods-udoc-client.onrender.com";
+          window.open(clientHost + "/citizen.html", "_blank");
+        }
       });
     });
   }
@@ -122,13 +125,14 @@
         panel.className = "panel";
         panel.style.borderLeft = "3px solid #00C2D4";
         panel.innerHTML =
-          "<h3>EVA scenario chips (v7 parity)</h3>" +
+          "<h3>EVA scenario chips (v7 parity · auto-run)</h3>" +
           '<div class="row" style="gap:8px;flex-wrap:wrap">' +
-          '<button class="btn cyan sm" onclick="v7Eva(\'fair\')">Fair</button>' +
-          '<button class="btn sm" onclick="v7Eva(\'biased\')">Biased → BLOCK</button>' +
-          '<button class="btn sm" onclick="v7Eva(\'high\')">High-risk</button>' +
-          '<button class="btn sm" onclick="v7Eva(\'sov\')">Sovereignty</button>' +
-          "</div><div id="v7-eva-out" class="small muted" style="margin-top:10px"></div>";
+          '<button class="btn cyan sm" type="button" onclick="v7Eva(\'fair\')">Fair</button>' +
+          '<button class="btn sm" type="button" onclick="v7Eva(\'biased\')">Biased → BLOCK</button>' +
+          '<button class="btn sm" type="button" onclick="v7Eva(\'high\')">High-risk</button>' +
+          '<button class="btn sm" type="button" onclick="v7Eva(\'sov\')">Sovereignty</button>' +
+          '</div><div id="v7-eva-out" class="small muted" style="margin-top:10px"></div>' +
+          '<pre id="v7-eva-term" class="mono" style="margin-top:8px;font-size:11px;white-space:pre-wrap;background:#050a12;padding:10px;border-radius:8px;display:none"></pre>';
         var main = document.getElementById("main");
         if (main) {
           var first = main.querySelector(".panel");
@@ -144,7 +148,12 @@
 
   window.v7Eva = async function (kind) {
     var out = document.getElementById("v7-eva-out");
+    var term = document.getElementById("v7-eva-term");
     if (out) out.textContent = "Evaluating " + kind + "…";
+    if (term) {
+      term.style.display = "block";
+      term.textContent = "POST /decisions …";
+    }
     var midEl = document.getElementById("ev-mid");
     var mid = midEl ? midEl.value.trim() : "model-001";
     var body = {
@@ -197,14 +206,23 @@
           (d.policy_enforced ? "ENFORCED" : "off") +
           (reasons ? " · " + esc(reasons) : "");
       }
-      if (document.getElementById("ev-fair") && kind === "biased") {
-        document.getElementById("ev-fair").value = "biased";
-      }
-      if (typeof runEvaluate === "function" && kind === "biased") {
-        /* leave panel for full dim view */
+      if (term) {
+        var lines = ["SCENARIO: " + kind + " · " + body.model_id];
+        if (d.dimensions) {
+          ["Validity", "Confidence", "Risk", "Compliance", "Stability", "Impact"].forEach(function (k) {
+            if (d.dimensions[k] != null) lines.push("  " + k + " = " + Number(d.dimensions[k]).toFixed(3));
+          });
+        }
+        lines.push("  Composite = " + (d.composite_eva != null ? d.composite_eva : "—"));
+        lines.push("  Policy = " + (d.policy_enforced ? "ENFORCED" : "off"));
+        lines.push("  → " + decision);
+        if (reasons) lines.push("  · " + reasons);
+        if (d.certificate_id) lines.push("  cert " + d.certificate_id);
+        term.textContent = lines.join("\n");
       }
     } catch (e) {
       if (out) out.innerHTML = '<span class="t-bad">' + esc(e.message) + "</span>";
+      if (term) term.textContent = "FAIL " + e.message;
     }
   };
 
