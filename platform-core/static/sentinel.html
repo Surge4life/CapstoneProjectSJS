@@ -42,8 +42,6 @@ th{color:var(--mut);font-size:10px;text-transform:uppercase}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0a1c34;border:1px solid var(--gold);color:var(--gold-l);padding:10px 14px;border-radius:10px;z-index:50;font-size:13px}
 .pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;background:rgba(201,168,76,.12);color:var(--gold-l)}
 .APPROVE{color:#5ee9bf}.BLOCK{color:#ff8a85}.REVIEW{color:#fbc36a}.ESCALATE{color:#d6a8ef}
-.dist{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.dist span{font-size:12px;padding:4px 10px;border-radius:8px;background:#091022;border:1px solid var(--line)}
 </style></head><body>
 <div id="login">
   <h1>SENTINEL</h1>
@@ -72,12 +70,12 @@ th{color:var(--mut);font-size:10px;text-transform:uppercase}
     <button type="button" data-t="smoke" onclick="go(this,'smoke')">Smoke</button>
   </div>
   <div class="wrap" id="view"></div>
-  <div class="wrap note">UDOC first. Neon light. Startup seeds model-001 + demo policy pack (no file upload). GODS Intelligence / GBS GIS after UDOC smoke-ready.</div>
+  <div class="wrap note">UDOC first. Neon light. Startup seeds model-001 + demo policy. Smoke asserts /udoc/demo/ready and biased BLOCK.</div>
 </div>
 <script>
 let API="", TOK="", TAB="eva", LAST_SMOKE=null, LAST_DID=null;
 const $=id=>document.getElementById(id);
-function esc(s){return String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/\"/g,""");}
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
 async function api(path,opts={}){
   const h=Object.assign({},opts.headers||{}); if(TOK)h.Authorization="Bearer "+TOK;
@@ -120,13 +118,18 @@ async function render(){
   return renderSmoke(v);
 }
 async function renderEva(v){
-  let models=[], sum={};
+  let models=[], sum={}, ready=null;
   try{ models=await api("/registry/models"); if(!Array.isArray(models)) models=[]; }catch(e){}
   try{ sum=await api("/udoc/regulator/summary"); }catch(e){}
+  try{ ready=await api("/udoc/demo/ready"); }catch(e){ ready={ready:false,missing:[String(e.message)]}; }
   const mid0=(models[0]&&(models[0].model_id||models[0].id))||"model-001";
   const oc=(sum.decisions&&sum.decisions.by_outcome)||{};
   const total=sum.decisions&&sum.decisions.total!=null?sum.decisions.total:0;
-  v.innerHTML='<div class="panel"><h3>Outcome distribution (live)</h3>
+  const readyHtml=ready&&ready.ready
+    ? '<span class="ok">demo ready</span> · rules '+esc(ready.active_rules)
+    : '<span class="bad">not ready</span> · '+esc((ready&&ready.missing||[]).join("; ")||"check Core seed");
+  v.innerHTML='<div class="panel"><h3>Boot posture</h3><div style="font-size:13px">'+readyHtml+'</div></div>
+  <div class="panel"><h3>Outcome distribution (live)</h3>
     <div class="kpis">
       <div class="kpi"><div class="v">'+esc(total)+'</div><div class="l">Decisions</div></div>
       <div class="kpi"><div class="v APPROVE">'+esc(oc.APPROVE||0)+'</div><div class="l">Approve</div></div>
@@ -137,10 +140,10 @@ async function renderEva(v){
     </div></div>
   <div class="panel"><h3>EVA 6-D evaluate</h3>
     <div class="chips" id="sc-chips">
-      <button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair → APPROVE</button>
+      <button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair</button>
       <button type="button" class="chip" data-s="biased" onclick="pickSc(this)">Biased → BLOCK</button>
       <button type="button" class="chip" data-s="highrisk" onclick="pickSc(this)">High-risk</button>
-      <button type="button" class="chip" data-s="sov" onclick="pickSc(this)">Sovereignty breach</button>
+      <button type="button" class="chip" data-s="sov" onclick="pickSc(this)">Sovereignty</button>
     </div>
     <div class="row">
       <div class="f"><label>Model ID</label><input class="in" id="ev-mid" value="'+esc(mid0)+'" style="margin:0" list="mdl"/></div>
@@ -150,11 +153,11 @@ async function renderEva(v){
       <button class="btn cyan" type="button" onclick="runEva()">Evaluate</button>
     </div>
     <div id="ev-out" style="margin-top:12px"></div>
-    <div class="term" id="ev-term">Evidence → 6-D EVA → policy-to-code → seal → certificate.</div>
+    <div class="term" id="ev-term">Evidence → 6-D EVA → policy → seal → certificate.</div>
   </div>
   <div class="panel"><h3>Certificate · Evidence · Replay</h3>
     <div class="row">
-      <div class="f"><label>Certificate ID</label><input class="in" id="cert-id" style="margin:0" placeholder="EVA-…"/></div>
+      <div class="f"><label>Certificate ID</label><input class="in" id="cert-id" style="margin:0"/></div>
       <button class="btn ghost sm" type="button" onclick="verifyCert()">Verify</button>
       <div class="f"><label>Decision ID</label><input class="in" id="did" style="margin:0"/></div>
       <button class="btn ghost sm" type="button" onclick="loadEvidence()">Evidence</button>
@@ -186,22 +189,26 @@ async function runEva(){
       <div class="kpi"><div class="v">'+esc(d.composite_eva!=null?d.composite_eva:"—")+'</div><div class="l">Composite EVA</div></div>
       <div class="kpi"><div class="v">'+esc(d.svs!=null?d.svs:"—")+'</div><div class="l">SVS</div></div>
       <div class="kpi"><div class="v" style="font-size:13px">'+(d.policy_enforced?'YES':'no')+'</div><div class="l">Policy</div></div>
-      <div class="kpi"><div class="v" style="font-size:12px">'+esc(d.latency_ms!=null?d.latency_ms+"ms":"—")+'</div><div class="l">Latency</div></div>
     </div>'+dimBars(d.dimensions)+
-      '<div style="margin-top:10px;font-size:12px;color:var(--mut)">DI '+esc(d.disparate_impact)+' · SPD '+esc(d.spd)+' · ECS '+esc(d.ecs)+'</div>'+
       (reasons?'<div class="err" style="margin-top:8px">'+esc(reasons)+'</div>':'')+
       (pol?'<div style="margin-top:6px;font-size:12px;color:var(--mut)">Policy: '+esc(pol)+'</div>':'')+
-      (d.oversight_case?'<div style="margin-top:6px">HITL <span class="pill">'+esc(d.oversight_case)+'</span></div>':'')+
       (d.certificate_id?'<div style="margin-top:8px;font-size:12px">Cert <span class="mono">'+esc(d.certificate_id)+'</span></div>':'');
     if(d.certificate_id) $("cert-id").value=d.certificate_id;
-    term.textContent=JSON.stringify({decision:d.decision,composite_eva:d.composite_eva,svs:d.svs,certificate_id:d.certificate_id,policy_enforced:d.policy_enforced},null,2);
+    term.textContent=JSON.stringify({decision:d.decision,composite_eva:d.composite_eva,policy_enforced:d.policy_enforced,certificate_id:d.certificate_id},null,2);
     loadLists();
-  }catch(e){ term.textContent="FAIL "+e.message; o.innerHTML='<span class="bad">'+esc(e.message)+'</span>'; }
+  }catch(e){
+    const msg=String(e.message||e);
+    term.textContent="FAIL "+msg;
+    const tip=msg.indexOf("not registered")>=0||msg.indexOf("404")>=0
+      ? ' Fail-closed: model missing — wait for Core startup seed (model-001) or register an AI system.'
+      : '';
+    o.innerHTML='<span class="bad">'+esc(msg)+'</span><div style="margin-top:8px;font-size:12px;color:var(--mut)">'+esc(tip)+'</div>';
+  }
 }
 async function verifyCert(){
   const id=$("cert-id").value.trim(); if(!id) return;
   try{ const v=await api("/decisions/certificates/"+encodeURIComponent(id)+"/verify");
-    $("cert-out").innerHTML='<span class="'+(v.valid?'ok':'bad')+'">'+(v.valid?'VALID':'INVALID')+'</span> · '+esc(v.decision)+' · EVA '+esc(v.composite_eva);
+    $("cert-out").innerHTML='<span class="'+(v.valid?'ok':'bad')+'">'+(v.valid?'VALID':'INVALID')+'</span> · '+esc(v.decision);
   }catch(e){$("cert-out").innerHTML='<span class="bad">'+esc(e.message)+'</span>';}
 }
 async function loadEvidence(){
@@ -225,17 +232,18 @@ async function loadLists(){
   }catch(e){if($("dec-list"))$("dec-list").textContent=e.message;}
 }
 async function renderPolicy(v){
-  let active={}, packs=[], hot={};
+  let active={}, packs=[], hot={}, ready=null;
   try{ active=await api("/policy/active"); }catch(e){}
   try{ packs=await api("/policy/packs"); if(!Array.isArray(packs)) packs=[]; }catch(e){}
   try{ hot=await api("/policy/hotreload"); }catch(e){}
+  try{ ready=await api("/udoc/demo/ready"); }catch(e){}
   const ap=active.active_packs||[];
   v.innerHTML='<div class="kpis">
     <div class="kpi"><div class="v">'+esc(ap.length)+'</div><div class="l">Active packs</div></div>
     <div class="kpi"><div class="v">'+esc(active.enforced_rules!=null?active.enforced_rules:"—")+'</div><div class="l">Rules</div></div>
-    <div class="kpi"><div class="v" style="font-size:14px">'+esc(hot.last_reload_ms!=null?hot.last_reload_ms+" ms":"—")+'</div><div class="l">Hot-reload</div></div>
+    <div class="kpi"><div class="v" style="font-size:13px">'+(ready&&ready.ready?'READY':'WAIT')+'</div><div class="l">Demo seed</div></div>
   </div>
-  <div class="panel"><h3>Dry-run (no write)</h3>
+  <div class="panel"><h3>Dry-run</h3>
     <div class="row">
       <div class="f"><label>Model</label><input class="in" id="pt-mid" value="model-001" style="margin:0"/></div>
       <div class="f"><label>Scenario</label><select class="in" id="pt-sc" style="margin:0"><option>healthy</option><option>biased</option><option>breach</option></select></div>
@@ -243,18 +251,16 @@ async function renderPolicy(v){
     </div>
     <div class="term" id="pt-out" style="margin-top:10px">POST /policy/test</div>
   </div>
-  <div class="panel"><h3>Packs (startup seeds UDOC Demo · POPIA + Fairness)</h3>
-    <table><tr><th>Pack</th><th>Status</th><th>Rules</th><th></th></tr>'+
-    (packs.length?packs.slice(0,15).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.status)+'</td><td>'+esc(p.rule_count)+'</td><td>'+
-      (p.status!=="ACTIVE"?'<button class="btn ghost sm" type="button" onclick="actPack('+p.id+')">Activate</button>':'<span class="ok">live</span>')+'</td></tr>').join("")
-      :'<tr><td colspan="4">Waiting for Core redeploy seed…</td></tr>')+'</table></div>';
+  <div class="panel"><h3>Packs</h3>
+    <table><tr><th>Pack</th><th>Status</th><th>Rules</th></tr>'+
+    (packs.length?packs.slice(0,15).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.status)+'</td><td>'+esc(p.rule_count)+'</td></tr>').join("")
+      :'<tr><td colspan="3">Waiting for seed…</td></tr>')+'</table></div>';
 }
 async function policyTest(){
   try{ $("pt-out").textContent=JSON.stringify(await api("/policy/test",{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({model_id:$("pt-mid").value.trim(),scenario:$("pt-sc").value})}),null,2);
   }catch(e){$("pt-out").textContent="FAIL "+e.message;}
 }
-async function actPack(id){try{const r=await api("/policy/packs/"+id+"/activate",{method:"POST"}); toast("ACTIVE "+r.active_rules); render();}catch(e){toast(e.message);}}
 async function renderPillars(v){
   try{
     const d=await api("/udoc/constitutional/pillars"); const sum=d.status_summary||{};
@@ -266,43 +272,38 @@ async function renderPillars(v){
 }
 async function renderConf(v){
   let st={}; try{ st=await api("/conformance/status"); }catch(e){ v.innerHTML='<div class="panel bad">'+esc(e.message)+'</div>'; return; }
-  let sys=[]; try{ sys=await api("/conformance/systems"); if(!Array.isArray(sys))sys=[]; }catch(e){}
   v.innerHTML='<div class="kpis"><div class="kpi"><div class="v">'+(st.scanner_enabled?'ON':'OFF')+'</div><div class="l">Scanner</div></div>
     <div class="kpi"><div class="v ok">'+esc(st.conformant)+'</div><div class="l">OK</div></div>
     <div class="kpi"><div class="v bad">'+esc(st.non_conformant)+'</div><div class="l">NC</div></div></div>
-    <button class="btn cyan" type="button" onclick="runScan()">Run scan</button>
-    <div class="panel" style="margin-top:12px"><table><tr><th>System</th><th>Verdict</th></tr>'+
-      (sys.slice(0,12).map(m=>'<tr><td>'+esc(m.name||m.model_id)+'</td><td>'+esc(m.verdict)+'</td></tr>').join("")||'<tr><td colspan="2">None</td></tr>')+'</table></div>';
+    <button class="btn cyan" type="button" onclick="runScan()">Run scan</button>';
 }
 async function runScan(){try{await api("/conformance/scan",{method:"POST"}); toast("scan done"); render();}catch(e){toast(e.message);}}
 async function renderSystems(v){
-  let models=[], sum={};
-  try{ models=await api("/registry/models"); if(!Array.isArray(models)) models=[]; }catch(e){}
-  try{ sum=await api("/udoc/regulator/summary"); }catch(e){}
-  v.innerHTML='<div class="kpis"><div class="kpi"><div class="v">'+esc(models.length)+'</div><div class="l">Systems</div></div>
-    <div class="kpi"><div class="v">'+esc(sum.decisions&&sum.decisions.total!=null?sum.decisions.total:"—")+'</div><div class="l">Decisions</div></div></div>
-    <div class="panel"><p style="font-size:12px;color:var(--mut)">Prefer existing model-001 (seeded). Optional AI system register only — not human users.</p>
+  let models=[]; try{ models=await api("/registry/models"); if(!Array.isArray(models)) models=[]; }catch(e){}
+  v.innerHTML='<div class="panel"><p style="font-size:12px;color:var(--mut)">model-001 seeded on startup. No new human users.</p>
     <table><tr><th>ID</th><th>Risk</th><th>Status</th></tr>'+
       models.slice(0,20).map(m=>'<tr><td class="mono">'+esc(m.model_id)+'</td><td>'+esc(m.risk_tier)+'</td><td>'+esc(m.status)+'</td></tr>').join("")+'</table></div>';
 }
 async function smoke(){
   const steps=[]; const t0=Date.now();
-  async function step(name,fn){ try{ steps.push({name,ok:true,detail:await fn()}); }catch(e){ steps.push({name,ok:false,detail:String(e.message||e)}); } }
+  async function step(name,fn){ try{ const r=await fn(); steps.push({name,ok:true,detail:r}); }catch(e){ steps.push({name,ok:false,detail:String(e.message||e)}); } }
   await step("/health", async()=>{ const r=await fetch(API+"/health"); if(!r.ok)throw new Error("HTTP "+r.status); return r.json().catch(()=>({})); });
-  await step("/policy/active", async()=>api("/policy/active"));
-  await step("/registry/models", async()=>{ const m=await api("/registry/models"); return {count:Array.isArray(m)?m.length:0}; });
-  await step("EVA fair", async()=>api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.92,compliance:1.0})}));
-  await step("EVA biased", async()=>api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.9,compliance:1.0,priv_favorable:900,priv_total:1000,unpriv_favorable:120,unpriv_total:1000})}));
+  await step("/udoc/demo/ready", async()=>{ const d=await api("/udoc/demo/ready"); if(!d.ready) throw new Error((d.missing||[]).join("; ")||"not ready"); return {ready:d.ready,rules:d.active_rules}; });
+  await step("/policy/active", async()=>{ const d=await api("/policy/active"); if(!(d.enforced_rules>0)) throw new Error("no enforced rules"); return {rules:d.enforced_rules}; });
+  await step("EVA fair", async()=>{ const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.92,compliance:1.0})}); if(d.decision==="BLOCK") throw new Error("fair unexpectedly BLOCK"); return {decision:d.decision,policy:d.policy_enforced}; });
+  await step("EVA biased BLOCK", async()=>{ const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.9,compliance:1.0,priv_favorable:900,priv_total:1000,unpriv_favorable:120,unpriv_total:1000})}); if(d.decision!=="BLOCK") throw new Error("expected BLOCK got "+d.decision); return {decision:d.decision,policy:d.policy_enforced,cert:!!d.certificate_id}; });
   LAST_SMOKE={ms:Date.now()-t0,steps};
   TAB="smoke"; document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.t==="smoke")); render();
 }
 function renderSmoke(v){
-  if(!LAST_SMOKE){ v.innerHTML='<div class="panel">Run Smoke in header.</div>'; return; }
+  if(!LAST_SMOKE){ v.innerHTML='<div class="panel">Run <b>Smoke</b> — asserts demo/ready, policy rules, fair path, biased BLOCK.</div>'; return; }
   const ok=LAST_SMOKE.steps.filter(s=>s.ok).length;
+  const bad=LAST_SMOKE.steps.length-ok;
   v.innerHTML='<div class="kpis"><div class="kpi"><div class="v ok">'+ok+'</div><div class="l">Passed</div></div>
+    <div class="kpi"><div class="v '+(bad?'bad':'ok')+'">'+bad+'</div><div class="l">Failed</div></div>
     <div class="kpi"><div class="v">'+LAST_SMOKE.ms+' ms</div><div class="l">Duration</div></div></div>
-    <div class="panel"><table><tr><th>Check</th><th>Result</th></tr>'+
-      LAST_SMOKE.steps.map(s=>'<tr><td>'+esc(s.name)+'</td><td class="'+(s.ok?'ok':'bad')+'">'+(s.ok?'PASS':'FAIL')+'</td></tr>').join("")+'</table></div>';
+    <div class="panel"><table><tr><th>Check</th><th>Result</th><th>Detail</th></tr>'+
+      LAST_SMOKE.steps.map(s=>'<tr><td>'+esc(s.name)+'</td><td class="'+(s.ok?'ok':'bad')+'">'+(s.ok?'PASS':'FAIL')+'</td><td class="mono" style="font-size:11px">'+esc(typeof s.detail==='object'?JSON.stringify(s.detail).slice(0,100):String(s.detail).slice(0,100))+'</td></tr>').join("")+'</table></div>';
 }
 (function(){
   const t=localStorage.getItem("udoc_sent_tok"); const a=localStorage.getItem("udoc_sent_api");
