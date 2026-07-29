@@ -10,28 +10,29 @@
 | Phase | Focus | Status | Commit(s) |
 |-------|--------|--------|-----------|
 | **P0** | Honest reset + inventory | Done | `1f45982`, `bea3ef1` |
-| **P1** | `udoc-v7-eva` → Sentinel Command shell | Done | `931d929` |
-| **P2** | `mvp-1` / `mvp-2` → client nav + views | Done | `4be3a84`, `1335729` |
-| **P3** | `udoc-v7-platform` → udoc-internal | **Wired** | `36325f7`, `b40ad85` |
-| **P4** | platform-ui + sovereign-console merge | Pending | — |
-| **P5** | Citizen + roles on existing hosts | Partial | — |
-| **P6** | Assessor side-by-side vs demos | Pending | — |
+| **P1** | `udoc-v7-eva` → Sentinel | Done | `931d929` |
+| **P2** | `mvp-1` / `mvp-2` → client | **Densified** | `4be3a84`, `1335729`, `8b85a6b` |
+| **P3** | `udoc-v7-platform` → admin | **Wired** | `36325f7`, `b40ad85` |
+| **P4** | platform-ui merge | Pending | — |
+| **P5** | Citizen + roles | Partial | — |
+| **P6** | Assessor side-by-side | Pending | — |
 
-## P3 delivery
-- `udoc-internal/admin-v7-enhance.js` — v7 nav labels, Command Centre boot banner, Fair/Biased/High-risk/Sovereignty chips on EVA Command, HITL title parity, fixed `esc`, Infrastructure links (Sentinel / API Health / Jobs / 24 Portals)
-- `udoc-internal/sw.js` (cache **v2**) — injects `<script src="/admin-v7-enhance.js">` into HTML navigations
+## P2 latest (`8b85a6b`)
+- Fixed HTML `esc` (entities)
+- Dashboard: APPROVE / BLOCK / ESCALATE outcome KPIs from regulator summary
+- Bias Monitor: live `/bias/scan` button + incident feed
+- Govern: Fair / Biased→BLOCK / High-risk / Sovereignty chips + terminal EVA
+- Compliance: multi-framework cards + sweep
 
-### Verify (admin host)
-1. Hard-refresh udoc-admin twice (so SW v2 activates)
-2. Overview → **Command Centre** + DEMO READY banner
-3. EVA Command → scenario chips → Biased **BLOCK**
-4. HITL Queue label + cases table
-5. Infra links open Sentinel / api-health / jobs / portals
+## P3
+- `admin-v7-enhance.js` + SW v2 inject on navigate
+- Hard-refresh admin **twice** so SW activates
 
-## Pass criteria
-1. Nav/tabs match mapped demo  
-2. ≥4 primary controls return live API results (or fail-closed)  
-3. Vol IX tokens  
-4. Existing Render hosts only · Neon ≤500MB  
+## Verify (client host after deploy)
+1. Sign in → Command Dashboard (boot READY, outcome KPIs)
+2. Govern → Biased → **BLOCK** + policy ENFORCED
+3. Bias Monitor → Run bias scan
+4. Compliance → Run sweep
+5. AI Registry / Audit / Sovereignty tabs populate from live APIs
 
 **Task 1** only after Task 2 pass.
