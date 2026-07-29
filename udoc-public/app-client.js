@@ -1,5 +1,5 @@
 const PROD_API="https://gods-platform-core.onrender.com";
-let SCENARIO="fair",SECTOR=null;
+let SCENARIO="fair",SECTOR=null,LAST_CERT="",LAST_DID=null;
 function apiBase(){return localStorage.getItem("udoc_client_api")||PROD_API;}
 function setApiBase(v){localStorage.setItem("udoc_client_api",v.replace(/\/+$/,""));}
 function token(){return localStorage.getItem("udoc_client_tok")||"";}
@@ -147,19 +147,41 @@ if(SCENARIO==="high")body.risk_tier="HIGH";
 if(SCENARIO==="sov"){body.bgp=0.4;body.traceroute=0.5;body.dnssec=0.6;body.storage=0.7;}
 try{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
 const decision=d.decision||"—";const reasons=Array.isArray(d.block_reasons)?d.block_reasons:[];
+if(d.id) LAST_DID=d.id; if(d.certificate_id) LAST_CERT=d.certificate_id;
 let term="SCENARIO: "+SCENARIO+" · "+body.model_id+"\n";
 if(d.dimensions){["Validity","Confidence","Risk","Compliance","Stability","Impact"].forEach(k=>{if(d.dimensions[k]!=null)term+="  "+k+" = "+Number(d.dimensions[k]).toFixed(3)+"\n";});}
 term+="  Composite = "+(d.composite_eva!=null?d.composite_eva:"—")+"\n  Policy = "+(d.policy_enforced?"ENFORCED":"off")+"\n  → "+decision+"\n";
 reasons.forEach(x=>{term+="  • "+x+"\n";});
+const certBlock=d.certificate_id
+  ?('<div style="margin-top:10px" class="row"><div class="f"><label>Certificate</label><input id="g-cert" class="mono" value="'+esc(d.certificate_id)+'"/></div>'+
+    '<button class="btn cyan sm" type="button" onclick="gVerifyCert()">Verify cert</button>'+
+    (d.id?'<button class="btn sm" type="button" onclick="gEvidence('+d.id+')">Evidence</button>':'')+
+    '</div><div id="g-cert-out" class="muted" style="margin-top:8px;font-size:12px"></div>')
+  :(d.id?'<div style="margin-top:10px"><button class="btn sm" type="button" onclick="gEvidence('+d.id+')">Evidence</button> <span id="g-cert-out" class="muted" style="font-size:12px"></span></div>':'');
 out.innerHTML='<div class="panel"><h3>EVA Verdict</h3><div class="verdict-big">'+statusTag(decision)+'</div>'+dimsHtml(d.dimensions)+
-'<div class="term">'+esc(term)+'</div>'+(d.certificate_id?'<div style="margin-top:8px" class="mono">'+esc(d.certificate_id)+'</div>':'')+'</div>';
+'<div class="term">'+esc(term)+'</div>'+certBlock+'</div>';
 }catch(e){out.innerHTML='<div class="panel t-bad">'+esc(e.message)+'</div>';}}
+async function gVerifyCert(){
+  const id=(document.getElementById("g-cert")&&document.getElementById("g-cert").value.trim())||LAST_CERT;
+  const o=document.getElementById("g-cert-out"); if(!id){if(o)o.textContent="No certificate id";return;}
+  if(o)o.textContent="Verifying…";
+  try{const v=await api("/decisions/certificates/"+encodeURIComponent(id)+"/verify");
+    if(o)o.innerHTML='<span class="'+(v.valid?'t-ok':'t-bad')+'">'+(v.valid?'VALID':'INVALID')+'</span> · '+esc(v.decision||"");
+  }catch(e){if(o)o.innerHTML='<span class="t-bad">'+esc(e.message)+'</span>';}
+}
+async function gEvidence(id){
+  const o=document.getElementById("g-cert-out"); if(o)o.textContent="Loading evidence…";
+  try{const d=await api("/udoc/decisions/"+id+"/evidence");
+    if(o)o.innerHTML='<div class="term" style="margin-top:6px">'+esc(JSON.stringify(d,null,2).slice(0,1200))+'</div>';
+  }catch(e){if(o)o.innerHTML='<span class="t-bad">'+esc(e.message)+'</span>';}
+}
 
 async function vDecisions(m){await safe(m,async()=>{let rows=[],certs=[];try{rows=asArray(await api("/decisions"));}catch(e){}try{certs=asArray(await api("/decisions/certificates"));}catch(e){}
 m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2></div><div class="panel"><h3>Decisions · '+rows.length+'</h3>'+tableFrom(rows.slice(0,50),[
 {h:"ID",r:x=>'<span class="mono">'+esc(x.id||x.decision_id)+'</span>'},{h:"System",r:x=>esc(x.model_id)},{h:"EVA",r:x=>esc(x.composite_eva)},{h:"Verdict",r:x=>statusTag(x.decision)}])+'</div>'+
 '<div class="panel"><h3>Certificates · '+certs.length+'</h3>'+tableFrom(certs.slice(0,25),[
-{h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.id)+'</span>'},{h:"Verdict",r:x=>statusTag(x.decision)}])+'</div>'+honesty();});}
+{h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.id)+'</span>'},{h:"Verdict",r:x=>statusTag(x.decision)},
+{h:"",r:x=>{const cid=x.certificate_id||x.id;return cid?'<button class="btn sm" type="button" onclick="LAST_CERT=\''+esc(cid)+'\';nav(\'govern\');setTimeout(function(){var el=document.getElementById(\'g-cert\');if(el){el.value=\''+esc(cid)+'\';}gVerifyCert();},400)">Verify</button>':'';}}])+'</div>'+honesty();});}
 
 async function vKnowledge(m){await safe(m,async()=>{let st={},docs=[];try{st=await api("/client/knowledge/state");}catch(e){}try{docs=asArray(await api("/client/knowledge/docs"));}catch(e){}
 m.innerHTML='<div class="pgh"><h2>Company Knowledge</h2><span class="desc">Text only · Neon-light</span></div>'+
