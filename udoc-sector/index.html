@@ -67,14 +67,18 @@
   .fw-card .basis{font-family:var(--fm);font-size:10.5px;color:var(--acc)}
   .fw-card .focus{font-size:12.5px;color:var(--txt2);margin-top:8px}.fw-card .applies{font-size:11px;color:var(--muted);margin-top:6px}
   .honesty{font-size:11px;color:var(--muted);border-top:1px solid var(--bd2);padding-top:10px;margin-top:18px}
-  .seg{display:flex;gap:6px;margin-bottom:14px}
+  .seg{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
   .seg button{padding:6px 12px;border-radius:20px;border:1px solid var(--bd2);background:transparent;color:var(--muted);font-family:var(--fc);font-size:12px;letter-spacing:.06em;cursor:pointer}
   .seg button.on{border-color:var(--acc);color:var(--acc-l);background:rgba(0,194,212,.1)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .chip{cursor:pointer;padding:6px 12px;border-radius:16px;border:1px solid var(--bd2);background:#091022;color:var(--muted);font-size:11px}
+  .chip.on{border-color:var(--acc);color:var(--acc-l)}
+  .term{background:#050a12;border:1px solid var(--bd2);border-radius:8px;padding:10px;font-family:var(--fm);font-size:11px;color:var(--muted);white-space:pre-wrap;margin-top:10px}
   .dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
   .dim{background:#091022;border:1px solid var(--bd2);border-radius:8px;padding:8px;text-align:center}
   .dim .dl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.dim .dv{font-family:var(--fc);font-weight:700;font-size:16px;color:var(--gold-l)}
   .loading{color:var(--muted);padding:40px;text-align:center}
-  .small{font-size:12px}
+  .small{font-size:12px}.verdict-big{font-size:22px;font-weight:700}
 </style>
 </head>
 <body>
@@ -82,9 +86,9 @@
   <div class="card">
     <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
       <div><h1>UDOC</h1><div class="sub">SECTOR GOVERNANCE</div></div></div>
-    <p class="muted small" style="margin:10px 0 0">Public vs Private sector experience — frameworks, oversight model and KPIs tailored to your classification.</p>
-    <label>Email</label><input id="li-email" type="email" value="client.dsd@gods.local"/>
-    <label>Password</label><input id="li-pass" type="password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <p class="muted small" style="margin:10px 0 0">Public vs Private sector — frameworks, oversight, EVA on live Core. Existing operator only.</p>
+    <label>Email</label><input id="li-email" type="email" value="admin@gods.local"/>
+    <label>Password</label><input id="li-pass" type="password" value="admin123" onkeydown="if(event.key==='Enter')doLogin()"/>
     <div style="margin-top:16px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
     <div class="err" id="li-err"></div>
     <div class="apibar"><span>API</span><input id="li-api" class="mono"/></div>
@@ -117,7 +121,7 @@ const PROD_API="https://gods-platform-core.onrender.com";
 function apiBase(){ return localStorage.getItem("udoc_sec_api")||PROD_API; }
 function setApiBase(v){ localStorage.setItem("udoc_sec_api", v.replace(/\/+$/,"")); }
 function token(){ return localStorage.getItem("udoc_sec_tok")||""; }
-let SECTOR=null, FORCE=null;
+let SECTOR=null, FORCE=null, SCENARIO="fair";
 async function api(path,opts={}){
   const h=Object.assign({},opts.headers||{}); if(token())h["Authorization"]="Bearer "+token();
   const r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));
@@ -130,12 +134,16 @@ document.getElementById("li-api").value=apiBase();
 async function doLogin(){
   const e=document.getElementById("li-err"); e.textContent="";
   const a=document.getElementById("li-api").value.trim(); if(a) setApiBase(a);
-  const email=document.getElementById("li-email").value.trim(), pass=document.getElementById("li-pass").value;
+  const btn=document.getElementById("li-btn"); btn.disabled=true; btn.textContent="Signing in…";
   try{
-    const r=await api("/auth/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pass})});
-    localStorage.setItem("udoc_sec_tok", r.access_token||r.token||"");
+    const f=new URLSearchParams({username:document.getElementById("li-email").value.trim().toLowerCase(),password:document.getElementById("li-pass").value});
+    const r=await fetch(apiBase()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
+    if(!r.ok) throw new Error(r.status===401?"Invalid credentials":"Login failed");
+    const d=await r.json();
+    localStorage.setItem("udoc_sec_tok", d.access_token||"");
+    localStorage.setItem("udoc_sec_who", JSON.stringify({email:document.getElementById("li-email").value.trim().toLowerCase(),role:d.role,tenant_id:d.tenant_id}));
     enterApp();
-  }catch(err){ e.textContent=err.message; }
+  }catch(err){ e.textContent=err.message; } finally { btn.disabled=false; btn.textContent="Sign in"; }
 }
 function logout(){ localStorage.removeItem("udoc_sec_tok"); document.getElementById("app").classList.remove("on"); document.getElementById("login").style.display="flex"; }
 function applyAccent(){
@@ -152,8 +160,9 @@ async function loadSector(){
 async function enterApp(){
   document.getElementById("login").style.display="none";
   document.getElementById("app").classList.add("on");
-  try{ const me=await api("/auth/me"); document.getElementById("who-email").textContent=me.email||me.sub||"—"; document.getElementById("who-tenant").textContent=me.tenant_id||me.tenant||""; }catch(e){}
-  document.getElementById("hb").textContent="· live";
+  const w=JSON.parse(localStorage.getItem("udoc_sec_who")||"{}");
+  document.getElementById("who-email").textContent=w.email||"—"; document.getElementById("who-tenant").textContent=w.tenant_id||"";
+  try{ await fetch(apiBase()+"/health"); document.getElementById("hb").textContent="· live"; }catch(e){ document.getElementById("hb").textContent="· offline"; }
   await loadSector(); nav("overview");
 }
 function nav(v){
@@ -163,37 +172,37 @@ function nav(v){
   (map[v]||vOverview)(m);
 }
 document.querySelectorAll("#nav .navitem").forEach(n=>n.addEventListener("click",()=>nav(n.dataset.view)));
-function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;'}[c])); }
+function esc(s){ const d=document.createElement("div"); d.textContent=String(s==null?"":s); return d.innerHTML; }
 function asArray(d){ if(Array.isArray(d))return d; if(d&&typeof d==="object"){ for(const k of ["items","records","models","results","data","cases"]) if(Array.isArray(d[k]))return d[k]; } return []; }
-function statusTag(v){ const u=String(v||"").toUpperCase(); const c=u.includes("ACTIVE")||u.includes("APPROVE")||u.includes("RESOLVED")?"t-ok":(u.includes("PEND")||u.includes("REVIEW")||u.includes("OPEN")?"t-warn":(u.includes("BLOCK")||u.includes("DENY")||u.includes("SUSP")?"t-bad":"t-info")); return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>'; }
+function statusTag(v){ const u=String(v||"").toUpperCase(); const c=u.includes("ACTIVE")||u.includes("APPROVE")||u.includes("RESOLVED")||u.includes("VALID")?"t-ok":(u.includes("PEND")||u.includes("REVIEW")||u.includes("OPEN")?"t-warn":(u.includes("BLOCK")||u.includes("DENY")||u.includes("SUSP")?"t-bad":"t-info")); return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>'; }
 function tableFrom(rows,cols){ if(!rows.length) return '<div class="muted small">No records.</div>'; let h='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c.h)+'</th>').join("")+'</tr></thead><tbody>';
   rows.forEach(r=>{ h+='<tr>'+cols.map(c=>'<td>'+(c.r?c.r(r):esc(r[c.k]))+'</td>').join("")+'</tr>'; }); return h+'</tbody></table>'; }
-function honesty(){ return '<div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33. Sector frameworks reflect standing SA instruments as of mid-2026.</div>'; }
+function honesty(){ return '<div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33. Neon ≤500MB. Sector frameworks reflect standing SA instruments.</div>'; }
 function dimsHtml(dims){ if(!dims||typeof dims!=="object") return ""; const keys=["Validity","Confidence","Risk","Compliance","Stability","Impact"];
-  let h='<div class="dims">'; keys.forEach(k=>{ const v=dims[k]!=null?dims[k]:(dims[k.toLowerCase()]!=null?dims[k.toLowerCase()]:null); if(v==null)return;
+  let h='<div class="dims">'; keys.forEach(k=>{ const v=dims[k]!=null?dims[k]:null; if(v==null)return;
     h+='<div class="dim"><div class="dl">'+esc(k)+'</div><div class="dv">'+esc(v)+'</div></div>'; }); return h+'</div>'; }
 async function safe(host,fn){ try{ return await fn(); }catch(e){ host.innerHTML='<div class="panel"><div class="t-bad small">⚠ '+esc(e.message)+'</div></div>'; } }
 
 async function vOverview(m){
   await loadSector();
   const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
-  let ov=null, fw={frameworks:[]};
+  let ov=null, fw={frameworks:[]}, ready=null;
   const q=FORCE?("?sector="+encodeURIComponent(FORCE)):"";
   try{ ov=await api("/sector/overview"+q); }catch(e){}
   try{ fw=await api("/sector/frameworks"+q); }catch(e){}
+  try{ ready=await api("/udoc/demo/ready"); }catch(e){}
   const card=(k,v,cls)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v '+(cls||"")+'">'+(v==null?"—":esc(v))+'</div></div>';
   const tiles=(ov&&ov.tiles&&ov.tiles.length)?ov.tiles.map((t,i)=>card(t.k,t.v,i===0?"acc":"")).join(""):
     card("Decisions","—","acc")+card("Blocked","—")+card("Oversight","—")+card("Frameworks",(fw.frameworks||[]).length);
   m.innerHTML='<div class="pgh"><h2>'+esc(S.label||"Sector")+' Overview</h2><span class="desc">'+esc(S.tagline||"")+'</span></div>'+
-    '<div class="panel acc-border"><div class="small muted">'+esc(S.summary||"")+'</div>'+
+    '<div class="panel acc-border"><div class="small">'+(ready&&ready.ready?'<span class="t-ok">DEMO READY</span> · rules '+esc(ready.active_rules):'<span class="t-warn">SEED PENDING</span>')+'</div>'+
+      '<div class="small muted" style="margin-top:8px">'+esc(S.summary||"")+'</div>'+
       '<div class="small" style="margin-top:12px;letter-spacing:.08em;color:'+esc(acc)+'">OVERSIGHT MODEL</div>'+
-      '<div class="small muted" style="margin-top:3px">'+esc(S.oversight_model||"")+'</div>'+
-      (S.terminology?'<div class="small" style="margin-top:10px">Subjects: <b>'+esc(S.terminology.subjects||"")+'</b> · Org: <b>'+esc(S.terminology.org||"")+'</b> · Risk frame: <b>'+esc(S.terminology.risk||"")+'</b></div>':"")+
-    '</div>'+
+      '<div class="small muted" style="margin-top:3px">'+esc(S.oversight_model||"")+'</div></div>'+
     '<div class="grid kpis" style="margin-top:14px">'+tiles+'</div>'+
     '<div class="panel"><h3>Frameworks in scope · '+(fw.frameworks||[]).length+'</h3>'+
       '<div class="fw-grid">'+(fw.frameworks||[]).slice(0,4).map(f=>'<div class="fw-card"><h4>'+esc(f.name)+'</h4><div class="basis">'+esc(f.basis)+'</div><div class="focus">'+esc(f.focus)+'</div></div>').join("")+'</div>'+
-      '<div style="margin-top:10px"><button class="btn sm" onclick="nav(\'frameworks\')">All frameworks →</button></div></div>'+honesty();
+      '<div style="margin-top:10px"><button class="btn sm" onclick="nav(\'frameworks\')">All frameworks →</button> <button class="btn sm" onclick="nav(\'decisions\')">EVA scenarios →</button></div></div>'+honesty();
 }
 async function vFrameworks(m){
   await loadSector();
@@ -206,15 +215,22 @@ async function vFrameworks(m){
 }
 async function vDecisions(m){ await safe(m, async()=>{
   await loadSector();
-  let rows=[],certs=[]; try{ rows=asArray(await api("/decisions")); }catch(e){} try{ certs=asArray(await api("/decisions/certificates")); }catch(e){}
+  let rows=[],certs=[],ready=null; try{ rows=asArray(await api("/decisions")); }catch(e){} try{ certs=asArray(await api("/decisions/certificates")); }catch(e){} try{ ready=await api("/udoc/demo/ready"); }catch(e){}
   const S=SECTOR||{}; const term=(S.terminology&&S.terminology.subjects)||"subjects";
-  m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2><span class="desc">Governed decisions affecting '+esc(term)+'</span></div>'+
-    '<div class="panel"><h3>Run evaluation</h3><div class="row">'+
-      '<div class="f"><label>Model ID</label><input id="ev-mid" value="model-001"></div>'+
-      '<div class="f"><label>Confidence</label><input id="ev-conf" value="0.92"></div>'+
-      '<div class="f"><label>Compliance</label><input id="ev-comp" value="1.0"></div>'+
-      '<div class="f"><label>Sample</label><select id="ev-fair"><option value="fair">fair</option><option value="biased">biased</option></select></div>'+
-      '<button class="btn" onclick="runEval()">Evaluate</button></div><div id="ev-out" style="margin-top:12px"></div></div>'+
+  m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2><span class="desc">'+(ready&&ready.ready?'<span class="t-ok">demo ready</span>':'seed pending')+' · '+esc(term)+'</span></div>'+
+    '<div class="panel"><h3>Scenario chips · live POST /decisions</h3>'+
+      '<div class="chips" id="sc-chips">'+
+        '<button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair</button>'+
+        '<button type="button" class="chip" data-s="biased" onclick="pickSc(this)">Biased → BLOCK</button>'+
+        '<button type="button" class="chip" data-s="high" onclick="pickSc(this)">High-risk</button>'+
+        '<button type="button" class="chip" data-s="sov" onclick="pickSc(this)">Sovereignty</button>'+
+      '</div>'+
+      '<div class="row">'+
+        '<div class="f"><label>Model ID</label><input id="ev-mid" value="model-001"></div>'+
+        '<div class="f"><label>Confidence</label><input id="ev-conf" value="0.92"></div>'+
+        '<div class="f"><label>Compliance</label><input id="ev-comp" value="1.0"></div>'+
+        '<button class="btn" type="button" onclick="runEval()">Evaluate</button></div>'+
+      '<div id="ev-out" style="margin-top:12px"></div></div>'+
     '<div class="panel"><h3>Recent · '+rows.length+'</h3>'+tableFrom(rows.slice(0,50),[
       {h:"Ref",r:x=>'<span class="mono">'+esc(x.decision_id||x.id||"—")+'</span>'},
       {h:"System",r:x=>esc(x.model_id||"—")},
@@ -224,36 +240,38 @@ async function vDecisions(m){ await safe(m, async()=>{
     '<div class="panel"><h3>Certificates · '+certs.length+'</h3>'+tableFrom(certs.slice(0,30),[
       {h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.cert_id||x.id||"—")+'</span>'},
       {h:"Composite",r:x=>esc(x.composite_eva!=null?x.composite_eva:"—")},
-      {h:"Sector",r:x=>esc(x.sector||"—")},
-      {h:"",r:x=>{const cid=esc(x.certificate_id||x.cert_id||x.id||""); return cid?'<button class="btn sm" onclick="verifyCert(\''+cid+'\')">Verify</button>':'';}},
+      {h:"",r:x=>{const cid=esc(x.certificate_id||x.cert_id||x.id||""); return cid?'<button class="btn sm" type="button" onclick="verifyCert(\''+cid+'\')">Verify</button>':'';}},
     ])+'</div>'+honesty();
 }); }
+function pickSc(el){ document.querySelectorAll("#sc-chips .chip").forEach(c=>c.classList.remove("on")); el.classList.add("on"); SCENARIO=el.dataset.s; runEval(); }
 async function runEval(){
-  const o=document.getElementById("ev-out"); o.innerHTML='<div class="muted small">Evaluating…</div>';
+  const o=document.getElementById("ev-out"); if(!o) return; o.innerHTML='<div class="muted small">POST /decisions …</div>';
+  const body={model_id:(document.getElementById("ev-mid")||{}).value||"model-001", raw_confidence:parseFloat((document.getElementById("ev-conf")||{}).value)||0.92, compliance:parseFloat((document.getElementById("ev-comp")||{}).value)||1.0};
+  if(SCENARIO==="biased"){ body.priv_favorable=900; body.priv_total=1000; body.unpriv_favorable=120; body.unpriv_total=1000; }
+  if(SCENARIO==="high") body.risk_tier="HIGH";
+  if(SCENARIO==="sov"){ body.bgp=0.4; body.traceroute=0.5; body.dnssec=0.6; body.storage=0.7; }
   try{
-    const body={model_id:document.getElementById("ev-mid").value.trim(), confidence:parseFloat(document.getElementById("ev-conf").value)||0.9,
-      compliance:parseFloat(document.getElementById("ev-comp").value)||1, sample:document.getElementById("ev-fair").value};
-    const d=await api("/eva/evaluate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-    o.innerHTML='<div class="small">Composite <b style="color:var(--gold-l)">'+(d.composite_eva!=null?d.composite_eva:"—")+'</b> · '+statusTag(d.decision||d.verdict)+'</div>'+
-      dimsHtml(d.dimensions)+
-      (d.certificate_id?'<div class="small" style="margin-top:8px">Cert <span class="mono">'+esc(d.certificate_id)+'</span> <button class="btn sm" onclick="verifyCert(\''+esc(d.certificate_id)+'\')">Verify</button></div>':"");
+    const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const decision=d.decision||"—"; const reasons=Array.isArray(d.block_reasons)?d.block_reasons:[];
+    let term="SCENARIO: "+SCENARIO+" · "+body.model_id+"\n";
+    if(d.dimensions){["Validity","Confidence","Risk","Compliance","Stability","Impact"].forEach(k=>{if(d.dimensions[k]!=null)term+="  "+k+" = "+Number(d.dimensions[k]).toFixed(3)+"\n";});}
+    term+="  Composite = "+(d.composite_eva!=null?d.composite_eva:"—")+"\n  Policy = "+(d.policy_enforced?"ENFORCED":"off")+"\n  → "+decision+"\n";
+    reasons.forEach(x=>{term+="  • "+x+"\n";});
+    o.innerHTML='<div class="verdict-big">'+statusTag(decision)+'</div>'+dimsHtml(d.dimensions)+
+      '<div class="term">'+esc(term)+'</div>'+
+      (d.certificate_id?'<div class="small" style="margin-top:8px">Cert <span class="mono">'+esc(d.certificate_id)+'</span> <button class="btn sm" type="button" onclick="verifyCert(\''+esc(d.certificate_id)+'\')">Verify</button></div>':"");
   }catch(e){ o.innerHTML='<div class="t-bad small">'+esc(e.message)+'</div>'; }
 }
 async function verifyCert(cid){
   try{ const r=await api("/decisions/certificates/"+encodeURIComponent(cid)+"/verify");
-    alert("Certificate "+cid+"\nValid: "+(r.valid!==false)+"\nComposite: "+(r.composite_eva!=null?r.composite_eva:"—")+"\n"+(r.message||"")); }
+    alert("Certificate "+cid+"\nValid: "+(r.valid!==false)+"\nDecision: "+(r.decision||"—")); }
   catch(e){ alert("Verify failed: "+e.message); }
 }
 async function vSystems(m){ await safe(m, async()=>{
   await loadSector();
   let rows=[]; try{ rows=asArray(await api("/registry/models")); }catch(e){}
   const S=SECTOR||{};
-  m.innerHTML='<div class="pgh"><h2>AI Systems</h2><span class="desc">Registered models in this '+esc(S.label||"sector")+' scope</span></div>'+
-    '<div class="panel"><h3>Register system</h3><div class="row">'+
-      '<div class="f"><label>Model ID</label><input id="ns-id" placeholder="model-xxx"></div>'+
-      '<div class="f"><label>Name</label><input id="ns-name" placeholder="Display name"></div>'+
-      '<div class="f"><label>Risk tier</label><select id="ns-risk"><option>LOW</option><option>MEDIUM</option><option selected>HIGH</option><option>CRITICAL</option></select></div>'+
-      '<button class="btn" onclick="registerSystem()">Register</button></div><div class="err small" id="ns-err"></div></div>'+
+  m.innerHTML='<div class="pgh"><h2>AI Systems</h2><span class="desc">Registered models · prefer model-001</span></div>'+
     '<div class="panel"><h3>Registry · '+rows.length+'</h3>'+tableFrom(rows,[
       {h:"ID",r:x=>'<span class="mono">'+esc(x.model_id||x.id||"—")+'</span>'},
       {h:"Name",r:x=>esc(x.name||"—")},
@@ -261,15 +279,8 @@ async function vSystems(m){ await safe(m, async()=>{
       {h:"Status",r:x=>statusTag(x.status)},
     ])+'</div>'+honesty();
 }); }
-async function registerSystem(){
-  const e=document.getElementById("ns-err"); e.textContent="";
-  const body={model_id:document.getElementById("ns-id").value.trim(),name:document.getElementById("ns-name").value.trim(),risk_tier:document.getElementById("ns-risk").value};
-  if(!body.model_id||!body.name){ e.textContent="ID and name required."; return; }
-  try{ await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); nav("systems"); }
-  catch(err){ e.textContent=err.message; }
-}
 async function vOversight(m){ await safe(m, async()=>{
-  const rows=asArray(await api("/oversight/cases"));
+  let rows=[]; try{ rows=asArray(await api("/oversight/cases")); }catch(e){}
   const S=SECTOR||{};
   m.innerHTML='<div class="pgh"><h2>Oversight</h2><span class="desc">'+esc(S.oversight_model||"Human-in-the-loop review")+'</span></div>'+
     '<div class="panel"><h3>Cases · '+rows.length+'</h3>'+tableFrom(rows,[
@@ -281,12 +292,12 @@ async function vOversight(m){ await safe(m, async()=>{
 }); }
 async function vSwitch(m){
   const cur=FORCE||(SECTOR&&SECTOR.sector)||"GENERAL";
-  m.innerHTML='<div class="pgh"><h2>Inspect sector</h2><span class="desc">Staff may inspect PUBLIC or PRIVATE experience; tenants see their assigned sector</span></div>'+
+  m.innerHTML='<div class="pgh"><h2>Inspect sector</h2><span class="desc">PUBLIC / PRIVATE experience</span></div>'+
     '<div class="panel"><h3>Active view</h3><div class="seg">'+
       '<button class="'+(cur==="PUBLIC"?"on":"")+'" onclick="setForce(\'PUBLIC\')">Public Sector</button>'+
       '<button class="'+(cur==="PRIVATE"?"on":"")+'" onclick="setForce(\'PRIVATE\')">Private Sector</button>'+
-      '<button class="'+(cur==="GENERAL"||!FORCE?"on":"")+'" onclick="setForce(null)">My tenant sector</button>'+
-    '</div><div class="note">Switching reloads profile, frameworks and KPIs for that sector classification. Tenant users remain bound to their organisation\'s assigned sector on the backend.</div></div>'+honesty();
+      '<button class="'+(!FORCE?"on":"")+'" onclick="setForce(null)">My tenant sector</button>'+
+    '</div><div class="note">Switching reloads profile, frameworks and KPIs. EVA chips always hit live Core.</div></div>'+honesty();
 }
 function setForce(s){ FORCE=s; const url=new URL(location.href); if(s) url.searchParams.set("sector",s); else url.searchParams.delete("sector");
   history.replaceState(null,"",url.pathname+url.search); loadSector().then(()=>nav("overview")); }
