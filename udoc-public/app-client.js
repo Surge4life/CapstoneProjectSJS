@@ -3,7 +3,7 @@ let SCENARIO="fair",SECTOR=null;
 function apiBase(){return localStorage.getItem("udoc_client_api")||PROD_API;}
 function setApiBase(v){localStorage.setItem("udoc_client_api",v.replace(/\/+$/,""));}
 function token(){return localStorage.getItem("udoc_client_tok")||"";}
-function esc(s){return String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");}
+function esc(s){const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;}
 async function api(path,opts={}){const h=Object.assign({},opts.headers||{});if(token())h.Authorization="Bearer "+token();
 const r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));
 if(r.status===401){if(token())logout();throw new Error("Session expired");}
@@ -24,7 +24,9 @@ document.getElementById("login").style.display="none";document.getElementById("a
 document.getElementById("who-email").textContent=w.email||"—";document.getElementById("who-tenant").textContent=w.tenant_id||"";
 heartbeat();try{SECTOR=await api("/sector/profile");}catch(e){}nav("dash");}
 async function heartbeat(){const el=document.getElementById("hb");try{await fetch(apiBase()+"/health");el.textContent="· online";el.className="pill up";}catch{el.textContent="· offline";el.className="pill down";}}
-function nav(v){if(v==="sentinel"){window.open(apiBase()+"/Sentinel","_blank");return;}
+function nav(v){
+if(v==="citizen"){window.location.href="/citizen.html";return;}
+if(v==="sentinel"){window.open(apiBase()+"/Sentinel","_blank");return;}
 document.querySelectorAll("#nav .navitem").forEach(n=>n.classList.toggle("active",n.dataset.view===v));
 const m=document.getElementById("main");m.innerHTML='<div class="loading">Loading…</div>';
 ({dash:vDash,systems:vSystems,compliance:vCompliance,audit:vAudit,bias:vBias,sovereignty:vSov,govern:vGovern,decisions:vDecisions,knowledge:vKnowledge,settings:vSettings}[v]||vDash)(m);}
@@ -61,7 +63,8 @@ m.innerHTML='<div class="pgh"><h2>Command Dashboard</h2><span class="desc">mvp-1
 '<div class="panel" style="margin:0"><h3>Quick actions</h3>'+
 '<button class="btn cyan sm" onclick="nav(\'govern\')">Govern · EVA</button> '+
 '<button class="btn sm" onclick="nav(\'bias\')">Bias Monitor</button> '+
-'<button class="btn sm" onclick="nav(\'compliance\')">Compliance</button></div></div>'+honesty();}
+'<button class="btn sm" onclick="nav(\'compliance\')">Compliance</button> '+
+'<button class="btn sm" onclick="nav(\'citizen\')">Citizen Portal</button></div></div>'+honesty();}
 
 async function vSystems(m){await safe(m,async()=>{const rows=asArray(await api("/registry/models"));
 m.innerHTML='<div class="pgh"><h2>AI Registry</h2><span class="desc">mvp-1 · registered systems</span></div><div class="panel"><h3>Registered · '+rows.length+'</h3>'+tableFrom(rows,[
