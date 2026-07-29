@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UDOC — Client · mvp-1/2 parity</title>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#060E1C"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#060E1C;--navy2:#0A1628;--navy3:#0D1A2E;--gold:#C9A84C;--gold-l:#E8C97A;--cyan:#00C2D4;--txt:#F1F5F9;--mut:#94A3B8;--muted:#64748B;--bd:#1A2D4A;--ok:#22C55E;--bad:#EF4444;--warn:#F59E0B}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{background:var(--navy);color:var(--txt);font:13.5px/1.45 Inter,system-ui,sans-serif}
+.mono{font-family:JetBrains Mono,ui-monospace,monospace}.muted{color:var(--muted)}
+#login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(900px 400px at 50% -10%,#0f2748,var(--navy) 55%)}
+.card{width:380px;max-width:92vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:12px;padding:26px}
+.card h1{margin:0;color:var(--gold);letter-spacing:.08em;font-size:24px}.card .sub{font-size:10px;letter-spacing:.18em;color:var(--cyan);margin-top:4px}
+label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px}
+input,select,textarea{width:100%;background:#091022;border:1px solid var(--bd);color:var(--txt);border-radius:8px;padding:10px 12px;font:inherit}
+.btn{cursor:pointer;border:1px solid var(--gold);background:rgba(201,168,76,.14);color:var(--gold-l);font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:8px;padding:10px 14px;font-size:12px}
+.btn.sm{padding:5px 10px;font-size:11px}.btn.cyan{border-color:var(--cyan);color:var(--cyan);background:rgba(0,194,212,.1)}.btn:disabled{opacity:.5}
+.err{color:#fda4a4;font-size:12px;margin-top:8px;min-height:16px}
+#app{display:none;grid-template-columns:220px 1fr;grid-template-rows:50px 1fr;height:100%}
+header{grid-column:1/3;display:flex;align-items:center;gap:12px;padding:0 14px;background:var(--navy2);border-bottom:1px solid var(--bd)}
+header .wm{font-weight:800;letter-spacing:.1em;color:var(--gold)}.tag{font-size:10px;letter-spacing:.12em;color:var(--cyan);border:1px solid var(--bd);padding:3px 8px;border-radius:4px}
+.spacer{flex:1}.who{font-size:12px;color:var(--mut);text-align:right}.who b{color:var(--gold-l)}
+.pill{font-family:JetBrains Mono,monospace;font-size:10px;padding:2px 7px;border-radius:12px;border:1px solid var(--bd)}.pill.up{color:var(--ok)}.pill.down{color:#fda4a4}
+nav{grid-row:2;background:var(--navy);border-right:1px solid var(--bd);padding:10px 0;overflow:auto}
+.sech{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:12px 14px 4px}
+.navitem{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;color:var(--mut);font-size:13px;border-left:2px solid transparent}
+.navitem:hover{background:var(--navy3);color:var(--txt)}.navitem.active{background:linear-gradient(90deg,rgba(201,168,76,.12),transparent);color:var(--gold-l);border-left-color:var(--gold)}
+.navitem .ico{width:16px;text-align:center}
+main{grid-row:2;overflow:auto;padding:18px 20px}
+.pgh{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}.pgh h2{margin:0;font-size:22px}.pgh .desc{color:var(--muted);font-size:12px}
+.grid{display:grid;gap:12px}.kpis{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+.kpi{background:linear-gradient(180deg,var(--navy3),var(--navy2));border:1px solid var(--bd);border-radius:10px;padding:14px}
+.kpi .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.kpi .v{font-size:22px;font-weight:700;color:var(--gold-l);margin-top:4px}
+.kpi .v.cyan{color:var(--cyan)}.kpi .v.green{color:var(--ok)}.kpi .v.amber{color:var(--warn)}.kpi .v.red{color:var(--bad)}
+.panel{background:linear-gradient(180deg,var(--navy3),var(--navy2));border:1px solid var(--bd);border-radius:10px;padding:14px;margin-top:12px}
+.panel h3{margin:0 0 10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th{font-size:10px;text-transform:uppercase;color:var(--muted);text-align:left;padding:7px 8px;border-bottom:1px solid var(--bd)}
+td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+.tag2{display:inline-block;font-family:JetBrains Mono,monospace;font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--bd)}
+.t-ok{color:var(--ok)}.t-warn{color:var(--warn)}.t-bad{color:#fda4a4}.t-info{color:var(--cyan)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}.row .f{flex:1;min-width:110px}.row .f label{margin-top:0}
+.note{background:rgba(0,194,212,.06);border:1px dashed rgba(0,194,212,.3);border-radius:8px;padding:12px;color:var(--mut);font-size:12px;margin-top:12px}
+.dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+.dim{background:#091022;border:1px solid var(--bd);border-radius:8px;padding:8px;text-align:center}.dim .dk{font-size:9px;color:var(--muted)}.dim .dv{font-size:16px;font-weight:700;color:var(--gold-l)}
+.dim .bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:6px;overflow:hidden}.dim .bar i{display:block;height:100%;background:var(--cyan)}
+.verdict-big{font-size:26px;font-weight:800}
+.term{background:#050a12;border:1px solid var(--bd);border-radius:8px;padding:12px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--mut);white-space:pre-wrap;margin-top:10px}
+.scenarios{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{cursor:pointer;font-size:11px;text-transform:uppercase;padding:6px 12px;border-radius:16px;border:1px solid var(--bd);color:var(--mut);background:#091022}
+.chip.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,194,212,.1)}
+.covbar{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-top:6px}.covbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold))}
+.sov-ok{color:var(--ok);font-size:12px;margin:4px 0}.loading{color:var(--muted);padding:10px 0}
+</style></head><body>
+<div id="login"><div class="card">
+<h1>UDOC</h1><div class="sub">CLIENT · MVP-1/2 PARITY</div>
+<p class="muted" style="font-size:12px;margin:12px 0 0">Dashboard · Registry · Compliance · Audit · Bias · Sovereignty · Govern. Existing operator only.</p>
+<label>Email</label><input id="li-email" value="admin@gods.local"/>
+<label>Password</label><input id="li-pass" type="password" value="admin123" onkeydown="if(event.key==='Enter')doLogin()"/>
+<div style="margin-top:14px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
+<div class="err" id="li-err"></div>
+<label>API</label><input id="li-api" class="mono" style="font-size:11px"/>
+</div></div>
+<div id="app">
+<header>
+<span class="wm">UDOC</span><span class="tag" id="org-tag">CLIENT</span><span class="pill" id="hb">· …</span>
+<span class="spacer"></span>
+<div class="who"><b id="who-email">—</b><br><span class="mono" style="font-size:10px" id="who-tenant"></span></div>
+<button class="btn sm" onclick="logout()">Sign out</button>
+</header>
+<nav id="nav">
+<div class="sech">Platform · mvp-1/2</div>
+<div class="navitem active" data-view="dash"><span class="ico">◈</span> Dashboard</div>
+<div class="navitem" data-view="systems"><span class="ico">◉</span> AI Registry</div>
+<div class="navitem" data-view="compliance"><span class="ico">✓</span> Compliance</div>
+<div class="navitem" data-view="audit"><span class="ico">🔐</span> Audit Trail</div>
+<div class="navitem" data-view="bias"><span class="ico">⊘</span> Bias Monitor</div>
+<div class="navitem" data-view="sovereignty"><span class="ico">🛡</span> Sovereignty</div>
+<div class="sech">Govern</div>
+<div class="navitem" data-view="govern"><span class="ico">⬡</span> Govern · EVA</div>
+<div class="navitem" data-view="decisions"><span class="ico">⚡</span> Decisions</div>
+<div class="sech">Private</div>
+<div class="navitem" data-view="knowledge"><span class="ico">◈</span> Company Knowledge</div>
+<div class="navitem" data-view="settings"><span class="ico">⚙</span> Plan &amp; API Keys</div>
+<div class="navitem" data-view="sentinel"><span class="ico">◎</span> Sentinel runtime</div>
+</nav>
+<main id="main"><div class="loading">Loading…</div></main>
+</div>
+<script src="/app-client.js"></script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});}</script>
+</body></html>
