@@ -32,7 +32,7 @@
   .btn:hover{background:rgba(201,168,76,.22)}.btn:disabled{opacity:.5;cursor:not-allowed}
   .btn.cyan{border-color:var(--cyan);color:var(--cyan-b);background:rgba(0,194,212,.1)}
   .err{color:#fda4a4;font-size:12.5px;margin-top:10px;min-height:16px}
-  .surfaces{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:18px}
+  .surfaces{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:18px}
   .surf{text-align:center;border:1px solid var(--bd2);border-radius:9px;padding:8px 4px;font-family:var(--fc);letter-spacing:.05em;font-size:10px;color:var(--muted)}
   .surf b{display:block;color:var(--txt2);font-size:11.5px;letter-spacing:.04em}
   .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);justify-content:center;margin-top:16px}.apibar input{width:240px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
@@ -50,7 +50,7 @@
     <div id="signin">
       <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
         <div><h1>G.O.D.S</h1><div class="sub">UDOC SOVEREIGN SIGN-ON</div></div></div>
-      <p class="intro">One sign-on for the existing UDOC surfaces. Admin is GODS UDOC (udoc-internal). Client hosts governance console and the <b>Citizen Portal</b> route. No extra fabricated environments.</p>
+      <p class="intro">One sign-on for existing UDOC surfaces. Admin = GODS UDOC (udoc-internal). Client hosts governance + <b>Citizen</b>. Portals = client SaaS role/sector access. No fabricated environments.</p>
       <label>Email</label><input id="li-email" type="email" placeholder="you@org"/>
       <label>Password</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
       <div style="margin-top:18px"><button class="btn" id="li-btn" onclick="doLogin()">Sign in</button></div>
@@ -58,14 +58,18 @@
       <div class="surfaces">
         <div class="surf"><b>Admin</b>GODS UDOC</div>
         <div class="surf"><b>Client</b>governance</div>
+        <div class="surf"><b>Portals</b>SaaS roles</div>
         <div class="surf"><b>Sector</b>public/private</div>
         <div class="surf"><b>Operator</b>workspace</div>
+        <div class="surf"><b>Sentinel</b>EVA runtime</div>
       </div>
       <div class="links">
-        <a href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener">Citizen Portal (AI Rights) →</a>
+        <a href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener">Citizen Portal →</a>
+        <a href="https://gods-udoc-portals.onrender.com/" target="_blank" rel="noopener">Client SaaS Portals →</a>
+        <a href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noopener">Sentinel EVA →</a>
       </div>
       <div class="apibar"><span>API</span><input id="li-api" class="mono"/></div>
-      <div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33.</div>
+      <div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33. Neon ≤500MB.</div>
       <div class="classbar">© G.O.D.S HOLDINGS (PTY) LTD · UDOC™</div>
     </div>
     <div id="route">
