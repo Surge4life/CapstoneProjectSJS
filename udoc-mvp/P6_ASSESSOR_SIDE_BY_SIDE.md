@@ -1,7 +1,8 @@
 # P6 — Assessor side-by-side (demo vs live)
 
 **Demo SoT:** https://capstoneprojectsjs.netlify.app/#demo=<slug>  
-**Live SoT:** Render services below · Core Neon ≤500MB · no new registration required
+**Live SoT:** Render services below · Core Neon ≤500MB · no new registration required  
+**Smoke checklist:** `UDOC_SMOKE_PASS.md`
 
 ## Minimum pass rule
 Each live surface must return **≥4 live function results** (API-backed, not mock) matching the demo interaction pattern.
@@ -12,7 +13,7 @@ Each live surface must return **≥4 live function results** (API-backed, not mo
 | Demo feature | Live URL | Verify |
 |---|---|---|
 | Command Centre KPIs | `/Sentinel` | DEMO READY + outcome counts |
-| Live Evaluation chips | Live Evaluation tab | Fair ≠ BLOCK · **Biased = BLOCK** (auto-run) |
+| Live Evaluation chips | Live Evaluation | Fair ≠ BLOCK · **Biased = BLOCK** (auto-run) |
 | 6-D bars + certificate | after Evaluate | dimensions + cert id |
 | Smoke Pass | top-bar Smoke | health · demo/ready · policy · fair · biased |
 | Run Full EVA | EVA Command | batch table ≥1 row |
@@ -21,13 +22,13 @@ Each live surface must return **≥4 live function results** (API-backed, not mo
 ### 2. Client · `#demo=udoc-mvp-1` / `mvp-2`
 | Demo feature | Live | Verify |
 |---|---|---|
-| Dashboard KPIs | Client host | APPROVE/BLOCK/ESCALATE + seed banner |
+| Dashboard KPIs + mini-smoke | Client host | **Run client smoke** 4/4 |
 | AI Registry | AI Registry | model-001 listed |
-| Compliance frameworks + sweep | Compliance | sweep button returns |
+| Compliance + sweep | Compliance | sweep returns |
 | Bias Monitor + scan | Bias | scan returns counts |
 | Govern scenario chips | Govern | Biased → BLOCK + terminal |
-| Sovereignty | Sovereignty | ZA jurisdiction |
-| Citizen entry | login link + nav | `/citizen.html` no login |
+| Cert verify + Evidence | after EVA | VALID / evidence JSON |
+| Citizen entry | login + nav | `/citizen.html` no login |
 
 ### 3. Citizen · `#demo=udoc-v7-platform` screen-citizen
 | Demo feature | Live | Verify |
@@ -36,24 +37,40 @@ Each live surface must return **≥4 live function results** (API-backed, not mo
 | Challenge a Decision | Challenge | case_ref from Core |
 | Check My Case | Status | timeline from Neon |
 | Know Your Rights | Rights | 6 rights cards |
-| Core health pill | top bar | citizen live / core online |
+| Core health pill | top bar | citizen live / online |
 
 ### 4. Admin · `#demo=udoc-v7-platform`
 | Demo feature | Live | Verify |
 |---|---|---|
-| Command Centre label + boot | `/udoc-admin` (hard-refresh ×2) | DEMO READY banner |
-| EVA Command chips | Decisions / EVA | Fair / Biased terminal output |
+| Command Centre + boot | Admin host (hard-refresh ×2) | DEMO READY banner |
+| EVA Command chips | Decisions / EVA | Fair / Biased terminal |
 | HITL Queue label | Oversight | relabelled |
-| Infra: Sentinel / Health / Jobs / Portals / Citizen | nav footer | links open |
+| Infra links | nav footer | Sentinel / Health / Jobs / Portals / Citizen |
+
+### 5. Sector · Public/Private console
+| Demo feature | Live | Verify |
+|---|---|---|
+| Overview DEMO READY | Sector host | seed banner |
+| Frameworks list | Frameworks | ≥1 instrument |
+| EVA scenario chips | Decisions · EVA | Biased → BLOCK |
+| Switch PUBLIC/PRIVATE | Switch sector | profile reload |
+
+### 6. Portals SaaS (optional depth)
+| Feature | Live | Verify |
+|---|---|---|
+| Role + sector filters | Portals host | visible portal count |
+| Open portal controls | drawer | control list |
+| Run control | POST | toast ref |
+| Citizen link | login card | opens citizen |
 
 ---
 
 ## Fail conditions (honest)
 - Simulated scores instead of live `/decisions`
 - Biased scenario does not BLOCK
-- New Render service added beyond quota
+- New Render service beyond existing blueprint
 - New user registration required for smoke path
 - SPA swallows `/citizen.html`
 
 ## Task 2 close criteria
-All four surfaces pass the table above under hard-refresh. Then Task 1 (docs/ Engineering Canon volume commits) may start.
+Surfaces **1–5** pass under hard-refresh. Then Task 1 (docs/ Engineering Canon volume commits) may start.
