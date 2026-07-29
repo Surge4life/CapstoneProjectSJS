@@ -44,6 +44,10 @@ def _startup():
     except Exception as e:
         print(f"[startup] bootstrap-admin skipped: {e}")
     try:
+        _ensure_udoc_demo_seed()
+    except Exception as e:
+        print(f"[startup] udoc demo seed skipped: {e}")
+    try:
         from app.services.conformance_scanner import start_scheduler
         start_scheduler()
     except Exception as e:
@@ -103,6 +107,83 @@ def _ensure_bootstrap_admin():
             db.add(User(email=email, password_hash=hash_password(pw), role="admin", division="GODS"))
             db.commit()
             print(f"[bootstrap] empty database detected — created bootstrap admin '{email}'.")
+    finally:
+        db.close()
+
+
+def _ensure_udoc_demo_seed():
+    """Neon-light UDOC showcase seed: model-001 + one ACTIVE platform policy pack.
+    No new human users. Idempotent. Keeps Sentinel / demo scenarios operational without file uploads."""
+    from datetime import datetime, timezone
+    from sqlalchemy import select
+    from app.db.session import SessionLocal
+    from app.db.models import AIModel, PolicyPack, PolicyRule
+    from app.services import policy_engine as pe
+
+    db = SessionLocal()
+    try:
+        if not db.execute(select(AIModel).where(AIModel.model_id == "model-001")).scalar_one_or_none():
+            db.add(AIModel(
+                model_id="model-001", name="UDOC Showcase Model",
+                operator_id="platform", risk_tier="NOTABLE",
+                use_case="capstone eva demonstration", jurisdiction="ZA", status="ACTIVE",
+            ))
+            db.commit()
+            print("[bootstrap] seeded AIModel model-001")
+
+        pack = db.execute(
+            select(PolicyPack).where(PolicyPack.name == "UDOC Demo · POPIA + Fairness")
+        ).scalar_one_or_none()
+        if not pack:
+            pack = PolicyPack(
+                name="UDOC Demo · POPIA + Fairness",
+                source_filename="seed://udoc-demo-pack",
+                jurisdiction="ZA", sector="GENERAL", tenant_pk=None,
+                status="ACTIVE", uploaded_by="system",
+                sha256="seed-udoc-demo", summary="Minimal showcase pack: fairness, HITL, sovereignty, localisation.",
+                rule_count=5, current_version=1,
+                activated_at=datetime.now(timezone.utc),
+            )
+            db.add(pack); db.commit(); db.refresh(pack)
+            rules = [
+                dict(code="PR-001", kind="MAX_DISPARATE_IMPACT", target="fairness bias",
+                     operator=">=", threshold=0.8, severity="BLOCK",
+                     description="Non-discrimination — disparate-impact floor (EVA whitepaper).",
+                     source_excerpt="Seed: systems must not produce unlawful discrimination against protected groups.",
+                     confidence=0.95, enabled=True),
+                dict(code="PR-002", kind="REQUIRE_HITL", target="human oversight",
+                     operator=">=", threshold=None, severity="REVIEW",
+                     description="High-risk systems require human-in-the-loop review.",
+                     source_excerpt="Seed: high-risk AI decisions shall be subject to meaningful human oversight.",
+                     confidence=0.9, enabled=True),
+                dict(code="PR-003", kind="MIN_SOVEREIGNTY", target="sovereignty jurisdiction",
+                     operator=">=", threshold=1.0, severity="BLOCK",
+                     description="Sovereignty signals must be clean (Pillar III).",
+                     source_excerpt="Seed: decisioning must execute under in-jurisdiction sovereignty signals.",
+                     confidence=0.9, enabled=True),
+                dict(code="PR-004", kind="DATA_LOCALISATION", target="popia localisation",
+                     operator=">=", threshold=1.0, severity="REVIEW",
+                     description="Data localisation / POPIA cross-border posture.",
+                     source_excerpt="Seed: personal information processed subject to localisation and POPIA s72.",
+                     confidence=0.85, enabled=True),
+                dict(code="PR-005", kind="RISK_TIER_CAP", target="high risk",
+                     operator=">=", threshold=0.8, severity="REVIEW",
+                     description="High-risk tier requires conformity review before approval.",
+                     source_excerpt="Seed: high-risk systems require conformity assessment prior to approval.",
+                     confidence=0.88, enabled=True),
+            ]
+            for r in rules:
+                db.add(PolicyRule(pack_id=pack.id, **r))
+            pack.rule_count = len(rules)
+            db.commit()
+            pe.invalidate()
+            print(f"[bootstrap] seeded ACTIVE policy pack id={pack.id} rules={len(rules)}")
+        elif pack.status != "ACTIVE":
+            pack.status = "ACTIVE"
+            pack.activated_at = datetime.now(timezone.utc)
+            db.commit()
+            pe.invalidate()
+            print(f"[bootstrap] re-activated demo policy pack id={pack.id}")
     finally:
         db.close()
 
