@@ -61,6 +61,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .timeline{list-style:none;padding:0;margin:0}.timeline li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
 .dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
 .dot.done{border-color:var(--green);color:var(--green)}.dot.active{border-color:var(--amber);color:var(--amber)}
+.syslinks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.syslinks a,.syslinks button{font-size:12px}
 </style>
 </head>
 <body>
@@ -84,7 +86,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <button class="green" type="button" onclick="openCitizen()">Citizen (no login)</button>
       <span id="who" style="color:var(--mut)"></span>
     </div>
-    <p style="color:var(--mut);font-size:13px">Catalog = 24 operator portals with <b>real control forms</b>. <b>Citizen</b> is a full public interface (challenge / status / rights) on this same surface — not a heading-only route.</p>
+    <p style="color:var(--mut);font-size:13px">24 operator portals = control forms + terminal. Backend profile <b>CITIZEN</b> opens the full AI-Rights interface (same as public /citizen/*) — not a heading list.</p>
   </div>
 
   <div id="catalog" style="display:none">
@@ -107,10 +109,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <button class="ghost" type="button" id="btn-run4" onclick="runFour()">Run 4 controls</button>
     </div>
     <p id="c-desc" style="color:var(--mut);font-size:13px"></p>
+    <div class="syslinks" id="c-sys"></div>
     <div class="kpis" id="c-kpis"></div>
     <div class="side">
       <div>
-        <h4 style="color:var(--gold);margin:0 0 10px">Control forms</h4>
+        <h4 style="color:var(--gold);margin:0 0 10px">Control workspace</h4>
         <div class="ctrl-grid" id="c-controls"></div>
       </div>
       <div>
@@ -122,7 +125,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
     </div>
   </div>
 
-  <!-- Full Citizen interface (not a heading) -->
   <div id="citizen-ui" style="display:none">
     <div class="bar">
       <button class="ghost" type="button" onclick="backFromCitizen()">← Back</button>
@@ -130,7 +132,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <span class="tag" id="cit-pill">core · …</span>
       <a href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener">Open on Client host →</a>
     </div>
-    <div class="banner">YOUR RIGHTS UNDER SOUTH AFRICAN LAW — If an AI system made a decision about you (grant, job, tax, ID), you may request an explanation, challenge the decision, and ask for human review. POPIA + Constitution ss 9/16/33.</div>
+    <div class="banner">YOUR RIGHTS UNDER SOUTH AFRICAN LAW — Challenge automated decisions, request explanations, and track cases on Core + Neon. POPIA + Constitution ss 9/16/33.</div>
     <div class="tabs" id="cit-tabs">
       <button type="button" class="on" data-t="home" onclick="citTab(this,'home')">Home</button>
       <button type="button" data-t="challenge" onclick="citTab(this,'challenge')">Challenge</button>
@@ -200,10 +202,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
     </div>
   </div>
 
-  <div class="note"><b>/admin</b> GODS constitutional · <b>/udoc-admin</b> UDOC controller · <b>/portals</b> 24-operator select + control forms · <b>Citizen</b> full UI on this page + Client host <code>/citizen.html</code>.</div>
+  <div class="note"><b>CITIZEN</b> backend profile → full AI-Rights UI. Other 23 portals → control workspace (Target/Note/Execute + terminal). Client host still serves standalone <code>/citizen.html</code>.</div>
 </div>
 <script>
-let API="", TOK="", CATALOG=[], ACTIVE=null, MAY=false, LAST_KEY="", FROM="login";
+let API="", TOK="", CATALOG=[], ACTIVE=null, MAY=false, LAST_KEY="";
 const $=id=>document.getElementById(id);
 const esc=s=>{const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;};
 function term(line){
@@ -252,14 +254,18 @@ function renderCards(g){
   const q=(($("q")&&$("q").value)||"").toLowerCase().trim();
   let list=g==="ALL"?CATALOG:CATALOG.filter(p=>p.group===g);
   if(q) list=list.filter(p=>(p.title+" "+p.key+" "+(p.desc||"")).toLowerCase().includes(q));
-  $("count").textContent=list.length+" portals + Citizen UI";
-  const citizenCard='<div class="card citizen" onclick="openCitizen()"><div class="g">PUBLIC · AI RIGHTS</div><h4>Citizen Portal</h4><p>Full interface: Challenge · Case status · Explanation · Rights · Help. Public /citizen/* APIs — not a heading-only route.</p><span class="pill" style="color:var(--green);border-color:rgba(16,185,129,.4)">Challenge</span><span class="pill" style="color:var(--green);border-color:rgba(16,185,129,.4)">Status</span><span class="pill" style="color:var(--green);border-color:rgba(16,185,129,.4)">Rights</span><span class="pill" style="color:var(--green);border-color:rgba(16,185,129,.4)">Explain</span></div>';
-  $("cards").innerHTML=citizenCard+list.map(p=>{
+  $("count").textContent=list.length+" portals";
+  $("cards").innerHTML=list.map(p=>{
+    const isCit=(p.key||"").toUpperCase()==="CITIZEN";
     const caps=(p.capabilities||[]).slice(0,4).map(c=>'<span class="pill">'+esc(c)+'</span>').join("");
+    if(isCit){
+      return '<div class="card citizen" onclick="openCitizen()"><div class="g">PUBLIC · AI RIGHTS · backend key CITIZEN</div><h4>'+esc(p.title)+'</h4><p>Full interface — Challenge · Status · Explanation · Rights · Help (not control headings).</p>'+caps+'</div>';
+    }
     return '<div class="card" onclick="openPortal(\''+esc(p.key)+'\')"><div class="g">'+esc(p.group)+' · '+esc(p.base_role)+'</div><h4>'+esc(p.title)+'</h4><p>'+esc((p.desc||"").slice(0,160))+'</p>'+caps+'</div>';
-  }).join("");
+  }).join("")||'<div class="card">No match.</div>';
 }
 async function openPortal(key){
+  if((key||"").toUpperCase()==="CITIZEN"){ openCitizen(); return; }
   LAST_KEY=key;
   const d=await api("/portal/"+encodeURIComponent(key));
   ACTIVE=d.portal; MAY=!!d.may_operate;
@@ -274,6 +280,12 @@ async function openPortal(key){
   const ctrls=ACTIVE.controls||[];
   const syss=ACTIVE.systems||[];
   const act=d.activity||[];
+  const sysHtml=syss.length
+    ? syss.slice(0,8).map(s=>'<span class="tag">'+esc(s)+'</span>').join("")
+    : '<span class="tag">no linked systems</span>';
+  $("c-sys").innerHTML='<span style="color:var(--mut);font-size:12px">Linked systems · </span>'+sysHtml+
+    ' <button class="cyan" type="button" onclick="window.open(apiBase()+\'/Sentinel\',\'_blank\')">Sentinel EVA</button>'+
+    ' <button class="green" type="button" onclick="openCitizen()">Citizen UI</button>';
   $("c-kpis").innerHTML=
     '<div class="kpi"><div class="k">Controls</div><div class="v">'+ctrls.length+'</div></div>'+
     '<div class="kpi"><div class="k">Activity</div><div class="v">'+act.length+'</div></div>'+
@@ -281,15 +293,15 @@ async function openPortal(key){
     '<div class="kpi"><div class="k">Systems</div><div class="v" style="font-size:14px">'+(syss.length||"—")+'</div></div>';
   $("c-controls").innerHTML=ctrls.map((c,i)=>{
     const id="tg_"+i;
-    return '<div class="ctrl"><b>'+esc(c.name)+'</b><div class="d">'+esc(c.desc||c.op_type||"")+'</div>'+
+    return '<div class="ctrl"><b>'+esc(c.name)+'</b><div class="d">'+esc(c.desc||c.op_type||"")+' · <span style="color:var(--cyan)">'+esc(c.op_type||"")+'</span></div>'+
       (MAY?('<div class="row">'+
         '<div style="flex:1;min-width:100px"><label>Target</label><input id="'+id+'_t" placeholder="optional target"/></div>'+
         '<div style="flex:1;min-width:100px"><label>Note</label><input id="'+id+'_n" placeholder="operator note"/></div>'+
-        '<button type="button" onclick="runControl(\''+esc(ACTIVE.key)+'\',\''+esc(c.name).replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\','+i+')">Execute</button></div>'):'<span class="err">Requires role: '+esc(ACTIVE.base_role)+'</span>')+
+        '<button type="button" onclick="runControl(\''+esc(ACTIVE.key)+'\',\''+esc(c.name).replace(/\\/g,"\\\\").replace(/\'/g,"\\\'")+'\','+i+')">Execute</button></div>'):'<span class="err">Requires role: '+esc(ACTIVE.base_role)+'</span>')+
       '</div>';
-  }).join("")||'<div class="ctrl"><b>No controls defined</b><div class="d">Backend profile has no control forms for this portal yet.</div></div>';
+  }).join("")||'<div class="ctrl"><b>No controls defined</b></div>';
   $("c-act").innerHTML=act.length?act.map(a=>'<div class="act">'+esc((a.at||"").slice(0,19))+' · <b>'+esc(a.control)+'</b> · '+esc(a.ref)+'</div>').join(""):'<div class="act">No activity yet.</div>';
-  term("Opened "+ACTIVE.key+" · "+(MAY?"operate":"view")+" · "+ctrls.length+" control forms");
+  term("Opened "+ACTIVE.key+" · "+(MAY?"operate":"view")+" · "+ctrls.length+" controls");
 }
 function refreshPortal(){ if(LAST_KEY) openPortal(LAST_KEY); }
 async function runControl(key, control, idx){
@@ -325,14 +337,9 @@ async function runFour(){
 function backCatalog(){
   $("controller").style.display="none";
   $("citizen-ui").style.display="none";
-  if(TOK){ $("catalog").style.display="block"; }
-  else { $("catalog").style.display="none"; }
+  if(TOK) $("catalog").style.display="block";
 }
-
-/* —— Citizen full UI (public /citizen/*) —— */
 function openCitizen(){
-  FROM = $("catalog").style.display!=="none" ? "catalog" : (TOK?"catalog":"login");
-  $("login").style.display="block";
   $("catalog").style.display="none";
   $("controller").style.display="none";
   $("citizen-ui").style.display="block";
@@ -350,7 +357,7 @@ function openCitizen(){
 }
 function backFromCitizen(){
   $("citizen-ui").style.display="none";
-  if(TOK){ $("catalog").style.display="block"; }
+  if(TOK) $("catalog").style.display="block";
 }
 function citTab(el, name){
   ["home","challenge","status","explain","rights","help"].forEach(n=>{
@@ -404,7 +411,7 @@ function getExplanation(){
   const ref=(($("ex-ref").value)||"").trim();
   const out=$("ex-out");
   if(!ref){ out.textContent="Enter a reference."; return; }
-  out.innerHTML='<div class="banner" style="margin:0"><strong>Plain-language note for '+esc(ref)+'</strong><br><br>Under Constitution s33 you may request reasons for administrative action. If this outcome harmed you, use Challenge and keep this reference. Operator review happens through oversight on Core.</div>';
+  out.innerHTML='<div class="banner" style="margin:0"><strong>Plain-language note for '+esc(ref)+'</strong><br><br>Under Constitution s33 you may request reasons for administrative action. If this outcome harmed you, use Challenge and keep this reference.</div>';
 }
 </script>
 </body>
