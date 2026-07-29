@@ -1,5 +1,5 @@
 /* G.O.D.S UDOC PWA service worker — installable + injects admin-v7-enhance.js into shell */
-const CACHE = 'gods-udoc-pwa-v2';
+const CACHE = 'gods-udoc-pwa-v3';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/admin-v7-enhance.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
