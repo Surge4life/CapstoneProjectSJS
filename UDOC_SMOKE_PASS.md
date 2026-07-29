@@ -2,7 +2,8 @@
 
 **Purpose:** Verify the live UDOC division is operational on Render + Neon without fabricating scale.  
 **Constraint:** Neon free ≤500MB · no new human user registration required · prefer seeded `model-001`.  
-**Date track:** 2026-07-29 · Task 2 client SaaS runtime path
+**Date track:** 2026-07-29 · Task 2 client SaaS runtime path  
+**Side-by-side matrix:** `udoc-mvp/P6_ASSESSOR_SIDE_BY_SIDE.md`
 
 ---
 
@@ -12,12 +13,14 @@
 |---------|-----|
 | Platform Core | `https://gods-platform-core.onrender.com` |
 | Sentinel (EVA + policy runtime) | `https://gods-platform-core.onrender.com/Sentinel` |
-| Client console | `gods-udoc-client` host (`udoc-public`) |
-| Citizen (public) | client host `/citizen.html` |
-| Admin (internal UDOC) | `https://gods-platform-core.onrender.com/udoc-admin` |
+| Client console | `https://gods-udoc-client.onrender.com` |
+| Citizen (public) | `https://gods-udoc-client.onrender.com/citizen.html` |
+| Client SaaS portals | `https://gods-udoc-portals.onrender.com` |
+| Admin (internal UDOC) | `https://gods-udoc-admin.onrender.com` |
 | GODS constitutional admin | `https://gods-platform-core.onrender.com/admin` |
+| Gateway | `https://gods-udoc-gateway.onrender.com` |
 
-Use **existing** operator credentials only (bootstrap / platform admin). Do not create assessor user accounts on the free Neon instance.
+Use **existing** operator credentials only. Do not create assessor user accounts on free Neon.
 
 ---
 
@@ -26,22 +29,18 @@ Use **existing** operator credentials only (bootstrap / platform admin). Do not 
 | # | Check | Pass |
 |---|--------|------|
 | A1 | `GET /health` | 200 |
-| A2 | `GET /version` | JSON with service/commit |
-| A3 | `GET /` surfaces list includes `sentinel` | present |
+| A2 | `GET /citizen/health` | `surface: citizen` |
+| A3 | `GET /udoc/demo/ready` (may need auth) | seed status |
 
 ---
 
 ## B · Demo seed readiness (authenticated)
 
-Sign in on Sentinel or Client with existing operator.
-
 | # | Check | Pass |
 |---|--------|------|
-| B1 | `GET /udoc/demo/ready` → `ready: true` | model-001 + ACTIVE demo policy pack |
+| B1 | `GET /udoc/demo/ready` → `ready: true` | model-001 + ACTIVE pack |
 | B2 | `GET /policy/active` → `enforced_rules > 0` | demo pack live |
 | B3 | `GET /registry/models` includes `model-001` | seeded |
-
-If B1 fails: wait for Core redeploy after startup seed commit, or confirm Neon connectivity. **Fail-closed** is correct when the model is absent.
 
 ---
 
@@ -57,53 +56,64 @@ On `/Sentinel` → header **Smoke**.
 | C4 | EVA fair on `model-001` | decision ≠ BLOCK |
 | C5 | EVA biased | decision = **BLOCK** |
 
-All five green = **runtime smoke-pass**.
+---
+
+## C2 · Client dashboard mini-smoke
+
+On Client → Dashboard → **Run client smoke**.
+
+| # | Step | Pass |
+|---|------|------|
+| C2.1 | `/health` | PASS |
+| C2.2 | `/udoc/demo/ready` | PASS |
+| C2.3 | EVA fair | ≠ BLOCK |
+| C2.4 | EVA biased | = **BLOCK** |
 
 ---
 
-## D · Client Govern scenarios (`udoc-public`)
+## D · Client Govern scenarios
 
 | # | Chip | Expected |
 |---|------|----------|
-| D1 | Fair | Non-BLOCK path; composite EVA shown |
-| D2 | Biased → BLOCK | BLOCK + reasons and/or policy findings |
-| D3 | High-risk | `risk_tier: HIGH` applied; REVIEW/ESCALATE/BLOCK not pure silent APPROVE |
-| D4 | Sovereignty | Sovereignty / block path from degraded signals |
-| D5 | Certificate verify (if issued) | VALID on verify control |
-
-Dashboard should show **demo boot posture READY** when B1 is true.
+| D1 | Fair | Non-BLOCK; composite EVA |
+| D2 | Biased → BLOCK | **BLOCK** + terminal |
+| D3 | High-risk | risk path not silent APPROVE |
+| D4 | Sovereignty | degraded signals path |
+| D5 | Client smoke 4/4 | same asserts as C2 |
 
 ---
 
-## E · Evidence / replay (optional depth)
+## E · Citizen (public, no login)
 
 | # | Check | Pass |
 |---|--------|------|
-| E1 | Decision row → Evidence | sealed bundle JSON |
-| E2 | Replay | REPRODUCIBLE or explicit DRIFT |
-| E3 | 12 Pillars tab | ENFORCED counts present |
+| E1 | Open `/citizen.html` | rights banner |
+| E2 | Submit challenge | `case_ref` from Core |
+| E3 | Check case status | timeline from Neon |
+| E4 | Core pill | citizen live / online |
 
 ---
 
-## F · What is *not* required for this pass
+## F · Admin (hard-refresh ×2 for SW v3)
 
-- New human user registration or multi-tenant commercial onboarding  
-- File uploads into GIS corpus (text path only under DB limits)  
+| # | Check | Pass |
+|---|--------|------|
+| F1 | Command Centre DEMO READY banner | after login |
+| F2 | EVA Command chips → terminal | Biased BLOCK |
+| F3 | Infra links | Sentinel / Health / Jobs / Portals / Citizen |
+
+---
+
+## G · What is *not* required
+
+- New human user registration  
+- File uploads into GIS corpus  
 - GODS GBS / SETHS / MADIBA / TS full product depth  
-- New Render services beyond the existing blueprint  
-
----
-
-## Honesty labels (must remain visible)
-
-- Pre-registration entity posture  
-- GG54477 withdrawn 26 Apr 2026  
-- Standing basis: POPIA s71 + Constitution ss 9/16/33  
-- Neon capacity / open-source upgrade path stated on Sentinel and Client footers  
+- New Render services beyond existing blueprint  
 
 ---
 
 ## Pass statement
 
-**UDOC division smoke-pass** when A + B + C are green and D2 (biased BLOCK) is observed on Client or Sentinel.  
-That is the minimum credible live demonstration for assessor grading of the UDOC showcase path.
+**UDOC division smoke-pass** when A + B + (C or C2) are green and D2 (biased BLOCK) is observed.  
+Full Task 2 close: walk `P6_ASSESSOR_SIDE_BY_SIDE.md` all four surfaces.
