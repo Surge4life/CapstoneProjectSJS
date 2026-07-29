@@ -10,21 +10,28 @@
 | Phase | Focus | Status | Commit(s) |
 |-------|--------|--------|-----------|
 | **P0** | Honest reset + inventory | Done | `1f45982`, `bea3ef1` |
-| **P1** | `udoc-v7-eva` → Sentinel Command shell | Done (density) | `931d929` |
-| **P2** | `mvp-1` / `mvp-2` → client nav + views | Done (nav + live APIs) | `4be3a84`, `1335729` |
-| **P3** | `udoc-v7-platform` → udoc-internal | **In progress** | `86a53ba` (`admin-v7-enhance.js`) |
+| **P1** | `udoc-v7-eva` → Sentinel Command shell | Done | `931d929` |
+| **P2** | `mvp-1` / `mvp-2` → client nav + views | Done | `4be3a84`, `1335729` |
+| **P3** | `udoc-v7-platform` → udoc-internal | **Wired** | `36325f7`, `b40ad85` |
 | **P4** | platform-ui + sovereign-console merge | Pending | — |
-| **P5** | Citizen + roles on existing hosts | Partial (citizen.html) | — |
+| **P5** | Citizen + roles on existing hosts | Partial | — |
 | **P6** | Assessor side-by-side vs demos | Pending | — |
 
-## P3 notes
-- `udoc-internal/admin-v7-enhance.js` relabels nav to v7 Command Centre language, injects Infrastructure links (Sentinel, API Health, Jobs, 24 Portals), wraps Overview with `/udoc/demo/ready` boot banner, fixes `esc`.
-- **Wire:** `udoc-internal/index.html` must load `<script src="/admin-v7-enhance.js"></script>` before the service-worker block (next CONTINUE if not yet on live host).
+## P3 delivery
+- `udoc-internal/admin-v7-enhance.js` — v7 nav labels, Command Centre boot banner, Fair/Biased/High-risk/Sovereignty chips on EVA Command, HITL title parity, fixed `esc`, Infrastructure links (Sentinel / API Health / Jobs / 24 Portals)
+- `udoc-internal/sw.js` (cache **v2**) — injects `<script src="/admin-v7-enhance.js">` into HTML navigations
 
-## Pass criteria (unchanged)
+### Verify (admin host)
+1. Hard-refresh udoc-admin twice (so SW v2 activates)
+2. Overview → **Command Centre** + DEMO READY banner
+3. EVA Command → scenario chips → Biased **BLOCK**
+4. HITL Queue label + cases table
+5. Infra links open Sentinel / api-health / jobs / portals
+
+## Pass criteria
 1. Nav/tabs match mapped demo  
 2. ≥4 primary controls return live API results (or fail-closed)  
 3. Vol IX tokens  
 4. Existing Render hosts only · Neon ≤500MB  
 
-**Task 1** (full Canon / GODS ecosystem) starts only after Task 2 pass.
+**Task 1** only after Task 2 pass.
