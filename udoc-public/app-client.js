@@ -43,6 +43,22 @@ return'<div class="dims">'+keys.map(k=>{const v=Number(dims[k]);const pct=isNaN(
 return'<div class="dim"><div class="dk">'+esc(k)+'</div><div class="dv">'+(isNaN(v)?"—":(v<=1?v.toFixed(2):v))+'</div><div class="bar"><i style="width:'+pct+'%"></i></div></div>';}).join('')+'</div>';}
 function honesty(){return'<div class="note">Pre-registration · GG54477 withdrawn · POPIA s71 + Constitution · Neon ≤500MB · Netlify mvp-1/mvp-2 acceptance path.</div>';}
 
+async function clientSmoke(){
+  const host=document.getElementById("client-smoke-out"); if(!host) return;
+  host.innerHTML="Running 4 live checks…";
+  const steps=[]; const t0=Date.now();
+  async function step(name,fn){try{const d=await fn();steps.push({name,ok:true,d});}catch(e){steps.push({name,ok:false,d:String(e.message||e)});}}
+  await step("/health",async()=>{const r=await fetch(apiBase()+"/health");if(!r.ok)throw new Error("HTTP "+r.status);return await r.json().catch(()=>({}));});
+  await step("/udoc/demo/ready",async()=>{const d=await api("/udoc/demo/ready");if(!d.ready)throw new Error((d.missing||[]).join("; ")||"not ready");return d;});
+  await step("EVA fair",async()=>{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.92,compliance:1.0})});if(d.decision==="BLOCK")throw new Error("fair BLOCK");return {decision:d.decision};});
+  await step("EVA biased BLOCK",async()=>{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.9,compliance:1.0,priv_favorable:900,priv_total:1000,unpriv_favorable:120,unpriv_total:1000})});if(d.decision!=="BLOCK")throw new Error("got "+d.decision);return {decision:d.decision};});
+  const ok=steps.filter(s=>s.ok).length;
+  host.innerHTML='<div class="grid kpis" style="margin-top:8px"><div class="kpi"><div class="k">Passed</div><div class="v '+(ok===4?'green':'red')+'">'+ok+'/4</div></div><div class="kpi"><div class="k">ms</div><div class="v">'+(Date.now()-t0)+'</div></div></div>'+
+    '<table style="margin-top:8px"><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>'+
+    steps.map(s=>'<tr><td>'+esc(s.name)+'</td><td class="'+(s.ok?'t-ok':'t-bad')+'">'+(s.ok?'PASS':'FAIL')+'</td><td class="mono" style="font-size:11px">'+esc(typeof s.d==='object'?JSON.stringify(s.d).slice(0,80):String(s.d).slice(0,80))+'</td></tr>').join('')+
+    '</tbody></table>';
+}
+
 async function vDash(m){let sys=[],dec=[],ready=null,ex={},certs=[],sum={};
 try{sys=asArray(await api("/registry/models"));}catch(e){}
 try{dec=asArray(await api("/decisions"));}catch(e){}
@@ -64,7 +80,11 @@ m.innerHTML='<div class="pgh"><h2>Command Dashboard</h2><span class="desc">mvp-1
 '<button class="btn cyan sm" onclick="nav(\'govern\')">Govern · EVA</button> '+
 '<button class="btn sm" onclick="nav(\'bias\')">Bias Monitor</button> '+
 '<button class="btn sm" onclick="nav(\'compliance\')">Compliance</button> '+
-'<button class="btn sm" onclick="nav(\'citizen\')">Citizen Portal</button></div></div>'+honesty();}
+'<button class="btn sm" onclick="nav(\'citizen\')">Citizen Portal</button></div></div>'+
+'<div class="panel"><h3>Client smoke · 4 live checks</h3>'+
+'<button class="btn cyan" onclick="clientSmoke()">Run client smoke</button>'+
+'<div id="client-smoke-out" class="muted" style="margin-top:10px;font-size:12px">health · demo/ready · fair ≠ BLOCK · biased = BLOCK</div></div>'+
+honesty();}
 
 async function vSystems(m){await safe(m,async()=>{const rows=asArray(await api("/registry/models"));
 m.innerHTML='<div class="pgh"><h2>AI Registry</h2><span class="desc">mvp-1 · registered systems</span></div><div class="panel"><h3>Registered · '+rows.length+'</h3>'+tableFrom(rows,[
