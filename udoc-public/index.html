@@ -51,6 +51,8 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:
 .chip.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,194,212,.1)}
 .covbar{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-top:6px}.covbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold))}
 .sov-ok{color:var(--ok);font-size:12px;margin:4px 0}.loading{color:var(--muted);padding:10px 0}
+a.citizen-link{display:block;text-align:center;margin-top:14px;color:var(--cyan);font-size:12px;text-decoration:none}
+a.citizen-link:hover{text-decoration:underline}
 </style></head><body>
 <div id="login"><div class="card">
 <h1>UDOC</h1><div class="sub">CLIENT · MVP-1/2 PARITY</div>
@@ -60,6 +62,7 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:
 <div style="margin-top:14px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
 <div class="err" id="li-err"></div>
 <label>API</label><input id="li-api" class="mono" style="font-size:11px"/>
+<a class="citizen-link" href="/citizen.html">Citizen Portal · AI Rights · no login →</a>
 </div></div>
 <div id="app">
 <header>
@@ -79,9 +82,11 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:
 <div class="sech">Govern</div>
 <div class="navitem" data-view="govern"><span class="ico">⬡</span> Govern · EVA</div>
 <div class="navitem" data-view="decisions"><span class="ico">⚡</span> Decisions</div>
+<div class="sech">Public</div>
+<div class="navitem" data-view="citizen"><span class="ico">✋</span> Citizen Portal</div>
 <div class="sech">Private</div>
 <div class="navitem" data-view="knowledge"><span class="ico">◈</span> Company Knowledge</div>
-<div class="navitem" data-view="settings"><span class="ico">⚙</span> Plan &amp; API Keys</div>
+<div class="navitem" data-view="settings"><span class="ico">⚙</span> Plan & API Keys</div>
 <div class="navitem" data-view="sentinel"><span class="ico">◎</span> Sentinel runtime</div>
 </nav>
 <main id="main"><div class="loading">Loading…</div></main>
