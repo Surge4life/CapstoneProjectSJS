@@ -134,7 +134,7 @@ th{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06
 <script>
 let API="",TOK="",PAGE="cmd",LAST_SMOKE=null,LAST_DID=null,SCENARIO="fair";
 const $=id=>document.getElementById(id);
-function esc(s){return String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/\"/g,""");}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");}
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
 function tick(){const el=$("clock"); if(el) el.textContent=new Date().toLocaleTimeString("en-ZA",{hour12:false,timeZone:"Africa/Johannesburg"});}
 setInterval(tick,1000); tick();
@@ -207,35 +207,11 @@ async function renderCmd(pg){
   try{models=await api("/registry/models"); if(!Array.isArray(models))models=[];}catch(e){}
   const oc=(sum.decisions&&sum.decisions.by_outcome)||{};
   const total=sum.decisions&&sum.decisions.total!=null?sum.decisions.total:0;
-  pg.innerHTML='<div class="pgh"><h2>Command Centre</h2><span class="desc">Live regulator rollup · demo parity shell for udoc-v7-eva</span></div>
-  <div class="panel"><h3>Boot posture</h3><div>'+(ready.ready?'<span class="ok">READY</span> · model-001 + ACTIVE policy · rules '+esc(ready.active_rules):'<span class="bad">NOT READY</span> · '+esc((ready.missing||[]).join("; ")))+'</div></div>
-  <div class="kpis">
-    <div class="kpi"><div class="v">'+esc(models.length)+'</div><div class="l">AI systems</div></div>
-    <div class="kpi"><div class="v">'+esc(total)+'</div><div class="l">Decisions</div></div>
-    <div class="kpi"><div class="v APPROVE">'+esc(oc.APPROVE||0)+'</div><div class="l">Approve</div></div>
-    <div class="kpi"><div class="v REVIEW">'+esc(oc.REVIEW||0)+'</div><div class="l">Review</div></div>
-    <div class="kpi"><div class="v ESCALATE">'+esc(oc.ESCALATE||0)+'</div><div class="l">Escalate</div></div>
-    <div class="kpi"><div class="v BLOCK">'+esc(oc.BLOCK||0)+'</div><div class="l">Block</div></div>
-    <div class="kpi"><div class="v">'+esc(sum.policy&&sum.policy.active_rules!=null?sum.policy.active_rules:"—")+'</div><div class="l">Policy rules</div></div>
-    <div class="kpi"><div class="v">'+esc(sum.oversight&&sum.oversight.open!=null?sum.oversight.open:"—")+'</div><div class="l">Open HITL</div></div>
-  </div>
-  <div class="panel"><h3>Quick actions</h3>
-    <button class="btn cyan sm" type="button" onclick="nav(\'eva-cmd\',document.querySelector(\'.sb-item[data-p=eva-cmd]\'))">Open EVA Command</button>
-    <button class="btn ghost sm" type="button" onclick="nav(\'eva-eval\',document.querySelector(\'.sb-item[data-p=eva-eval]\'))">Live Evaluation</button>
-    <button class="btn ghost sm" type="button" onclick="smoke()">Run Smoke</button>
-  </div>';
+  pg.innerHTML='<div class="pgh"><h2>Command Centre</h2><span class="desc">Live regulator rollup · demo parity shell for udoc-v7-eva</span></div>\n  <div class="panel"><h3>Boot posture</h3><div>'+(ready.ready?'<span class="ok">READY</span> · model-001 + ACTIVE policy · rules '+esc(ready.active_rules):'<span class="bad">NOT READY</span> · '+esc((ready.missing||[]).join("; ")))+'</div></div>\n  <div class="kpis">\n    <div class="kpi"><div class="v">'+esc(models.length)+'</div><div class="l">AI systems</div></div>\n    <div class="kpi"><div class="v">'+esc(total)+'</div><div class="l">Decisions</div></div>\n    <div class="kpi"><div class="v APPROVE">'+esc(oc.APPROVE||0)+'</div><div class="l">Approve</div></div>\n    <div class="kpi"><div class="v REVIEW">'+esc(oc.REVIEW||0)+'</div><div class="l">Review</div></div>\n    <div class="kpi"><div class="v ESCALATE">'+esc(oc.ESCALATE||0)+'</div><div class="l">Escalate</div></div>\n    <div class="kpi"><div class="v BLOCK">'+esc(oc.BLOCK||0)+'</div><div class="l">Block</div></div>\n    <div class="kpi"><div class="v">'+esc(sum.policy&&sum.policy.active_rules!=null?sum.policy.active_rules:"—")+'</div><div class="l">Policy rules</div></div>\n    <div class="kpi"><div class="v">'+esc(sum.oversight&&sum.oversight.open!=null?sum.oversight.open:"—")+'</div><div class="l">Open HITL</div></div>\n  </div>\n  <div class="panel"><h3>Quick actions</h3>\n    <button class="btn cyan sm" type="button" onclick="nav(\'eva-eval\',document.querySelector(\'.sb-item[data-p=eva-eval]\'))">Live Evaluation</button>\n    <button class="btn ghost sm" type="button" onclick="nav(\'eva-cmd\',document.querySelector(\'.sb-item[data-p=eva-cmd]\'))">Run Full EVA</button>\n    <button class="btn ghost sm" type="button" onclick="smoke()">Run Smoke</button>\n  </div>';
 }
 async function renderEvaCmd(pg){
   let models=[]; try{models=await api("/registry/models"); if(!Array.isArray(models))models=[];}catch(e){}
-  pg.innerHTML='<div class="pgh"><h2>EVA Command</h2><span class="desc">Run Full EVA across registered systems · live POST /decisions</span></div>
-  <div class="panel"><h3>Batch evaluate</h3>
-    <p style="color:var(--mut);font-size:12px;margin:0 0 10px">Evaluates each listed system with fair baseline inputs. Prefer seeded model-001.</p>
-    <button class="btn cyan" type="button" onclick="runFullEva()">▶ Run Full EVA</button>
-    <div class="term" id="batch-term" style="margin-top:10px">Ready.</div>
-    <div id="batch-table" style="margin-top:12px"></div>
-  </div>
-  <div class="panel"><h3>Systems in registry · '+models.length+'</h3>
-    <table><tr><th>ID</th><th>Risk</th><th>Status</th></tr>'+
+  pg.innerHTML='<div class="pgh"><h2>EVA Command</h2><span class="desc">Run Full EVA across registered systems · live POST /decisions</span></div>\n  <div class="panel"><h3>Batch evaluate</h3>\n    <p style="color:var(--mut);font-size:12px;margin:0 0 10px">Evaluates each listed system with fair baseline inputs. Prefer seeded model-001.</p>\n    <button class="btn cyan" type="button" onclick="runFullEva()">▶ Run Full EVA</button>\n    <div class="term" id="batch-term" style="margin-top:10px">Ready.</div>\n    <div id="batch-table" style="margin-top:12px"></div>\n  </div>\n  <div class="panel"><h3>Systems in registry · '+models.length+'</h3>\n    <table><tr><th>ID</th><th>Risk</th><th>Status</th></tr>'+
     models.slice(0,20).map(m=>'<tr><td class="mono">'+esc(m.model_id)+'</td><td>'+esc(m.risk_tier)+'</td><td>'+esc(m.status)+'</td></tr>').join("")+
     '</table></div>';
 }
@@ -262,38 +238,12 @@ async function runFullEva(){
 async function renderEvaEval(pg){
   let models=[]; try{models=await api("/registry/models"); if(!Array.isArray(models))models=[];}catch(e){}
   const mid0=(models.find(x=>x.model_id==="model-001")||models[0]||{}).model_id||"model-001";
-  pg.innerHTML='<div class="pgh"><h2>Live Evaluation</h2><span class="desc">Scenario chips · 6-D bars · certificate</span></div>
-  <div class="panel"><h3>Scenario</h3>
-    <div class="chips" id="sc-chips">
-      <button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair</button>
-      <button type="button" class="chip" data-s="biased" onclick="pickSc(this)">Biased → BLOCK</button>
-      <button type="button" class="chip" data-s="highrisk" onclick="pickSc(this)">High-risk</button>
-      <button type="button" class="chip" data-s="sov" onclick="pickSc(this)">Sovereignty</button>
-    </div>
-    <div class="row">
-      <div class="f"><label>Model</label><input class="in" id="ev-mid" value="'+esc(mid0)+'" style="margin:0"/></div>
-      <div class="f"><label>Confidence</label><input class="in" id="ev-conf" value="0.92" style="margin:0"/></div>
-      <div class="f"><label>Compliance</label><input class="in" id="ev-comp" value="1.0" style="margin:0"/></div>
-      <button class="btn cyan" type="button" onclick="runEva()">▶ Evaluate</button>
-    </div>
-    <div id="ev-out" style="margin-top:12px"></div>
-    <div class="term" id="ev-term" style="margin-top:10px">POST /decisions</div>
-  </div>
-  <div class="panel"><h3>Verify · Evidence · Replay</h3>
-    <div class="row">
-      <div class="f"><label>Certificate</label><input class="in" id="cert-id" style="margin:0"/></div>
-      <button class="btn ghost sm" type="button" onclick="verifyCert()">Verify</button>
-      <div class="f"><label>Decision ID</label><input class="in" id="did" style="margin:0"/></div>
-      <button class="btn ghost sm" type="button" onclick="loadEvidence()">Evidence</button>
-      <button class="btn ghost sm" type="button" onclick="loadReplay()">Replay</button>
-    </div>
-    <div id="cert-out" style="margin-top:8px"></div>
-    <div class="term" id="er-term" style="margin-top:8px;display:none"></div>
-  </div>';
+  pg.innerHTML='<div class="pgh"><h2>Live Evaluation</h2><span class="desc">Scenario chips auto-run · 6-D bars · certificate</span></div>\n  <div class="panel"><h3>Scenario</h3>\n    <div class="chips" id="sc-chips">\n      <button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair</button>\n      <button type="button" class="chip" data-s="biased" onclick="pickSc(this)">Biased → BLOCK</button>\n      <button type="button" class="chip" data-s="highrisk" onclick="pickSc(this)">High-risk</button>\n      <button type="button" class="chip" data-s="sov" onclick="pickSc(this)">Sovereignty</button>\n    </div>\n    <div class="row">\n      <div class="f"><label>Model</label><input class="in" id="ev-mid" value="'+esc(mid0)+'" style="margin:0"/></div>\n      <div class="f"><label>Confidence</label><input class="in" id="ev-conf" value="0.92" style="margin:0"/></div>\n      <div class="f"><label>Compliance</label><input class="in" id="ev-comp" value="1.0" style="margin:0"/></div>\n      <button class="btn cyan" type="button" onclick="runEva()">▶ Evaluate</button>\n    </div>\n    <div id="ev-out" style="margin-top:12px"></div>\n    <div class="term" id="ev-term" style="margin-top:10px">POST /decisions</div>\n  </div>\n  <div class="panel"><h3>Verify · Evidence · Replay</h3>\n    <div class="row">\n      <div class="f"><label>Certificate</label><input class="in" id="cert-id" style="margin:0"/></div>\n      <button class="btn ghost sm" type="button" onclick="verifyCert()">Verify</button>\n      <div class="f"><label>Decision ID</label><input class="in" id="did" style="margin:0"/></div>\n      <button class="btn ghost sm" type="button" onclick="loadEvidence()">Evidence</button>\n      <button class="btn ghost sm" type="button" onclick="loadReplay()">Replay</button>\n    </div>\n    <div id="cert-out" style="margin-top:8px"></div>\n    <div class="term" id="er-term" style="margin-top:8px;display:none"></div>\n  </div>';
 }
-function pickSc(el){document.querySelectorAll("#sc-chips .chip").forEach(c=>c.classList.remove("on")); el.classList.add("on"); SCENARIO=el.dataset.s;}
+function pickSc(el){document.querySelectorAll("#sc-chips .chip").forEach(c=>c.classList.remove("on")); el.classList.add("on"); SCENARIO=el.dataset.s; if(typeof runEva==="function") runEva();}
 async function runEva(){
   const term=$("ev-term"); const o=$("ev-out");
+  if(!term||!o) return;
   const body={model_id:$("ev-mid").value.trim(),raw_confidence:parseFloat($("ev-conf").value)||0.9,compliance:parseFloat($("ev-comp").value)||1.0};
   if(SCENARIO==="biased"){ body.priv_favorable=900; body.priv_total=1000; body.unpriv_favorable=120; body.unpriv_total=1000; }
   if(SCENARIO==="highrisk"){ body.risk_tier="HIGH"; }
@@ -305,12 +255,7 @@ async function runEva(){
     const pol=(d.policy_findings||[]).map(f=>(f.code||"")+":"+(f.kind||"")).join(" · ");
     const oc=esc(d.decision||"—");
     if(d.id) LAST_DID=d.id;
-    o.innerHTML='<div class="verdict '+oc+'">'+oc+'</div>
-      <div class="kpis" style="margin-top:10px">
-        <div class="kpi"><div class="v">'+esc(d.composite_eva!=null?d.composite_eva:"—")+'</div><div class="l">Composite</div></div>
-        <div class="kpi"><div class="v">'+esc(d.svs!=null?d.svs:"—")+'</div><div class="l">SVS</div></div>
-        <div class="kpi"><div class="v" style="font-size:14px">'+(d.policy_enforced?'YES':'no')+'</div><div class="l">Policy</div></div>
-      </div>'+dimBars(d.dimensions)+
+    o.innerHTML='<div class="verdict '+oc+'">'+oc+'</div>\n      <div class="kpis" style="margin-top:10px">\n        <div class="kpi"><div class="v">'+esc(d.composite_eva!=null?d.composite_eva:"—")+'</div><div class="l">Composite</div></div>\n        <div class="kpi"><div class="v">'+esc(d.svs!=null?d.svs:"—")+'</div><div class="l">SVS</div></div>\n        <div class="kpi"><div class="v" style="font-size:14px">'+(d.policy_enforced?'YES':'no')+'</div><div class="l">Policy</div></div>\n      </div>'+dimBars(d.dimensions)+
       (reasons?'<div class="err" style="margin-top:8px">'+esc(reasons)+'</div>':'')+
       (pol?'<div style="margin-top:6px;font-size:12px;color:var(--mut)">Policy: '+esc(pol)+'</div>':'')+
       (d.certificate_id?'<div style="margin-top:8px" class="mono">'+esc(d.certificate_id)+'</div>':'');
@@ -340,15 +285,7 @@ async function loadReplay(){
 async function renderPolicy(pg){
   let active={},packs=[]; try{active=await api("/policy/active");}catch(e){}
   try{packs=await api("/policy/packs"); if(!Array.isArray(packs))packs=[];}catch(e){}
-  pg.innerHTML='<div class="pgh"><h2>Policy Engine</h2><span class="desc">Policy-to-code · active packs</span></div>
-  <div class="kpis"><div class="kpi"><div class="v">'+esc((active.active_packs||[]).length)+'</div><div class="l">Active packs</div></div>
-    <div class="kpi"><div class="v">'+esc(active.enforced_rules!=null?active.enforced_rules:"—")+'</div><div class="l">Rules</div></div></div>
-  <div class="panel"><h3>Dry-run</h3>
-    <div class="row"><div class="f"><label>Model</label><input class="in" id="pt-mid" value="model-001" style="margin:0"/></div>
-      <div class="f"><label>Scenario</label><select class="in" id="pt-sc" style="margin:0"><option>healthy</option><option>biased</option><option>breach</option></select></div>
-      <button class="btn cyan" type="button" onclick="policyTest()">Test</button></div>
-    <div class="term" id="pt-out" style="margin-top:10px">POST /policy/test</div></div>
-  <div class="panel"><h3>Packs</h3><table><tr><th>Name</th><th>Status</th><th>Rules</th></tr>'+
+  pg.innerHTML='<div class="pgh"><h2>Policy Engine</h2><span class="desc">Policy-to-code · active packs</span></div>\n  <div class="kpis"><div class="kpi"><div class="v">'+esc((active.active_packs||[]).length)+'</div><div class="l">Active packs</div></div>\n    <div class="kpi"><div class="v">'+esc(active.enforced_rules!=null?active.enforced_rules:"—")+'</div><div class="l">Rules</div></div></div>\n  <div class="panel"><h3>Dry-run</h3>\n    <div class="row"><div class="f"><label>Model</label><input class="in" id="pt-mid" value="model-001" style="margin:0"/></div>\n      <div class="f"><label>Scenario</label><select class="in" id="pt-sc" style="margin:0"><option>healthy</option><option>biased</option><option>breach</option></select></div>\n      <button class="btn cyan" type="button" onclick="policyTest()">Test</button></div>\n    <div class="term" id="pt-out" style="margin-top:10px">POST /policy/test</div></div>\n  <div class="panel"><h3>Packs</h3><table><tr><th>Name</th><th>Status</th><th>Rules</th></tr>'+
     packs.slice(0,15).map(p=>'<tr><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.status)+'</td><td>'+esc(p.rule_count)+'</td></tr>').join("")+'</table></div>';
 }
 async function policyTest(){
@@ -359,53 +296,34 @@ async function policyTest(){
 async function renderAudit(pg){
   let dec=[]; try{dec=await api("/decisions"); if(!Array.isArray(dec))dec=[];}catch(e){}
   if(dec[0]) LAST_DID=dec[0].id;
-  pg.innerHTML='<div class="pgh"><h2>EVA Audit Log</h2><span class="desc">Recent decisions · click ID for evidence</span></div>
-  <div class="panel"><table><tr><th>ID</th><th>Model</th><th>Outcome</th><th>SVS</th><th>ms</th></tr>'+
+  pg.innerHTML='<div class="pgh"><h2>EVA Audit Log</h2><span class="desc">Recent decisions · click ID for evidence</span></div>\n  <div class="panel"><table><tr><th>ID</th><th>Model</th><th>Outcome</th><th>SVS</th><th>ms</th></tr>'+
     dec.slice(0,25).map(d=>'<tr style="cursor:pointer" onclick="LAST_DID='+d.id+';nav(\'eva-eval\',document.querySelector(\'.sb-item[data-p=eva-eval]\'));setTimeout(()=>{const el=$(\'did\');if(el)el.value='+d.id+';},200)"><td class="mono">'+esc(d.id)+'</td><td class="mono">'+esc(d.model_id||"—")+'</td><td class="'+esc(d.decision)+'"><b>'+esc(d.decision)+'</b></td><td>'+esc(d.svs)+'</td><td>'+esc(d.latency_ms)+'</td></tr>').join("")+'</table></div>';
 }
 async function renderRegistry(pg){
   let models=[]; try{models=await api("/registry/models"); if(!Array.isArray(models))models=[];}catch(e){}
-  pg.innerHTML='<div class="pgh"><h2>AI Registry</h2><span class="desc">Live systems · prefer model-001</span></div>
-  <div class="panel"><table><tr><th>ID</th><th>Name</th><th>Risk</th><th>Status</th></tr>'+
+  pg.innerHTML='<div class="pgh"><h2>AI Registry</h2><span class="desc">Live systems · prefer model-001</span></div>\n  <div class="panel"><table><tr><th>ID</th><th>Name</th><th>Risk</th><th>Status</th></tr>'+
     models.slice(0,30).map(m=>'<tr><td class="mono">'+esc(m.model_id)+'</td><td>'+esc(m.name)+'</td><td>'+esc(m.risk_tier)+'</td><td>'+esc(m.status)+'</td></tr>').join("")+'</table></div>';
 }
 async function renderHitl(pg){
   let inc={}; try{inc=await api("/udoc/incidents");}catch(e){pg.innerHTML='<div class="panel bad">'+esc(e.message)+'</div>';return;}
   const cases=inc.open_cases||[]; const incidents=inc.incidents||[];
-  pg.innerHTML='<div class="pgh"><h2>HITL Queue</h2><span class="desc">Open oversight + BLOCK/ESCALATE feed</span></div>
-  <div class="kpis"><div class="kpi"><div class="v">'+esc(cases.length)+'</div><div class="l">Open cases</div></div>
-    <div class="kpi"><div class="v">'+esc(incidents.length)+'</div><div class="l">Incidents</div></div></div>
-  <div class="panel"><h3>Open cases</h3>'+(cases.length?'<table><tr><th>ID</th><th>Model</th><th>Status</th><th>Reason</th></tr>'+
-    cases.slice(0,20).map(c=>'<tr><td>'+esc(c.id)+'</td><td class="mono">'+esc(c.model_id)+'</td><td>'+esc(c.status)+'</td><td>'+esc(c.reason)+'</td></tr>').join("")+'</table>':'<div style="color:var(--mut)">None open</div>')+'</div>
-  <div class="panel"><h3>Recent BLOCK / ESCALATE</h3><table><tr><th>Decision</th><th>Model</th><th>Severity</th><th>Reasons</th></tr>'+
+  pg.innerHTML='<div class="pgh"><h2>HITL Queue</h2><span class="desc">Open oversight + BLOCK/ESCALATE feed</span></div>\n  <div class="kpis"><div class="kpi"><div class="v">'+esc(cases.length)+'</div><div class="l">Open cases</div></div>\n    <div class="kpi"><div class="v">'+esc(incidents.length)+'</div><div class="l">Incidents</div></div></div>\n  <div class="panel"><h3>Open cases</h3>'+(cases.length?'<table><tr><th>ID</th><th>Model</th><th>Status</th><th>Reason</th></tr>'+
+    cases.slice(0,20).map(c=>'<tr><td>'+esc(c.id)+'</td><td class="mono">'+esc(c.model_id)+'</td><td>'+esc(c.status)+'</td><td>'+esc(c.reason)+'</td></tr>').join("")+'</table>':'<div style="color:var(--mut)">None open</div>')+'</div>\n  <div class="panel"><h3>Recent BLOCK / ESCALATE</h3><table><tr><th>Decision</th><th>Model</th><th>Severity</th><th>Reasons</th></tr>'+
     incidents.slice(0,15).map(i=>'<tr><td>'+esc(i.decision_id)+'</td><td class="mono">'+esc(i.model_id)+'</td><td class="'+esc(i.severity)+'">'+esc(i.severity)+'</td><td>'+esc(i.reasons)+'</td></tr>').join("")+'</table></div>';
 }
 async function renderPillars(pg){
   const d=await api("/udoc/constitutional/pillars"); const sum=d.status_summary||{};
-  pg.innerHTML='<div class="pgh"><h2>12 Constitutional Pillars</h2></div>
-  <div class="kpis"><div class="kpi"><div class="v">'+esc(d.count)+'</div><div class="l">Pillars</div></div>
-    <div class="kpi"><div class="v ok">'+esc(sum.ENFORCED||0)+'</div><div class="l">Enforced</div></div></div>
-  <div class="panel"><table><tr><th>#</th><th>Pillar</th><th>Status</th></tr>'+
+  pg.innerHTML='<div class="pgh"><h2>12 Constitutional Pillars</h2></div>\n  <div class="kpis"><div class="kpi"><div class="v">'+esc(d.count)+'</div><div class="l">Pillars</div></div>\n    <div class="kpi"><div class="v ok">'+esc(sum.ENFORCED||0)+'</div><div class="l">Enforced</div></div></div>\n  <div class="panel"><table><tr><th>#</th><th>Pillar</th><th>Status</th></tr>'+
     (d.pillars||[]).map(p=>'<tr><td>'+esc(p.n)+'</td><td><b>'+esc(p.name)+'</b><div style="color:var(--mut);font-size:11px">'+esc(p.principle)+'</div></td><td class="'+(p.status==="ENFORCED"?'ok':'')+'">'+esc(p.status)+'</td></tr>').join("")+'</table></div>';
 }
 async function renderSov(pg){
   let ex={}; try{ex=await api("/udoc/exchange");}catch(e){}
   let ready={}; try{ready=await api("/udoc/demo/ready");}catch(e){}
-  pg.innerHTML='<div class="pgh"><h2>Sovereignty</h2><span class="desc">ZA jurisdiction · localisation rules</span></div>
-  <div class="kpis"><div class="kpi"><div class="v">'+esc(ex.jurisdiction||"ZA")+'</div><div class="l">Jurisdiction</div></div>
-    <div class="kpi"><div class="v">'+esc(ex.rules_active!=null?ex.rules_active:"—")+'</div><div class="l">Localisation rules</div></div>
-    <div class="kpi"><div class="v">'+(ready.ready?'OK':'WAIT')+'</div><div class="l">Demo seed</div></div></div>
-  <div class="panel"><h3>Posture</h3>
-    <div style="font-size:13px;color:var(--mut)">'+esc(ex.cross_border_transfer||"")+' · '+esc(ex.data_localisation||"")+'</div>
-    <div class="term" style="margin-top:10px">'+esc(ex.basis||"")+'</div></div>';
+  pg.innerHTML='<div class="pgh"><h2>Sovereignty</h2><span class="desc">ZA jurisdiction · localisation rules</span></div>\n  <div class="kpis"><div class="kpi"><div class="v">'+esc(ex.jurisdiction||"ZA")+'</div><div class="l">Jurisdiction</div></div>\n    <div class="kpi"><div class="v">'+esc(ex.rules_active!=null?ex.rules_active:"—")+'</div><div class="l">Localisation rules</div></div>\n    <div class="kpi"><div class="v">'+(ready.ready?'OK':'WAIT')+'</div><div class="l">Demo seed</div></div></div>\n  <div class="panel"><h3>Posture</h3>\n    <div style="font-size:13px;color:var(--mut)">'+esc(ex.cross_border_transfer||"")+' · '+esc(ex.data_localisation||"")+'</div>\n    <div class="term" style="margin-top:10px">'+esc(ex.basis||"")+'</div></div>';
 }
 async function renderConf(pg){
   let st={}; try{st=await api("/conformance/status");}catch(e){pg.innerHTML='<div class="panel bad">'+esc(e.message)+'</div>';return;}
-  pg.innerHTML='<div class="pgh"><h2>Conformance</h2></div>
-  <div class="kpis"><div class="kpi"><div class="v">'+(st.scanner_enabled?'ON':'OFF')+'</div><div class="l">Scanner</div></div>
-    <div class="kpi"><div class="v ok">'+esc(st.conformant)+'</div><div class="l">OK</div></div>
-    <div class="kpi"><div class="v bad">'+esc(st.non_conformant)+'</div><div class="l">NC</div></div></div>
-  <button class="btn cyan" type="button" onclick="runScan()">Run scan</button>';
+  pg.innerHTML='<div class="pgh"><h2>Conformance</h2></div>\n  <div class="kpis"><div class="kpi"><div class="v">'+(st.scanner_enabled?'ON':'OFF')+'</div><div class="l">Scanner</div></div>\n    <div class="kpi"><div class="v ok">'+esc(st.conformant)+'</div><div class="l">OK</div></div>\n    <div class="kpi"><div class="v bad">'+esc(st.non_conformant)+'</div><div class="l">NC</div></div></div>\n  <button class="btn cyan" type="button" onclick="runScan()">Run scan</button>';
 }
 async function runScan(){try{await api("/conformance/scan",{method:"POST"}); toast("scan done"); nav("conf",document.querySelector('.sb-item[data-p="conf"]'));}catch(e){toast(e.message);}}
 async function smoke(){
@@ -422,10 +340,7 @@ async function smoke(){
 function renderSmoke(pg){
   if(!LAST_SMOKE){ pg.innerHTML='<div class="panel">Run <b>Smoke</b> in the top bar.</div>'; return; }
   const ok=LAST_SMOKE.steps.filter(s=>s.ok).length;
-  pg.innerHTML='<div class="pgh"><h2>Smoke Pass</h2></div>
-  <div class="kpis"><div class="kpi"><div class="v ok">'+ok+'</div><div class="l">Passed</div></div>
-    <div class="kpi"><div class="v">'+LAST_SMOKE.ms+' ms</div><div class="l">Duration</div></div></div>
-  <div class="panel"><table><tr><th>Check</th><th>Result</th><th>Detail</th></tr>'+
+  pg.innerHTML='<div class="pgh"><h2>Smoke Pass</h2></div>\n  <div class="kpis"><div class="kpi"><div class="v ok">'+ok+'</div><div class="l">Passed</div></div>\n    <div class="kpi"><div class="v">'+LAST_SMOKE.ms+' ms</div><div class="l">Duration</div></div></div>\n  <div class="panel"><table><tr><th>Check</th><th>Result</th><th>Detail</th></tr>'+
     LAST_SMOKE.steps.map(s=>'<tr><td>'+esc(s.name)+'</td><td class="'+(s.ok?'ok':'bad')+'">'+(s.ok?'PASS':'FAIL')+'</td><td class="mono" style="font-size:11px">'+esc(typeof s.detail==='object'?JSON.stringify(s.detail).slice(0,90):String(s.detail).slice(0,90))+'</td></tr>').join("")+'</table></div>';
 }
 (function(){
