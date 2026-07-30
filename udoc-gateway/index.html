@@ -18,13 +18,13 @@
     --cyan:#00C2D4;--cyan-b:#00E5FF;--txt:#EDE7D6;--txt2:#A9B6CC;--muted:#8A9BB0;--green:#10B981;
     --bd:rgba(201,168,76,.22);--bd2:rgba(201,168,76,.12);--fc:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;--fm:'IBM Plex Mono',monospace;}
   *{box-sizing:border-box} html,body{margin:0;height:100%}
-  body{background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%);color:var(--txt);font-family:var(--fb);font-size:14px;min-height:100%;display:flex;align-items:center;justify-content:center}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#10224a 0,var(--navy) 60%);color:var(--txt);font-family:var(--fb);font-size:14px;min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px 0}
   .mono{font-family:var(--fm)}.muted{color:var(--muted)}
-  .card{width:440px;max-width:93vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:16px;padding:32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .card{width:480px;max-width:94vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:16px;padding:32px 30px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
   .bm{display:flex;align-items:center;gap:14px}.shield{width:46px;height:46px;flex:none}
   .bm h1{font-family:var(--fc);font-weight:700;letter-spacing:.05em;font-size:26px;margin:0;color:var(--gold)}
   .bm .sub{font-family:var(--fc);letter-spacing:.24em;color:var(--cyan);font-size:11px}
-  .intro{color:var(--txt2);font-size:12.5px;margin:14px 0 4px}
+  .intro{color:var(--txt2);font-size:12.5px;margin:14px 0 4px;line-height:1.45}
   label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:16px 0 5px}
   input{width:100%;background:#091022;border:1px solid var(--bd2);color:var(--txt);border-radius:8px;padding:11px 13px;font-family:var(--fb);font-size:14px}
   input:focus{outline:none;border-color:var(--gold)}
@@ -32,10 +32,12 @@
   .btn:hover{background:rgba(201,168,76,.22)}.btn:disabled{opacity:.5;cursor:not-allowed}
   .btn.cyan{border-color:var(--cyan);color:var(--cyan-b);background:rgba(0,194,212,.1)}
   .err{color:#fda4a4;font-size:12.5px;margin-top:10px;min-height:16px}
-  .surfaces{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:18px}
-  .surf{text-align:center;border:1px solid var(--bd2);border-radius:9px;padding:8px 4px;font-family:var(--fc);letter-spacing:.05em;font-size:10px;color:var(--muted)}
-  .surf b{display:block;color:var(--txt2);font-size:11.5px;letter-spacing:.04em}
-  .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);justify-content:center;margin-top:16px}.apibar input{width:240px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
+  .surfaces{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+  .surf{text-align:center;border:1px solid var(--bd2);border-radius:9px;padding:10px 6px;font-family:var(--fc);letter-spacing:.05em;font-size:10px;color:var(--muted);text-decoration:none;display:block;transition:border-color .15s,background .15s}
+  .surf:hover{border-color:var(--cyan);background:rgba(0,194,212,.06)}
+  .surf b{display:block;color:var(--txt2);font-size:12px;letter-spacing:.04em;margin-bottom:2px}
+  .surf.pub{border-color:rgba(16,185,129,.3)}.surf.pub b{color:var(--green)}
+  .apibar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);justify-content:center;margin-top:16px}.apibar input{width:260px;padding:5px 8px;font-size:11px;font-family:var(--fm)}
   .classbar{margin-top:18px;text-align:center;font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;color:var(--gold-d)}
   .honesty{margin-top:12px;font-size:10.5px;color:var(--muted);line-height:1.4;border-top:1px solid var(--bd2);padding-top:10px}
   #route{display:none;text-align:center}
@@ -43,6 +45,7 @@
   .spin{width:34px;height:34px;border:3px solid var(--bd2);border-top-color:var(--cyan);border-radius:50%;margin:18px auto;animation:sp 0.9s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
   .links{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   .links a{font-size:11px;color:var(--cyan-b);text-decoration:none;border:1px solid rgba(0,194,212,.25);padding:4px 10px;border-radius:6px}
+  .seclabel{font-family:var(--fc);font-size:10px;letter-spacing:.16em;color:var(--muted);margin:16px 0 6px;text-align:center}
 </style>
 </head>
 <body>
@@ -50,26 +53,37 @@
     <div id="signin">
       <div class="bm"><svg class="shield" viewBox="0 0 64 64" fill="none"><path d="M32 3l24 9v18c0 16-10.5 26-24 31C18.5 56 8 46 8 30V12l24-9z" fill="#0D1F3C" stroke="#C9A84C" stroke-width="2.2"/><path d="M32 14v36M14 30h36" stroke="#00C2D4" stroke-width="1.4" opacity=".7"/><circle cx="32" cy="30" r="6.5" fill="none" stroke="#C9A84C" stroke-width="2"/></svg>
         <div><h1>G.O.D.S</h1><div class="sub">UDOC SOVEREIGN SIGN-ON</div></div></div>
-      <p class="intro">One sign-on for existing UDOC surfaces. Admin = GODS UDOC (udoc-internal). Client hosts governance + <b>Citizen</b>. Portals = client SaaS role/sector access. No fabricated environments.</p>
-      <label>Email</label><input id="li-email" type="email" placeholder="you@org"/>
-      <label>Password</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <p class="intro">One sign-on for existing UDOC surfaces. <b>Admin</b> = GODS UDOC (udoc-internal). <b>Client</b> = governance + Citizen. <b>Portals SaaS</b> = role/sector. <b>Core /portals</b> = 24 dual-path workspace. No new environments.</p>
+      <label>Email</label><input id="li-email" type="email" placeholder="you@org" value="admin@gods.local"/>
+      <label>Password</label><input id="li-pass" type="password" placeholder="••••••••" value="admin123" onkeydown="if(event.key==='Enter')doLogin()"/>
       <div style="margin-top:18px"><button class="btn" id="li-btn" onclick="doLogin()">Sign in</button></div>
       <div class="err" id="li-err"></div>
+
+      <div class="seclabel">AUTHENTICATED CONSOLES</div>
       <div class="surfaces">
-        <div class="surf"><b>Admin</b>GODS UDOC</div>
-        <div class="surf"><b>Client</b>governance</div>
-        <div class="surf"><b>Portals</b>SaaS roles</div>
-        <div class="surf"><b>Sector</b>public/private</div>
-        <div class="surf"><b>Operator</b>workspace</div>
-        <div class="surf"><b>Sentinel</b>EVA runtime</div>
+        <a class="surf" href="https://gods-udoc-admin.onrender.com/" target="_blank" rel="noopener"><b>Admin</b>GODS UDOC</a>
+        <a class="surf" href="https://gods-udoc-client.onrender.com/" target="_blank" rel="noopener"><b>Client</b>governance</a>
+        <a class="surf" href="https://gods-udoc-portals.onrender.com/" target="_blank" rel="noopener"><b>Portals</b>SaaS roles</a>
+        <a class="surf" href="https://gods-udoc-sector.onrender.com/" target="_blank" rel="noopener"><b>Sector</b>public/private</a>
+        <a class="surf" href="https://gods-udoc-operator.onrender.com/" target="_blank" rel="noopener"><b>Operator</b>workspace</a>
+        <a class="surf" href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noopener"><b>Sentinel</b>EVA runtime</a>
       </div>
+
+      <div class="seclabel">PUBLIC · CORE WORKSPACES</div>
+      <div class="surfaces">
+        <a class="surf pub" href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener"><b>Citizen</b>AI Rights</a>
+        <a class="surf" href="https://gods-platform-core.onrender.com/portals" target="_blank" rel="noopener"><b>24 Portals</b>dual-path</a>
+        <a class="surf" href="https://gods-platform-core.onrender.com/admin" target="_blank" rel="noopener"><b>Core Admin</b>constitutional</a>
+      </div>
+
       <div class="links">
-        <a href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener">Citizen Portal →</a>
-        <a href="https://gods-udoc-portals.onrender.com/" target="_blank" rel="noopener">Client SaaS Portals →</a>
-        <a href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noopener">Sentinel EVA →</a>
+        <a href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener">Citizen →</a>
+        <a href="https://gods-udoc-portals.onrender.com/" target="_blank" rel="noopener">SaaS Portals →</a>
+        <a href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noopener">Sentinel →</a>
+        <a href="https://gods-platform-core.onrender.com/portals" target="_blank" rel="noopener">Core /portals →</a>
       </div>
       <div class="apibar"><span>API</span><input id="li-api" class="mono"/></div>
-      <div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33. Neon ≤500MB.</div>
+      <div class="honesty">UDOC is a <b>proposed</b> platform (pre-registration). GG54477 withdrawn 26 Apr 2026. Compliance basis: POPIA s71 + Constitution ss 9/16/33. Neon ≤500MB · existing operator only.</div>
       <div class="classbar">© G.O.D.S HOLDINGS (PTY) LTD · UDOC™</div>
     </div>
     <div id="route">
@@ -79,6 +93,13 @@
       <div class="big" id="r-target">Routing…</div>
       <div style="margin-top:8px"><button class="btn cyan" id="r-go" onclick="goNow()">Continue to your console</button></div>
       <div class="muted" style="font-size:11px;margin-top:12px">If you are not redirected automatically, use the button above.</div>
+      <div class="links" style="margin-top:16px">
+        <a href="https://gods-udoc-admin.onrender.com/" target="_blank" rel="noopener">Admin</a>
+        <a href="https://gods-udoc-client.onrender.com/" target="_blank" rel="noopener">Client</a>
+        <a href="https://gods-udoc-portals.onrender.com/" target="_blank" rel="noopener">SaaS Portals</a>
+        <a href="https://gods-udoc-sector.onrender.com/" target="_blank" rel="noopener">Sector</a>
+        <a href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noopener">Sentinel</a>
+      </div>
     </div>
   </div>
 <script>
@@ -88,20 +109,32 @@ const CONSOLES={
   client:   localStorage.getItem("gw_url_client")   || "https://gods-udoc-client.onrender.com",
   operator: localStorage.getItem("gw_url_operator") || "https://gods-udoc-operator.onrender.com",
   sector:   localStorage.getItem("gw_url_sector")   || "https://gods-udoc-sector.onrender.com",
+  portals:  localStorage.getItem("gw_url_portals")  || "https://gods-udoc-portals.onrender.com",
 };
-const LABEL={admin:"GODS UDOC Admin",client:"Client Governance Platform",operator:"Operator Workspace",sector:"Sector Governance Console"};
+const LABEL={admin:"GODS UDOC Admin",client:"Client Governance Platform",operator:"Operator Workspace",sector:"Sector Governance Console",portals:"Client SaaS Portals"};
 function apiBase(){ return localStorage.getItem("gw_api")||PROD_API; }
 function setApiBase(v){ localStorage.setItem("gw_api", v.replace(/\/+$/,"")); }
 document.getElementById("li-api").value=apiBase();
-function routeFor(role){ role=(role||"").toLowerCase(); if(role==="admin"||role==="exec") return "admin"; if(role==="client") return "client"; return "operator"; }
+function routeFor(role){
+  role=(role||"").toLowerCase();
+  if(role==="admin"||role==="exec") return "admin";
+  if(role==="client") return "client";
+  if(role==="gov") return "sector";
+  return "operator";
+}
 let _dest="";
-function buildDest(d, which){ const t=encodeURIComponent; const target=CONSOLES[which||routeFor(d.role)];
-  return target.replace(/\/+$/,"")+"/#sso="+t(d.access_token)+"&api="+t(apiBase())+"&email="+t(d.email)+"&role="+t(d.role||"")+"&division="+t(d.division||"")+"&tenant="+t(d.tenant_id||""); }
+function buildDest(d, which){
+  const t=encodeURIComponent;
+  const target=CONSOLES[which||routeFor(d.role)];
+  return target.replace(/\/+$/,"")+"/#sso="+t(d.access_token)+"&api="+t(apiBase())+"&email="+t(d.email)+"&role="+t(d.role||"")+"&division="+t(d.division||"")+"&tenant="+t(d.tenant_id||"");
+}
 function goNow(){ if(_dest) location.href=_dest; }
-async function doLogin(){ const e=document.getElementById("li-err"); e.textContent="";
+async function doLogin(){
+  const e=document.getElementById("li-err"); e.textContent="";
   const a=document.getElementById("li-api").value.trim(); if(a)setApiBase(a);
   const btn=document.getElementById("li-btn"); btn.disabled=true; btn.textContent="Signing in…";
-  try{ const f=new URLSearchParams(); const email=document.getElementById("li-email").value.trim().toLowerCase();
+  try{
+    const f=new URLSearchParams(); const email=document.getElementById("li-email").value.trim().toLowerCase();
     f.set("username",email); f.set("password",document.getElementById("li-pass").value);
     const r=await fetch(apiBase()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
     if(!r.ok) throw new Error(r.status===401?"Invalid credentials":("Sign-on failed ("+r.status+")"));
@@ -110,9 +143,10 @@ async function doLogin(){ const e=document.getElementById("li-err"); e.textConte
     document.getElementById("signin").style.display="none";
     document.getElementById("route").style.display="block";
     document.getElementById("r-email").textContent=email;
-    document.getElementById("r-target").textContent=LABEL[which];
+    document.getElementById("r-target").textContent=LABEL[which]||which;
     setTimeout(goNow, 900);
-  }catch(err){ e.textContent=err.message; btn.disabled=false; btn.textContent="Sign in"; } }
+  }catch(err){ e.textContent=err.message; btn.disabled=false; btn.textContent="Sign in"; }
+}
 </script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});}</script>
 </body>
