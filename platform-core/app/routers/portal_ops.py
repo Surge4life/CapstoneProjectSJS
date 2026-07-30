@@ -1,12 +1,11 @@
 """
-Portal Operations API — turns each of the 24 Sovereign-Operator portals into a LIVE, operable console.
+Portal Operations API — 24 Sovereign-Operator portals as LIVE operable consoles.
 
-- GET  /portal/{key}            → enriched portal + controls + activity + live oversight when applicable
-- POST /portal/{key}/control    → operate a control (audit-linked) + dual-path live Core for case-bearing portals
+- GET  /portal/{key}            → profile + controls + activity + live panel
+- POST /portal/{key}/control    → audit-linked action + dual-path OversightCase / audit
 - GET  /portal/{key}/activity   → recent operations
 
-Access is server-authoritative: admin/exec may operate any portal; otherwise the caller must hold the
-portal's base_role. Neon-light: reuses OversightCase only — no new tables.
+Neon-light: reuses OversightCase only — no new tables, no new Render services.
 """
 from datetime import datetime, timezone
 import json, uuid
@@ -21,11 +20,22 @@ from app.services.audit_writer import append_audit
 
 router = APIRouter(prefix="/portal", tags=["Portals"])
 
-# Portals that dual-path into OversightCase (or audit-only for AI_OWNER)
+# Case-bearing portals: every control opens OversightCase unless it is a resolve control + COB- target
 LIVE_CASE_PORTALS = {
-    "HITL_REVIEW", "REGULATOR", "INFO_REGULATOR", "SAHRC",
-    "CASE_MANAGER", "WELFARE", "SARS", "CONSTITUTIONAL_OVERSIGHT",
+    "HITL_REVIEW", "REGULATOR", "INFO_REGULATOR", "SAHRC", "CASE_MANAGER",
+    "WELFARE", "SARS", "CONSTITUTIONAL_OVERSIGHT",
+    "BORDER", "DHA", "SERVICE_DELIVERY", "MUNICIPAL", "JUSTICE", "NPA", "HEALTH",
+    "SETHS", "EMPLOYER", "MADIBA", "INSURANCE", "DCDT_POLICY", "SUPER_ADMIN",
 }
+
+# Resolve when Target is an existing COB- case_ref
+RESOLVE_CONTROLS = {
+    "Approve AI Decision", "Override", "Release", "Close Case", "Close Matter",
+    "Publish Finding", "Disburse", "Withdraw Case", "Archive Case", "Resolve",
+    "Close Feedback", "Release Hold", "Approve Payout", "Certify",
+}
+
+# Audit-only (no OversightCase row)
 LIVE_AUDIT_PORTALS = {"AI_OWNER", "PRIVATE_COMPLIANCE"}
 
 
@@ -63,13 +73,16 @@ def _open_case(db: Session, user: dict, model_id: str, reason: str, audit_evt: s
     oc = OversightCase(
         case_ref=f"COB-{uuid.uuid4().hex[:8]}",
         model_id=mid,
-        reason=reason[:500] if reason else "portal action",
+        reason=(reason or "portal action")[:500],
     )
     db.add(oc)
     db.commit()
     db.refresh(oc)
-    append_audit(db, audit_evt, {"case": oc.case_ref, "model": mid, "reason": reason[:200]},
-                 classification="GOVERNANCE", actor_class=user.get("role", "operator"))
+    append_audit(
+        db, audit_evt,
+        {"case": oc.case_ref, "model": mid, "reason": (reason or "")[:200]},
+        classification="GOVERNANCE", actor_class=user.get("role", "operator"),
+    )
     return {"case_ref": oc.case_ref, "state": oc.state, "model_id": mid}
 
 
@@ -79,97 +92,55 @@ def _resolve_case(db: Session, user: dict, case_ref: str, control: str, note: st
     ).scalar_one_or_none()
     if not case:
         return None
-    case.state = "OVERRIDDEN" if "Override" in control or "Withdraw" in control else "RESOLVED"
+    if any(x in control for x in ("Override", "Withdraw")):
+        case.state = "OVERRIDDEN"
+    else:
+        case.state = "RESOLVED"
     case.resolution = note or control
     case.assigned_to = user.get("sub", "")
     db.commit()
-    append_audit(db, "PORTAL_RESOLVE", {"case": case.case_ref, "control": control, "state": case.state},
-                 classification="GOVERNANCE", actor_class=user.get("role", "operator"))
+    append_audit(
+        db, "PORTAL_RESOLVE",
+        {"case": case.case_ref, "control": control, "state": case.state},
+        classification="GOVERNANCE", actor_class=user.get("role", "operator"),
+    )
     return {"case_ref": case.case_ref, "state": case.state, "action": control}
 
 
 def _live_side_effect(db: Session, user: dict, key: str, control: str, target: str, note: str) -> dict | None:
-    """Map selected portal controls onto real Core tables (Neon-light)."""
+    """Map portal controls onto OversightCase or audit (Neon-light)."""
     k = (key or "").upper()
     c = (control or "").strip()
 
-    # —— HITL: resolve by case_ref or open ——
-    if k == "HITL_REVIEW":
-        if c in ("Approve AI Decision", "Override", "Release", "Flag for Training"):
-            if target and target.upper().startswith("COB-"):
-                resolved = _resolve_case(db, user, target, c, note)
-                if resolved:
-                    return {"oversight": resolved}
-            o = _open_case(db, user, target or "model-001", note or f"HITL · {c}", "HITL_OPEN")
-            o["action"] = c
-            return {"oversight": o}
-
-    # —— Regulator family: open case ——
-    if k == "REGULATOR" and c in ("Start Audit", "Review Submission", "Impose Penalty", "Issue Directive"):
-        o = _open_case(db, user, target or "model-001", f"REGULATOR · {c}" + (f" — {note}" if note else ""), "REGULATOR_ACTION")
-        o["action"] = c
-        return {"oversight": o}
-
-    if k == "INFO_REGULATOR" and c in ("Open Investigation", "Issue PAIA Notice", "Assess Breach", "Close Case"):
-        if c == "Close Case" and target and target.upper().startswith("COB-"):
+    if k in LIVE_CASE_PORTALS:
+        # Resolve existing case when Target is COB-… and control is a close/resolve verb
+        if c in RESOLVE_CONTROLS and target and target.upper().startswith("COB-"):
             resolved = _resolve_case(db, user, target, c, note)
             if resolved:
                 return {"oversight": resolved}
-        o = _open_case(db, user, target or "model-001", f"INFO_REG · {c}" + (f" — {note}" if note else ""), "INFO_REG_ACTION")
-        o["action"] = c
-        return {"oversight": o}
+            # fall through to open if case_ref unknown
 
-    if k == "CONSTITUTIONAL_OVERSIGHT" and c in ("Constitutional Review", "Issue Opinion", "Refer to Court", "Close Matter"):
-        if c == "Close Matter" and target and target.upper().startswith("COB-"):
-            resolved = _resolve_case(db, user, target, c, note)
-            if resolved:
-                return {"oversight": resolved}
-        o = _open_case(db, user, target or "model-001", f"COB · {c}" + (f" — {note}" if note else ""), "COB_ACTION")
-        o["action"] = c
-        return {"oversight": o}
-
-    if k == "SAHRC" and c in ("Log Complaint", "Start Investigation", "Schedule Hearing", "Publish Finding"):
-        if c == "Publish Finding" and target and target.upper().startswith("COB-"):
-            resolved = _resolve_case(db, user, target, c, note)
-            if resolved:
-                return {"oversight": resolved}
-        o = _open_case(db, user, target or "model-001", f"SAHRC · {c}" + (f" — {note}" if note else ""), "SAHRC_ACTION")
-        o["action"] = c
-        return {"oversight": o}
-
-    if k == "CASE_MANAGER" and c in ("Open Case", "Assign Worker", "Update Status", "Close Case"):
-        if c == "Close Case" and target and target.upper().startswith("COB-"):
-            resolved = _resolve_case(db, user, target, c, note)
-            if resolved:
-                return {"oversight": resolved}
-        o = _open_case(db, user, target or "model-001", f"CASE_MGR · {c}" + (f" — {note}" if note else ""), "CASE_MGR_ACTION")
-        o["action"] = c
-        return {"oversight": o}
-
-    if k == "WELFARE" and c in ("Approve Grant", "Verify Beneficiary", "Investigate Fraud", "Disburse"):
-        if c == "Disburse" and target and target.upper().startswith("COB-"):
-            resolved = _resolve_case(db, user, target, c, note)
-            if resolved:
-                return {"oversight": resolved}
-        o = _open_case(db, user, target or "model-001", f"WELFARE · {c}" + (f" — {note}" if note else ""), "WELFARE_ACTION")
-        o["action"] = c
-        return {"oversight": o}
-
-    if k == "SARS" and c in ("Initiate Audit", "Verify Return", "Issue Assessment", "Close Case"):
-        if c == "Close Case" and target and target.upper().startswith("COB-"):
-            resolved = _resolve_case(db, user, target, c, note)
-            if resolved:
-                return {"oversight": resolved}
-        o = _open_case(db, user, target or "model-001", f"SARS · {c}" + (f" — {note}" if note else ""), "SARS_ACTION")
+        reason = f"{k} · {c}" + (f" — {note}" if note else "")
+        o = _open_case(db, user, target or "model-001", reason, f"{k}_ACTION")
         o["action"] = c
         return {"oversight": o}
 
     if k in LIVE_AUDIT_PORTALS:
-        live = {"audit": {"portal": k, "control": c, "model_id": target or "model-001", "note": note or ""}}
-        append_audit(db, f"{k}_CONTROL", live["audit"], classification="OPERATIONS",
-                     actor_class=user.get("role", "client"))
+        live = {
+            "audit": {
+                "portal": k,
+                "control": c,
+                "model_id": target or "model-001",
+                "note": note or "",
+            }
+        }
+        append_audit(
+            db, f"{k}_CONTROL", live["audit"],
+            classification="OPERATIONS", actor_class=user.get("role", "client"),
+        )
         return live
 
+    # CITIZEN is UI-only; remaining unknown keys stay OperatorAction-only
     return None
 
 
@@ -189,9 +160,16 @@ def portal_detail(key: str, db: Session = Depends(get_db), user: dict = Depends(
     if k in LIVE_CASE_PORTALS:
         out["live"]["oversight_cases"] = _oversight_list(db)
         out["live"]["mode"] = "oversight"
+        out["live"]["resolve_hint"] = (
+            "Target = COB-… + resolve control (Close Case / Override / Resolve / …) closes the case. "
+            "Otherwise every control opens a new OversightCase."
+        )
     elif k in LIVE_AUDIT_PORTALS:
         out["live"]["mode"] = "audit"
         out["live"]["tip"] = "Target = model id (prefer model-001). Controls write audit on Core."
+    elif k == "CITIZEN":
+        out["live"]["mode"] = "citizen_ui"
+        out["live"]["tip"] = "Use the Citizen interface — public /citizen/* APIs, not control forms."
     return out
 
 
@@ -200,18 +178,28 @@ def portal_activity(key: str, limit: int = 20, db: Session = Depends(get_db), us
     prof = sp.get(key)
     if not prof:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"unknown portal '{key}'")
-    return {"portal": prof["key"], "title": prof["title"], "activity": _activity(db, prof["key"], min(limit, 100))}
+    return {
+        "portal": prof["key"],
+        "title": prof["title"],
+        "activity": _activity(db, prof["key"], min(limit, 100)),
+    }
 
 
-@router.post("/{key}/control", summary="Operate a control on this portal (records a real, audit-linked action)")
-def operate_control(key: str, payload: dict = Body(...),
-                    db: Session = Depends(get_db), user: dict = Depends(current_user)):
+@router.post("/{key}/control", summary="Operate a control (audit-linked + live dual-path)")
+def operate_control(
+    key: str,
+    payload: dict = Body(...),
+    db: Session = Depends(get_db),
+    user: dict = Depends(current_user),
+):
     prof = sp.get(key)
     if not prof:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"unknown portal '{key}'")
     if not _may_operate(user, prof):
-        raise HTTPException(status.HTTP_403_FORBIDDEN,
-                            f"This portal is operated by the '{prof['base_role']}' role; you are '{user.get('role')}'.")
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            f"This portal is operated by the '{prof['base_role']}' role; you are '{user.get('role')}'.",
+        )
     control = (payload.get("control") or "").strip()
     valid = {c["name"] for c in prof["controls"]}
     if control not in valid:
@@ -231,17 +219,30 @@ def operate_control(key: str, payload: dict = Body(...),
         summary += f" · case {live['oversight']['case_ref']}"
 
     op = OperatorAction(
-        ref=ref, actor_email=user.get("sub", ""), profile_key=prof["key"], capability=control,
-        op_type=sp.op_type_for(control), target=target, result_ref=ref, result_summary=summary,
-        detail_json=json.dumps({"portal": prof["title"], "control": control, "note": note,
-                                "by_role": user.get("role", ""), "group": prof["group"],
-                                "live": live}),
+        ref=ref,
+        actor_email=user.get("sub", ""),
+        profile_key=prof["key"],
+        capability=control,
+        op_type=sp.op_type_for(control),
+        target=target,
+        result_ref=ref,
+        result_summary=summary,
+        detail_json=json.dumps({
+            "portal": prof["title"], "control": control, "note": note,
+            "by_role": user.get("role", ""), "group": prof["group"], "live": live,
+        }),
         status="EXECUTED",
     )
-    db.add(op); db.commit(); db.refresh(op)
+    db.add(op)
+    db.commit()
+    db.refresh(op)
     return {
-        "ref": ref, "portal": prof["title"], "portal_key": prof["key"], "control": control,
-        "op_type": op.op_type, "status": "EXECUTED",
+        "ref": ref,
+        "portal": prof["title"],
+        "portal_key": prof["key"],
+        "control": control,
+        "op_type": op.op_type,
+        "status": "EXECUTED",
         "at": op.created_at.isoformat() if op.created_at else datetime.now(timezone.utc).isoformat(),
         "message": f"{control} executed on {prof['title']}.",
         "live": live,
