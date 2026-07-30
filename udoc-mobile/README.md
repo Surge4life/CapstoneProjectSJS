@@ -1,35 +1,24 @@
-# UDOC Control — Android .apk build (app id: za.gods.udoc)
+# UDOC Client — Android .apk (app id: za.gods.udoc)
 
-Capacitor project that compiles the **udoc-app** web app into a native Android `.apk`.
+**Audience:** Tenant / SaaS clients only.  
+**Not** GODS staff admin. Staff mobile path for Capstone = PWA install of Admin (`gods-udoc-admin`).
 
-## Why it isn't pre-compiled in the package
-A signed `.apk` needs the Android SDK + Android Gradle Plugin + a keystore. The build sandbox
-that produced this package has no SDK and is firewall-blocked from downloading it. Everything
-else is done; the SDK build is the one step that must run on your machine.
+Capacitor project that packages the **udoc-app** (client Control) web UI.
 
-## Requirements (on your desktop)
-- Android Studio (gives you the SDK + an emulator) **or** Android command-line tools
+Package matrix: `udoc-mvp/UDOC_MVP_PACKAGE_MATRIX.md`.
+
+## Requirements (your desktop)
+- Android Studio or Android command-line tools
 - JDK 17+
 - Node.js 18+
 
-## Build (one script)
+## Build
 ```bash
 cd udoc-mobile
-./build-apk.sh          # builds web app → generates android/ → applies resources → assembles APK
+./build-apk.sh
+npx cap open android    # signed APK via Android Studio
 ```
-Then to produce a **signed** apk for sideload/Play Store:
-```bash
-npx cap open android    # opens Android Studio → Build > Generate Signed Bundle / APK > APK
-```
-Output (unsigned): `android/app/build/outputs/apk/release/app-release-unsigned.apk`
-
-## What's already prepared for you
-- `www/` — the built web app (works as an installable PWA right now, no toolchain)
-- `capacitor.config.json` — app id za.gods.udoc, cleartext enabled for the connect-screen
-- `android-resources/` — network-security config (lets the app reach your LAN/tunnel backend),
-  strings.xml, and the manifest permissions to merge
-- `build-apk.sh` — the exact end-to-end build
 
 ## First launch
-The app shows a connect screen — enter your deployed backend URL (e.g. your Render URL
-`https://gods-platform-core.onrender.com`, or a LAN IP / ngrok tunnel) and it runs live.
+Connect screen → Core API base (`https://gods-platform-core.onrender.com`).  
+Client functions only: register/govern **own** models, dashboard, tenant flows — no kill-switch / global jobs.
