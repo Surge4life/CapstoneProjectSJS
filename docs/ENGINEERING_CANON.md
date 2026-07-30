@@ -16,6 +16,24 @@ When a developer joins this project, they read this document before they write a
 
 ---
 
+## Capstone live UDOC (valuation track · 2026-07-30)
+
+UDOC division is the Capstone showcase. Live deployment is **Render free + Neon ≤500MB** — software bootloaders of the governance loop, not full Tier-3 hardware.
+
+| Document | Use |
+|----------|-----|
+| [`udoc-mvp/UDOC_LIVE_ENVIRONMENTS.md`](../udoc-mvp/UDOC_LIVE_ENVIRONMENTS.md) | Hosts · access nodes · API routing by user class |
+| [`udoc-mvp/UDOC_V93_DEMO67_PATENT_CONTROLS.md`](../udoc-mvp/UDOC_V93_DEMO67_PATENT_CONTROLS.md) | Netlify demos 6–7 → live control mapping |
+| [`udoc-mvp/P6_ASSESSOR_SIDE_BY_SIDE.md`](../udoc-mvp/P6_ASSESSOR_SIDE_BY_SIDE.md) | Demo vs live matrix |
+| [`UDOC_SMOKE_PASS.md`](../UDOC_SMOKE_PASS.md) | Operator smoke checklist |
+| [`udoc-mvp/TASK2_DEMO_PARITY_STATUS.md`](../udoc-mvp/TASK2_DEMO_PARITY_STATUS.md) | Task 2 density status (close only after live green) |
+| [Vol X · Ch 13 Render](vol-10-infrastructure/13-render-deployment.md) | Honest free-tier deploy map |
+
+**Task 2** (demo parity on live UI) before **Task 1** (further Canon volume expansion).  
+**GIS / GBS product depth** after UDOC smoke-ready — engines may exist in Core; franchise/GIS corpus is post-seed.
+
+---
+
 ## Volume Index
 
 | Volume | Title | Scope |
@@ -42,6 +60,7 @@ When a developer joins this project, they read this document before they write a
 - **Frontend developers** — Start with Volume IX, then Volume VI.
 - **Security reviewers** — Start with Volume V, then Volume X, then Volume VIII.
 - **Governance/compliance officers** — Start with Volume I, then Volume IV, then Volume V.
+- **Capstone assessors (UDOC live)** — Capstone live UDOC table above, then Vol IX tokens, then Vol X Ch 13.
 
 ---
 
@@ -50,6 +69,7 @@ When a developer joins this project, they read this document before they write a
 | Version | Date | Author | Notes |
 |---------|------|--------|-------|
 | 1.0 | 2025 | Sashin J. Singh | Initial Engineering Canon |
+| 1.0-capstone-live | 2026-07-30 | Capstone track | Live UDOC environment + valuation pointers (no claim of full Tier-3 hardware) |
 
 ---
 
