@@ -1,35 +1,27 @@
-# Portal live dual-path (Neon-light)
+# Portal live dual-path (Neon-light) — COMPLETE
 
 **Surface:** `GET/POST /portal/{key}` on platform-core  
-**UI:** `/portals` · no new Render services
+**UI:** `/portals` · no new Render services · OversightCase only
 
-## OversightCase writers (open / resolve via Target = COB-…)
+## Model
 
-| Portal key | Open controls | Resolve controls (Target = case_ref) |
-|------------|---------------|--------------------------------------|
-| HITL_REVIEW | Flag for Training; others if no COB- target | Approve AI Decision · Override · Release |
-| REGULATOR | Start Audit · Review Submission · Impose Penalty · Issue Directive | — |
-| INFO_REGULATOR | Open Investigation · Issue PAIA Notice · Assess Breach | Close Case |
-| CONSTITUTIONAL_OVERSIGHT | Constitutional Review · Issue Opinion · Refer to Court | Close Matter |
-| SAHRC | Log Complaint · Start Investigation · Schedule Hearing | Publish Finding |
-| CASE_MANAGER | Open Case · Assign Worker · Update Status | Close Case |
-| WELFARE | Approve Grant · Verify Beneficiary · Investigate Fraud | Disburse |
-| SARS | Initiate Audit · Verify Return · Issue Assessment | Close Case |
+| Mode | Portals | Behaviour |
+|------|---------|-----------|
+| **oversight** | HITL, Regulator, InfoReg, SAHRC, Case Manager, Welfare, SARS, COB, Border, DHA, Service Delivery, Municipal, Justice, NPA, Health, SETHS, Employer, MADIBA, Insurance, DCDT Policy, Super Admin | Every control **opens** `COB-` case unless Target is existing `COB-…` **and** control is a resolve verb |
+| **audit** | AI Owner, Private Compliance | Audit row only; Target = model id |
+| **citizen_ui** | CITIZEN | Full AI-Rights UI · public `/citizen/*` |
 
-## Audit-only (no OversightCase row)
+## Resolve controls (Target = `COB-…`)
 
-| Portal key | Behaviour |
-|------------|-----------|
-| AI_OWNER | Audit + model target (prefer model-001) |
-| PRIVATE_COMPLIANCE | Audit + model/subject target |
+Approve AI Decision · Override · Release · Close Case · Close Matter · Publish Finding · Disburse · Withdraw Case · Archive Case · Resolve · Close Feedback · Release Hold · Approve Payout · Certify
 
-## Citizen
+## Verify (after Core redeploy)
 
-Full AI-Rights UI (not control headings) · public `/citizen/*` · also Client `/citizen.html`
+1. `/portals` sign in as admin
+2. **Border** → Flag Traveler (target `model-001`) → terminal `live → case_ref`
+3. **Health** → Triage Patient → new case on Neon panel
+4. **HITL** → click `COB-…` → Override → state **OVERRIDDEN**
+5. **AI Owner** → Monitor Drift → `live → audit` (no OversightCase)
+6. **Citizen** → full Challenge / Status UI (no control headings)
 
-## Verify
-
-1. Sign in `/portals`
-2. Open **SAHRC** → Execute **Log Complaint** (target `model-001`) → terminal `live → case_ref`
-3. Open **HITL Review** → click case_ref → **Override** → state OVERRIDDEN
-4. Neon ≤500MB · no new user registration
+Neon ≤500MB · no new user registration · no new Render services.
