@@ -1,40 +1,45 @@
 # UDOC Demo Inventory (source of truth)
 
 Extracted from `SJSCAPSTONE_Netlify_Deploy_v5_GBS.zip` → `index.html` (`#demo=<slug>`).  
-Live: https://capstoneprojectsjs.netlify.app/#demo=udoc-v7-platform
+Live demos: https://capstoneprojectsjs.netlify.app/#demo=udoc-v7-platform
 
-These demos are the **UI acceptance test** for Task 2. Engineering Canon Vol IX is the design law.
+These demos are the **UI acceptance test** for Task 2. Engineering Canon Vol IX is the design law.  
+Live environment map: `UDOC_LIVE_ENVIRONMENTS.md` · Patent control map (demos 6–7): `UDOC_V93_DEMO67_PATENT_CONTROLS.md`.
 
-## `udoc-mvp-1` — MVP 1 · International Standards Dashboard
-- body: 1682 · css: 9587 · js: 22805
+## 1. `udoc-mvp-1` — MVP 1 · International Standards Dashboard
 - Nav chrome: Dashboard · AI Registry · Compliance · Audit Trail · Sovereignty
+- **Live:** Client host (`udoc-public`) + mini-smoke + Govern batch
 
-## `udoc-mvp-2` — MVP 2 · Multi-Framework Compliance Engine
-- body: 21469 · css: 18712 · js: 16694
-- Chrome: Command Dashboard · Compliance Rate · Decisions Audited · Data Sovereignty 100% ZA · AI System Registry · Regulatory Compliance · Sovereignty Guarantees
+## 2. `udoc-mvp-2` — MVP 2 · Multi-Framework Compliance Engine
+- Chrome: Command Dashboard · Compliance · Decisions · Sovereignty · Registry
+- **Live:** Client Compliance + Sector frameworks + coverage bars
 
-## `udoc-v7-platform` — v7 Full Platform · World Deterministic Governance (FEATURED)
-- body: **295677** · css: 32331 · js: 86601
-- Multi-role launcher (Super Admin → Citizen)
-- Nav: Command Centre · AI Registry · Audit Trail · HITL Queue · Compliance · Sovereignty · Incident Command · EVA Command · EVA Audit Log · Bias Monitor · Bill of Rights · SETHS · TS · MADIBA · Citizen portal modules
-- Density: Live Audit Stream · Full Registry tables · SPD/HITL columns · Sovereignty Monitor
+## 3. `udoc-v7-platform` — v7 Full Platform (FEATURED)
+- Multi-role launcher · Command Centre · Registry · HITL · EVA · Citizen modules
+- **Live:** split across Admin enhance · Client · Citizen · Core `/portals` · Sentinel (not one mega-HTML)
 
-## `udoc-v7-eva` — v7 EVA Engine · Multi-Dimensional Evaluation
-- body: 54501 · css: 15525 · js: 9287
-- Chrome: EVA Command · Run Full EVA · system EVA table · pillar scores · Regulator Dashboard · Incident Command
+## 4. `udoc-v7-eva` — v7 EVA Engine
+- EVA Command · Run Full EVA · 6-D · regulator rollup
+- **Live:** Core `/Sentinel` · Full EVA matrix · Smoke
 
-## `udoc-v5-sa` — v5 SA-Aligned · Architecture Lineage
-- body: 131775 · css: 23418 · js: 3277
-- Chrome: 6 Strategic Pillars mapping · HITL pathway status · Live audit events · Sovereignty report export
+## 5. `udoc-v5-sa` — v5 SA-Aligned · Architecture Lineage
+- Pillars · HITL pathway · sovereignty report
+- **Live:** Sentinel 12 Pillars · Client/Sector sovereignty strips
 
-## `udoc-platform-ui` — Operational Control Platform v9.3
-- body: 46179 · css: 9660 · js: 40126
-- Chrome: Operations Dashboard · Model Registry · EVA Scoring · Sovereignty Control · StayChain™ · Hot-Reload · MFCM cells
+## 6. `udoc-platform-ui` — Operational Control Platform **v9.3**
+- Operations · Registry · EVA · Sovereignty · StayChain™ · Hot-Reload · MFCM
+- **Patent controls → live:** see `UDOC_V93_DEMO67_PATENT_CONTROLS.md` § Demo 6
+- **Live:** Client + Sentinel + Policy packs + cert/evidence (StayChain full UI = gap)
 
-## `udoc-sovereign-console` — Sovereign AI Governance Platform v9.3
-- body: 41914 · css: 7164 · js: 22739
-- Chrome: EVA Detail · StayChain™ blockchain · SVS Monitor · Kill-Switch · Agent Registry
+## 7. `udoc-sovereign-console` — Sovereign AI Governance **v9.3**
+- EVA Detail · StayChain · SVS · Kill-Switch · Agent Registry
+- **Patent controls → live:** see `UDOC_V93_DEMO67_PATENT_CONTROLS.md` § Demo 7
+- **Live:** Sentinel EVA detail · Admin kill-switch · Registry (StayChain viz = gap)
 
-## Gap statement
+---
 
-Current live shells (`udoc-public`, `udoc-internal`, `/Sentinel`) implement **fractions** of the above navigation and density. Task 2 remains **open** until live tabs match these demos functionally (min 4 live returns per surface) under Vol IX design tokens and existing Render/Neon limits.
+## Gap statement (honest · 2026-07-30)
+
+Density wave landed Full EVA batch / scenario chips / dual-path portals / gateway links on existing hosts.  
+**Task 2 remains open until operator verifies** biased = BLOCK on live Client + Sentinel + Admin + Sector.  
+Pixel-perfect single-page parity with Netlify mega-demos is not claimed; **functional governance loop parity** is the Capstone bar under Neon/Render limits.
