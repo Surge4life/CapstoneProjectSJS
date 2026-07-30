@@ -18,6 +18,7 @@ button{font-family:inherit;cursor:pointer;border:0}a{color:var(--gold-l)}
 .btn{background:var(--gold);color:#1a1305;border-radius:11px;padding:12px 16px;font-weight:700;font-size:14px;width:100%}
 .btn.sm{width:auto;padding:8px 14px;font-size:12px}.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--gold-l)}
 .btn.green{background:rgba(16,185,129,.2);color:var(--green);border:1px solid rgba(16,185,129,.4)}
+.btn.cyan{background:rgba(0,194,212,.12);color:var(--cyan);border:1px solid rgba(0,194,212,.35)}
 .err{color:var(--red);font-size:13px;min-height:18px;margin-top:8px}
 #app{display:none}
 .top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(10,22,40,.95);border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -40,7 +41,7 @@ button{font-family:inherit;cursor:pointer;border:0}a{color:var(--gold-l)}
 .pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;border:1px solid var(--line);color:var(--cyan);display:inline-block;margin:2px 3px 0 0}
 .note{font-size:12px;color:var(--mut);border-top:1px solid var(--line);padding-top:12px;margin-top:18px;line-height:1.45}
 .dw-bg{position:fixed;inset:0;background:rgba(2,7,15,.6);z-index:40;display:none}.dw-bg.on{display:block}
-.dw{position:fixed;top:0;right:0;height:100%;width:min(440px,96vw);background:var(--navy2);border-left:1px solid var(--line);z-index:50;transform:translateX(100%);transition:transform .25s;overflow-y:auto;padding:18px 18px 40px}
+.dw{position:fixed;top:0;right:0;height:100%;width:min(460px,96vw);background:var(--navy2);border-left:1px solid var(--line);z-index:50;transform:translateX(100%);transition:transform .25s;overflow-y:auto;padding:18px 18px 40px}
 .dw.on{transform:none}.dw .x{position:absolute;top:12px;right:14px;background:none;color:var(--mut);font-size:20px}
 .ctrl{display:block;width:100%;text-align:left;background:var(--navy);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;color:var(--ink)}
 .ctrl .row{display:flex;gap:6px;margin-top:8px}
@@ -48,18 +49,22 @@ button{font-family:inherit;cursor:pointer;border:0}a{color:var(--gold-l)}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0a1c34;border:1px solid var(--gold);color:var(--gold-l);padding:10px 16px;border-radius:10px;font-size:13px;z-index:90}
 .tier{display:inline-block;font-size:10px;padding:2px 8px;border-radius:6px;background:rgba(0,194,212,.12);color:var(--cyan);margin-left:6px}
 .term{background:#050a12;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--mut);white-space:pre-wrap;margin-top:10px;min-height:60px}
+.banner{background:var(--navy2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--mut)}
+.banner .ok{color:var(--green)}.banner .bad{color:var(--red)}
+.live{margin-top:10px;padding:10px;border:1px solid rgba(16,185,129,.25);border-radius:8px;background:rgba(16,185,129,.06);font-size:12px;color:var(--mut)}
 </style>
 </head>
 <body>
 <div id="login">
   <h1>UDOC</h1>
   <div class="sub">Client SaaS · Portal Access</div>
-  <p style="color:var(--mut);font-size:13px;line-height:1.45">Tenant portals under UDOC — role + sector gated. Citizen is a <b>full public interface</b>, not a heading-only route.</p>
+  <p style="color:var(--mut);font-size:13px;line-height:1.45">Tenant portals under UDOC — role + sector gated. Control forms hit Core dual-path (OversightCase). Citizen = full public UI on Client host.</p>
   <input class="in" id="li-email" placeholder="client email" autocomplete="username" value="admin@gods.local"/>
   <input class="in" id="li-pass" type="password" placeholder="password" value="admin123" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()"/>
   <button class="btn" id="li-btn" type="button" onclick="login()">Sign in</button>
   <div class="err" id="li-err"></div>
   <p style="margin-top:12px"><button class="btn green" type="button" onclick="location.href='https://gods-udoc-client.onrender.com/citizen.html'">Citizen Portal (public UI) →</button></p>
+  <p style="margin-top:8px"><button class="btn cyan" type="button" onclick="window.open('https://gods-platform-core.onrender.com/portals','_blank')">Core 24 Portals workspace →</button></p>
   <details style="margin-top:14px;color:var(--mut2);font-size:12px"><summary>API</summary>
     <input class="in" id="li-api" style="margin-top:8px" placeholder="https://gods-platform-core.onrender.com"/></details>
 </div>
@@ -69,9 +74,12 @@ button{font-family:inherit;cursor:pointer;border:0}a{color:var(--gold-l)}
     <div class="ttl"><b>UDOC</b> Client SaaS</div>
     <div class="who" id="who"></div>
     <button class="btn green sm" type="button" onclick="location.href='https://gods-udoc-client.onrender.com/citizen.html'">Citizen UI</button>
+    <button class="btn cyan sm" type="button" onclick="window.open(base()+'/portals','_blank')">Core /portals</button>
+    <button class="btn ghost sm" type="button" onclick="window.open(base()+'/Sentinel','_blank')">Sentinel</button>
     <button class="btn ghost sm" type="button" onclick="logout()">Sign out</button>
   </div>
   <div class="wrap">
+    <div class="banner" id="boot-banner">Boot…</div>
     <div class="seg" id="sector-seg">
       <button type="button" class="on" data-s="ALL" onclick="setSector(this,'ALL')">All sectors</button>
       <button type="button" data-s="PUBLIC" onclick="setSector(this,'PUBLIC')">Public sector</button>
@@ -88,7 +96,7 @@ button{font-family:inherit;cursor:pointer;border:0}a{color:var(--gold-l)}
     <div class="kpis" id="kpis"></div>
     <div id="tier-note" style="font-size:12px;color:var(--mut);margin-bottom:12px"></div>
     <div class="grid" id="portals"></div>
-    <div class="note">Each portal opens a <b>control form interface</b> (target + note + Execute + live terminal), not a heading list. Citizen public UI lives on Client host. Neon ≤500MB · no new registration.</div>
+    <div class="note">Control forms POST to Core <code>/portal/{key}/control</code> · dual-path may open/resolve OversightCase (Neon). Citizen public UI = Client host. Full dual-path workspace = Core <code>/portals</code>. Neon ≤500MB · no new registration.</div>
   </div>
 </div>
 
@@ -99,7 +107,7 @@ button{font-family:inherit;cursor:pointer;border:0}a{color:var(--gold-l)}
 const API_DEFAULT="https://gods-platform-core.onrender.com";
 const base=()=>localStorage.getItem("udoc_saas_api")||API_DEFAULT;
 const tok=()=>localStorage.getItem("udoc_saas_tok")||"";
-let ME={}, CATALOG=[], SECTOR="ALL", ROLE_VIEW="ALL", TENANT=null, CUR=null;
+let ME={}, CATALOG=[], SECTOR="ALL", ROLE_VIEW="ALL", TENANT=null, CUR=null, READY=null;
 const esc=s=>{const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;};
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800);}
 async function api(path,opts={}){
@@ -158,8 +166,15 @@ async function enter(){
   ME=JSON.parse(localStorage.getItem("udoc_saas_me")||"{}");
   ME._class=saasClass(ME.role);
   document.getElementById("who").innerHTML=esc(ME.email||"")+"<br>"+esc(ME._class)+" · "+esc(ME.role||"")+(ME.tenant_id?" · "+esc(ME.tenant_id):"");
+  try{ READY=await api("/udoc/demo/ready"); }catch(e){ READY=null; }
   try{ TENANT=await api("/tenants/me"); }catch(e){ TENANT=null; }
   try{ const data=await api("/access/profiles"); CATALOG=data.profiles||[]; }catch(e){ CATALOG=[]; toast(e.message); }
+  const ban=document.getElementById("boot-banner");
+  if(ban){
+    ban.innerHTML=READY&&READY.ready
+      ? '<span class="ok">DEMO READY</span> · active rules '+esc(READY.active_rules)+' · control forms → Core dual-path · prefer model-001'
+      : '<span class="bad">SEED PENDING</span> · portals still open · EVA seed optional for portal controls';
+  }
   paint();
 }
 function setSector(el,s){SECTOR=s; document.querySelectorAll("#sector-seg button").forEach(b=>b.classList.toggle("on",b.dataset.s===s)); paint();}
@@ -173,8 +188,8 @@ function paint(){
     '<div class="kpi"><div class="k">Visible portals</div><div class="v">'+list.length+'</div></div>'+
     '<div class="kpi"><div class="k">Tier</div><div class="v" style="font-size:13px">'+esc(tier)+'</div></div>';
   document.getElementById("tier-note").innerHTML=TENANT
-    ? ('Tenant <b>'+esc(TENANT.tenant_id||TENANT.name||"")+'</b> <span class="tier">'+esc(tier)+'</span> · Citizen = full public UI on Client host')
-    : 'Platform staff · portals open <b>control forms</b> (not headings only) · Citizen = full public UI';
+    ? ('Tenant <b>'+esc(TENANT.tenant_id||TENANT.name||"")+'</b> <span class="tier">'+esc(tier)+'</span> · Citizen = Client host · dual-path = Core /portals')
+    : 'Platform staff · control forms + live terminal · Citizen = Client host · full dual-path = Core /portals';
   const citizen='<div class="pc citizen" onclick="location.href=\'https://gods-udoc-client.onrender.com/citizen.html\'"><div class="nm">Citizen Portal · AI Rights</div>'+
     '<div class="role">PUBLIC · no login · /citizen/*</div>'+
     '<div class="caps">Challenge · Case status · Explanation · Rights · Help — full interface</div>'+
@@ -193,10 +208,15 @@ async function openPortal(key){
   try{
     const d=await api("/portal/"+encodeURIComponent(key));
     const p=d.portal, may=d.may_operate;
+    const live=d.live||{};
+    const cases=live.oversight_cases||live.cases||[];
+    const liveBlock=cases.length
+      ? ('<div class="live"><b>Live oversight on Neon</b><br>'+cases.slice(0,5).map(c=>esc(c.case_ref||c.id)+' · '+esc(c.state||c.status||"")).join("<br>")+'</div>')
+      : '<div class="live">No open oversight rows yet — Execute a control to dual-path open a case.</div>';
     const ctrls=(p.controls||[]).map((c,i)=>{
       const id="c_"+i;
       return '<div class="ctrl"><b>'+esc(c.name)+'</b><div style="font-size:11px;color:var(--mut);margin-top:4px">'+esc(c.desc||"")+'</div>'+
-        (may?('<div class="row"><input id="'+id+'_t" placeholder="target"/><input id="'+id+'_n" placeholder="note"/></div>'+
+        (may?('<div class="row"><input id="'+id+'_t" placeholder="target (COB-… to resolve)"/><input id="'+id+'_n" placeholder="note"/></div>'+
           '<div style="margin-top:8px"><button class="btn sm" type="button" onclick="operate(\''+esc(c.name).replace(/'/g,"\\'")+'\','+i+')">Execute → live</button></div>'):
           '<div style="font-size:11px;color:var(--amber);margin-top:6px">gated · needs '+esc(p.base_role)+'</div>')+
         '</div>';
@@ -205,8 +225,10 @@ async function openPortal(key){
       '<h3 style="margin:6px 0;font-family:Georgia,serif">'+esc(p.title)+'</h3>'+
       '<div style="color:var(--mut);font-size:12px">'+esc(p.base_role)+' · '+(may?'OPERATE':'VIEW')+'</div>'+
       '<p style="color:var(--mut);font-size:13px;line-height:1.5">'+esc(p.desc||"")+'</p>'+
+      liveBlock+
       '<div style="margin:12px 0 8px;font-size:11px;color:var(--mut);text-transform:uppercase">Control forms</div>'+ctrls+
-      '<div class="term" id="dw-term">Ready.</div>';
+      '<div class="term" id="dw-term">Ready · POST /portal/'+esc(key)+'/control</div>'+
+      '<div style="margin-top:12px"><button class="btn cyan sm" type="button" onclick="window.open(base()+\'/portals\',\'_blank\')">Open full Core /portals workspace</button></div>';
   }catch(e){document.getElementById("dw-body").textContent=e.message;}
 }
 async function operate(control, idx){
@@ -217,11 +239,18 @@ async function operate(control, idx){
     if(t) target=t.value.trim(); if(n) note=n.value.trim();
   }
   const term=document.getElementById("dw-term");
-  if(term) term.textContent="POST …/control · "+control+"…";
+  if(term) term.textContent="POST …/control · "+control+(target?" · target "+target:"")+"…";
   try{
     const r=await api("/portal/"+encodeURIComponent(CUR)+"/control",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({control,note:note||"client-saas",target})});
-    toast("✓ "+r.ref+" · "+control);
-    if(term) term.textContent="✓ "+r.status+" · ref "+r.ref+" · "+(r.message||control);
+    toast("✓ "+(r.ref||control)+" · "+control);
+    let line="✓ "+(r.status||"ok")+" · ref "+(r.ref||"—")+" · "+(r.message||control);
+    if(r.live){
+      if(r.live.case_ref) line+="\nlive.case_ref = "+r.live.case_ref;
+      if(r.live.state) line+=" · state "+r.live.state;
+      if(r.live.action) line+=" · action "+r.live.action;
+      line+="\n"+JSON.stringify(r.live).slice(0,400);
+    }
+    if(term) term.textContent=line;
   }catch(e){toast("✕ "+e.message); if(term) term.textContent="✗ "+e.message;}
 }
 function closeDw(){document.getElementById("dwbg").classList.remove("on");document.getElementById("dw").classList.remove("on");}
