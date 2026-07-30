@@ -2,7 +2,7 @@
 
 **Purpose:** Verify the live UDOC division is operational on Render + Neon without fabricating scale.  
 **Constraint:** Neon free ≤500MB · no new human user registration required · prefer seeded `model-001`.  
-**Date track:** 2026-07-29 · Task 2 client SaaS runtime path  
+**Date track:** 2026-07-30 · Task 2 density wave  
 **Side-by-side matrix:** `udoc-mvp/P6_ASSESSOR_SIDE_BY_SIDE.md`
 
 ---
@@ -13,10 +13,12 @@
 |---------|-----|
 | Platform Core | `https://gods-platform-core.onrender.com` |
 | Sentinel (EVA + policy runtime) | `https://gods-platform-core.onrender.com/Sentinel` |
+| 24 Portals | `https://gods-platform-core.onrender.com/portals` |
 | Client console | `https://gods-udoc-client.onrender.com` |
 | Citizen (public) | `https://gods-udoc-client.onrender.com/citizen.html` |
 | Client SaaS portals | `https://gods-udoc-portals.onrender.com` |
 | Admin (internal UDOC) | `https://gods-udoc-admin.onrender.com` |
+| Sector | Sector host (gods-udoc-sector) |
 | GODS constitutional admin | `https://gods-platform-core.onrender.com/admin` |
 | Gateway | `https://gods-udoc-gateway.onrender.com` |
 
@@ -44,9 +46,9 @@ Use **existing** operator credentials only. Do not create assessor user accounts
 
 ---
 
-## C · Sentinel smoke button
+## C · Sentinel smoke + Full EVA matrix
 
-On `/Sentinel` → header **Smoke**.
+On `/Sentinel` → header **Smoke** and **EVA Command → Run Full EVA matrix**.
 
 | # | Step | Pass |
 |---|------|------|
@@ -55,12 +57,13 @@ On `/Sentinel` → header **Smoke**.
 | C3 | `/policy/active` rules > 0 | PASS |
 | C4 | EVA fair on `model-001` | decision ≠ BLOCK |
 | C5 | EVA biased | decision = **BLOCK** |
+| C6 | Full EVA matrix | biased row **BLOCK** + KPIs |
 
 ---
 
-## C2 · Client dashboard mini-smoke
+## C2 · Client dashboard mini-smoke + Govern batch
 
-On Client → Dashboard → **Run client smoke**.
+On Client → Dashboard → **Run client smoke** · Govern → **Run Full EVA batch**.
 
 | # | Step | Pass |
 |---|------|------|
@@ -68,6 +71,7 @@ On Client → Dashboard → **Run client smoke**.
 | C2.2 | `/udoc/demo/ready` | PASS |
 | C2.3 | EVA fair | ≠ BLOCK |
 | C2.4 | EVA biased | = **BLOCK** |
+| C2.5 | Full EVA batch | outcome KPIs populated |
 
 ---
 
@@ -94,13 +98,34 @@ On Client → Dashboard → **Run client smoke**.
 
 ---
 
-## F · Admin (hard-refresh ×2 for SW v3)
+## F · Admin (hard-refresh ×2 for SW **v4**)
 
 | # | Check | Pass |
 |---|--------|------|
-| F1 | Command Centre DEMO READY banner | after login |
-| F2 | EVA Command chips → terminal | Biased BLOCK |
-| F3 | Infra links | Sentinel / Health / Jobs / Portals / Citizen |
+| F1 | Command Centre DEMO READY + outcome strip | after login |
+| F2 | EVA Command chips + **Full EVA batch** | Biased BLOCK |
+| F3 | HITL → Portals link | opens `/portals` |
+| F4 | Infra links | Sentinel / Health / Jobs / Portals / Citizen |
+
+---
+
+## H · Sector
+
+| # | Check | Pass |
+|---|--------|------|
+| H1 | Overview DEMO READY + BLOCK/APPROVE KPIs | visible |
+| H2 | Decisions Full EVA batch | Biased BLOCK |
+| H3 | Switch PUBLIC/PRIVATE | profile reload |
+
+---
+
+## I · 24 Portals dual-path
+
+| # | Check | Pass |
+|---|--------|------|
+| I1 | Open HITL / Border control | `live → case_ref` |
+| I2 | Resolve with Target=`COB-…` | RESOLVED/OVERRIDDEN |
+| I3 | CITIZEN card | full AI-Rights UI |
 
 ---
 
@@ -116,4 +141,4 @@ On Client → Dashboard → **Run client smoke**.
 ## Pass statement
 
 **UDOC division smoke-pass** when A + B + (C or C2) are green and D2 (biased BLOCK) is observed.  
-Full Task 2 close: walk `P6_ASSESSOR_SIDE_BY_SIDE.md` all four surfaces.
+**Task 2 close:** walk `P6_ASSESSOR_SIDE_BY_SIDE.md` surfaces 1–5 on live Render (operator-verified).
