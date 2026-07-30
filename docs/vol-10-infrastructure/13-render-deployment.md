@@ -1,129 +1,72 @@
-# Chapter 13 — Render Deployment (Current Production)
+# Chapter 13 — Render Deployment (Current Capstone Production)
 
-## Current Production Environment
+## Current production environment (honest)
 
-The G.O.D.S ecosystem is currently deployed to **Render** — a cloud platform that provides managed services for containers, databases, and static sites. This is the Tier 1 (cloud) deployment as described in the infrastructure overview.
+The Capstone UDOC stack runs on **Render free** web services + **external Neon Postgres (≤500MB)**.  
+Render’s free Postgres was expired; `DATABASE_URL` points at Neon (manual env, not `fromDatabase` in blueprint).
 
-The Render deployment configuration is defined in `render.yaml` at the repository root.
+Source of truth for service list: repository root `render.yaml`.  
+Human map for assessors: `udoc-mvp/UDOC_LIVE_ENVIRONMENTS.md`.
 
----
-
-## render.yaml Services
-
-```yaml
-# render.yaml (summary)
-services:
-  - name: gods-platform-core
-    type: web
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
-    envVars:
-      - key: ENVIRONMENT
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: gods-postgres
-          property: connectionString
-      # ... other env vars
-
-  - name: gods-udoc-web
-    type: web
-    buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-    
-  - name: gods-platform-internal
-    type: web
-    buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-
-  - name: gods-portals
-    type: web
-    buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-
-  - name: gods-udoc-admin
-    type: web
-    buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-
-databases:
-  - name: gods-postgres
-    databaseName: gods_production
-    user: gods_prod
-    plan: standard  # 4GB RAM, 2 vCPU
-```
+This is **Tier 1 (cloud pilot)** in the Volume X tier model — not Tier 3 sovereign hardware.
 
 ---
 
-## Environment Variables Required for Render Deployment
+## Active services (UDOC-relevant)
 
-These must be configured in the Render dashboard (or via the Render API) for the `gods-platform-core` service:
+| Service | Runtime | Root | Role |
+|---------|---------|------|------|
+| `gods-platform-core` | Python / uvicorn | `platform-core` | API + static `/Sentinel` · `/portals` · `/admin` |
+| `gods-udoc-client` | static | `udoc-public` | Client console + **Citizen** |
+| `gods-udoc-admin` | static | `udoc-internal` | Internal UDOC controller |
+| `gods-udoc-portals` | static | `udoc-portals` | Client SaaS role/sector portals |
+| `gods-udoc-sector` | static | `udoc-sector` | PUBLIC/PRIVATE sector console |
+| `gods-udoc-operator` | static | `udoc-operator` | Operator workspace |
+| `gods-udoc-gateway` | static | `udoc-gateway` | Sign-on router |
+| `gods-udoc-web` | static build | `udoc-app` | PWA / mobile OTA |
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | Auto-populated from Render PostgreSQL database |
-| `SECRET_KEY` | JWT signing key — generate with `openssl genrsa -out private.pem 2048` |
-| `REDIS_URL` | Render Redis instance URL |
-| `KAFKA_BOOTSTRAP_SERVERS` | External Kafka (Upstash or Confluent Cloud recommended) |
-| `CASSANDRA_HOSTS` | External Cassandra (DataStax Astra recommended) |
-| `OPENSEARCH_URL` | External OpenSearch (or AWS OpenSearch Service) |
-| `OBJECT_STORAGE_URL` | S3-compatible URL (Backblaze B2, Cloudflare R2, or AWS S3) |
-| `OBJECT_STORAGE_BUCKET` | Bucket name for document storage |
-| `OBJECT_STORAGE_KEY_ID` | Access key |
-| `OBJECT_STORAGE_SECRET` | Secret key |
-| `HSM_PKCS11_LIB` | Software HSM path (SoftHSM in cloud mode) |
-| `GOVERNANCE_ENGINE_URL` | URL of governance engines service |
+Also in blueprint (broader GODS): `gods-platform-internal`, `gods-portals` (division portals-web).
+
+**Quota rule:** Do not add services for Citizen or 24-portals — fold into Client and Core.
+
+---
+
+## Environment variables (Core)
+
+| Variable | Notes |
+|----------|-------|
+| `DATABASE_URL` | **Neon** connection string (manual; free Render SQL expired) |
 | `ENVIRONMENT` | `production` |
+| `GODS_SOV_KEY` | Generated / preserved on Render |
+
+Kafka, Cassandra, OpenSearch, object storage, and hardware HSM are **Canon target architecture** (other chapters). They are **not** required for Capstone UDOC smoke on free tier.
 
 ---
 
-## Render Limitations and Mitigations
-
-Render provides a good developer experience but has limitations for production governance workloads:
+## Limitations (free tier) and mitigations
 
 | Limitation | Impact | Mitigation |
-|-----------|--------|-----------|
-| No dedicated Kafka | Event streaming reliability | Use Upstash Kafka (managed, serverless) |
-| No dedicated Cassandra | WORM audit storage | Use DataStax Astra Serverless (Cassandra-compatible) |
-| Cold starts on free tier | Governance latency spikes | Use paid tier (always-on) |
-| Shared database | Performance | Use Standard plan minimum |
-| No hardware HSM | Cryptographic signing | SoftHSM (acceptable for cloud tier, not for sovereign tier) |
+|------------|--------|------------|
+| Neon ≤500MB | No bulk corpus / no mass user signup | Seed `model-001` · text-only knowledge · no new assessor users |
+| Render cold starts | First request latency | Smoke after warm · health check path `/health` |
+| ~20 service cap | Cannot spawn per-portal services | Core `/portals` data-driven dual-path |
+| No paid always-on | Spiky latency | Acceptable for Capstone valuation |
 
 ---
 
-## Deployment Process
+## Deploy process
 
-```bash
-# Trigger a production deployment via Render's deploy hook
-curl -X POST https://api.render.com/deploy/srv-{service-id}?key={deploy-key}
-```
+- `autoDeploy: true` on `main` for listed services.
+- Post-deploy verify:
+  1. `GET https://gods-platform-core.onrender.com/health`
+  2. `GET /udoc/demo/ready` (auth as needed) → seed status
+  3. Sentinel or Client smoke → fair ≠ BLOCK · biased = **BLOCK**
 
-Or via the Render dashboard: Services → gods-platform-core → Manual Deploy → Deploy latest commit.
-
-**Pre-deployment checklist:**
-1. All smoke tests passing locally
-2. Database migrations tested against a staging database
-3. Environment variables verified
-4. Render service health check URL accessible
-
-**Post-deployment verification:**
-1. `GET https://gods-platform-core.onrender.com/health` returns `{"status": "healthy"}`
-2. Authentication endpoint functional
-3. Run smoke test suite against production URL (read-only subset)
+Checklist: `UDOC_SMOKE_PASS.md` · matrix: `udoc-mvp/P6_ASSESSOR_SIDE_BY_SIDE.md`.
 
 ---
 
-## Scaling on Render
+## Relationship to patent / hardware
 
-Current production settings:
-- `gods-platform-core`: Standard plan (2 vCPU, 4GB RAM), single instance
-- Scale to multiple instances as load increases
-
-When to scale:
-- CPU consistently > 70% → scale up
-- Governance path p95 latency > 100ms → scale up or optimise
-- Memory > 80% → scale up
-
-Render supports automatic scaling based on CPU/memory metrics on the Pro plan.
+Software governance loop (evaluate → policy → block → certify → human path) is **deployable without full UDOC hardware**.  
+Tier 3 air-gap / HSM / WORM (Chapters 07, 12) is the **product upgrade path** after seed — documented, not claimed live on free Render.
