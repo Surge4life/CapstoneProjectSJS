@@ -1,7 +1,7 @@
 {
-  "name": "gods-udoc-desktop",
-  "version": "1.0.0",
-  "description": "UDOC Control desktop application (G.O.D.S ecosystem)",
+  "name": "gods-udoc-desktop-internal",
+  "version": "1.1.0",
+  "description": "UDOC Internal desktop — GODS staff / UDOC admins (not client SaaS)",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -9,8 +9,8 @@
     "dist:portable": "electron-builder --win portable"
   },
   "build": {
-    "appId": "za.gods.udoc.desktop",
-    "productName": "UDOC Control",
+    "appId": "za.gods.udoc.desktop.internal",
+    "productName": "UDOC Internal",
     "directories": { "output": "release" },
     "files": ["main.js", "preload.js", "icon.png"],
     "win": {
