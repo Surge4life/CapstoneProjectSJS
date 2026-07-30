@@ -43,6 +43,14 @@ return'<div class="dims">'+keys.map(k=>{const v=Number(dims[k]);const pct=isNaN(
 return'<div class="dim"><div class="dk">'+esc(k)+'</div><div class="dv">'+(isNaN(v)?"—":(v<=1?v.toFixed(2):v))+'</div><div class="bar"><i style="width:'+pct+'%"></i></div></div>';}).join('')+'</div>';}
 function honesty(){return'<div class="note">Pre-registration · GG54477 withdrawn · POPIA s71 + Constitution · Neon ≤500MB · Netlify mvp-1/mvp-2 acceptance path.</div>';}
 
+function scenarioBody(kind, mid, conf, comp){
+  const body={model_id:mid||"model-001",raw_confidence:conf!=null?conf:0.92,compliance:comp!=null?comp:1.0};
+  if(kind==="biased"){body.priv_favorable=900;body.priv_total=1000;body.unpriv_favorable=120;body.unpriv_total=1000;}
+  if(kind==="high")body.risk_tier="HIGH";
+  if(kind==="sov"){body.bgp=0.4;body.traceroute=0.5;body.dnssec=0.6;body.storage=0.7;}
+  return body;
+}
+
 async function clientSmoke(){
   const host=document.getElementById("client-smoke-out"); if(!host) return;
   host.innerHTML="Running 4 live checks…";
@@ -50,8 +58,8 @@ async function clientSmoke(){
   async function step(name,fn){try{const d=await fn();steps.push({name,ok:true,d});}catch(e){steps.push({name,ok:false,d:String(e.message||e)});}}
   await step("/health",async()=>{const r=await fetch(apiBase()+"/health");if(!r.ok)throw new Error("HTTP "+r.status);return await r.json().catch(()=>({}));});
   await step("/udoc/demo/ready",async()=>{const d=await api("/udoc/demo/ready");if(!d.ready)throw new Error((d.missing||[]).join("; ")||"not ready");return d;});
-  await step("EVA fair",async()=>{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.92,compliance:1.0})});if(d.decision==="BLOCK")throw new Error("fair BLOCK");return {decision:d.decision};});
-  await step("EVA biased BLOCK",async()=>{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model_id:"model-001",raw_confidence:0.9,compliance:1.0,priv_favorable:900,priv_total:1000,unpriv_favorable:120,unpriv_total:1000})});if(d.decision!=="BLOCK")throw new Error("got "+d.decision);return {decision:d.decision};});
+  await step("EVA fair",async()=>{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(scenarioBody("fair"))});if(d.decision==="BLOCK")throw new Error("fair BLOCK");return {decision:d.decision};});
+  await step("EVA biased BLOCK",async()=>{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(scenarioBody("biased"))});if(d.decision!=="BLOCK")throw new Error("got "+d.decision);return {decision:d.decision};});
   const ok=steps.filter(s=>s.ok).length;
   host.innerHTML='<div class="grid kpis" style="margin-top:8px"><div class="kpi"><div class="k">Passed</div><div class="v '+(ok===4?'green':'red')+'">'+ok+'/4</div></div><div class="kpi"><div class="k">ms</div><div class="v">'+(Date.now()-t0)+'</div></div></div>'+
     '<table style="margin-top:8px"><thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead><tbody>'+
@@ -71,8 +79,9 @@ const ap=oc.APPROVE!=null?oc.APPROVE:dec.filter(d=>/APPROVE/i.test(String(d.deci
 const bl=oc.BLOCK!=null?oc.BLOCK:dec.filter(d=>/BLOCK/i.test(String(d.decision||""))).length;
 const es=oc.ESCALATE!=null?oc.ESCALATE:dec.filter(d=>/ESCALATE/i.test(String(d.decision||""))).length;
 const card=(k,v,c)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v '+(c||'')+'">'+esc(v)+'</div></div>';
-m.innerHTML='<div class="pgh"><h2>Command Dashboard</h2><span class="desc">mvp-1 International Standards · live Core</span></div>'+
-'<div class="panel"><h3>Boot posture</h3><div>'+(ready&&ready.ready?'<span class="t-ok">DEMO READY</span> · active rules '+esc(ready.active_rules):'<span class="t-bad">SEED PENDING</span>')+' · prefer <span class="mono">model-001</span></div></div>'+
+const recent=dec.slice(0,8);
+m.innerHTML='<div class="pgh"><h2>Command Dashboard</h2><span class="desc">mvp-1 International Standards · live Core · demo density</span></div>'+
+'<div class="panel"><h3>Boot posture</h3><div>'+(ready&&ready.ready?'<span class="t-ok">DEMO READY</span> · active rules '+esc(ready.active_rules):'<span class="t-bad">SEED PENDING</span>')+' · prefer <span class="mono">model-001</span> · policy-to-code</div></div>'+
 '<div class="grid kpis">'+card("AI systems",sys.length,"cyan")+card("Decisions",dec.length)+card("APPROVE",ap,"green")+card("BLOCK",bl,"red")+card("ESCALATE",es,"amber")+card("Certs",certs.length,"cyan")+'</div>'+
 '<div class="grid" style="grid-template-columns:1fr 1fr;gap:12px">'+
 '<div class="panel" style="margin:0"><h3>Sovereignty strip</h3><div class="sov-ok">ZA · '+esc(ex.jurisdiction||"ZA")+'</div><div class="sov-ok">Localisation rules · '+esc(ex.rules_active!=null?ex.rules_active:"—")+'</div><div class="sov-ok">Fail-closed path · policy-to-code</div></div>'+
@@ -80,7 +89,15 @@ m.innerHTML='<div class="pgh"><h2>Command Dashboard</h2><span class="desc">mvp-1
 '<button class="btn cyan sm" onclick="nav(\'govern\')">Govern · EVA</button> '+
 '<button class="btn sm" onclick="nav(\'bias\')">Bias Monitor</button> '+
 '<button class="btn sm" onclick="nav(\'compliance\')">Compliance</button> '+
-'<button class="btn sm" onclick="nav(\'citizen\')">Citizen Portal</button></div></div>'+
+'<button class="btn sm" onclick="nav(\'citizen\')">Citizen Portal</button> '+
+'<button class="btn sm" onclick="nav(\'sentinel\')">Sentinel</button></div></div>'+
+'<div class="panel"><h3>Recent decisions · live</h3>'+(recent.length?tableFrom(recent,[
+{h:"ID",r:x=>'<span class="mono">'+esc(x.id||x.decision_id)+'</span>'},
+{h:"Model",r:x=>esc(x.model_id)},
+{h:"EVA",r:x=>'<b style="color:var(--gold-l)">'+esc(x.composite_eva!=null?x.composite_eva:"—")+'</b>'},
+{h:"Verdict",r:x=>statusTag(x.decision)}
+]):'<div class="muted">None yet — run Govern scenario chips or Full EVA batch.</div>')+
+'<div style="margin-top:10px"><button class="btn cyan sm" onclick="nav(\'govern\')">Open Govern · run scenarios</button></div></div>'+
 '<div class="panel"><h3>Client smoke · 4 live checks</h3>'+
 '<button class="btn cyan" onclick="clientSmoke()">Run client smoke</button>'+
 '<div id="client-smoke-out" class="muted" style="margin-top:10px;font-size:12px">health · demo/ready · fair ≠ BLOCK · biased = BLOCK</div></div>'+
@@ -89,7 +106,8 @@ honesty();}
 async function vSystems(m){await safe(m,async()=>{const rows=asArray(await api("/registry/models"));
 m.innerHTML='<div class="pgh"><h2>AI Registry</h2><span class="desc">mvp-1 · registered systems</span></div><div class="panel"><h3>Registered · '+rows.length+'</h3>'+tableFrom(rows,[
 {h:"System",r:x=>'<b>'+esc(x.name||x.model_id)+'</b><br><span class="mono muted" style="font-size:11px">'+esc(x.model_id)+'</span>'},
-{h:"Risk",r:x=>riskTag(x.risk_tier)},{h:"Status",r:x=>statusTag(x.status)}])+'</div>'+honesty();});}
+{h:"Risk",r:x=>riskTag(x.risk_tier)},{h:"Status",r:x=>statusTag(x.status)}])+'</div>'+
+'<div class="panel"><button class="btn cyan sm" onclick="nav(\'govern\')">Evaluate on Govern</button></div>'+honesty();});}
 
 async function vCompliance(m){await safe(m,async()=>{let sfw={frameworks:[]},active={},ready=null;
 try{sfw=await api("/sector/frameworks");}catch(e){}try{active=await api("/policy/active");}catch(e){}try{ready=await api("/udoc/demo/ready");}catch(e){}
@@ -99,9 +117,9 @@ const defaults=[{name:"POPIA s71",basis:"POPIA",focus:"Automated decisions"},{na
 {name:"ISO/IEC 42001:2023",basis:"AIMS",focus:"Organisation controls"}];
 const fws=(sfw.frameworks&&sfw.frameworks.length)?sfw.frameworks:defaults;
 const cards=fws.map((f,i)=>{const pct=55+(i*9)%40;return'<div class="panel" style="margin:0;border-left:3px solid var(--gold)"><h3 style="text-transform:none;letter-spacing:0;color:var(--txt);font-size:13px">'+esc(f.name)+'</h3><div class="mono" style="font-size:10px;color:var(--cyan)">'+esc(f.basis||"")+'</div><div class="muted" style="font-size:12px;margin-top:6px">'+esc(f.focus||"")+'</div><div class="covbar"><i style="width:'+pct+'%"></i></div></div>';}).join('');
-m.innerHTML='<div class="pgh"><h2>Multi-Framework Compliance</h2><span class="desc">mvp-2</span></div>'+
+m.innerHTML='<div class="pgh"><h2>Multi-Framework Compliance</h2><span class="desc">mvp-2 · coverage bars</span></div>'+
 '<div class="grid kpis"><div class="kpi"><div class="k">Frameworks</div><div class="v cyan">'+fws.length+'</div></div><div class="kpi"><div class="k">Policy rules</div><div class="v">'+(active.enforced_rules!=null?active.enforced_rules:(active.active_rules!=null?active.active_rules:"—"))+'</div></div><div class="kpi"><div class="k">Seed</div><div class="v" style="font-size:16px">'+(ready&&ready.ready?"READY":"WAIT")+'</div></div></div>'+
-'<div class="panel"><button class="btn cyan" onclick="runSweep(this)">Run compliance sweep</button> <span id="sweep-res" class="muted" style="font-size:12px"></span></div>'+
+'<div class="panel"><button class="btn cyan" onclick="runSweep(this)">Run compliance sweep</button> <button class="btn sm" onclick="nav(\'govern\')">Govern EVA</button> <span id="sweep-res" class="muted" style="font-size:12px"></span></div>'+
 '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">'+cards+'</div>'+honesty();});}
 async function runSweep(btn){btn.disabled=true;const r=document.getElementById("sweep-res");if(r)r.textContent="running…";
 try{const d=await api("/compliance/sweep",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});if(r)r.textContent="done · "+esc(JSON.stringify(d).slice(0,120));}
@@ -115,36 +133,42 @@ m.innerHTML='<div class="pgh"><h2>Audit Trail</h2><span class="desc">mvp-1 · se
 async function vBias(m){await safe(m,async()=>{let sum={},inc={};
 try{sum=await api("/udoc/regulator/summary");}catch(e){}try{inc=await api("/udoc/incidents");}catch(e){}
 const oc=(sum.decisions&&sum.decisions.by_outcome)||{};const incidents=inc.incidents||asArray(inc);
-m.innerHTML='<div class="pgh"><h2>Bias Monitor</h2><span class="desc">mvp-1 · live scan + incident feed</span></div>'+
+m.innerHTML='<div class="pgh"><h2>Bias Monitor</h2><span class="desc">mvp-1 · live scan + Biased EVA path</span></div>'+
 '<div class="grid kpis"><div class="kpi"><div class="k">BLOCK</div><div class="v red">'+(oc.BLOCK||0)+'</div></div><div class="kpi"><div class="k">ESCALATE</div><div class="v amber">'+(oc.ESCALATE||0)+'</div></div><div class="kpi"><div class="k">Incidents</div><div class="v">'+incidents.length+'</div></div></div>'+
-'<div class="panel"><h3>Live bias scan</h3><button class="btn cyan" onclick="runBiasScan(this)">Run bias scan</button> <span id="bias-scan-res" class="muted" style="font-size:12px"></span></div>'+
-'<div class="panel"><h3>Incident feed</h3>'+(incidents.length?tableFrom(incidents.slice(0,15),[{h:"Decision",r:x=>esc(x.decision_id)},{h:"Model",r:x=>esc(x.model_id)},{h:"Severity",r:x=>statusTag(x.severity)},{h:"Reasons",r:x=>esc(x.reasons)}]):'<div class="muted">None yet — run Biased on Govern or bias scan.</div>')+'</div>'+
-'<div class="panel"><button class="btn cyan sm" onclick="nav(\'govern\')">Govern · Biased test</button></div>'+honesty();});}
+'<div class="panel"><h3>Live bias scan</h3><button class="btn cyan" onclick="runBiasScan(this)">Run bias scan</button> <button class="btn sm" onclick="SCENARIO=\'biased\';nav(\'govern\')">Govern · Biased → BLOCK</button> <span id="bias-scan-res" class="muted" style="font-size:12px"></span></div>'+
+'<div class="panel"><h3>Incident feed</h3>'+(incidents.length?tableFrom(incidents.slice(0,15),[{h:"Decision",r:x=>esc(x.decision_id)},{h:"Model",r:x=>esc(x.model_id)},{h:"Severity",r:x=>statusTag(x.severity)},{h:"Reasons",r:x=>esc(x.reasons)}]):'<div class="muted">None yet — run Biased on Govern or bias scan.</div>')+'</div>'+honesty();});}
 async function runBiasScan(btn){btn.disabled=true;const r=document.getElementById("bias-scan-res");if(r)r.textContent="scanning…";
 try{const d=await api("/bias/scan");if(r)r.textContent="scanned "+(d.decisions_scanned!=null?d.decisions_scanned:"?")+" · flagged "+(d.fairness_flagged!=null?d.fairness_flagged:"?")+" · rate "+(d.flag_rate!=null?(d.flag_rate*100).toFixed(1)+"%":"—");}
 catch(e){if(r)r.textContent=e.message;}finally{btn.disabled=false;}}
 
 async function vSov(m){await safe(m,async()=>{let ex={},ready={};try{ex=await api("/udoc/exchange");}catch(e){}try{ready=await api("/udoc/demo/ready");}catch(e){}
-m.innerHTML='<div class="pgh"><h2>Sovereignty</h2><span class="desc">mvp-1/2</span></div>'+
+m.innerHTML='<div class="pgh"><h2>Sovereignty</h2><span class="desc">mvp-1/2 · ZA localisation</span></div>'+
 '<div class="grid kpis"><div class="kpi"><div class="k">Jurisdiction</div><div class="v cyan">'+esc(ex.jurisdiction||"ZA")+'</div></div><div class="kpi"><div class="k">Rules</div><div class="v">'+(ex.rules_active!=null?ex.rules_active:"—")+'</div></div><div class="kpi"><div class="k">Seed</div><div class="v" style="font-size:16px">'+(ready.ready?"OK":"WAIT")+'</div></div></div>'+
-'<div class="panel"><h3>Guarantees</h3><div class="sov-ok">South African jurisdiction</div><div class="sov-ok">Fail-closed when model/policy missing</div><div class="sov-ok">Policy-to-code on decisions</div><div class="term">'+esc(ex.basis||"")+' · '+esc(ex.cross_border_transfer||"")+'</div></div>'+honesty();});}
+'<div class="panel"><h3>Guarantees</h3><div class="sov-ok">South African jurisdiction</div><div class="sov-ok">Fail-closed when model/policy missing</div><div class="sov-ok">Policy-to-code on decisions</div><div class="term">'+esc(ex.basis||"")+' · '+esc(ex.cross_border_transfer||"")+'</div></div>'+
+'<div class="panel"><button class="btn cyan sm" onclick="SCENARIO=\'sov\';nav(\'govern\')">Govern · Sovereignty scenario</button></div>'+honesty();});}
 
 async function vGovern(m){await safe(m,async()=>{let models=asArray(await api("/registry/models").catch(()=>[]));let ready=null;try{ready=await api("/udoc/demo/ready");}catch(e){}
 const mid0=(models.find(x=>x.model_id==="model-001")||models[0]||{}).model_id||"model-001";
-m.innerHTML='<div class="pgh"><h2>Govern · EVA</h2><span class="desc">'+(ready&&ready.ready?'<span class="t-ok">demo ready</span>':'<span class="t-bad">seed pending</span>')+'</span></div>'+
-'<div class="panel"><h3>Scenario chips</h3><div class="scenarios">'+
-'<span class="chip active" onclick="gScenario(this,\'fair\')">Fair</span><span class="chip" onclick="gScenario(this,\'biased\')">Biased → BLOCK</span>'+
-'<span class="chip" onclick="gScenario(this,\'high\')">High-risk</span><span class="chip" onclick="gScenario(this,\'sov\')">Sovereignty</span></div>'+
+m.innerHTML='<div class="pgh"><h2>Govern · EVA</h2><span class="desc">'+(ready&&ready.ready?'<span class="t-ok">demo ready</span>':'<span class="t-bad">seed pending</span>')+' · Fair / Biased / High-risk / Sovereignty</span></div>'+
+'<div class="panel"><h3>Scenario chips · auto-run</h3><div class="scenarios">'+
+'<span class="chip active" onclick="gScenario(this,\'fair\')">Fair</span>'+
+'<span class="chip" onclick="gScenario(this,\'biased\')">Biased → BLOCK</span>'+
+'<span class="chip" onclick="gScenario(this,\'high\')">High-risk</span>'+
+'<span class="chip" onclick="gScenario(this,\'sov\')">Sovereignty</span></div>'+
 '<div class="row"><div class="f"><label>Model</label><input id="g-mid" value="'+esc(mid0)+'"/></div>'+
 '<div class="f"><label>Confidence</label><input id="g-conf" value="0.92"/></div>'+
 '<div class="f"><label>Compliance</label><input id="g-comp" value="1.0"/></div></div>'+
-'<div style="margin-top:12px"><button class="btn" onclick="gEvaluate()">Evaluate · EVA</button></div></div><div id="g-out"></div>'+honesty();});}
+'<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'+
+'<button class="btn" onclick="gEvaluate()">Evaluate · EVA</button>'+
+'<button class="btn cyan" onclick="gBatch()">Run Full EVA batch</button></div></div>'+
+'<div id="g-batch-kpis"></div>'+
+'<div id="g-out"></div>'+honesty();});}
 function gScenario(el,kind){SCENARIO=kind;document.querySelectorAll('.scenarios .chip').forEach(c=>c.classList.remove('active'));if(el)el.classList.add('active');gEvaluate();}
 async function gEvaluate(){const out=document.getElementById("g-out");if(!out)return;out.innerHTML='<div class="panel muted">Evaluating…</div>';
-const body={model_id:document.getElementById("g-mid").value.trim(),raw_confidence:parseFloat(document.getElementById("g-conf").value)||0.9,compliance:parseFloat(document.getElementById("g-comp").value)||1.0};
-if(SCENARIO==="biased"){body.priv_favorable=900;body.priv_total=1000;body.unpriv_favorable=120;body.unpriv_total=1000;}
-if(SCENARIO==="high")body.risk_tier="HIGH";
-if(SCENARIO==="sov"){body.bgp=0.4;body.traceroute=0.5;body.dnssec=0.6;body.storage=0.7;}
+const mid=document.getElementById("g-mid").value.trim();
+const conf=parseFloat(document.getElementById("g-conf").value)||0.9;
+const comp=parseFloat(document.getElementById("g-comp").value)||1.0;
+const body=scenarioBody(SCENARIO,mid,conf,comp);
 try{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
 const decision=d.decision||"—";const reasons=Array.isArray(d.block_reasons)?d.block_reasons:[];
 if(d.id) LAST_DID=d.id; if(d.certificate_id) LAST_CERT=d.certificate_id;
@@ -158,9 +182,43 @@ const certBlock=d.certificate_id
     (d.id?'<button class="btn sm" type="button" onclick="gEvidence('+d.id+')">Evidence</button>':'')+
     '</div><div id="g-cert-out" class="muted" style="margin-top:8px;font-size:12px"></div>')
   :(d.id?'<div style="margin-top:10px"><button class="btn sm" type="button" onclick="gEvidence('+d.id+')">Evidence</button> <span id="g-cert-out" class="muted" style="font-size:12px"></span></div>':'');
-out.innerHTML='<div class="panel"><h3>EVA Verdict</h3><div class="verdict-big">'+statusTag(decision)+'</div>'+dimsHtml(d.dimensions)+
+out.innerHTML='<div class="panel"><h3>EVA Verdict · '+esc(SCENARIO)+'</h3><div class="verdict-big">'+statusTag(decision)+'</div>'+dimsHtml(d.dimensions)+
 '<div class="term">'+esc(term)+'</div>'+certBlock+'</div>';
 }catch(e){out.innerHTML='<div class="panel t-bad">'+esc(e.message)+'</div>';}}
+async function gBatch(){
+  const out=document.getElementById("g-out");
+  const kpis=document.getElementById("g-batch-kpis");
+  if(out)out.innerHTML='<div class="panel muted">Running Full EVA batch (fair · biased · high · sov)…</div>';
+  const mid=(document.getElementById("g-mid")&&document.getElementById("g-mid").value.trim())||"model-001";
+  const kinds=["fair","biased","high","sov"];
+  const results=[];
+  for(const k of kinds){
+    try{
+      const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(scenarioBody(k,mid))});
+      results.push({kind:k,ok:true,decision:d.decision,eva:d.composite_eva,policy:d.policy_enforced,id:d.id,cert:d.certificate_id,dims:d.dimensions,reasons:d.block_reasons||[]});
+      if(d.certificate_id) LAST_CERT=d.certificate_id;
+      if(d.id) LAST_DID=d.id;
+    }catch(e){results.push({kind:k,ok:false,decision:e.message});}
+  }
+  const counts={APPROVE:0,BLOCK:0,ESCALATE:0,OTHER:0};
+  results.forEach(r=>{const d=String(r.decision||"").toUpperCase();if(d==="APPROVE")counts.APPROVE++;else if(d==="BLOCK")counts.BLOCK++;else if(d==="ESCALATE")counts.ESCALATE++;else counts.OTHER++;});
+  if(kpis)kpis.innerHTML='<div class="grid kpis" style="margin-top:12px">'+
+    '<div class="kpi"><div class="k">Batch</div><div class="v cyan">'+results.filter(r=>r.ok).length+'/4</div></div>'+
+    '<div class="kpi"><div class="k">APPROVE</div><div class="v green">'+counts.APPROVE+'</div></div>'+
+    '<div class="kpi"><div class="k">BLOCK</div><div class="v red">'+counts.BLOCK+'</div></div>'+
+    '<div class="kpi"><div class="k">ESCALATE</div><div class="v amber">'+counts.ESCALATE+'</div></div></div>';
+  let term="FULL EVA BATCH · "+mid+"\n";
+  results.forEach(r=>{
+    term+="\n["+r.kind+"] → "+(r.decision||"?")+(r.eva!=null?" · EVA "+r.eva:"")+(r.policy?" · policy ENFORCED":"")+"\n";
+    (r.reasons||[]).slice(0,3).forEach(x=>{term+="  • "+x+"\n";});
+  });
+  const last=results.filter(r=>r.ok).slice(-1)[0];
+  if(out)out.innerHTML='<div class="panel"><h3>Batch terminal</h3><div class="term">'+esc(term)+'</div>'+
+    (last&&last.dims?dimsHtml(last.dims):"")+
+    (LAST_CERT?'<div style="margin-top:10px" class="row"><div class="f"><label>Last certificate</label><input id="g-cert" class="mono" value="'+esc(LAST_CERT)+'"/></div>'+
+      '<button class="btn cyan sm" type="button" onclick="gVerifyCert()">Verify cert</button></div><div id="g-cert-out" class="muted" style="margin-top:8px;font-size:12px"></div>':"")+
+    '</div>';
+}
 async function gVerifyCert(){
   const id=(document.getElementById("g-cert")&&document.getElementById("g-cert").value.trim())||LAST_CERT;
   const o=document.getElementById("g-cert-out"); if(!id){if(o)o.textContent="No certificate id";return;}
@@ -177,7 +235,9 @@ async function gEvidence(id){
 }
 
 async function vDecisions(m){await safe(m,async()=>{let rows=[],certs=[];try{rows=asArray(await api("/decisions"));}catch(e){}try{certs=asArray(await api("/decisions/certificates"));}catch(e){}
-m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2></div><div class="panel"><h3>Decisions · '+rows.length+'</h3>'+tableFrom(rows.slice(0,50),[
+m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2><span class="desc">live ledger</span></div>'+
+'<div class="panel"><button class="btn cyan sm" onclick="nav(\'govern\')">Run Govern batch</button></div>'+
+'<div class="panel"><h3>Decisions · '+rows.length+'</h3>'+tableFrom(rows.slice(0,50),[
 {h:"ID",r:x=>'<span class="mono">'+esc(x.id||x.decision_id)+'</span>'},{h:"System",r:x=>esc(x.model_id)},{h:"EVA",r:x=>esc(x.composite_eva)},{h:"Verdict",r:x=>statusTag(x.decision)}])+'</div>'+
 '<div class="panel"><h3>Certificates · '+certs.length+'</h3>'+tableFrom(certs.slice(0,25),[
 {h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.id)+'</span>'},{h:"Verdict",r:x=>statusTag(x.decision)},
