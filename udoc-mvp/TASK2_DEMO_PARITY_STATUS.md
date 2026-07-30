@@ -1,24 +1,37 @@
-# Task 2 status — DEMO PARITY (2026-07-29)
+# Task 2 status — DEMO PARITY (2026-07-30)
 
 ## Source of truth
 - `docs/ENGINEERING_CANON.md` · Netlify demos
 - `P6_ASSESSOR_SIDE_BY_SIDE.md` (surfaces 1–5 required)
 - `UDOC_SMOKE_PASS.md`
+- `PORTAL_LIVE_CORE.md`
 
 ## Phase progress
 
-| Phase | Focus | Status | Commit(s) |
-|-------|--------|--------|-----------|
-| **P1** | Sentinel | Hardened | `5b5757c` |
-| **P2** | Client | Densified | `49fc4d1` |
-| **P3** | Admin | SW v3 | `747e25f` |
-| **P4** | Sector + Operator | EVA parity | `5d77a35`, `dd3e8ed` |
-| **P5** | Citizen | Linked | `b45e733` |
-| **P6** | Assessor matrix | Expanded | `366e5d0` |
+| Phase | Focus | Status | Latest commits |
+|-------|--------|--------|----------------|
+| **P1** | Sentinel | Density | `bc4496e` Full EVA matrix + esc fix |
+| **P2** | Client | Density | `c2ada6a` Govern batch + Dashboard |
+| **P3** | Admin | Density | `4c3dffe` batch + SW `v4` |
+| **P4** | Sector | Density | `06fa828` Full EVA batch + KPIs |
+| **P5** | Citizen | Live | public `/citizen.html` + Core `/citizen/*` |
+| **P6** | Assessor matrix | Updated | this file + P6 |
+| **Portals** | 24 dual-path | Complete | `bcb3ce7` data-driven OversightCase |
 
-## Latest
-- P6 matrix: Sector + client smoke + cert rows (`366e5d0`)
-- Operator: DEMO READY + Fair / Biased→BLOCK + Sentinel link (`dd3e8ed`)
+## Density wave (2026-07-30)
 
-## Close rule
-Surfaces **1–5** green on live Render. **Task 1** only after Task 2.
+Every primary surface now has:
+- Scenario chips Fair / Biased→BLOCK / High-risk / Sovereignty
+- **Run Full EVA batch** (or matrix) with outcome KPIs
+- Live `/decisions` only (no simulated scores)
+- Prefer `model-001` · DEMO READY banner where applicable
+
+## Close rule (unchanged)
+
+Surfaces **1–5** green on **live** Render after hard-refresh.  
+**Do not mark Task 2 complete** until biased = BLOCK is observed on Client + Sentinel + Admin + Sector.  
+**Task 1** (docs/ Engineering Canon volume commits) only after Task 2.
+
+## Honesty
+
+Wiring + density upgrades are in repo. Live matrix pass is **operator-verified**, not assumed.
