@@ -53,7 +53,7 @@
   .pgh .desc{font-size:13px;color:var(--muted)}
   .grid.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
   .kpi{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px}
-  .kpi .k{font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}.kpi .v{font-family:var(--fc);font-size:26px;font-weight:700;color:var(--txt);margin-top:4px}.kpi .v.acc{color:var(--acc-l)}
+  .kpi .k{font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}.kpi .v{font-family:var(--fc);font-size:26px;font-weight:700;color:var(--txt);margin-top:4px}.kpi .v.acc{color:var(--acc-l)}.kpi .v.green{color:var(--green)}.kpi .v.red{color:var(--red)}.kpi .v.amber{color:var(--amber)}
   .panel{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd2);border-radius:12px;padding:16px 18px;margin-top:14px}
   .panel h3{font-family:var(--fc);font-size:15px;margin:0 0 10px;letter-spacing:.06em;color:var(--gold-l)}
   .panel.acc-border{border-color:rgba(0,194,212,.35)}
@@ -181,20 +181,31 @@ function honesty(){ return '<div class="honesty">UDOC is a <b>proposed</b> platf
 function dimsHtml(dims){ if(!dims||typeof dims!=="object") return ""; const keys=["Validity","Confidence","Risk","Compliance","Stability","Impact"];
   let h='<div class="dims">'; keys.forEach(k=>{ const v=dims[k]!=null?dims[k]:null; if(v==null)return;
     h+='<div class="dim"><div class="dl">'+esc(k)+'</div><div class="dv">'+esc(v)+'</div></div>'; }); return h+'</div>'; }
+function scenarioBody(kind,mid,conf,comp){
+  const body={model_id:mid||"model-001",raw_confidence:conf!=null?conf:0.92,compliance:comp!=null?comp:1.0};
+  if(kind==="biased"){ body.priv_favorable=900; body.priv_total=1000; body.unpriv_favorable=120; body.unpriv_total=1000; }
+  if(kind==="high") body.risk_tier="HIGH";
+  if(kind==="sov"){ body.bgp=0.4; body.traceroute=0.5; body.dnssec=0.6; body.storage=0.7; }
+  return body;
+}
 async function safe(host,fn){ try{ return await fn(); }catch(e){ host.innerHTML='<div class="panel"><div class="t-bad small">⚠ '+esc(e.message)+'</div></div>'; } }
 
 async function vOverview(m){
   await loadSector();
   const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
-  let ov=null, fw={frameworks:[]}, ready=null;
+  let ov=null, fw={frameworks:[]}, ready=null, sum={};
   const q=FORCE?("?sector="+encodeURIComponent(FORCE)):"";
   try{ ov=await api("/sector/overview"+q); }catch(e){}
   try{ fw=await api("/sector/frameworks"+q); }catch(e){}
   try{ ready=await api("/udoc/demo/ready"); }catch(e){}
+  try{ sum=await api("/udoc/regulator/summary"); }catch(e){}
+  const oc=(sum.decisions&&sum.decisions.by_outcome)||{};
   const card=(k,v,cls)=>'<div class="kpi"><div class="k">'+esc(k)+'</div><div class="v '+(cls||"")+'">'+(v==null?"—":esc(v))+'</div></div>';
   const tiles=(ov&&ov.tiles&&ov.tiles.length)?ov.tiles.map((t,i)=>card(t.k,t.v,i===0?"acc":"")).join(""):
-    card("Decisions","—","acc")+card("Blocked","—")+card("Oversight","—")+card("Frameworks",(fw.frameworks||[]).length);
-  m.innerHTML='<div class="pgh"><h2>'+esc(S.label||"Sector")+' Overview</h2><span class="desc">'+esc(S.tagline||"")+'</span></div>'+
+    card("Decisions",sum.decisions&&sum.decisions.total!=null?sum.decisions.total:"—","acc")+
+    card("Blocked",oc.BLOCK||0,"red")+card("Approve",oc.APPROVE||0,"green")+
+    card("Escalate",oc.ESCALATE||0,"amber")+card("Frameworks",(fw.frameworks||[]).length);
+  m.innerHTML='<div class="pgh"><h2>'+esc(S.label||"Sector")+' Overview</h2><span class="desc">'+esc(S.tagline||"")+' · density</span></div>'+
     '<div class="panel acc-border"><div class="small">'+(ready&&ready.ready?'<span class="t-ok">DEMO READY</span> · rules '+esc(ready.active_rules):'<span class="t-warn">SEED PENDING</span>')+'</div>'+
       '<div class="small muted" style="margin-top:8px">'+esc(S.summary||"")+'</div>'+
       '<div class="small" style="margin-top:12px;letter-spacing:.08em;color:'+esc(acc)+'">OVERSIGHT MODEL</div>'+
@@ -217,7 +228,7 @@ async function vDecisions(m){ await safe(m, async()=>{
   await loadSector();
   let rows=[],certs=[],ready=null; try{ rows=asArray(await api("/decisions")); }catch(e){} try{ certs=asArray(await api("/decisions/certificates")); }catch(e){} try{ ready=await api("/udoc/demo/ready"); }catch(e){}
   const S=SECTOR||{}; const term=(S.terminology&&S.terminology.subjects)||"subjects";
-  m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2><span class="desc">'+(ready&&ready.ready?'<span class="t-ok">demo ready</span>':'seed pending')+' · '+esc(term)+'</span></div>'+
+  m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2><span class="desc">'+(ready&&ready.ready?'<span class="t-ok">demo ready</span>':'seed pending')+' · '+esc(term)+' · density</span></div>'+
     '<div class="panel"><h3>Scenario chips · live POST /decisions</h3>'+
       '<div class="chips" id="sc-chips">'+
         '<button type="button" class="chip on" data-s="fair" onclick="pickSc(this)">Fair</button>'+
@@ -229,7 +240,9 @@ async function vDecisions(m){ await safe(m, async()=>{
         '<div class="f"><label>Model ID</label><input id="ev-mid" value="model-001"></div>'+
         '<div class="f"><label>Confidence</label><input id="ev-conf" value="0.92"></div>'+
         '<div class="f"><label>Compliance</label><input id="ev-comp" value="1.0"></div>'+
-        '<button class="btn" type="button" onclick="runEval()">Evaluate</button></div>'+
+        '<button class="btn" type="button" onclick="runEval()">Evaluate</button>'+
+        '<button class="btn sm" type="button" onclick="runEvalBatch()">Run Full EVA batch</button></div>'+
+      '<div id="ev-batch-kpis"></div>'+
       '<div id="ev-out" style="margin-top:12px"></div></div>'+
     '<div class="panel"><h3>Recent · '+rows.length+'</h3>'+tableFrom(rows.slice(0,50),[
       {h:"Ref",r:x=>'<span class="mono">'+esc(x.decision_id||x.id||"—")+'</span>'},
@@ -246,10 +259,10 @@ async function vDecisions(m){ await safe(m, async()=>{
 function pickSc(el){ document.querySelectorAll("#sc-chips .chip").forEach(c=>c.classList.remove("on")); el.classList.add("on"); SCENARIO=el.dataset.s; runEval(); }
 async function runEval(){
   const o=document.getElementById("ev-out"); if(!o) return; o.innerHTML='<div class="muted small">POST /decisions …</div>';
-  const body={model_id:(document.getElementById("ev-mid")||{}).value||"model-001", raw_confidence:parseFloat((document.getElementById("ev-conf")||{}).value)||0.92, compliance:parseFloat((document.getElementById("ev-comp")||{}).value)||1.0};
-  if(SCENARIO==="biased"){ body.priv_favorable=900; body.priv_total=1000; body.unpriv_favorable=120; body.unpriv_total=1000; }
-  if(SCENARIO==="high") body.risk_tier="HIGH";
-  if(SCENARIO==="sov"){ body.bgp=0.4; body.traceroute=0.5; body.dnssec=0.6; body.storage=0.7; }
+  const mid=(document.getElementById("ev-mid")||{}).value||"model-001";
+  const conf=parseFloat((document.getElementById("ev-conf")||{}).value)||0.92;
+  const comp=parseFloat((document.getElementById("ev-comp")||{}).value)||1.0;
+  const body=scenarioBody(SCENARIO,mid,conf,comp);
   try{
     const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     const decision=d.decision||"—"; const reasons=Array.isArray(d.block_reasons)?d.block_reasons:[];
@@ -262,6 +275,28 @@ async function runEval(){
       (d.certificate_id?'<div class="small" style="margin-top:8px">Cert <span class="mono">'+esc(d.certificate_id)+'</span> <button class="btn sm" type="button" onclick="verifyCert(\''+esc(d.certificate_id)+'\')">Verify</button></div>':"");
   }catch(e){ o.innerHTML='<div class="t-bad small">'+esc(e.message)+'</div>'; }
 }
+async function runEvalBatch(){
+  const o=document.getElementById("ev-out"); const kpis=document.getElementById("ev-batch-kpis");
+  if(o) o.innerHTML='<div class="muted small">Running Full EVA batch…</div>';
+  const mid=(document.getElementById("ev-mid")||{}).value||"model-001";
+  const kinds=["fair","biased","high","sov"]; const results=[];
+  for(const k of kinds){
+    try{
+      const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(scenarioBody(k,mid))});
+      results.push({kind:k,ok:true,decision:d.decision,eva:d.composite_eva,policy:d.policy_enforced,reasons:d.block_reasons||[]});
+    }catch(e){ results.push({kind:k,ok:false,decision:e.message}); }
+  }
+  const counts={APPROVE:0,BLOCK:0,ESCALATE:0,OTHER:0};
+  results.forEach(r=>{const d=String(r.decision||"").toUpperCase(); if(d==="APPROVE")counts.APPROVE++; else if(d==="BLOCK")counts.BLOCK++; else if(d==="ESCALATE")counts.ESCALATE++; else if(r.ok)counts.OTHER++;});
+  if(kpis) kpis.innerHTML='<div class="grid kpis" style="margin-top:12px">'+
+    '<div class="kpi"><div class="k">Batch</div><div class="v acc">'+results.filter(r=>r.ok).length+'/4</div></div>'+
+    '<div class="kpi"><div class="k">APPROVE</div><div class="v green">'+counts.APPROVE+'</div></div>'+
+    '<div class="kpi"><div class="k">BLOCK</div><div class="v red">'+counts.BLOCK+'</div></div>'+
+    '<div class="kpi"><div class="k">ESCALATE</div><div class="v amber">'+counts.ESCALATE+'</div></div></div>';
+  let term="FULL EVA BATCH · "+mid+"\n";
+  results.forEach(r=>{ term+="\n["+r.kind+"] → "+(r.decision||"?")+(r.eva!=null?" · EVA "+r.eva:"")+(r.policy?" · policy ENFORCED":"")+"\n"; (r.reasons||[]).slice(0,2).forEach(x=>{term+="  • "+x+"\n";}); });
+  if(o) o.innerHTML='<div class="term">'+esc(term)+'</div><div class="small muted" style="margin-top:8px">Biased should be BLOCK · fair should not.</div>';
+}
 async function verifyCert(cid){
   try{ const r=await api("/decisions/certificates/"+encodeURIComponent(cid)+"/verify");
     alert("Certificate "+cid+"\nValid: "+(r.valid!==false)+"\nDecision: "+(r.decision||"—")); }
@@ -270,14 +305,14 @@ async function verifyCert(cid){
 async function vSystems(m){ await safe(m, async()=>{
   await loadSector();
   let rows=[]; try{ rows=asArray(await api("/registry/models")); }catch(e){}
-  const S=SECTOR||{};
   m.innerHTML='<div class="pgh"><h2>AI Systems</h2><span class="desc">Registered models · prefer model-001</span></div>'+
     '<div class="panel"><h3>Registry · '+rows.length+'</h3>'+tableFrom(rows,[
       {h:"ID",r:x=>'<span class="mono">'+esc(x.model_id||x.id||"—")+'</span>'},
       {h:"Name",r:x=>esc(x.name||"—")},
       {h:"Risk",r:x=>statusTag(x.risk_tier||x.risk_level)},
       {h:"Status",r:x=>statusTag(x.status)},
-    ])+'</div>'+honesty();
+    ])+'</div>'+
+    '<div class="panel"><button class="btn sm" onclick="nav(\'decisions\')">Evaluate on Decisions</button></div>'+honesty();
 }); }
 async function vOversight(m){ await safe(m, async()=>{
   let rows=[]; try{ rows=asArray(await api("/oversight/cases")); }catch(e){}
@@ -288,7 +323,8 @@ async function vOversight(m){ await safe(m, async()=>{
       {h:"Subject",r:x=>esc(x.subject||x.model_id||"—")},
       {h:"Reason",r:x=>esc(x.reason||x.kind||"—")},
       {h:"Status",r:x=>statusTag(x.state||x.status)},
-    ])+'</div>'+honesty();
+    ])+'</div>'+
+    '<div class="panel"><a class="btn sm" href="https://gods-platform-core.onrender.com/portals" target="_blank" rel="noopener">24 Portals · HITL dual-path →</a></div>'+honesty();
 }); }
 async function vSwitch(m){
   const cur=FORCE||(SECTOR&&SECTOR.sector)||"GENERAL";
@@ -297,7 +333,7 @@ async function vSwitch(m){
       '<button class="'+(cur==="PUBLIC"?"on":"")+'" onclick="setForce(\'PUBLIC\')">Public Sector</button>'+
       '<button class="'+(cur==="PRIVATE"?"on":"")+'" onclick="setForce(\'PRIVATE\')">Private Sector</button>'+
       '<button class="'+(!FORCE?"on":"")+'" onclick="setForce(null)">My tenant sector</button>'+
-    '</div><div class="note">Switching reloads profile, frameworks and KPIs. EVA chips always hit live Core.</div></div>'+honesty();
+    '</div><div class="note">Switching reloads profile, frameworks and KPIs. EVA chips + Full batch always hit live Core.</div></div>'+honesty();
 }
 function setForce(s){ FORCE=s; const url=new URL(location.href); if(s) url.searchParams.set("sector",s); else url.searchParams.delete("sector");
   history.replaceState(null,"",url.pathname+url.search); loadSector().then(()=>nav("overview")); }
