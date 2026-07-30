@@ -1,5 +1,5 @@
 /* G.O.D.S UDOC PWA service worker — installable + injects admin-v7-enhance.js into shell */
-const CACHE = 'gods-udoc-pwa-v3';
+const CACHE = 'gods-udoc-pwa-v4';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/admin-v7-enhance.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -40,6 +40,17 @@ self.addEventListener('fetch', e => {
           });
         })
         .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+  // Network-first for enhance script so density updates land
+  if (u.pathname.endsWith('/admin-v7-enhance.js')) {
+    e.respondWith(
+      fetch(r).then(resp => {
+        const cp = resp.clone();
+        caches.open(CACHE).then(cc => cc.put(r, cp));
+        return resp;
+      }).catch(() => caches.match(r))
     );
     return;
   }
