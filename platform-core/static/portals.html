@@ -24,9 +24,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .groups button{background:transparent;color:var(--mut);border:1px solid var(--line)}
 .groups button.on{color:var(--gold);border-color:var(--gold)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer}
 .card:hover{border-color:var(--gold)}
 .card.citizen{border-color:rgba(16,185,129,.45);background:linear-gradient(180deg,#0a1f18,var(--navy2))}
+.card.live{border-color:rgba(0,194,212,.4)}
 .card h4{margin:0 0 6px;font-size:15px;color:var(--gold)}
 .card.citizen h4{color:var(--green)}
 .card .g{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
@@ -61,8 +62,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .timeline{list-style:none;padding:0;margin:0}.timeline li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
 .dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
 .dot.done{border-color:var(--green);color:var(--green)}.dot.active{border-color:var(--amber);color:var(--amber)}
-.syslinks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.syslinks a,.syslinks button{font-size:12px}
+.syslinks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.live-row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.live-row .ref{font-family:ui-monospace,Menlo,monospace;color:var(--cyan);cursor:pointer}
 </style>
 </head>
 <body>
@@ -86,7 +88,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <button class="green" type="button" onclick="openCitizen()">Citizen (no login)</button>
       <span id="who" style="color:var(--mut)"></span>
     </div>
-    <p style="color:var(--mut);font-size:13px">24 operator portals = control forms + terminal. Backend profile <b>CITIZEN</b> opens the full AI-Rights interface (same as public /citizen/*) — not a heading list.</p>
+    <p style="color:var(--mut);font-size:13px"><b>CITIZEN</b> → full AI-Rights UI. <b>HITL / Regulator</b> → live oversight cases on Neon. Other portals → control workspace + audit log.</p>
   </div>
 
   <div id="catalog" style="display:none">
@@ -105,12 +107,13 @@ button:disabled{opacity:.5;cursor:not-allowed}
       <strong id="c-title">Portal</strong>
       <span class="tag" id="c-group"></span>
       <span id="c-may" class="tag"></span>
-      <button class="cyan" type="button" id="btn-refresh" onclick="refreshPortal()">Refresh</button>
-      <button class="ghost" type="button" id="btn-run4" onclick="runFour()">Run 4 controls</button>
+      <button class="cyan" type="button" onclick="refreshPortal()">Refresh</button>
+      <button class="ghost" type="button" onclick="runFour()">Run 4 controls</button>
     </div>
     <p id="c-desc" style="color:var(--mut);font-size:13px"></p>
     <div class="syslinks" id="c-sys"></div>
     <div class="kpis" id="c-kpis"></div>
+    <div id="c-live"></div>
     <div class="side">
       <div>
         <h4 style="color:var(--gold);margin:0 0 10px">Control workspace</h4>
@@ -153,23 +156,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div id="cit-challenge" class="panel citizen" style="display:none">
       <h3>Challenge an AI Decision</h3>
       <label>Government service</label>
-      <select id="ch-service">
-        <option>Social Grants (SASSA/DSD)</option>
-        <option>Tax matters (SARS)</option>
-        <option>Job application — Government post</option>
-        <option>Medical service access (Public hospital)</option>
-        <option>Home Affairs / ID documents</option>
-        <option>Police — Criminal justice</option>
-        <option>Other government service</option>
-      </select>
+      <select id="ch-service"><option>Social Grants (SASSA/DSD)</option><option>Tax matters (SARS)</option><option>Job application — Government post</option><option>Medical service access (Public hospital)</option><option>Home Affairs / ID documents</option><option>Police — Criminal justice</option><option>Other government service</option></select>
       <label>What decision was wrong?</label>
       <textarea id="ch-desc" rows="4" placeholder="Describe the decision…"></textarea>
       <label>Unfair because of who you are? (optional)</label>
-      <select id="ch-bias">
-        <option>I'm not sure</option><option>Yes — disability</option><option>Yes — gender</option>
-        <option>Yes — race or ethnicity</option><option>Yes — age</option><option>Yes — rural area</option>
-        <option>No — factually wrong</option>
-      </select>
+      <select id="ch-bias"><option>I'm not sure</option><option>Yes — disability</option><option>Yes — gender</option><option>Yes — race or ethnicity</option><option>Yes — age</option><option>Yes — rural area</option><option>No — factually wrong</option></select>
       <label>Contact email</label>
       <input id="ch-email" type="email" placeholder="you@email.com"/>
       <div style="margin-top:10px"><button class="green" type="button" onclick="submitChallenge()">Submit challenge → Core</button></div>
@@ -202,7 +193,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
     </div>
   </div>
 
-  <div class="note"><b>CITIZEN</b> backend profile → full AI-Rights UI. Other 23 portals → control workspace (Target/Note/Execute + terminal). Client host still serves standalone <code>/citizen.html</code>.</div>
+  <div class="note"><b>CITIZEN</b> → AI-Rights UI. <b>HITL_REVIEW / REGULATOR</b> controls dual-path into OversightCase on Neon. Target = model id or existing COB- case_ref. Neon ≤500MB.</div>
 </div>
 <script>
 let API="", TOK="", CATALOG=[], ACTIVE=null, MAY=false, LAST_KEY="";
@@ -211,7 +202,7 @@ const esc=s=>{const d=document.createElement("div");d.textContent=String(s==null
 function term(line){
   const t=$("term"); if(!t) return;
   const ts=new Date().toISOString().slice(11,19);
-  t.textContent="["+ts+"] "+line+"\n"+t.textContent.split("\n").slice(0,40).join("\n");
+  t.textContent="["+ts+"] "+line+"\n"+t.textContent.split("\n").slice(0,50).join("\n");
 }
 async function api(path, opts={}){
   const h=Object.assign({}, opts.headers||{});
@@ -255,13 +246,15 @@ function renderCards(g){
   let list=g==="ALL"?CATALOG:CATALOG.filter(p=>p.group===g);
   if(q) list=list.filter(p=>(p.title+" "+p.key+" "+(p.desc||"")).toLowerCase().includes(q));
   $("count").textContent=list.length+" portals";
+  const LIVE=new Set(["HITL_REVIEW","REGULATOR","AI_OWNER"]);
   $("cards").innerHTML=list.map(p=>{
-    const isCit=(p.key||"").toUpperCase()==="CITIZEN";
+    const key=(p.key||"").toUpperCase();
     const caps=(p.capabilities||[]).slice(0,4).map(c=>'<span class="pill">'+esc(c)+'</span>').join("");
-    if(isCit){
-      return '<div class="card citizen" onclick="openCitizen()"><div class="g">PUBLIC · AI RIGHTS · backend key CITIZEN</div><h4>'+esc(p.title)+'</h4><p>Full interface — Challenge · Status · Explanation · Rights · Help (not control headings).</p>'+caps+'</div>';
+    if(key==="CITIZEN"){
+      return '<div class="card citizen" onclick="openCitizen()"><div class="g">PUBLIC · AI RIGHTS</div><h4>'+esc(p.title)+'</h4><p>Full interface — Challenge · Status · Rights (not control headings).</p>'+caps+'</div>';
     }
-    return '<div class="card" onclick="openPortal(\''+esc(p.key)+'\')"><div class="g">'+esc(p.group)+' · '+esc(p.base_role)+'</div><h4>'+esc(p.title)+'</h4><p>'+esc((p.desc||"").slice(0,160))+'</p>'+caps+'</div>';
+    const live=LIVE.has(key);
+    return '<div class="card '+(live?'live':'')+'" onclick="openPortal(\''+esc(p.key)+'\')"><div class="g">'+esc(p.group)+' · '+esc(p.base_role)+(live?' · LIVE CORE':'')+'</div><h4>'+esc(p.title)+'</h4><p>'+esc((p.desc||"").slice(0,150))+'</p>'+caps+'</div>';
   }).join("")||'<div class="card">No match.</div>';
 }
 async function openPortal(key){
@@ -280,28 +273,41 @@ async function openPortal(key){
   const ctrls=ACTIVE.controls||[];
   const syss=ACTIVE.systems||[];
   const act=d.activity||[];
-  const sysHtml=syss.length
-    ? syss.slice(0,8).map(s=>'<span class="tag">'+esc(s)+'</span>').join("")
-    : '<span class="tag">no linked systems</span>';
-  $("c-sys").innerHTML='<span style="color:var(--mut);font-size:12px">Linked systems · </span>'+sysHtml+
-    ' <button class="cyan" type="button" onclick="window.open(apiBase()+\'/Sentinel\',\'_blank\')">Sentinel EVA</button>'+
-    ' <button class="green" type="button" onclick="openCitizen()">Citizen UI</button>';
+  const cases=(d.live&&d.live.oversight_cases)||[];
+  const sysHtml=syss.length?syss.slice(0,8).map(s=>'<span class="tag">'+esc(s)+'</span>').join(""):'<span class="tag">—</span>';
+  $("c-sys").innerHTML='<span style="color:var(--mut);font-size:12px">Systems · </span>'+sysHtml+
+    ' <button class="cyan" type="button" onclick="window.open(apiBase()+\'/Sentinel\',\'_blank\')">Sentinel</button>'+
+    ' <button class="green" type="button" onclick="openCitizen()">Citizen</button>';
   $("c-kpis").innerHTML=
     '<div class="kpi"><div class="k">Controls</div><div class="v">'+ctrls.length+'</div></div>'+
     '<div class="kpi"><div class="k">Activity</div><div class="v">'+act.length+'</div></div>'+
-    '<div class="kpi"><div class="k">Base role</div><div class="v" style="font-size:14px">'+esc(ACTIVE.base_role)+'</div></div>'+
-    '<div class="kpi"><div class="k">Systems</div><div class="v" style="font-size:14px">'+(syss.length||"—")+'</div></div>';
+    '<div class="kpi"><div class="k">Oversight</div><div class="v">'+cases.length+'</div></div>'+
+    '<div class="kpi"><div class="k">Role</div><div class="v" style="font-size:14px">'+esc(ACTIVE.base_role)+'</div></div>';
+  if(cases.length){
+    $("c-live").innerHTML='<div class="panel"><h3>Live oversight cases (Neon)</h3>'+
+      '<div style="font-size:12px;color:var(--mut);margin-bottom:8px">Click case_ref to fill Target · HITL Override/Approve resolves that case</div>'+
+      cases.map(c=>'<div class="live-row"><span class="ref" onclick="fillTarget(\''+esc(c.case_ref)+'\')">'+esc(c.case_ref)+'</span><span>'+esc(c.model_id)+'</span><span class="'+(/RESOLVE|OVERRIDE/i.test(c.state||'')?'ok':'')+'">'+esc(c.state)+'</span><span style="color:var(--mut);max-width:40%">'+esc(c.reason||'')+'</span></div>').join('')+
+      '</div>';
+  } else {
+    $("c-live").innerHTML=(ACTIVE.key||'').toUpperCase()==="AI_OWNER"
+      ? '<div class="panel"><h3>AI Owner tip</h3><div style="font-size:13px;color:var(--mut)">Target = model id (prefer <b>model-001</b>). Controls log + audit on Core. Monitor Drift / Deploy via workspace.</div></div>'
+      : '';
+  }
   $("c-controls").innerHTML=ctrls.map((c,i)=>{
     const id="tg_"+i;
-    return '<div class="ctrl"><b>'+esc(c.name)+'</b><div class="d">'+esc(c.desc||c.op_type||"")+' · <span style="color:var(--cyan)">'+esc(c.op_type||"")+'</span></div>'+
-      (MAY?('<div class="row">'+
-        '<div style="flex:1;min-width:100px"><label>Target</label><input id="'+id+'_t" placeholder="optional target"/></div>'+
+    const ph=(ACTIVE.key||'').toUpperCase().match(/HITL|REGULATOR/)?'model-001 or COB-…':'optional target';
+    return '<div class="ctrl"><b>'+esc(c.name)+'</b><div class="d">'+esc(c.desc||'')+' · <span style="color:var(--cyan)">'+esc(c.op_type||'')+'</span></div>'+
+      (MAY?('<div class="row"><div style="flex:1;min-width:100px"><label>Target</label><input id="'+id+'_t" placeholder="'+ph+'"/></div>'+
         '<div style="flex:1;min-width:100px"><label>Note</label><input id="'+id+'_n" placeholder="operator note"/></div>'+
-        '<button type="button" onclick="runControl(\''+esc(ACTIVE.key)+'\',\''+esc(c.name).replace(/\\/g,"\\\\").replace(/\'/g,"\\\'")+'\','+i+')">Execute</button></div>'):'<span class="err">Requires role: '+esc(ACTIVE.base_role)+'</span>')+
+        '<button type="button" onclick="runControl(\''+esc(ACTIVE.key)+'\',\''+esc(c.name).replace(/\\/g,'\\\\').replace(/\'/g,"\\\'")+'\','+i+')">Execute</button></div>'):'<span class="err">Requires role: '+esc(ACTIVE.base_role)+'</span>')+
       '</div>';
-  }).join("")||'<div class="ctrl"><b>No controls defined</b></div>';
-  $("c-act").innerHTML=act.length?act.map(a=>'<div class="act">'+esc((a.at||"").slice(0,19))+' · <b>'+esc(a.control)+'</b> · '+esc(a.ref)+'</div>').join(""):'<div class="act">No activity yet.</div>';
-  term("Opened "+ACTIVE.key+" · "+(MAY?"operate":"view")+" · "+ctrls.length+" controls");
+  }).join('')||'<div class="ctrl"><b>No controls</b></div>';
+  $("c-act").innerHTML=act.length?act.map(a=>'<div class="act">'+esc((a.at||'').slice(0,19))+' · <b>'+esc(a.control)+'</b> · '+esc(a.ref)+'</div>').join(''):'<div class="act">No activity yet.</div>';
+  term("Opened "+ACTIVE.key+" · "+(MAY?"operate":"view")+" · live cases "+cases.length);
+}
+function fillTarget(ref){
+  document.querySelectorAll('[id$="_t"]').forEach(el=>{ if(el.tagName==='INPUT') el.value=ref; });
+  term("Target filled: "+ref);
 }
 function refreshPortal(){ if(LAST_KEY) openPortal(LAST_KEY); }
 async function runControl(key, control, idx){
@@ -317,19 +323,20 @@ async function runControl(key, control, idx){
       body:JSON.stringify({control:control, note:note, target:target})
     });
     term("✓ "+r.status+" · ref "+r.ref+" · "+r.message);
+    if(r.live) term("  live → "+JSON.stringify(r.live));
     openPortal(key);
   }catch(e){ term("✗ "+e.message); }
 }
 async function runFour(){
-  if(!ACTIVE||!MAY){ term("Cannot batch — role locked or no portal"); return; }
+  if(!ACTIVE||!MAY){ term("Cannot batch — role locked"); return; }
   const names=(ACTIVE.controls||[]).slice(0,4).map(c=>c.name);
   for(const c of names){
     try{
       const r=await api("/portal/"+encodeURIComponent(ACTIVE.key)+"/control",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({control:c, note:"batch demo", target:"demo"})
+        body:JSON.stringify({control:c, note:"batch demo", target:"model-001"})
       });
-      term("✓ "+c+" → "+r.ref);
+      term("✓ "+c+" → "+r.ref+(r.live&&r.live.oversight?" · "+r.live.oversight.case_ref:""));
     }catch(e){ term("✗ "+c+" · "+e.message); }
   }
   openPortal(ACTIVE.key);
@@ -402,16 +409,15 @@ async function findCase(){
       '<ul class="timeline">'+
       '<li><div class="dot done">✓</div><div><b>Received</b><div style="font-size:12px;color:var(--mut)">'+esc((d.created_at||"").replace("T"," ").slice(0,16))+'</div></div></li>'+
       '<li><div class="dot done">✓</div><div><b>Queued</b><div style="font-size:12px;color:var(--mut)">'+esc((d.reason||"").slice(0,120))+'</div></div></li>'+
-      '<li><div class="dot active">⚡</div><div><b>State: '+esc(st)+'</b><div style="font-size:12px;color:var(--mut)">'+(d.assigned_to?esc("Assigned: "+d.assigned_to):"Awaiting human review")+'</div></div></li>'+
-      '<li><div class="dot">⏳</div><div><b>Resolution</b><div style="font-size:12px;color:var(--mut)">'+esc(d.resolution||"Est. 2 working days")+'</div></div></li>'+
-      '</ul>';
+      '<li><div class="dot active">⚡</div><div><b>State: '+esc(st)+'</b></div></li>'+
+      '<li><div class="dot">⏳</div><div><b>Resolution</b><div style="font-size:12px;color:var(--mut)">'+esc(d.resolution||"Est. 2 working days")+'</div></div></li></ul>';
   }catch(e){ box.innerHTML='<span class="err">'+esc(e.message)+'</span>'; }
 }
 function getExplanation(){
   const ref=(($("ex-ref").value)||"").trim();
   const out=$("ex-out");
   if(!ref){ out.textContent="Enter a reference."; return; }
-  out.innerHTML='<div class="banner" style="margin:0"><strong>Plain-language note for '+esc(ref)+'</strong><br><br>Under Constitution s33 you may request reasons for administrative action. If this outcome harmed you, use Challenge and keep this reference.</div>';
+  out.innerHTML='<div class="banner" style="margin:0"><strong>Plain-language note for '+esc(ref)+'</strong><br><br>Under Constitution s33 you may request reasons for administrative action. If harmed, use Challenge and keep this reference.</div>';
 }
 </script>
 </body>
