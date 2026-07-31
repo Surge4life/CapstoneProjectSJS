@@ -8,11 +8,13 @@ This folder tracks integration of the original interactive demos into production
 
 | Doc | Purpose |
 |-----|---------|
+| **`CAPSTONE_COVER_NOTE.md`** | One-page submission framing |
 | **`ASSESSOR_READING_ORDER.md`** | 15-minute and 45-minute reading paths |
 | **`ARCHITECTURE_MAP.md`** | One-page stack + deploy diagram |
+| **`GLOSSARY.md`** | Shared term meanings |
 | **`CAPSTONE_EVIDENCE_PACK.md`** | What constitutes submission evidence |
 | **`ENGINEERING_ROADMAP_CAPSTONE.md`** | Freeze list · phases · constraints · Capstone bar |
-| **`EDR-001`** · **`EDR-002`** · **`EDR-003`** | Deploy layer · packages · free-tier limits |
+| **`EDR-001` … `EDR-004`** | Deploy layer · packages · free-tier · demo-seed smoke |
 | **`CAPSTONE_PACKAGE_STORY.md`** | Demos 1–7 → live channels |
 | **`UDOC_MVP_PACKAGE_MATRIX.md`** | Package checklist |
 | **`UDOC_SMOKE_PASS.md`** | Minimum live pass definition |
@@ -42,9 +44,7 @@ This folder tracks integration of the original interactive demos into production
 
 ## Session log
 
-- Sessions 1–5: Core density  
-- Sessions 8–14: ecosystem blueprint (historical; Task 2 reopened for demo parity honesty)  
-- Density + portals dual-path + package split (2026-07-28 → 07-31)  
-- M10–M11: Roadmap · EDRs · assessor path · smoke evidence  
-- **EDR-003 · evidence pack · architecture map** (2026-07-31)  
+- Density + portals + package split (2026-07-28 → 07-31)  
+- M10–M12: Roadmap · EDRs 001–003 · assessor path · evidence pack · architecture map  
+- **EDR-004 · glossary · cover note** (2026-07-31)  
 - **M7:** still operator live smoke (biased = BLOCK)

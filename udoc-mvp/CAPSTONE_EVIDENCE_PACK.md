@@ -12,10 +12,13 @@
 
 | Item | Location | Present? |
 |------|----------|----------|
+| Cover note | `CAPSTONE_COVER_NOTE.md` | Yes |
+| Glossary | `GLOSSARY.md` | Yes |
 | Engineering roadmap + freeze list | `ENGINEERING_ROADMAP_CAPSTONE.md` | Yes |
 | UDOC-only deploy layer | `EDR-001-udoc-only-deploy-layer.md` | Yes |
 | Internal vs Client packages | `EDR-002-internal-vs-client-packages.md` | Yes |
 | Free-tier constraints | `EDR-003-free-tier-constraints.md` | Yes |
+| Demo seed / no-registration smoke | `EDR-004-demo-seed-no-registration-smoke.md` | Yes |
 | Package story (demos → channels) | `CAPSTONE_PACKAGE_STORY.md` | Yes |
 | Assessor reading order | `ASSESSOR_READING_ORDER.md` | Yes |
 | SaaS / commercial non-claim | `UDOC_SAAS_READINESS_GAP.md` | Yes |

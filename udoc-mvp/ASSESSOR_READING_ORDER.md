@@ -11,11 +11,11 @@ Commercial certainty is **not** claimed. This Capstone values **known intent and
 
 | Step | Open | Why |
 |------|------|-----|
-| 1 | `ENGINEERING_ROADMAP_CAPSTONE.md` | Freeze list · Capstone bar · why docs matter |
-| 2 | `ARCHITECTURE_MAP.md` | One-page stack + deploy shape |
-| 3 | `EDR-001-udoc-only-deploy-layer.md` | Only UDOC deploys as product layer |
-| 4 | `EDR-002-internal-vs-client-packages.md` | Staff vs tenant package split |
-| 5 | `EDR-003-free-tier-constraints.md` | Limits are design, not excuses |
+| 1 | `CAPSTONE_COVER_NOTE.md` | Framing: what is / is not claimed |
+| 2 | `GLOSSARY.md` | Shared terms |
+| 3 | `ENGINEERING_ROADMAP_CAPSTONE.md` | Freeze list · Capstone bar |
+| 4 | `ARCHITECTURE_MAP.md` | One-page stack + deploy shape |
+| 5 | `EDR-001` · `EDR-002` · `EDR-003` · `EDR-004` | Deploy · packages · limits · smoke seed |
 | 6 | `CAPSTONE_PACKAGE_STORY.md` | Seven demos → live channels |
 | 7 | `UDOC_SAAS_READINESS_GAP.md` § Executive | What is **not** claimed |
 
