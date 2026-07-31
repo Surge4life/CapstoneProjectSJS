@@ -113,7 +113,8 @@ def _ensure_bootstrap_admin():
 
 def _ensure_udoc_demo_seed():
     """Neon-light UDOC showcase seed: model-001 + one ACTIVE platform policy pack.
-    No new human users. Idempotent. Keeps Sentinel / demo scenarios operational without file uploads."""
+    No new human users. Idempotent. Re-activates model-001 if SUSPENDED so smoke stays green
+    after kill-switch demos (fail-closed is correct in product; Capstone seed must stay ACTIVE)."""
     from datetime import datetime, timezone
     from sqlalchemy import select
     from app.db.session import SessionLocal
@@ -122,7 +123,8 @@ def _ensure_udoc_demo_seed():
 
     db = SessionLocal()
     try:
-        if not db.execute(select(AIModel).where(AIModel.model_id == "model-001")).scalar_one_or_none():
+        m = db.execute(select(AIModel).where(AIModel.model_id == "model-001")).scalar_one_or_none()
+        if not m:
             db.add(AIModel(
                 model_id="model-001", name="UDOC Showcase Model",
                 operator_id="platform", risk_tier="NOTABLE",
@@ -130,6 +132,11 @@ def _ensure_udoc_demo_seed():
             ))
             db.commit()
             print("[bootstrap] seeded AIModel model-001")
+        elif (m.status or "").upper() != "ACTIVE":
+            prev = m.status
+            m.status = "ACTIVE"
+            db.commit()
+            print(f"[bootstrap] re-activated model-001 (was {prev})")
 
         pack = db.execute(
             select(PolicyPack).where(PolicyPack.name == "UDOC Demo · POPIA + Fairness")
