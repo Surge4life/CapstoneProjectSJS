@@ -13,8 +13,18 @@
 | **Client Web** | Tenants | Static | `udoc-public` · gods-udoc-client |
 | **Client App/Mobile** | Tenants | PWA/APK | `udoc-app` · `udoc-mobile` |
 | **Citizen** | Public | Browser | Client `/citizen.html` |
-| **Gateway** | All | Static | `udoc-gateway` |
+| **Gateway** | All | Static | `udoc-gateway` · role → package |
 | **Sentinel / Portals** | Staff ops | Core | `/Sentinel` · `/portals` · `/admin` |
+
+## Gateway role map
+
+| Role | Routes to |
+|------|-----------|
+| admin · exec · auditor | Internal Admin |
+| operator · viewer | Operator workspace |
+| gov | Sector |
+| client | Client SaaS |
+| (none) | Citizen public |
 
 ## Progress
 
@@ -22,16 +32,18 @@
 |----|------|--------|
 | M1 | Internal Desktop → Admin | **Done** |
 | M2 | Client Desktop | **Done** |
-| M3 | App client gate (no hardware plane) | **Done** |
+| M3 | App client gate | **Done** |
 | M4 | Staff mobile = Admin PWA | Documented |
-| M5 | Client Web Models/Reports/Policy | **Done** |
-| M6 | Internal package identity + infra nav | **Done** (banner, Core/admin, SW v5) |
+| M5 | Client Web labels | **Done** |
+| M6 | Internal package identity | **Done** |
 | M7 | Live P6 smoke green | **Operator** |
+| M8 | Gateway package routing | **Done** |
 
 ## Notes
 
 - Client: `UDOC_CLIENT_PACKAGE_NOTES.md`  
 - Internal: `UDOC_INTERNAL_PACKAGE_NOTES.md`  
+- Gateway: `udoc-gateway/README.md`  
 - SaaS gap: `UDOC_SAAS_READINESS_GAP.md`
 
 ## Capstone bar
