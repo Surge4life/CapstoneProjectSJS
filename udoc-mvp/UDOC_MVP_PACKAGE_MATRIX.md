@@ -3,9 +3,9 @@
 **Updated:** 2026-07-31  
 **API:** `gods-platform-core` · Free Render/Neon · not commercial SaaS  
 **Story:** `CAPSTONE_PACKAGE_STORY.md`  
-**Intent / freeze / phases:** `ENGINEERING_ROADMAP_CAPSTONE.md`  
-**EDRs:** `EDR-001-udoc-only-deploy-layer.md` · `EDR-002-internal-vs-client-packages.md`  
-**Assessor path:** `ASSESSOR_READING_ORDER.md`
+**Intent:** `ENGINEERING_ROADMAP_CAPSTONE.md`  
+**EDRs:** 001 deploy layer · 002 packages · 003 free-tier limits  
+**Assessor:** `ASSESSOR_READING_ORDER.md` · `CAPSTONE_EVIDENCE_PACK.md` · `ARCHITECTURE_MAP.md`
 
 ## Package map
 
@@ -36,24 +36,22 @@
 |----|------|--------|
 | M1 | Internal Desktop → Admin | **Done** |
 | M2 | Client Desktop | **Done** |
-| M3 | App client gate (`packageMode` + CSS + plane) | **Done** |
+| M3 | App client gate | **Done** |
 | M4 | Staff mobile = Admin PWA | **Documented** |
 | M5 | Client Web labels | **Done** |
 | M6 | Internal package identity | **Done** |
 | M7 | Live P6 smoke green | **Operator** |
 | M8 | Gateway package routing | **Done** |
-| M9 | Capstone package story (demos → packages) | **Done** |
-| M10 | Engineering roadmap + EDR-001 (intent first) | **Done** |
+| M9 | Capstone package story | **Done** |
+| M10 | Roadmap + EDR-001 | **Done** |
 | M11 | EDR-002 + assessor order + smoke evidence | **Done** |
+| M12 | EDR-003 + evidence pack + architecture map | **Done** |
 
 ## Notes
 
-- Client: `UDOC_CLIENT_PACKAGE_NOTES.md`  
-- Internal: `UDOC_INTERNAL_PACKAGE_NOTES.md`  
-- Package story: `CAPSTONE_PACKAGE_STORY.md`  
-- Roadmap: `ENGINEERING_ROADMAP_CAPSTONE.md`  
 - Smoke: `UDOC_SMOKE_PASS.md` · `SMOKE_EVIDENCE_TEMPLATE.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md`  
-- SaaS gap (honest non-claim): `UDOC_SAAS_READINESS_GAP.md`
+- SaaS gap (honest non-claim): `UDOC_SAAS_READINESS_GAP.md`  
+- Live hosts: `UDOC_LIVE_ENVIRONMENTS.md`
 
 ## Capstone bar
 

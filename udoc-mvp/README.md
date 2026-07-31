@@ -9,9 +9,10 @@ This folder tracks integration of the original interactive demos into production
 | Doc | Purpose |
 |-----|---------|
 | **`ASSESSOR_READING_ORDER.md`** | 15-minute and 45-minute reading paths |
+| **`ARCHITECTURE_MAP.md`** | One-page stack + deploy diagram |
+| **`CAPSTONE_EVIDENCE_PACK.md`** | What constitutes submission evidence |
 | **`ENGINEERING_ROADMAP_CAPSTONE.md`** | Freeze list · phases · constraints · Capstone bar |
-| **`EDR-001-udoc-only-deploy-layer.md`** | Why only UDOC is the deploy product layer |
-| **`EDR-002-internal-vs-client-packages.md`** | Staff vs tenant package split |
+| **`EDR-001`** · **`EDR-002`** · **`EDR-003`** | Deploy layer · packages · free-tier limits |
 | **`CAPSTONE_PACKAGE_STORY.md`** | Demos 1–7 → live channels |
 | **`UDOC_MVP_PACKAGE_MATRIX.md`** | Package checklist |
 | **`UDOC_SMOKE_PASS.md`** | Minimum live pass definition |
@@ -44,6 +45,6 @@ This folder tracks integration of the original interactive demos into production
 - Sessions 1–5: Core density  
 - Sessions 8–14: ecosystem blueprint (historical; Task 2 reopened for demo parity honesty)  
 - Density + portals dual-path + package split (2026-07-28 → 07-31)  
-- **M10:** Engineering roadmap + EDR-001  
-- **EDR-002 + assessor path + smoke evidence template** (2026-07-31)  
+- M10–M11: Roadmap · EDRs · assessor path · smoke evidence  
+- **EDR-003 · evidence pack · architecture map** (2026-07-31)  
 - **M7:** still operator live smoke (biased = BLOCK)
