@@ -4,8 +4,10 @@ function apiBase(){return localStorage.getItem("udoc_client_api")||PROD_API;}
 function setApiBase(v){localStorage.setItem("udoc_client_api",v.replace(/\/+$/,""));}
 function token(){return localStorage.getItem("udoc_client_tok")||"";}
 function esc(s){const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;}
+function netErr(e){const m=String(e&&e.message||e||"");if(/Failed to fetch|NetworkError|Load failed|network/i.test(m))return "Core unreachable (Render cold start or offline). Open "+apiBase()+"/health · wait 30–90s · retry.";return m;}
 async function api(path,opts={}){const h=Object.assign({},opts.headers||{});if(token())h.Authorization="Bearer "+token();
-const r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));
+let r;
+try{r=await fetch(apiBase()+path,Object.assign({},opts,{headers:h}));}catch(e){throw new Error(netErr(e));}
 if(r.status===401){if(token())logout();throw new Error("Session expired");}
 const ct=r.headers.get("content-type")||"";const body=ct.includes("json")?await r.json().catch(()=>null):await r.text();
 if(!r.ok)throw new Error((body&&body.detail)||(typeof body==="string"?body:("HTTP "+r.status)));return body;}
@@ -16,12 +18,12 @@ try{const f=new URLSearchParams({username:document.getElementById("li-email").va
 const r=await fetch(apiBase()+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:f});
 if(!r.ok)throw new Error(r.status===401?"Invalid credentials":"Login failed");
 const d=await r.json();localStorage.setItem("udoc_client_tok",d.access_token);
-localStorage.setItem("udoc_client_who",JSON.stringify({email:document.getElementById("li-email").value.trim().toLowerCase(),role:d.role,tenant_id:d.tenant_id}));enterApp();
-}catch(err){e.textContent=err.message;}finally{btn.disabled=false;btn.textContent="Sign in";}}
+localStorage.setItem("udoc_client_who",JSON.stringify({email:document.getElementById("li-email").value.trim().toLowerCase(),role:d.role,tenant_id:d.tenant_id,tenant_pk:d.tenant_pk}));enterApp();
+}catch(err){e.textContent=netErr(err);}finally{btn.disabled=false;btn.textContent="Sign in";}}
 function logout(){localStorage.removeItem("udoc_client_tok");document.getElementById("app").style.display="none";document.getElementById("login").style.display="flex";}
 async function enterApp(){const w=JSON.parse(localStorage.getItem("udoc_client_who")||"{}");
 document.getElementById("login").style.display="none";document.getElementById("app").style.display="grid";
-document.getElementById("who-email").textContent=w.email||"—";document.getElementById("who-tenant").textContent=w.tenant_id||"";
+document.getElementById("who-email").textContent=w.email||"—";document.getElementById("who-tenant").textContent=w.tenant_id||(w.role?("role:"+w.role):"");
 heartbeat();try{SECTOR=await api("/sector/profile");}catch(e){}nav("dash");}
 async function heartbeat(){const el=document.getElementById("hb");try{await fetch(apiBase()+"/health");el.textContent="· online";el.className="pill up";}catch{el.textContent="· offline";el.className="pill down";}}
 function nav(v){
@@ -36,7 +38,7 @@ function riskTag(v){v=String(v||"").toUpperCase();const c=/HIGH|CRIT|UNACCEPTABL
 function statusTag(v){const u=String(v||"").toUpperCase();const c=/ACTIVE|APPROVE|VALID|VERIFIED/.test(u)?"t-ok":(/PEND|REVIEW/.test(u)?"t-warn":(/BLOCK|DENIED|INVALID|ESCALATE/.test(u)?"t-bad":"t-info"));return '<span class="tag2 '+c+'">'+esc(v||"—")+'</span>';}
 function tableFrom(rows,cols){if(!rows.length)return'<div class="muted">No records.</div>';let h='<table><thead><tr>'+cols.map(c=>'<th>'+esc(c.h)+'</th>').join('')+'</tr></thead><tbody>';
 rows.forEach(r=>{h+='<tr>'+cols.map(c=>'<td>'+(c.r?c.r(r):esc(r[c.k]))+'</td>').join('')+'</tr>';});return h+'</tbody></table>';}
-async function safe(host,fn){try{return await fn();}catch(e){host.innerHTML='<div class="panel t-bad">'+esc(e.message)+'</div>';}}
+async function safe(host,fn){try{return await fn();}catch(e){host.innerHTML='<div class="panel t-bad">'+esc(netErr(e))+'</div>';}}
 function dimsHtml(dims){if(!dims||typeof dims!=="object")return"";const order=["Validity","Confidence","Risk","Compliance","Stability","Impact"];
 const keys=order.filter(k=>dims[k]!=null).concat(Object.keys(dims).filter(k=>!order.includes(k)));
 return'<div class="dims">'+keys.map(k=>{const v=Number(dims[k]);const pct=isNaN(v)?0:Math.min(100,Math.max(0,(v<=1?v*100:v*10)));
@@ -87,6 +89,7 @@ m.innerHTML='<div class="pgh"><h2>Command Dashboard</h2><span class="desc">mvp-1
 '<div class="panel" style="margin:0"><h3>Sovereignty strip</h3><div class="sov-ok">ZA · '+esc(ex.jurisdiction||"ZA")+'</div><div class="sov-ok">Localisation rules · '+esc(ex.rules_active!=null?ex.rules_active:"—")+'</div><div class="sov-ok">Fail-closed path · policy-to-code</div></div>'+
 '<div class="panel" style="margin:0"><h3>Quick actions</h3>'+
 '<button class="btn cyan sm" onclick="nav(\'govern\')">Govern · EVA</button> '+
+'<button class="btn sm" onclick="nav(\'knowledge\')">Company Knowledge</button> '+
 '<button class="btn sm" onclick="nav(\'bias\')">Bias Monitor</button> '+
 '<button class="btn sm" onclick="nav(\'compliance\')">Compliance</button> '+
 '<button class="btn sm" onclick="nav(\'citizen\')">Citizen Portal</button> '+
@@ -123,7 +126,7 @@ m.innerHTML='<div class="pgh"><h2>Multi-Framework Compliance</h2><span class="de
 '<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">'+cards+'</div>'+honesty();});}
 async function runSweep(btn){btn.disabled=true;const r=document.getElementById("sweep-res");if(r)r.textContent="running…";
 try{const d=await api("/compliance/sweep",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});if(r)r.textContent="done · "+esc(JSON.stringify(d).slice(0,120));}
-catch(e){if(r)r.textContent=e.message;}finally{btn.disabled=false;}}
+catch(e){if(r)r.textContent=netErr(e);}finally{btn.disabled=false;}}
 
 async function vAudit(m){await safe(m,async()=>{const rows=asArray(await api("/decisions"));
 m.innerHTML='<div class="pgh"><h2>Audit Trail</h2><span class="desc">mvp-1 · sealed decisions</span></div><div class="panel"><h3>Recent · '+rows.length+'</h3>'+tableFrom(rows.slice(0,50),[
@@ -139,7 +142,7 @@ m.innerHTML='<div class="pgh"><h2>Bias Monitor</h2><span class="desc">mvp-1 · l
 '<div class="panel"><h3>Incident feed</h3>'+(incidents.length?tableFrom(incidents.slice(0,15),[{h:"Decision",r:x=>esc(x.decision_id)},{h:"Model",r:x=>esc(x.model_id)},{h:"Severity",r:x=>statusTag(x.severity)},{h:"Reasons",r:x=>esc(x.reasons)}]):'<div class="muted">None yet — run Biased on Govern or bias scan.</div>')+'</div>'+honesty();});}
 async function runBiasScan(btn){btn.disabled=true;const r=document.getElementById("bias-scan-res");if(r)r.textContent="scanning…";
 try{const d=await api("/bias/scan");if(r)r.textContent="scanned "+(d.decisions_scanned!=null?d.decisions_scanned:"?")+" · flagged "+(d.fairness_flagged!=null?d.fairness_flagged:"?")+" · rate "+(d.flag_rate!=null?(d.flag_rate*100).toFixed(1)+"%":"—");}
-catch(e){if(r)r.textContent=e.message;}finally{btn.disabled=false;}}
+catch(e){if(r)r.textContent=netErr(e);}finally{btn.disabled=false;}}
 
 async function vSov(m){await safe(m,async()=>{let ex={},ready={};try{ex=await api("/udoc/exchange");}catch(e){}try{ready=await api("/udoc/demo/ready");}catch(e){}
 m.innerHTML='<div class="pgh"><h2>Sovereignty</h2><span class="desc">mvp-1/2 · ZA localisation</span></div>'+
@@ -184,7 +187,7 @@ const certBlock=d.certificate_id
   :(d.id?'<div style="margin-top:10px"><button class="btn sm" type="button" onclick="gEvidence('+d.id+')">Evidence</button> <span id="g-cert-out" class="muted" style="font-size:12px"></span></div>':'');
 out.innerHTML='<div class="panel"><h3>EVA Verdict · '+esc(SCENARIO)+'</h3><div class="verdict-big">'+statusTag(decision)+'</div>'+dimsHtml(d.dimensions)+
 '<div class="term">'+esc(term)+'</div>'+certBlock+'</div>';
-}catch(e){out.innerHTML='<div class="panel t-bad">'+esc(e.message)+'</div>';}}
+}catch(e){out.innerHTML='<div class="panel t-bad">'+esc(netErr(e))+'</div>';}}
 async function gBatch(){
   const out=document.getElementById("g-out");
   const kpis=document.getElementById("g-batch-kpis");
@@ -195,10 +198,10 @@ async function gBatch(){
   for(const k of kinds){
     try{
       const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(scenarioBody(k,mid))});
-      results.push({kind:k,ok:true,decision:d.decision,eva:d.composite_eva,policy:d.policy_enforced,id:d.id,cert:d.certificate_id,dims:d.dimensions,reasons:d.block_reasons||[]});
+      results.push({kind:k,ok:true,decision:d.decision,eva:d.composite_eva,policy:d.policy_enforced,id:d.id,cert:d.certificate_id,dims:d.dimensions,reasons:d.block_reasons ||[]});
       if(d.certificate_id) LAST_CERT=d.certificate_id;
       if(d.id) LAST_DID=d.id;
-    }catch(e){results.push({kind:k,ok:false,decision:e.message});}
+    }catch(e){results.push({kind:k,ok:false,decision:netErr(e)});}
   }
   const counts={APPROVE:0,BLOCK:0,ESCALATE:0,OTHER:0};
   results.forEach(r=>{const d=String(r.decision||"").toUpperCase();if(d==="APPROVE")counts.APPROVE++;else if(d==="BLOCK")counts.BLOCK++;else if(d==="ESCALATE")counts.ESCALATE++;else counts.OTHER++;});
@@ -225,13 +228,13 @@ async function gVerifyCert(){
   if(o)o.textContent="Verifying…";
   try{const v=await api("/decisions/certificates/"+encodeURIComponent(id)+"/verify");
     if(o)o.innerHTML='<span class="'+(v.valid?'t-ok':'t-bad')+'">'+(v.valid?'VALID':'INVALID')+'</span> · '+esc(v.decision||"");
-  }catch(e){if(o)o.innerHTML='<span class="t-bad">'+esc(e.message)+'</span>';}
+  }catch(e){if(o)o.innerHTML='<span class="t-bad">'+esc(netErr(e))+'</span>';}
 }
 async function gEvidence(id){
   const o=document.getElementById("g-cert-out"); if(o)o.textContent="Loading evidence…";
   try{const d=await api("/udoc/decisions/"+id+"/evidence");
     if(o)o.innerHTML='<div class="term" style="margin-top:6px">'+esc(JSON.stringify(d,null,2).slice(0,1200))+'</div>';
-  }catch(e){if(o)o.innerHTML='<span class="t-bad">'+esc(e.message)+'</span>';}
+  }catch(e){if(o)o.innerHTML='<span class="t-bad">'+esc(netErr(e))+'</span>';}
 }
 
 async function vDecisions(m){await safe(m,async()=>{let rows=[],certs=[];try{rows=asArray(await api("/decisions"));}catch(e){}try{certs=asArray(await api("/decisions/certificates"));}catch(e){}
@@ -243,19 +246,72 @@ m.innerHTML='<div class="pgh"><h2>Decisions · EVA</h2><span class="desc">live l
 {h:"Cert",r:x=>'<span class="mono">'+esc(x.certificate_id||x.id)+'</span>'},{h:"Verdict",r:x=>statusTag(x.decision)},
 {h:"",r:x=>{const cid=x.certificate_id||x.id;return cid?'<button class="btn sm" type="button" onclick="LAST_CERT=\''+esc(cid)+'\';nav(\'govern\');setTimeout(function(){var el=document.getElementById(\'g-cert\');if(el){el.value=\''+esc(cid)+'\';}gVerifyCert();},400)">Verify</button>':'';}}])+'</div>'+honesty();});}
 
-async function vKnowledge(m){await safe(m,async()=>{let st={},docs=[];try{st=await api("/client/knowledge/state");}catch(e){}try{docs=asArray(await api("/client/knowledge/docs"));}catch(e){}
-m.innerHTML='<div class="pgh"><h2>Company Knowledge</h2><span class="desc">Text only · Neon-light</span></div>'+
-'<div class="grid kpis"><div class="kpi"><div class="k">Docs</div><div class="v cyan">'+(st.docs!=null?st.docs:docs.length)+'</div></div></div>'+
-'<div class="panel"><h3>Ask</h3><div class="row"><div class="f"><input id="kb-q" placeholder="query"/></div><button class="btn cyan" onclick="kbAsk()">Ask</button></div><div id="kb-ans" style="margin-top:8px"></div></div>'+
-'<div class="panel"><h3>Add text</h3><label>Title</label><input id="kb-t"/><label>Text</label><textarea id="kb-text" rows="3" style="width:100%;background:#091022;border:1px solid var(--bd);color:var(--txt);border-radius:8px;padding:10px;font:inherit"></textarea>'+
-'<div style="margin-top:8px"><button class="btn" onclick="kbIngest()">Add</button> <span id="kb-msg" class="muted"></span></div></div>'+
-'<div class="panel"><h3>Documents</h3>'+tableFrom(docs.slice(0,20),[{h:"Title",r:x=>esc(x.title)},{h:"Chars",r:x=>esc(x.char_len)},{h:"",r:x=>'<button class="btn sm" onclick="kbDelete('+x.id+')">remove</button>'}])+'</div>'+honesty();});}
-async function kbAsk(){const a=document.getElementById("kb-ans");const q=document.getElementById("kb-q").value.trim();if(!q)return;a.textContent="…";
-try{const r=await api("/client/knowledge/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q})});a.innerHTML='<div class="note">'+esc(r.answer||"")+'</div>';}catch(e){a.textContent=e.message;}}
-async function kbIngest(){const mg=document.getElementById("kb-msg");const body={title:document.getElementById("kb-t").value.trim(),text:document.getElementById("kb-text").value,category:"GENERAL"};
-if(!body.title||!body.text){mg.textContent="Required";return;}mg.textContent="…";
-try{await api("/client/knowledge/ingest-text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});nav("knowledge");}catch(e){mg.textContent=e.message;}}
-async function kbDelete(id){try{await api("/client/knowledge/docs/"+id,{method:"DELETE"});nav("knowledge");}catch(e){alert(e.message);}}
+async function vKnowledge(m){
+  const who=JSON.parse(localStorage.getItem("udoc_client_who")||"{}");
+  let st=null,docs=[],errMsg="";
+  try{st=await api("/client/knowledge/state");}catch(e){errMsg=netErr(e);}
+  try{if(!errMsg)docs=asArray(await api("/client/knowledge/docs"));}catch(e){if(!errMsg)errMsg=netErr(e);}
+  const locked=/tenant-private|No tenant|403|Internal staff/i.test(errMsg);
+  m.innerHTML='<div class="pgh"><h2>Company Knowledge</h2><span class="desc">Private tenant corpus · grounded ask · Neon-light text substrate</span></div>'+
+    (errMsg?'<div class="panel t-bad"><b>'+(locked?'Tenant-private surface':'Error')+'</b><br>'+esc(errMsg)+
+      (locked?'<br><span class="muted">Sign in as role <b>client</b> with a tenant_pk. Platform admin uses Core <code>/intel</code> — not this Client KB.</span>':'')+
+      '</div>':'')+
+    '<div class="grid kpis">'+
+      '<div class="kpi"><div class="k">Your docs</div><div class="v cyan">'+(st&&st.docs!=null?st.docs:docs.length)+'</div></div>'+
+      '<div class="kpi"><div class="k">Characters</div><div class="v">'+(st&&st.chars!=null?st.chars:"—")+'</div></div>'+
+      '<div class="kpi"><div class="k">Scope</div><div class="v" style="font-size:14px">'+(st&&st.tenant_scoped?'TENANT':'—')+'</div></div>'+
+      '<div class="kpi"><div class="k">Account</div><div class="v" style="font-size:12px">'+esc(who.role||"?")+'</div></div></div>'+
+    '<div class="panel"><h3>Private intelligence · how it works</h3>'+
+      '<div class="sov-ok">Each client tenant only sees rows with their tenant_pk</div>'+
+      '<div class="sov-ok">Ask answers cite only your active documents</div>'+
+      '<div class="sov-ok">Shared UDOC host · private KB rows · not a second Neon per client</div>'+
+      '<div class="muted" style="font-size:12px;margin-top:8px">'+esc(st&&st.note?st.note:"Upload SOPs, policies, and company text. Grounded retrieval — not open-web chat.")+'</div></div>'+
+    '<div class="panel"><h3>Ask your corpus</h3>'+
+      '<div class="row"><div class="f"><input id="kb-q" placeholder="Question using terms from your documents"/></div>'+
+      '<button class="btn cyan" onclick="kbAsk()" '+(errMsg?'disabled':'')+'>Ask</button></div>'+
+      '<div id="kb-ans" style="margin-top:10px"></div></div>'+
+    '<div class="panel"><h3>Add text (preferred · Neon-light)</h3>'+
+      '<label>Title</label><input id="kb-t" placeholder="e.g. Leave policy 2026"/>'+
+      '<label>Category</label><select id="kb-cat"><option>GENERAL</option><option>POLICY</option><option>SOP</option><option>LEGAL</option><option>HR</option><option>PRODUCT</option></select>'+
+      '<label>Text</label><textarea id="kb-text" rows="4" style="width:100%;background:#091022;border:1px solid var(--bd);color:var(--txt);border-radius:8px;padding:10px;font:inherit" placeholder="Paste company material…"></textarea>'+
+      '<div style="margin-top:8px"><button class="btn" onclick="kbIngest()" '+(errMsg?'disabled':'')+'>Add to private KB</button> <span id="kb-msg" class="muted"></span></div></div>'+
+    '<div class="panel"><h3>Upload file (PDF · DOCX · TXT · max 25MB)</h3>'+
+      '<input type="file" id="kb-file" accept=".pdf,.docx,.txt,.md"/>'+
+      '<div style="margin-top:8px"><button class="btn cyan" onclick="kbUpload()" '+(errMsg?'disabled':'')+'>Upload into private KB</button> <span id="kb-up-msg" class="muted"></span></div>'+
+      '<div class="muted" style="font-size:11px;margin-top:8px">Large archives stay off free Neon — prefer short policy extracts.</div></div>'+
+    '<div class="panel"><h3>Documents in your tenant · '+docs.length+'</h3>'+
+      (docs.length?tableFrom(docs.slice(0,40),[{
+        h:"Title",r:x=>'<b>'+esc(x.title)+'</b><br><span class="mono muted" style="font-size:10px">'+esc(x.category||"")+' · '+esc(x.source||"")+'</span>'},
+        {h:"Chars",r:x=>esc(x.char_len)},
+        {h:"Active",r:x=>statusTag(x.active?"ACTIVE":"OFF")},
+        {h:"",r:x=>'<button class="btn sm" onclick="kbDelete('+x.id+')">remove</button>'}]):
+        '<div class="muted">Empty — add text or upload a small document to start your private substrate.</div>')+
+    '</div>'+honesty();
+}
+async function kbAsk(){const a=document.getElementById("kb-ans");const q=document.getElementById("kb-q").value.trim();if(!q)return;a.innerHTML='<span class="muted">…</span>';
+try{const r=await api("/client/knowledge/ask",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:q})});
+  let html='<div class="note">'+esc(r.answer||"")+'</div>';
+  if(r.coverage!=null)html+='<div class="muted" style="font-size:11px;margin-top:6px">coverage '+esc(r.coverage)+(r.blocked?' · blocked':'')+'</div>';
+  if(r.citations&&r.citations.length){
+    html+='<table style="margin-top:8px"><thead><tr><th>Source</th><th>Snippet</th></tr></thead><tbody>'+
+      r.citations.map(c=>'<tr><td>'+esc(c.title)+'<br><span class="mono muted" style="font-size:10px">#'+esc(c.doc_id)+' · '+esc(c.category||"")+'</span></td><td style="font-size:12px">'+esc(c.snippet||"")+'</td></tr>').join('')+
+      '</tbody></table>';
+  }
+  a.innerHTML=html;
+}catch(e){a.innerHTML='<span class="t-bad">'+esc(netErr(e))+'</span>';}}
+async function kbIngest(){const mg=document.getElementById("kb-msg");const body={title:document.getElementById("kb-t").value.trim(),text:document.getElementById("kb-text").value,category:(document.getElementById("kb-cat")&&document.getElementById("kb-cat").value)||"GENERAL"};
+if(!body.title||!body.text){mg.textContent="Title and text required";return;}mg.textContent="Saving…";
+try{await api("/client/knowledge/ingest-text",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});nav("knowledge");}catch(e){mg.textContent=netErr(e);}}
+async function kbUpload(){const mg=document.getElementById("kb-up-msg");const f=document.getElementById("kb-file");const file=f&&f.files&&f.files[0];if(!file){mg.textContent="Choose a file";return;}
+mg.textContent="Uploading…";
+try{const fd=new FormData();fd.append("file",file);fd.append("title",file.name);fd.append("category","GENERAL");
+  const h={};if(token())h.Authorization="Bearer "+token();
+  const r=await fetch(apiBase()+"/client/knowledge/ingest",{method:"POST",headers:h,body:fd});
+  const ct=r.headers.get("content-type")||"";const body=ct.includes("json")?await r.json().catch(()=>null):await r.text();
+  if(!r.ok)throw new Error((body&&body.detail)||("HTTP "+r.status));
+  nav("knowledge");
+}catch(e){mg.textContent=netErr(e);}}
+async function kbDelete(id){try{await api("/client/knowledge/docs/"+id,{method:"DELETE"});nav("knowledge");}catch(e){alert(netErr(e));}}
 
 async function vSettings(m){await safe(m,async()=>{let plan={},keys=[];try{plan=await api("/tenants/me");}catch(e){}try{keys=asArray(await api("/tenants/me/apikeys"));}catch(e){}
 const rows=Object.entries(plan||{}).filter(([k,v])=>typeof v!=="object").map(([k,v])=>'<tr><td class="muted">'+esc(k)+'</td><td class="mono">'+esc(v)+'</td></tr>');
