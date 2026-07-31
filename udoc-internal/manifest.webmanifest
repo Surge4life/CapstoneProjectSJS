@@ -1,13 +1,13 @@
 {
-  "name": "UDOC Admin \u00b7 G.O.D.S",
-  "short_name": "UDOC Admin",
-  "description": "Sovereign AI governance \u2014 G.O.D.S UDOC",
+  "name": "UDOC Internal · GODS Staff",
+  "short_name": "UDOC Internal",
+  "description": "UDOC Internal package — staff admin, kill-switch, HITL, jobs. Not client SaaS.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0A1628",
-  "theme_color": "#0A1628",
+  "orientation": "any",
+  "background_color": "#060E1C",
+  "theme_color": "#060E1C",
   "icons": [
     {
       "src": "/icon-192.png",
