@@ -10,11 +10,14 @@ This folder tracks integration of the original interactive demos into production
 |-----|---------|
 | **`CAPSTONE_COVER_NOTE.md`** | One-page submission framing |
 | **`ASSESSOR_READING_ORDER.md`** | 15-minute and 45-minute reading paths |
-| **`ARCHITECTURE_MAP.md`** | One-page stack + deploy diagram |
 | **`GLOSSARY.md`** | Shared term meanings |
+| **`ARCHITECTURE_MAP.md`** | One-page stack + deploy diagram |
 | **`CAPSTONE_EVIDENCE_PACK.md`** | What constitutes submission evidence |
-| **`ENGINEERING_ROADMAP_CAPSTONE.md`** | Freeze list · phases · constraints · Capstone bar |
-| **`EDR-001` … `EDR-004`** | Deploy layer · packages · free-tier · demo-seed smoke |
+| **`LIMITATIONS_REGISTER.md`** | Known limits named explicitly |
+| **`SUBMISSION_TIMELINE.md`** | Orientation to March 2027 |
+| **`CANON_FREEZE_NOTICE.md`** | Do not expand philosophy instead of verifying live |
+| **`ENGINEERING_ROADMAP_CAPSTONE.md`** | Freeze list · phases · Capstone bar |
+| **`EDR-001` … `EDR-004`** | Deploy · packages · free-tier · demo-seed smoke |
 | **`CAPSTONE_PACKAGE_STORY.md`** | Demos 1–7 → live channels |
 | **`UDOC_MVP_PACKAGE_MATRIX.md`** | Package checklist |
 | **`UDOC_SMOKE_PASS.md`** | Minimum live pass definition |
@@ -27,24 +30,19 @@ This folder tracks integration of the original interactive demos into production
 
 | Original Demo | Target Production Surface | Status |
 |---------------|---------------------------|--------|
-| mvp-1 International Standards Dashboard | **Client** Web / App / Desktop Client | Core live + Session 9 |
-| mvp-2 Multi-Framework Compliance Engine | **Client** + Sector | Core live + Session 9 |
-| v5-sa SA-Aligned Architecture Lineage | **Internal** + Client sov strip | Session 10 |
-| v7-platform Full Platform | **Split** Internal + Client + Citizen + Portals | Density wave |
-| v7-eva EVA Engine | Sentinel + Client Govern | Live 6-dim + certs |
-| udoc-platform-ui Operational Control | **Internal** Admin (Client subset) | Session 11 |
-| udoc-sovereign-console | **Internal** Admin + Sentinel | Session 11 |
+| mvp-1 / mvp-2 | **Client** (+ Sector) | Core live |
+| v7-eva / platform / sovereign | **Internal** + Sentinel + Client subset | Density wave |
+| v7-platform Citizen | Client `/citizen.html` | Live public path |
 
 ## Tier / package ownership
 
 - **Client package:** `udoc-public`, `udoc-portals`, `udoc-app`, `udoc-mobile`, `udoc-desktop-client`  
 - **Internal package:** `udoc-internal`, `udoc-desktop`, `udoc-operator`, Core `/Sentinel` · `/portals` · `/admin`  
 - **Gateway:** role → package host  
-- **GIS / GBS / GODS product depth:** after Task 2 live smoke green (see roadmap)
+- **GIS / GBS depth:** after Task 2 live smoke green
 
 ## Session log
 
-- Density + portals + package split (2026-07-28 → 07-31)  
-- M10–M12: Roadmap · EDRs 001–003 · assessor path · evidence pack · architecture map  
-- **EDR-004 · glossary · cover note** (2026-07-31)  
+- Package + intent spine M10–M13 (2026-07-31)  
+- **Limitations · timeline · Canon freeze** (2026-07-31)  
 - **M7:** still operator live smoke (biased = BLOCK)

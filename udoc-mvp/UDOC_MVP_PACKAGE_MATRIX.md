@@ -1,11 +1,11 @@
 # UDOC Capstone MVP · Package Matrix (March 2027)
 
 **Updated:** 2026-07-31  
-**API:** `gods-platform-core` · Free Render/Neon · not commercial SaaS  
 **Cover:** `CAPSTONE_COVER_NOTE.md`  
 **Glossary:** `GLOSSARY.md`  
-**EDRs:** 001–004  
-**Assessor:** `ASSESSOR_READING_ORDER.md` · `CAPSTONE_EVIDENCE_PACK.md` · `ARCHITECTURE_MAP.md`
+**Limits:** `LIMITATIONS_REGISTER.md` · `EDR-001`…`004`  
+**Timeline:** `SUBMISSION_TIMELINE.md`  
+**Canon:** `CANON_FREEZE_NOTICE.md`
 
 ## Package map
 
@@ -20,23 +20,13 @@
 | **Gateway** | All | Static | `udoc-gateway` · role → package |
 | **Sentinel / Portals** | Staff ops | Core | `/Sentinel` · `/portals` · `/admin` |
 
-## Gateway role map
-
-| Role | Routes to |
-|------|-----------|
-| admin · exec · auditor | Internal Admin |
-| operator · viewer | Operator workspace |
-| gov | Sector |
-| client | Client SaaS |
-| (none) | Citizen public |
-
 ## Progress
 
 | ID | Work | Status |
 |----|------|--------|
-| M1–M6, M8–M12 | Package channels + intent docs | **Done** |
+| M1–M6, M8–M13 | Packages + intent documentation spine | **Done** |
 | M7 | Live P6 smoke green | **Operator** |
-| M13 | Glossary · cover note · EDR-004 | **Done** |
+| M14 | Limitations · timeline · Canon freeze | **Done** |
 
 ## Capstone bar
 

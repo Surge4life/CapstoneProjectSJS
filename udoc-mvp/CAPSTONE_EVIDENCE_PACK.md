@@ -10,18 +10,18 @@
 
 ### A. Intent and decisions (required)
 
-| Item | Location | Present? |
-|------|----------|----------|
-| Cover note | `CAPSTONE_COVER_NOTE.md` | Yes |
-| Glossary | `GLOSSARY.md` | Yes |
-| Engineering roadmap + freeze list | `ENGINEERING_ROADMAP_CAPSTONE.md` | Yes |
-| UDOC-only deploy layer | `EDR-001-udoc-only-deploy-layer.md` | Yes |
-| Internal vs Client packages | `EDR-002-internal-vs-client-packages.md` | Yes |
-| Free-tier constraints | `EDR-003-free-tier-constraints.md` | Yes |
-| Demo seed / no-registration smoke | `EDR-004-demo-seed-no-registration-smoke.md` | Yes |
-| Package story (demos → channels) | `CAPSTONE_PACKAGE_STORY.md` | Yes |
-| Assessor reading order | `ASSESSOR_READING_ORDER.md` | Yes |
-| SaaS / commercial non-claim | `UDOC_SAAS_READINESS_GAP.md` | Yes |
+| Item | Location |
+|------|----------|
+| Cover note | `CAPSTONE_COVER_NOTE.md` |
+| Glossary | `GLOSSARY.md` |
+| Limitations register | `LIMITATIONS_REGISTER.md` |
+| Submission timeline | `SUBMISSION_TIMELINE.md` |
+| Canon freeze notice | `CANON_FREEZE_NOTICE.md` |
+| Engineering roadmap + freeze list | `ENGINEERING_ROADMAP_CAPSTONE.md` |
+| EDRs 001–004 | deploy · packages · free-tier · demo-seed smoke |
+| Package story | `CAPSTONE_PACKAGE_STORY.md` |
+| Assessor reading order | `ASSESSOR_READING_ORDER.md` |
+| SaaS / commercial non-claim | `UDOC_SAAS_READINESS_GAP.md` |
 
 ### B. Live environment honesty (required)
 
@@ -39,14 +39,14 @@
 | Side-by-side demo vs live | `P6_ASSESSOR_SIDE_BY_SIDE.md` |
 | **Filled** evidence form (dated) | `SMOKE_EVIDENCE_TEMPLATE.md` → copy when run |
 
-### D. Optional depth (when time allows)
+### D. Optional depth
 
 | Item | Location |
 |------|----------|
 | Demos 6–7 patent/control map | `UDOC_V93_DEMO67_PATENT_CONTROLS.md` |
 | Portal dual-path | `PORTAL_LIVE_CORE.md` |
-| Engineering Canon volumes | `docs/` |
-| Screenshots of live BLOCK / Citizen / Gateway | Capstone submission folder (operator-produced) |
+| Engineering Canon volumes | `docs/` (frozen philosophy) |
+| Screenshots | Operator-produced for submission folder |
 
 ---
 
@@ -54,7 +54,7 @@
 
 1. Walk `ASSESSOR_READING_ORDER.md` once yourself.  
 2. Run live smoke; complete evidence template; keep a copy with date.  
-3. Do not expand GIS/GBS claims beyond what roadmap and gap docs allow.  
+3. Keep `LIMITATIONS_REGISTER.md` current.  
 4. Prefer updating an EDR when a decision changes — before rewriting large code.
 
 ---
@@ -62,6 +62,6 @@
 ## Explicit non-evidence
 
 - Commit count alone  
-- Unverified "parity" claims without biased = BLOCK live  
+- Unverified parity claims without biased = BLOCK live  
 - Commercial readiness language  
 - Hardware appliance claims without ops evidence  
