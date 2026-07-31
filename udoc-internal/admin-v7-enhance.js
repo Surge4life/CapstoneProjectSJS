@@ -1,5 +1,5 @@
-/* UDOC Admin P3 — v7-platform Command Centre density
- * Robust esc, nav relabel, Command Centre boot, infra links, denser EVA + HITL + batch matrix.
+/* UDOC Admin — Internal package density
+ * Staff-only identity · nav relabel · Command Centre · EVA batch · HITL · infra links
  */
 (function () {
   "use strict";
@@ -9,6 +9,28 @@
     d.textContent = String(s == null ? "" : s);
     return d.innerHTML;
   };
+
+  function stampInternalPackage() {
+    document.documentElement.setAttribute("data-udoc-package", "internal");
+    if (document.title && !/Internal/i.test(document.title)) {
+      document.title = "UDOC Internal · GODS Staff";
+    }
+    var tag = document.getElementById("org-tag");
+    if (tag) tag.textContent = "INTERNAL · STAFF";
+    if (document.getElementById("udoc-internal-ribbon")) return;
+    var rib = document.createElement("div");
+    rib.id = "udoc-internal-ribbon";
+    rib.setAttribute(
+      "style",
+      "background:#060E1C;color:#C9A84C;font:10px/1.4 'IBM Plex Mono',Consolas,monospace;" +
+        "letter-spacing:.08em;text-align:center;padding:6px 10px;border-bottom:1px solid #1A2D4A;"
+    );
+    rib.textContent =
+      "UDOC INTERNAL PACKAGE · STAFF ONLY · NOT CLIENT SAAS · KILL-SWITCH · HITL · JOBS · CORE API";
+    var body = document.body;
+    if (body && body.firstChild) body.insertBefore(rib, body.firstChild);
+    else if (body) body.appendChild(rib);
+  }
 
   function relabelNav() {
     var map = {
@@ -53,12 +75,14 @@
     var div = document.createElement("div");
     div.id = "v7-infra";
     div.innerHTML =
-      '<div class="sech">INFRASTRUCTURE</div>' +
+      '<div class="sech">INFRASTRUCTURE · INTERNAL</div>' +
       '<div class="navitem" data-view="_sentinel"><span class="ico">◎</span> Sentinel runtime</div>' +
+      '<div class="navitem" data-view="_coreadmin"><span class="ico">⚖</span> Core /admin constitutional</div>' +
       '<div class="navitem" data-view="_apihealth"><span class="ico">⚡</span> API Health</div>' +
       '<div class="navitem" data-view="_jobs"><span class="ico">⏱</span> Scheduled Jobs</div>' +
-      '<div class="navitem" data-view="_portals"><span class="ico">▤</span> 24 Portals</div>' +
-      '<div class="navitem" data-view="_citizen"><span class="ico">✋</span> Citizen Portal</div>';
+      '<div class="navitem" data-view="_portals"><span class="ico">▤</span> 24 Portals dual-path</div>' +
+      '<div class="navitem" data-view="_citizen"><span class="ico">✋</span> Citizen (public view)</div>' +
+      '<div class="navitem" data-view="_client"><span class="ico">◇</span> Client SaaS host</div>';
     nav.appendChild(div);
     div.querySelectorAll(".navitem").forEach(function (n) {
       n.addEventListener("click", function () {
@@ -68,11 +92,14 @@
             ? apiBase()
             : "https://gods-platform-core.onrender.com";
         if (v === "_sentinel") window.open(base + "/Sentinel", "_blank");
+        else if (v === "_coreadmin") window.open(base + "/admin", "_blank");
         else if (v === "_apihealth") window.location.href = "/api-health.html";
         else if (v === "_jobs") window.location.href = "/jobs.html";
         else if (v === "_portals") window.open(base + "/portals", "_blank");
         else if (v === "_citizen") {
           window.open("https://gods-udoc-client.onrender.com/citizen.html", "_blank");
+        } else if (v === "_client") {
+          window.open("https://gods-udoc-client.onrender.com/", "_blank");
         }
       });
     });
@@ -94,7 +121,7 @@
         banner.className = "panel";
         banner.style.borderLeft = "3px solid #C9A84C";
         banner.innerHTML =
-          "<h3>Command Centre · boot posture</h3><div class=\"small\">" +
+          "<h3>Command Centre · Internal boot posture</h3><div class=\"small\">" +
           (ready.ready
             ? '<span class="tag2 t-ok">DEMO READY</span> · active rules ' +
               esc(String(ready.active_rules)) +
@@ -111,7 +138,7 @@
           "</b> · HITL open <b>" +
           esc(sum.oversight && sum.oversight.open != null ? sum.oversight.open : "—") +
           "</b></div>" +
-          '<div class="small muted" style="margin-top:8px">v7 density · live Core · Neon ≤500MB · ' +
+          '<div class="small muted" style="margin-top:8px">Internal package · live Core · Neon ≤500MB · ' +
           '<a href="#" onclick="if(typeof showPage===\'function\')showPage(\'decisions\');return false">EVA Command</a></div>';
         var main = document.getElementById("main");
         if (main) {
@@ -125,7 +152,7 @@
       var desc = document.querySelector("#main .pgh .desc");
       if (desc)
         desc.textContent =
-          "Full platform overview · live registry · SA NAIFP / POPIA · fail-closed";
+          "Staff control plane · registry · kill-switch · HITL · fail-closed governance";
     };
     window.vOverview._v7 = true;
   }
@@ -140,7 +167,7 @@
         panel.className = "panel";
         panel.style.borderLeft = "3px solid #00C2D4";
         panel.innerHTML =
-          "<h3>EVA scenario chips + Full matrix (v7 density)</h3>" +
+          "<h3>EVA scenario chips + Full matrix (Internal density)</h3>" +
           '<div class="row" style="gap:8px;flex-wrap:wrap">' +
           '<button class="btn cyan sm" type="button" onclick="v7Eva(\'fair\')">Fair</button>' +
           '<button class="btn sm" type="button" onclick="v7Eva(\'biased\')">Biased → BLOCK</button>' +
@@ -334,7 +361,7 @@
       var desc = document.querySelector("#main .pgh .desc");
       if (desc)
         desc.textContent =
-          "Human-in-the-loop · escalated & blocked · COB resolution · portal dual-path";
+          "Human-in-the-loop · escalated & blocked · COB · portal dual-path (Internal)";
       try {
         var base =
           typeof apiBase === "function"
@@ -344,7 +371,7 @@
         bar.className = "panel";
         bar.style.borderLeft = "3px solid #10B981";
         bar.innerHTML =
-          "<h3>Portal dual-path</h3><div class=\"small muted\">HITL Review / Regulator controls open or resolve OversightCase on Neon.</div>" +
+          "<h3>Portal dual-path</h3><div class=\"small muted\">HITL / Regulator controls open or resolve OversightCase on Neon.</div>" +
           '<div style="margin-top:8px"><button class="btn cyan sm" type="button" onclick="window.open(\'' +
           base +
           "/portals','_blank')">Open 24 Portals · HITL workspace</button></div>";
@@ -360,6 +387,7 @@
   }
 
   function run() {
+    stampInternalPackage();
     relabelNav();
     injectInfraLinks();
     wrapOverview();
