@@ -118,3 +118,17 @@ td{padding:8px 7px;border-bottom:1px solid rgba(36,58,90,.5);color:var(--text)}
 .composite{text-align:center;padding:0 12px;border-left:1px solid var(--border)}
 .composite .cscore{font-family:var(--fm);font-size:1.7rem;color:var(--white);font-weight:700;line-height:1}
 .composite .cscore small{font-size:.8rem;color:var(--muted)}
+
+/* =========================================================
+   CLIENT PACKAGE GATING (udoc-app / mobile = tenant SaaS)
+   data-udoc-package="client" is set on <html> from main.tsx
+   Staff Internal package uses Admin Desktop/Web — not this build.
+   ========================================================= */
+html[data-udoc-package="client"] .plane.hw{display:none!important}
+html[data-udoc-package="client"] .planes{grid-template-columns:1fr;max-width:420px}
+html[data-udoc-package="client"] .switch{display:none!important}
+html[data-udoc-package="client"] .select-h h1{font-size:1.35rem}
+html[data-udoc-package="client"] .select-h h1::after{content:" Client";color:var(--gold)}
+html[data-udoc-package="client"] .connect .foot,
+html[data-udoc-package="client"] .login .prereg{opacity:.9}
+html[data-udoc-package="client"] .connect h1::before{content:"Client · ";color:var(--gold)}
