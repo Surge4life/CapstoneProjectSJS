@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UDOC — Client · mvp-1/2 parity</title>
+<title>UDOC Client · Tenant SaaS · Models · Reports · Policy · EVA</title>
+<meta name="x-udoc-package" content="client"/>
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#060E1C"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -10,7 +11,7 @@
 *{box-sizing:border-box}html,body{margin:0;height:100%}body{background:var(--navy);color:var(--txt);font:13.5px/1.45 Inter,system-ui,sans-serif}
 .mono{font-family:JetBrains Mono,ui-monospace,monospace}.muted{color:var(--muted)}
 #login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(900px 400px at 50% -10%,#0f2748,var(--navy) 55%)}
-.card{width:380px;max-width:92vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:12px;padding:26px}
+.card{width:400px;max-width:92vw;background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:12px;padding:26px}
 .card h1{margin:0;color:var(--gold);letter-spacing:.08em;font-size:24px}.card .sub{font-size:10px;letter-spacing:.18em;color:var(--cyan);margin-top:4px}
 label{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:12px 0 4px}
 input,select,textarea{width:100%;background:#091022;border:1px solid var(--bd);color:var(--txt);border-radius:8px;padding:10px 12px;font:inherit}
@@ -53,38 +54,40 @@ td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:
 .sov-ok{color:var(--ok);font-size:12px;margin:4px 0}.loading{color:var(--muted);padding:10px 0}
 a.citizen-link{display:block;text-align:center;margin-top:14px;color:var(--cyan);font-size:12px;text-decoration:none}
 a.citizen-link:hover{text-decoration:underline}
+.pkg{font-size:11px;color:var(--mut);margin-top:10px;line-height:1.4;border-top:1px solid var(--bd);padding-top:10px}
 </style></head><body>
 <div id="login"><div class="card">
-<h1>UDOC</h1><div class="sub">CLIENT · MVP-1/2 PARITY</div>
-<p class="muted" style="font-size:12px;margin:12px 0 0">Dashboard · Registry · Compliance · Audit · Bias · Sovereignty · Govern. Existing operator only.</p>
+<h1>UDOC</h1><div class="sub">CLIENT PACKAGE · TENANT SAAS</div>
+<p class="muted" style="font-size:12px;margin:12px 0 0"><b>Models</b> · <b>Reports</b> (decisions) · <b>Policy/Compliance</b> · <b>EVA Govern</b> · Audit · Bias · Sovereignty. Staff admin is a separate package.</p>
 <label>Email</label><input id="li-email" value="admin@gods.local"/>
 <label>Password</label><input id="li-pass" type="password" value="admin123" onkeydown="if(event.key==='Enter')doLogin()"/>
 <div style="margin-top:14px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
 <div class="err" id="li-err"></div>
 <label>API</label><input id="li-api" class="mono" style="font-size:11px"/>
 <a class="citizen-link" href="/citizen.html">Citizen Portal · AI Rights · no login →</a>
+<div class="pkg">Desktop Client = <code>udoc-desktop-client</code> · Mobile/App = same client CAPS · Internal staff = Admin Desktop/Web</div>
 </div></div>
 <div id="app">
 <header>
-<span class="wm">UDOC</span><span class="tag" id="org-tag">CLIENT</span><span class="pill" id="hb">· …</span>
+<span class="wm">UDOC</span><span class="tag" id="org-tag">CLIENT SAAS</span><span class="pill" id="hb">· …</span>
 <span class="spacer"></span>
 <div class="who"><b id="who-email">—</b><br><span class="mono" style="font-size:10px" id="who-tenant"></span></div>
 <button class="btn sm" onclick="logout()">Sign out</button>
 </header>
 <nav id="nav">
-<div class="sech">Platform · mvp-1/2</div>
+<div class="sech">Tenant · Client package</div>
 <div class="navitem active" data-view="dash"><span class="ico">◈</span> Dashboard</div>
-<div class="navitem" data-view="systems"><span class="ico">◉</span> AI Registry</div>
-<div class="navitem" data-view="compliance"><span class="ico">✓</span> Compliance</div>
+<div class="navitem" data-view="systems"><span class="ico">◉</span> Models · Registry</div>
+<div class="navitem" data-view="compliance"><span class="ico">✓</span> Policy · Compliance</div>
+<div class="navitem" data-view="decisions"><span class="ico">⚡</span> Reports · Decisions</div>
 <div class="navitem" data-view="audit"><span class="ico">🔐</span> Audit Trail</div>
 <div class="navitem" data-view="bias"><span class="ico">⊘</span> Bias Monitor</div>
 <div class="navitem" data-view="sovereignty"><span class="ico">🛡</span> Sovereignty</div>
 <div class="sech">Govern</div>
 <div class="navitem" data-view="govern"><span class="ico">⬡</span> Govern · EVA</div>
-<div class="navitem" data-view="decisions"><span class="ico">⚡</span> Decisions</div>
 <div class="sech">Public</div>
 <div class="navitem" data-view="citizen"><span class="ico">✋</span> Citizen Portal</div>
-<div class="sech">Private</div>
+<div class="sech">Account</div>
 <div class="navitem" data-view="knowledge"><span class="ico">◈</span> Company Knowledge</div>
 <div class="navitem" data-view="settings"><span class="ico">⚙</span> Plan & API Keys</div>
 <div class="navitem" data-view="sentinel"><span class="ico">◎</span> Sentinel runtime</div>
