@@ -4,7 +4,8 @@
 **API:** `gods-platform-core` · Free Render/Neon · not commercial SaaS  
 **Story:** `CAPSTONE_PACKAGE_STORY.md`  
 **Intent / freeze / phases:** `ENGINEERING_ROADMAP_CAPSTONE.md`  
-**Decision record:** `EDR-001-udoc-only-deploy-layer.md`
+**EDRs:** `EDR-001-udoc-only-deploy-layer.md` · `EDR-002-internal-vs-client-packages.md`  
+**Assessor path:** `ASSESSOR_READING_ORDER.md`
 
 ## Package map
 
@@ -43,14 +44,15 @@
 | M8 | Gateway package routing | **Done** |
 | M9 | Capstone package story (demos → packages) | **Done** |
 | M10 | Engineering roadmap + EDR-001 (intent first) | **Done** |
+| M11 | EDR-002 + assessor order + smoke evidence | **Done** |
 
 ## Notes
 
 - Client: `UDOC_CLIENT_PACKAGE_NOTES.md`  
 - Internal: `UDOC_INTERNAL_PACKAGE_NOTES.md`  
 - Package story: `CAPSTONE_PACKAGE_STORY.md`  
-- Roadmap (freeze, phases, constraints): `ENGINEERING_ROADMAP_CAPSTONE.md`  
-- Gateway: `udoc-gateway/README.md`  
+- Roadmap: `ENGINEERING_ROADMAP_CAPSTONE.md`  
+- Smoke: `UDOC_SMOKE_PASS.md` · `SMOKE_EVIDENCE_TEMPLATE.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md`  
 - SaaS gap (honest non-claim): `UDOC_SAAS_READINESS_GAP.md`
 
 ## Capstone bar
