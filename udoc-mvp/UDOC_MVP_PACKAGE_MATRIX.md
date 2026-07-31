@@ -2,7 +2,9 @@
 
 **Updated:** 2026-07-31  
 **API:** `gods-platform-core` · Free Render/Neon · not commercial SaaS  
-**Story:** `CAPSTONE_PACKAGE_STORY.md`
+**Story:** `CAPSTONE_PACKAGE_STORY.md`  
+**Intent / freeze / phases:** `ENGINEERING_ROADMAP_CAPSTONE.md`  
+**Decision record:** `EDR-001-udoc-only-deploy-layer.md`
 
 ## Package map
 
@@ -40,15 +42,19 @@
 | M7 | Live P6 smoke green | **Operator** |
 | M8 | Gateway package routing | **Done** |
 | M9 | Capstone package story (demos → packages) | **Done** |
+| M10 | Engineering roadmap + EDR-001 (intent first) | **Done** |
 
 ## Notes
 
 - Client: `UDOC_CLIENT_PACKAGE_NOTES.md`  
 - Internal: `UDOC_INTERNAL_PACKAGE_NOTES.md`  
 - Package story: `CAPSTONE_PACKAGE_STORY.md`  
+- Roadmap (freeze, phases, constraints): `ENGINEERING_ROADMAP_CAPSTONE.md`  
 - Gateway: `udoc-gateway/README.md`  
-- SaaS gap: `UDOC_SAAS_READINESS_GAP.md`
+- SaaS gap (honest non-claim): `UDOC_SAAS_READINESS_GAP.md`
 
 ## Capstone bar
 
 1. Internal path · 2. Client path · 3. Citizen · 4. Gateway · 5. biased **BLOCK** on Client + Sentinel
+
+**Intent rule:** Well-documented limits and decisions are Capstone assets. Commercial certainty is not required and is not claimed.

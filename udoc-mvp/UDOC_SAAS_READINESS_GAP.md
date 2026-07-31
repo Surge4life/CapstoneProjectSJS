@@ -1,8 +1,9 @@
-# UDOC SaaS Readiness · Triple-Check (2026-07-30)
+# UDOC SaaS Readiness · Triple-Check (2026-07-30 · updated 2026-07-31)
 
 **Purpose:** Honest answer to: *Is UDOC ready for test clientele and paid/startup hosting, or what must land first?*  
 **Sources:** Live Render/Neon stack · Netlify demos · Engineering Canon · external architecture review · Task 2 density work  
-**Rule:** Do not expand GIS/GBS until UDOC operational bar below is met.
+**Rule:** Do not expand GIS/GBS until UDOC operational bar below is met.  
+**Capstone note:** Commercial success is **not** definite and is **not** the grading target. Well-documented intent under constraints is. See `ENGINEERING_ROADMAP_CAPSTONE.md`.
 
 ---
 
@@ -11,13 +12,13 @@
 | Milestone | Status |
 |-----------|--------|
 | **Architecture ready** | YES — Canon + engines + surfaces |
-| **Developer / Capstone ready** | YES — runnable Core + demos + smoke path |
+| **Developer / Capstone ready** | YES — runnable Core + demos + smoke path + intent docs |
 | **Assessor demo-parity ready** | **CONDITIONAL** — density in repo; **operator must still green P6 live** |
 | **Pilot SaaS ready (friendly breakers)** | **NOT YET** — identity, tenancy proof, backups, monitoring |
-| **Commercial SaaS ready** | **NO** |
+| **Commercial SaaS ready** | **NO** — and not claimed |
 | **Hardware product ready** | **NO** — architecture stronger than ops |
 
-**Verdict matches the external review:** platform repository, not commercial SaaS. Overall ~**75–80%** of a production-grade *platform shape*; the remaining gap is **operational hardening**, not more product vision.
+**Verdict:** platform repository for Capstone evidence, not commercial SaaS. Overall ~**75–80%** of a production-grade *platform shape*; the remaining gap is **operational hardening**, not more product vision.
 
 ---
 
@@ -43,7 +44,7 @@
 | Gateway | Sign-on router |
 | Operator | Workspace |
 
-### Density (Task 2 engineering — 2026-07-30)
+### Density (Task 2 engineering)
 
 - Scenario chips + **Full EVA batch** on Client / Sentinel / Admin / Sector
 - Portal dual-path → OversightCase on Neon (`PORTAL_LIVE_CORE.md`)
@@ -54,13 +55,11 @@
 
 ### Documentation maturity
 
-Canon volumes I–XI exist as modular knowledge base. External review: freeze **Canon v1.0** — do **not** expand philosophy; implement from Canon. Optional later (ADR, domain model, event catalogue) only when a **real engineering problem** appears during hardening.
+Canon volumes I–XI exist as modular knowledge base. Intent artefacts (roadmap, EDR-001, package story) record decisions so code can evolve without losing purpose. Freeze **Canon v1.0** philosophy — implement from Canon; expand philosophy only when a real engineering problem forces it.
 
 ---
 
 ## B. What is still outstanding for UDOC (priority order)
-
-Aligned with external review + Capstone constraints.
 
 ### P0 — Must pass before claiming “UDOC Capstone complete”
 
@@ -101,7 +100,7 @@ Aligned with external review + Capstone constraints.
 
 **Do not** block Capstone software valuation on hardware. **Do** block “UDOC appliance product” claims until P3 ops exist.
 
-### Explicitly defer (reviewer agrees)
+### Explicitly defer
 
 - GIS Intelligence product depth  
 - GBS franchise runtime  
@@ -114,7 +113,7 @@ Aligned with external review + Capstone constraints.
 
 | Area | Score | Note |
 |------|------:|------|
-| Documentation | 9–10 | Canon modular; freeze v1 |
+| Documentation / intent | 9–10 | Canon + roadmap + EDR; freeze philosophy |
 | Repository structure | 9 | Platform shape |
 | Governance model / EVA | 9 | Deterministic philosophy live |
 | UDOC UI density vs demos | 7–8 | Much improved; P6 live still required |
@@ -125,7 +124,7 @@ Aligned with external review + Capstone constraints.
 | Disaster recovery | 4–5 | Not restore-tested |
 | Production infrastructure | 5–6 | Free tier limits |
 | Hardware integration | 6–7 | Docs > ops |
-| **Commercial SaaS** | **~5–6** | Not ready |
+| **Commercial SaaS** | **~5–6** | Not ready · **not Capstone success metric** |
 | **Friendly pilot** | **~6** | After P1 |
 
 ---
@@ -136,15 +135,16 @@ Aligned with external review + Capstone constraints.
 1. YOU: walk UDOC_SMOKE_PASS + P6 live → report fails
 2. Fix only failed live surfaces (Task 2 close)
 3. Freeze UDOC Capstone software bar
-4. P1 identity + tenant isolation tests (still can stay on free/Neon while coding)
-5. Backup/restore + minimal monitoring
-6. 3–5 breaker pilot orgs (no revenue target)
-7. Fix what pilots break → freeze UDOC v1.0 product
-8. Then paid hosting + GIS/GBS/Intelligence on top
+4. Keep intent docs current when direction changes
+5. P1 identity + tenant isolation tests (still can stay on free/Neon while coding)
+6. Backup/restore + minimal monitoring
+7. Optional 3–5 breaker pilot orgs (no revenue target)
+8. Fix what pilots break → freeze UDOC v1.0 product shape
+9. Then paid hosting + GIS/GBS/Intelligence on top — if ever justified
 ```
 
-**Question every new module must answer:** *Which Canon document does this implement?*  
-If none — do not add it yet.
+**Question every new module must answer:** *Which documented intent does this implement?*  
+If none — write the intent first, then the code.
 
 ---
 
@@ -153,19 +153,21 @@ If none — do not add it yet.
 **Is UDOC SaaS-ready for test clientele today?**  
 No. Capstone/demo and internal operator use: yes (after live P6 green). External orgs: only after P1 identity + tenancy proof + backup story.
 
+**Is commercial success expected from this free-tier Capstone?**  
+No. Success = documented system with known limits and a verifiable governance loop.
+
 **Is it hardware-functional ready?**  
 No. Software bootloaders are portable; appliance ops are not.
 
-**What work before leaving free hosting?**  
-P0 live matrix + P1 identity/tenancy/backups/monitoring minimum; then paid Core + DB with restore drill. Not more features.
-
 **GIS/GBS next?**  
-Only after UDOC Stage 1–4 above. UDOC is the platform underneath.
+Only after UDOC Stage 1–3 above. UDOC is the platform underneath.
 
 ---
 
 ## F. Related files
 
+- `ENGINEERING_ROADMAP_CAPSTONE.md` — freeze · phases · Capstone value of documentation  
+- `EDR-001-udoc-only-deploy-layer.md`  
 - `UDOC_LIVE_ENVIRONMENTS.md` — hosts & routing  
 - `UDOC_SMOKE_PASS.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md`  
 - `UDOC_V93_DEMO67_PATENT_CONTROLS.md` — demos 6–7 gaps  

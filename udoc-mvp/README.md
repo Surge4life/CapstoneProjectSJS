@@ -1,8 +1,20 @@
 # udoc-mvp — Demo-to-Production Mapping (v9.3)
 
-This folder tracks integration of the original interactive demos into production **package channels** (Internal staff vs Client tenant SaaS).
+This folder tracks integration of the original interactive demos into production **package channels** (Internal staff vs Client tenant surfaces) and records **engineering intent** under free-tier limits.
 
-**Start here for Capstone packaging:** `CAPSTONE_PACKAGE_STORY.md` · `UDOC_MVP_PACKAGE_MATRIX.md`
+**Capstone priority:** documented intention and honest constraints > competing on code novelty with the rest of the world. Code can change; unwritten purpose cannot be graded.
+
+## Start here
+
+| Doc | Purpose |
+|-----|---------|
+| **`ENGINEERING_ROADMAP_CAPSTONE.md`** | Freeze list · phases · constraints · Capstone bar |
+| **`EDR-001-udoc-only-deploy-layer.md`** | Why only UDOC is the deploy product layer |
+| **`CAPSTONE_PACKAGE_STORY.md`** | Demos 1–7 → Internal vs Client |
+| **`UDOC_MVP_PACKAGE_MATRIX.md`** | Package checklist (M1–M10) |
+| `UDOC_SAAS_READINESS_GAP.md` | What is **not** claimed commercially |
+| `UDOC_LIVE_ENVIRONMENTS.md` | Live hosts |
+| `UDOC_SMOKE_PASS.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md` | Verify live |
 
 ## Demo → Surface Mapping
 
@@ -18,14 +30,15 @@ This folder tracks integration of the original interactive demos into production
 
 ## Tier / package ownership
 
-- **Client package (tenant sales):** `udoc-public`, `udoc-portals`, `udoc-app`, `udoc-mobile`, `udoc-desktop-client`, Sector (client-facing)
-- **Internal package (staff):** `udoc-internal`, `udoc-desktop`, `udoc-operator`, Core `/Sentinel` · `/portals` · `/admin`
-- **Gateway:** role → package host
-- **GODS / GIS / GBS:** after Task 2 live smoke green
+- **Client package:** `udoc-public`, `udoc-portals`, `udoc-app`, `udoc-mobile`, `udoc-desktop-client`  
+- **Internal package:** `udoc-internal`, `udoc-desktop`, `udoc-operator`, Core `/Sentinel` · `/portals` · `/admin`  
+- **Gateway:** role → package host  
+- **GIS / GBS / GODS product depth:** after Task 2 live smoke green (see roadmap)
 
 ## Session log
 
 - Sessions 1–5: Core density  
 - Sessions 8–14: ecosystem blueprint (historical; Task 2 reopened for demo parity honesty)  
 - Density + portals dual-path + package split (2026-07-28 → 07-31)  
-- **Package matrix M1–M6, M8–M9 done; M7 = operator live smoke**
+- **M10:** Engineering roadmap + EDR-001 — intent documented before further expansion  
+- **M7:** still operator live smoke (biased = BLOCK)
