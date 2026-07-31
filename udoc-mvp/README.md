@@ -1,81 +1,47 @@
-# udoc-mvp — Capstone live UDOC documentation
+# udoc-mvp — Demo-to-Production Mapping (v9.3)
 
-**Plane A** of the repository documentation structure.  
-**Master index (all docs):** [`../DOCUMENTATION_STRUCTURE.md`](../DOCUMENTATION_STRUCTURE.md)  
-**Canon (Plane B):** [`../docs/ENGINEERING_CANON.md`](../docs/ENGINEERING_CANON.md)
+This folder tracks integration of the original interactive demos into production **package channels** (Internal staff vs Client tenant surfaces) and records **engineering intent** under free-tier limits.
 
-**Priority:** documented intention and honest constraints under Render free + Neon ≤500MB. Code can change; unwritten purpose cannot be graded.
+**Capstone priority:** documented intention and honest constraints > competing on code novelty. Code can change; unwritten purpose cannot be graded. Corpus and Canon are **Knowledge Substrate** (EDR-002), not optional extras.
 
----
+## Start here
 
-## Category 1 · Entry and framing
+| Doc | Purpose |
+|-----|---------|
+| **`ENGINEERING_ROADMAP_CAPSTONE.md`** | Freeze list · phases · constraints · Capstone bar |
+| **`CAPSTONE_STOP_START_CONTINUE.md`** | Discipline from final external CTO assessment |
+| **`EDR-001-udoc-only-deploy-layer.md`** | Why only UDOC is the deploy product layer |
+| **`EDR-002-knowledge-substrate.md`** | Docs/corpus as intelligence feedstock |
+| **`CAPSTONE_PACKAGE_STORY.md`** | Demos 1–7 → Internal vs Client |
+| **`UDOC_MVP_PACKAGE_MATRIX.md`** | Package checklist (M1–M11) |
+| `UDOC_SAAS_READINESS_GAP.md` | What is **not** claimed commercially |
+| `UDOC_LIVE_ENVIRONMENTS.md` | Live hosts |
+| `UDOC_SMOKE_PASS.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md` | Verify live |
 
-| Document | Relevance |
-|----------|-----------|
-| [CAPSTONE_COVER_NOTE.md](CAPSTONE_COVER_NOTE.md) | What this Capstone is / is not |
-| [ASSESSOR_READING_ORDER.md](ASSESSOR_READING_ORDER.md) | 15- and 45-minute reading paths |
-| [GLOSSARY.md](GLOSSARY.md) | Shared definitions |
+## Demo → Surface Mapping
 
-## Category 2 · Engineering decisions (EDRs)
+| Original Demo | Target Production Surface | Status |
+|---------------|---------------------------|--------|
+| mvp-1 International Standards Dashboard | **Client** Web / App / Desktop Client | Core live + Session 9 |
+| mvp-2 Multi-Framework Compliance Engine | **Client** + Sector | Core live + Session 9 |
+| v5-sa SA-Aligned Architecture Lineage | **Internal** + Client sov strip | Session 10 |
+| v7-platform Full Platform | **Split** Internal + Client + Citizen + Portals | Density wave |
+| v7-eva EVA Engine | Sentinel + Client Govern | Live 6-dim + certs |
+| udoc-platform-ui Operational Control | **Internal** Admin (Client subset) | Session 11 |
+| udoc-sovereign-console | **Internal** Admin + Sentinel | Session 11 |
 
-| Document | Relevance |
-|----------|-----------|
-| [EDR-001](EDR-001-udoc-only-deploy-layer.md) | UDOC is the only customer deploy layer |
-| [EDR-002](EDR-002-internal-vs-client-packages.md) | Internal vs Client packages |
-| [EDR-003](EDR-003-free-tier-constraints.md) | Free-tier limits as design |
-| [EDR-004](EDR-004-demo-seed-no-registration-smoke.md) | Demo seed; no registration for smoke |
+## Tier / package ownership
 
-## Category 3 · Architecture and packages
+- **Client package:** `udoc-public`, `udoc-portals`, `udoc-app`, `udoc-mobile`, `udoc-desktop-client`  
+- **Internal package:** `udoc-internal`, `udoc-desktop`, `udoc-operator`, Core `/Sentinel` · `/portals` · `/admin`  
+- **Gateway:** role → package host  
+- **GIS / GBS / Knowledge Compiler depth:** after Task 2 live smoke green (see roadmap)
 
-| Document | Relevance |
-|----------|-----------|
-| [ARCHITECTURE_MAP.md](ARCHITECTURE_MAP.md) | One-page deploy diagram |
-| [CAPSTONE_PACKAGE_STORY.md](CAPSTONE_PACKAGE_STORY.md) | Demos → channels |
-| [UDOC_MVP_PACKAGE_MATRIX.md](UDOC_MVP_PACKAGE_MATRIX.md) | Package checklist |
-| [UDOC_CLIENT_PACKAGE_NOTES.md](UDOC_CLIENT_PACKAGE_NOTES.md) | Client package |
-| [UDOC_INTERNAL_PACKAGE_NOTES.md](UDOC_INTERNAL_PACKAGE_NOTES.md) | Internal package |
-| [UDOC_LIVE_ENVIRONMENTS.md](UDOC_LIVE_ENVIRONMENTS.md) | Hosts and API routing |
+## Session log
 
-## Category 4 · Roadmap, limits, honesty
-
-| Document | Relevance |
-|----------|-----------|
-| [ENGINEERING_ROADMAP_CAPSTONE.md](ENGINEERING_ROADMAP_CAPSTONE.md) | Freeze list · phases · bar |
-| [LIMITATIONS_REGISTER.md](LIMITATIONS_REGISTER.md) | Named gaps |
-| [UDOC_SAAS_READINESS_GAP.md](UDOC_SAAS_READINESS_GAP.md) | Not commercial SaaS |
-| [SUBMISSION_TIMELINE.md](SUBMISSION_TIMELINE.md) | Path to March 2027 |
-| [CANON_FREEZE_NOTICE.md](CANON_FREEZE_NOTICE.md) | Canon philosophy freeze |
-
-## Category 5 · Verification and evidence
-
-| Document | Relevance |
-|----------|-----------|
-| [CAPSTONE_EVIDENCE_PACK.md](CAPSTONE_EVIDENCE_PACK.md) | Evidence checklist |
-| [UDOC_SMOKE_PASS.md](UDOC_SMOKE_PASS.md) | Minimum live pass |
-| [SMOKE_EVIDENCE_TEMPLATE.md](SMOKE_EVIDENCE_TEMPLATE.md) | Operator record form |
-| [P6_ASSESSOR_SIDE_BY_SIDE.md](P6_ASSESSOR_SIDE_BY_SIDE.md) | Demo vs live matrix |
-| [TASK2_DEMO_PARITY_STATUS.md](TASK2_DEMO_PARITY_STATUS.md) | Task 2 open until live green |
-
-## Category 6 · Demo and control mapping
-
-| Document | Relevance |
-|----------|-----------|
-| [UDOC_DEMO_INVENTORY.md](UDOC_DEMO_INVENTORY.md) | Seven Netlify demos |
-| [UDOC_V93_DEMO67_PATENT_CONTROLS.md](UDOC_V93_DEMO67_PATENT_CONTROLS.md) | Demos 6–7 controls |
-| [PORTAL_LIVE_CORE.md](PORTAL_LIVE_CORE.md) | Portal dual-path |
-
-## Category 7 · Historical session logs
-
-Build-session notes (archive). Not the primary assessor path.
-
-- SESSION9_CLIENT_FIDELITY · SESSION10_EVA_LINEAGE · SESSION11_ADMIN_DENSITY  
-- SESSION12_SALES_ONBOARDING · SESSION13_GIS_ACCESS · SESSION14_FINAL_READINESS  
-- SESSION_CITIZEN_PORTALS_1  
-
----
-
-## Capstone bar
-
-Internal path · Client path · Citizen · Gateway · **live biased = BLOCK** on Client + Sentinel.
-
-**M7** remains operator live verification.
+- Sessions 1–5: Core density  
+- Sessions 8–14: ecosystem blueprint (historical; Task 2 reopened for demo parity honesty)  
+- Density + portals dual-path + package split (2026-07-28 → 07-31)  
+- **M10:** Engineering roadmap + EDR-001  
+- **M11:** EDR-002 Knowledge Substrate + stop/start/continue (Volume 4 Part 7–8 absorbed as intent, not build order)  
+- **M7:** still operator live smoke (biased = BLOCK)

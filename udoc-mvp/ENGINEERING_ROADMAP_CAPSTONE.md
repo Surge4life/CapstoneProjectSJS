@@ -6,6 +6,8 @@
 
 This document records **why** the platform is shaped the way it is under **real constraints** (Render free, Neon ≤500MB, solo Capstone to March 2027). It is not a commercial success plan. Thousands of developers can out-code any free-tier stack. What this repository must prove is **known intention, honest limits, and a coherent governance product story**.
 
+Discipline list: `CAPSTONE_STOP_START_CONTINUE.md`.
+
 ---
 
 ## 1. Primary value of this Capstone
@@ -16,31 +18,38 @@ This document records **why** the platform is shaped the way it is under **real 
 | Live governance loop under free-tier limits | Guaranteed commercial SaaS |
 | Clear Internal vs Client package split | Infinite feature surface |
 | Honest gap list (what is not claimed) | Marketing completeness |
+| Knowledge Substrate named and bounded (EDR-002) | “Docs grew, software didn’t” without purpose |
 | Reproducible smoke path | Silent overclaim |
 
 **Rule:** Prefer a smaller system whose purpose is written down over a larger system whose purpose is only in the author’s head.
 
 ---
 
-## 2. Constitutional stack (intent)
+## 2. Constitutional + knowledge stack (intent)
 
-Only **UDOC** is the customer-facing operational product. Higher layers define behaviour; they are not separate paid apps in this Capstone environment.
+Only **UDOC** is the customer-facing operational product in this Capstone environment (EDR-001). Documentation and corpus are **Knowledge Substrate**, not passive by-products (EDR-002).
 
 ```
-G.O.D.S     Constitutional authority (intent / holdings)
+G.O.D.S              Constitutional authority (intent / holdings)
    │
-GBS         Constitutional framework (policy / franchise structure)
+GBS                  Constitutional framework (policy / franchise structure)
    │
-GIS         Deterministic governance intelligence (corpus → rules)
+Knowledge Substrate  Canon · policies · client corpus · EDRs (governed source material)
    │
-EVA         Evaluation + coordination (6-D, fail-closed)
+Knowledge Compiler   Intent layer: structure → objects / graph (post-Capstone depth)
    │
-UDOC        Operational surfaces (Client / Internal / Citizen / Gateway)
+GIS                  Deterministic governance intelligence (UDOC-controlled)
+   │
+EVA                  Evaluation + coordination / acquisition (6-D, fail-closed)
+   │
+UDOC                 Operational surfaces (Client / Internal / Citizen / Gateway)
+   │
+Owned agents         Organisation-scoped behaviour from owned knowledge (vision; not Capstone product claim)
 ```
 
 - Country / university / enterprise difference = **corpus and configuration**, not a software rewrite.  
-- GIS / GBS product depth = **after** UDOC Capstone bar is honest and live-verified.  
-- See also: `EDR-001-udoc-only-deploy-layer.md`.
+- Client interaction with company data / policy is the structured path toward **owned intelligence** (deterministic assistance under rules), not a claim of a finished private foundation model on free Neon.  
+- GIS / GBS / full Knowledge Compiler product depth = **after** UDOC Capstone bar is honest and live-verified.
 
 ---
 
@@ -96,30 +105,31 @@ Package map: `UDOC_MVP_PACKAGE_MATRIX.md` · `CAPSTONE_PACKAGE_STORY.md`.
 
 ## 6. Phased work after the bar (intent order)
 
-Aligned with external engineering review (Volume 4 style) **mapped onto this repo**, not a greenfield rewrite:
-
 | Phase | Intent | Status in this repo |
 |-------|--------|---------------------|
 | **A. Honesty + smoke** | Prove live loop; freeze Capstone software claim | In progress (M7 operator) |
-| **B. Intent artefacts** | Roadmap, EDRs, package story, gap list | This file + siblings |
-| **C. Isolation proof** | Document + test that tenant A cannot read tenant B (when multi-tenant is claimed) | Documented gap; not yet proven |
-| **D. Policy / corpus depth** | Stronger policy lifecycle docs + small corpus under 500MB rules | Partial (packs live) |
-| **E. GIS under UDOC control** | Access control + approved open path — **not** parallel product | Deferred until A green |
-| **F. GBS / holdings narrative** | Framework docs; no free-tier DB expansion | Deferred |
-| **G. Open-source packaging story** | README · run · limits · honesty | Partial |
-| **H. Capstone evidence pack** | Smoke record · screenshots · architecture pointers | After A |
+| **B. Intent artefacts** | Roadmap, EDRs, package story, stop/start/continue | This file + siblings |
+| **C. Isolation proof** | Document + test tenant A cannot read tenant B when multi-tenant is claimed | Documented gap |
+| **D. Policy / corpus as substrate** | Policy lifecycle + small corpus under 500MB; name substrate in UI/docs | Partial (packs + intel paths live) |
+| **E. GIS under UDOC control** | Access control + approved open path — not parallel product | Deferred until A green |
+| **F. Knowledge Compiler depth** | Structure corpus → objects for deterministic use | Intent only (EDR-002) |
+| **G. GBS / holdings narrative** | Framework docs; no free-tier DB expansion | Deferred |
+| **H. Open-source packaging story** | README · run · limits · honesty | Partial |
+| **I. Capstone evidence pack** | Smoke record · screenshots · architecture pointers | After A |
+| **J. Enterprise packaging** | SSO, connectors, hierarchical orgs, support ops | **Out of Capstone** (Volume 4 Part 7 reference only) |
 
-Never start E before A is honest. Never treat F–G as Capstone blockers.
+Never start E–G before A is honest. Never treat J as a Capstone blocker.
 
 ---
 
-## 7. What “commercial SaaS” means here
+## 7. What “commercial / Enterprise” means here
 
-Commercial SaaS readiness is **explicitly not** the Capstone success criterion.
+Commercial and Enterprise readiness are **explicitly not** Capstone success criteria.
 
 - Documented in `UDOC_SAAS_READINESS_GAP.md`.  
+- Volume 4 Part 7 (Enterprise Edition) is a **future packaging reference**, not a build order for free Neon.  
 - Architecture can be Capstone-ready while operations (MFA, proven isolation, backups, monitoring) are not pilot-ready.  
-- Saying “not commercial SaaS” is a feature of honesty, not a failure of vision.
+- Saying “not commercial SaaS” is honesty, not a failure of vision.
 
 ---
 
@@ -128,14 +138,16 @@ Commercial SaaS readiness is **explicitly not** the Capstone success criterion.
 | Doc | Intent |
 |-----|--------|
 | `ENGINEERING_ROADMAP_CAPSTONE.md` (this file) | Why / order / freeze / constraints |
+| `CAPSTONE_STOP_START_CONTINUE.md` | Discipline |
 | `CAPSTONE_PACKAGE_STORY.md` | Demos → Internal vs Client channels |
 | `UDOC_MVP_PACKAGE_MATRIX.md` | Package progress checklist |
 | `UDOC_LIVE_ENVIRONMENTS.md` | What is actually hosted |
 | `UDOC_SMOKE_PASS.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md` | How to verify live |
 | `UDOC_SAAS_READINESS_GAP.md` | What is not claimed |
 | `UDOC_V93_DEMO67_PATENT_CONTROLS.md` | Patent/control map demos 6–7 |
-| `EDR-001-*.md` | Single durable engineering decision |
-| Engineering Canon `docs/` volumes | Long-form design law |
+| `EDR-001-*.md` | UDOC-only deploy layer |
+| `EDR-002-*.md` | Knowledge Substrate |
+| Engineering Canon `docs/` volumes | Long-form design law (substrate) |
 
 ---
 
@@ -144,10 +156,11 @@ Commercial SaaS readiness is **explicitly not** the Capstone success criterion.
 - Prefer commits that **state intent** in the message (what decision, what limit).  
 - Prefer updating these `.md` files when direction changes — before large code thrash.  
 - Prefer fixing smoke failures over adding surfaces.  
-- Prefer one coherent Capstone story over parallel unfinished products.
+- Prefer one coherent Capstone story over parallel unfinished products.  
+- Prefer substrate that feeds policy/corpus over unscoped philosophy pages.
 
 ---
 
 ## 10. One-sentence position
 
-**This Capstone documents a constrained, live UDOC governance platform whose intentions, limits, and package boundaries are written down so that code can change without the purpose disappearing.**
+**This Capstone documents a constrained, live UDOC governance platform — with a named Knowledge Substrate and written limits — so that code can change without the purpose disappearing, and without claiming Enterprise or commercial certainty.**

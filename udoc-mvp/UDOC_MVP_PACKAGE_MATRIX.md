@@ -1,11 +1,11 @@
 # UDOC Capstone MVP · Package Matrix (March 2027)
 
 **Updated:** 2026-07-31  
-**Cover:** `CAPSTONE_COVER_NOTE.md`  
-**Glossary:** `GLOSSARY.md`  
-**Limits:** `LIMITATIONS_REGISTER.md` · `EDR-001`…`004`  
-**Timeline:** `SUBMISSION_TIMELINE.md`  
-**Canon:** `CANON_FREEZE_NOTICE.md`
+**API:** `gods-platform-core` · Free Render/Neon · not commercial SaaS  
+**Story:** `CAPSTONE_PACKAGE_STORY.md`  
+**Intent / freeze / phases:** `ENGINEERING_ROADMAP_CAPSTONE.md`  
+**Discipline:** `CAPSTONE_STOP_START_CONTINUE.md`  
+**Decisions:** `EDR-001-udoc-only-deploy-layer.md` · `EDR-002-knowledge-substrate.md`
 
 ## Package map
 
@@ -20,16 +20,42 @@
 | **Gateway** | All | Static | `udoc-gateway` · role → package |
 | **Sentinel / Portals** | Staff ops | Core | `/Sentinel` · `/portals` · `/admin` |
 
+## Gateway role map
+
+| Role | Routes to |
+|------|-----------|
+| admin · exec · auditor | Internal Admin |
+| operator · viewer | Operator workspace |
+| gov | Sector |
+| client | Client SaaS |
+| (none) | Citizen public |
+
 ## Progress
 
 | ID | Work | Status |
 |----|------|--------|
-| M1–M6, M8–M13 | Packages + intent documentation spine | **Done** |
+| M1 | Internal Desktop → Admin | **Done** |
+| M2 | Client Desktop | **Done** |
+| M3 | App client gate (`packageMode` + CSS + plane) | **Done** |
+| M4 | Staff mobile = Admin PWA | **Documented** |
+| M5 | Client Web labels | **Done** |
+| M6 | Internal package identity | **Done** |
 | M7 | Live P6 smoke green | **Operator** |
-| M14 | Limitations · timeline · Canon freeze | **Done** |
+| M8 | Gateway package routing | **Done** |
+| M9 | Capstone package story (demos → packages) | **Done** |
+| M10 | Engineering roadmap + EDR-001 (intent first) | **Done** |
+| M11 | EDR-002 Knowledge Substrate + stop/start/continue | **Done** |
+
+## Notes
+
+- Client: `UDOC_CLIENT_PACKAGE_NOTES.md`  
+- Internal: `UDOC_INTERNAL_PACKAGE_NOTES.md`  
+- Package story: `CAPSTONE_PACKAGE_STORY.md`  
+- Roadmap: `ENGINEERING_ROADMAP_CAPSTONE.md`  
+- SaaS gap (honest non-claim): `UDOC_SAAS_READINESS_GAP.md`
 
 ## Capstone bar
 
 1. Internal path · 2. Client path · 3. Citizen · 4. Gateway · 5. biased **BLOCK** on Client + Sentinel
 
-**Intent rule:** Well-documented limits and decisions are Capstone assets. Commercial certainty is not required and is not claimed.
+**Intent rule:** Well-documented limits and decisions are Capstone assets. Commercial / Enterprise certainty is not required and is not claimed.
