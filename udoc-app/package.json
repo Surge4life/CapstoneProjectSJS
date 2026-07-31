@@ -1,7 +1,8 @@
 {
-  "name": "gods-udoc-app",
-  "version": "1.0.0",
+  "name": "gods-udoc-client-app",
+  "version": "1.1.0",
   "private": true,
+  "description": "UDOC Client — tenant SaaS (registry, EVA, policy, tenancy). Staff uses udoc-desktop / udoc-internal.",
   "type": "module",
   "scripts": { "dev": "vite", "build": "tsc -b && vite build", "preview": "vite preview" },
   "dependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" },
