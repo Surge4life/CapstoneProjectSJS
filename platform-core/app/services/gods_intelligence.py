@@ -174,12 +174,25 @@ def overview(db: Session) -> Dict:
 
 def gaps(db: Session) -> Dict:
     """Knowledge-gap analysis over the internal corpus — which institutional categories are
-    well-covered vs thin vs absent. A faithful, self-contained port of the intelligence gap concept;
-    guides what to ingest next to strengthen grounded coverage. INTERNAL ONLY."""
-    EXPECTED = {"PATENT": "IP / patent instruments", "SPEC": "technical specifications",
-                "BRAND": "brand & identity", "MANDATE": "mandate & doctrine",
-                "FINANCIAL": "financial models", "LEGAL": "legal & compliance",
-                "MEMOIR": "founder memoir / S.E.T.H.S", "GENERAL": "general corpus"}
+    well-covered vs thin vs absent. Aligns with Admin Intelligence ingest category list.
+    Guides what to ingest next (Neon-light extracts, not full Drive). INTERNAL ONLY."""
+    # Categories match udoc-internal Intelligence ingest UI + data-room intent
+    EXPECTED = {
+        "GBS": "GBS / franchise framework extracts",
+        "CANON": "Engineering / constitutional Canon extracts",
+        "EIF": "EIF / institutional instruction",
+        "CONSTITUTION": "Constitutional doctrine & pillars",
+        "POLICY": "Policy packs & legislation notes",
+        "SOP": "Internal SOPs",
+        "PATENT": "IP / patent instruments",
+        "SPEC": "Technical specifications",
+        "MANDATE": "Mandate & doctrine",
+        "LEGAL": "Legal & compliance",
+        "FINANCIAL": "Financial models",
+        "MEMOIR": "Founder memoir / S.E.T.H.S",
+        "BRAND": "Brand & identity",
+        "GENERAL": "General corpus",
+    }
     docs = db.execute(select(KnowledgeDoc).where(KnowledgeDoc.active == True)).scalars().all()  # noqa: E712
     counts: Dict[str, int] = {}
     for d in docs:
@@ -191,6 +204,8 @@ def gaps(db: Session) -> Dict:
                      "status": "ABSENT" if n == 0 else ("THIN" if n < 2 else "COVERED")})
     covered = sum(1 for g in cats if g["status"] == "COVERED")
     return {"categories": cats, "covered": covered, "total": len(EXPECTED),
-            "maturity_pct": round(100 * covered / len(EXPECTED)),
+            "maturity_pct": round(100 * covered / max(len(EXPECTED), 1)),
             "uncategorised": [k for k in counts if k not in EXPECTED],
-            "recommendation": "Ingest material for ABSENT/THIN categories to strengthen grounded coverage."}
+            "recommendation": "Ingest short Neon-light extracts for ABSENT/THIN categories. "
+                              "Full Drive portfolio stays external (CORPUS_NEON_VS_DRIVE). "
+                              "Re-label GENERAL docs to GBS/CANON/EIF when re-ingesting."}
