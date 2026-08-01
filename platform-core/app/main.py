@@ -48,6 +48,10 @@ def _startup():
     except Exception as e:
         print(f"[startup] udoc demo seed skipped: {e}")
     try:
+        _ensure_client_kb_demo_seed()
+    except Exception as e:
+        print(f"[startup] client kb demo seed skipped: {e}")
+    try:
         from app.services.conformance_scanner import start_scheduler
         start_scheduler()
     except Exception as e:
@@ -191,6 +195,111 @@ def _ensure_udoc_demo_seed():
             db.commit()
             pe.invalidate()
             print(f"[bootstrap] re-activated demo policy pack id={pack.id}")
+    finally:
+        db.close()
+
+
+def _ensure_client_kb_demo_seed():
+    """Neon-light client corpus samples + optional client login for Company Knowledge demo.
+
+    Does NOT import Google Drive (11GB). Drive stays external; Neon only holds short text
+    extracts so grounded ask is demonstrable under ≤500MB. Idempotent.
+    """
+    import hashlib
+    from sqlalchemy import select, func
+    from app.db.session import SessionLocal
+    from app.db.models import Tenant, ClientKBDoc, User
+    from app.core.security import hash_password
+
+    samples = [
+        {
+            "title": "UDOC Capstone · Leave SOP extract",
+            "category": "SOP",
+            "text": (
+                "Company leave policy extract for Capstone demonstration. "
+                "Employees must submit leave requests at least five working days in advance "
+                "except for medical emergencies. Annual leave accrues at 1.25 days per month. "
+                "Managers approve or decline within three working days. "
+                "This text lives in Neon as a short extract only. The full portfolio remains on Google Drive."
+            ),
+        },
+        {
+            "title": "UDOC Capstone · POPIA automated decision note",
+            "category": "POLICY",
+            "text": (
+                "POPIA section 71 note for Capstone. Where a decision with legal or significant effect "
+                "is based solely on automated processing, the responsible party must implement appropriate "
+                "safeguards including meaningful human intervention on request. "
+                "UDOC enforces this via EVA, policy-to-code, and HITL on BLOCK — not via a client LLM override."
+            ),
+        },
+    ]
+
+    db = SessionLocal()
+    try:
+        tenants = db.execute(select(Tenant).where(Tenant.status == "ACTIVE").order_by(Tenant.id)).scalars().all()
+        if not tenants:
+            print("[bootstrap] client kb seed skipped — no ACTIVE tenants")
+            return
+
+        for t in tenants[:3]:  # at most three tenants · keep Neon light
+            existing = db.execute(
+                select(func.count()).select_from(ClientKBDoc).where(
+                    ClientKBDoc.tenant_pk == t.id,
+                    ClientKBDoc.source == "seed://udoc-client-kb",
+                )
+            ).scalar() or 0
+            if existing >= len(samples):
+                continue
+            for s in samples:
+                title = f"{s['title']} · {t.tenant_id}"
+                if db.execute(
+                    select(ClientKBDoc).where(
+                        ClientKBDoc.tenant_pk == t.id,
+                        ClientKBDoc.title == title,
+                    )
+                ).scalar_one_or_none():
+                    continue
+                body = s["text"]
+                db.add(ClientKBDoc(
+                    tenant_pk=t.id,
+                    title=title,
+                    source="seed://udoc-client-kb",
+                    category=s["category"],
+                    sha256=hashlib.sha256(body.encode()).hexdigest(),
+                    content_text=body,
+                    char_len=len(body),
+                    tags="capstone seed neon-light",
+                    added_by="system",
+                    active=True,
+                ))
+            db.commit()
+            print(f"[bootstrap] client kb samples for tenant {t.tenant_id} (pk={t.id})")
+
+        # Optional client login so Company Knowledge is reachable without staff 403.
+        # Not a public registration flow — single Capstone demo identity if missing.
+        demo_email = os.environ.get("UDOC_CLIENT_DEMO_EMAIL", "client@udoc.demo")
+        demo_pw = os.environ.get("UDOC_CLIENT_DEMO_PASSWORD", "client123")
+        u = db.execute(select(User).where(User.email == demo_email)).scalar_one_or_none()
+        primary = tenants[0]
+        if not u:
+            db.add(User(
+                email=demo_email,
+                password_hash=hash_password(demo_pw),
+                role="client",
+                division="UDOC",
+                tenant_id=primary.tenant_id,
+                tenant_pk=primary.id,
+                active=True,
+            ))
+            db.commit()
+            print(f"[bootstrap] client demo user {demo_email} → tenant {primary.tenant_id}")
+        elif not u.tenant_pk:
+            u.role = "client"
+            u.tenant_id = primary.tenant_id
+            u.tenant_pk = primary.id
+            db.commit()
+            print(f"[bootstrap] linked {demo_email} to tenant {primary.tenant_id}")
     finally:
         db.close()
 
