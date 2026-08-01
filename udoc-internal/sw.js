@@ -1,6 +1,6 @@
-/* G.O.D.S UDOC Internal PWA — injects admin-v7-enhance.js */
-const CACHE = 'gods-udoc-pwa-v6';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/admin-v7-enhance.js'];
+/* G.O.D.S UDOC Internal PWA — injects admin-v7-enhance.js + intel-density.js */
+const CACHE = 'gods-udoc-pwa-v7';
+const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/admin-v7-enhance.js', '/intel-density.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
@@ -10,15 +10,19 @@ self.addEventListener('activate', e => {
   );
 });
 function injectEnhance(html) {
-  if (html.indexOf('admin-v7-enhance.js') !== -1) return html;
-  var tag = '<script src="/admin-v7-enhance.js"><\/script>';
+  var tags = '';
+  if (html.indexOf('admin-v7-enhance.js') === -1)
+    tags += '<script src="/admin-v7-enhance.js"><\/script>\n';
+  if (html.indexOf('intel-density.js') === -1)
+    tags += '<script src="/intel-density.js"><\/script>\n';
+  if (!tags) return html;
   if (html.indexOf('serviceWorker') !== -1) {
     return html.replace(
       '<script>if("serviceWorker"',
-      tag + '\n<script>if("serviceWorker"'
+      tags + '<script>if("serviceWorker"'
     );
   }
-  return html.replace('</body>', tag + '\n</body>');
+  return html.replace('</body>', tags + '</body>');
 }
 self.addEventListener('fetch', e => {
   const r = e.request;
@@ -43,7 +47,7 @@ self.addEventListener('fetch', e => {
     );
     return;
   }
-  if (u.pathname.endsWith('/admin-v7-enhance.js')) {
+  if (u.pathname.endsWith('/admin-v7-enhance.js') || u.pathname.endsWith('/intel-density.js')) {
     e.respondWith(
       fetch(r).then(resp => {
         const cp = resp.clone();
