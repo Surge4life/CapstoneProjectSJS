@@ -16,7 +16,7 @@ see exactly which clause produced which rule, edit it, and approve it before it 
 import io
 import re
 import time
-from typing import List, Dict
+from typing import List, Dict, Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.db.models import PolicyPack, PolicyRule
@@ -110,7 +110,7 @@ def extract_rules(text: str) -> List[Dict]:
                     "confidence": round(0.55 + 0.05 * min(4, low.count(" ") // 8), 2),
                     "enabled": True,
                 })
-                break  # one rule per sentence (first/strongest match)
+                break
         if n >= 60:
             break
     return out
@@ -126,7 +126,7 @@ def summarise(text: str, rules: List[Dict]) -> str:
 
 
 # ─────────────────────────── enforcement ───────────────────────────
-# ── hot-reload cache: enforcement reads the active rule set from memory; rebuilt on any policy change ──
+# Cache PLAIN DICTS only — never ORM instances (DetachedInstanceError across requests).
 _EPOCH = 0
 _MEMO: Dict = {}
 _LAST_RELOAD_MS = 0.0
@@ -143,7 +143,22 @@ def hot_reload_stats() -> Dict:
     return {"epoch": _EPOCH, "last_reload_ms": round(_LAST_RELOAD_MS, 3), "cached_keys": len(_MEMO)}
 
 
-def active_rules(db: Session, jurisdiction: str = None, sector: str = None, tenant_pk: int = None) -> List[PolicyRule]:
+def _rule_dict(r: PolicyRule) -> Dict[str, Any]:
+    return {
+        "code": r.code or "",
+        "kind": r.kind or "",
+        "severity": r.severity or "REVIEW",
+        "operator": r.operator or "",
+        "threshold": r.threshold,
+        "target": r.target or "",
+        "description": r.description or "",
+        "source_excerpt": r.source_excerpt or "",
+        "confidence": r.confidence,
+        "enabled": bool(r.enabled),
+    }
+
+
+def active_rules(db: Session, jurisdiction: str = None, sector: str = None, tenant_pk: int = None) -> List[Dict[str, Any]]:
     global _LAST_RELOAD_MS
     key = (_EPOCH, jurisdiction, sector, tenant_pk)
     hit = _MEMO.get(key)
@@ -153,7 +168,6 @@ def active_rules(db: Session, jurisdiction: str = None, sector: str = None, tena
     packs = db.execute(select(PolicyPack).where(PolicyPack.status == "ACTIVE")).scalars().all()
     pack_ids = []
     for p in packs:
-        # tenant isolation: platform packs (NULL) apply to all; tenant packs only to that tenant
         if tenant_pk is not None and p.tenant_pk is not None and p.tenant_pk != tenant_pk:
             continue
         if jurisdiction and p.jurisdiction not in (jurisdiction, "GLOBAL", "*"):
@@ -162,10 +176,11 @@ def active_rules(db: Session, jurisdiction: str = None, sector: str = None, tena
             continue
         pack_ids.append(p.id)
     if not pack_ids:
-        rows: List[PolicyRule] = []
+        rows: List[Dict[str, Any]] = []
     else:
-        rows = db.execute(select(PolicyRule).where(
+        orm_rows = db.execute(select(PolicyRule).where(
             PolicyRule.pack_id.in_(pack_ids), PolicyRule.enabled == True)).scalars().all()  # noqa: E712
+        rows = [_rule_dict(r) for r in orm_rows]
     _MEMO[key] = rows
     _LAST_RELOAD_MS = (time.perf_counter() - _t0) * 1000.0
     return rows
@@ -181,33 +196,44 @@ def apply(db: Session, ev, model, verdict) -> Dict:
 
     for r in rules:
         fired, msg = False, ""
-        if r.kind == "PROHIBIT":
-            kws = [k for k in (r.target or "").split() if len(k) > 3]
+        kind = r.get("kind") or ""
+        thr = r.get("threshold")
+        sev = r.get("severity") or "REVIEW"
+        target = r.get("target") or ""
+        code = r.get("code") or ""
+        excerpt = (r.get("source_excerpt") or "")[:160]
+
+        if kind == "PROHIBIT":
+            kws = [k for k in target.split() if len(k) > 3]
             hit = [k for k in kws if k in haystack]
             if hit or ev.risk_tier == "UNACCEPTABLE":
                 fired = True; msg = f"prohibited practice (matched: {', '.join(hit) or ev.risk_tier})"
-        elif r.kind == "RISK_TIER_CAP":
-            if r.threshold is not None and risk_num >= r.threshold:
-                fired = True; msg = f"risk {risk_num:.2f} ≥ cap {r.threshold:.2f}"
-        elif r.kind == "REQUIRE_HITL":
+        elif kind == "RISK_TIER_CAP":
+            if thr is not None and risk_num >= thr:
+                fired = True; msg = f"risk {risk_num:.2f} ≥ cap {thr:.2f}"
+        elif kind == "REQUIRE_HITL":
             if ev.risk_tier in ("HIGH", "UNACCEPTABLE"):
                 fired = True; msg = "high-risk system requires human oversight"
-        elif r.kind == "MIN_SOVEREIGNTY":
-            if verdict.sovereign_svs < (r.threshold or 1.0):
-                fired = True; msg = f"sovereignty {verdict.sovereign_svs:.2f} < {r.threshold or 1.0:.2f}"
-        elif r.kind == "MIN_COMPLIANCE":
-            if verdict.compliance < (r.threshold or 0.7):
-                fired = True; msg = f"compliance {verdict.compliance:.2f} < {r.threshold or 0.7:.2f}"
-        elif r.kind == "MAX_DISPARATE_IMPACT":
-            if verdict.disparate_impact < (r.threshold or 0.8):
-                fired = True; msg = f"disparate-impact {verdict.disparate_impact:.2f} < {r.threshold or 0.8:.2f}"
-        elif r.kind == "DATA_LOCALISATION":
+        elif kind == "MIN_SOVEREIGNTY":
+            need = thr if thr is not None else 1.0
+            if verdict.sovereign_svs < need:
+                fired = True; msg = f"sovereignty {verdict.sovereign_svs:.2f} < {need:.2f}"
+        elif kind == "MIN_COMPLIANCE":
+            need = thr if thr is not None else 0.7
+            if verdict.compliance < need:
+                fired = True; msg = f"compliance {verdict.compliance:.2f} < {need:.2f}"
+        elif kind == "MAX_DISPARATE_IMPACT":
+            need = thr if thr is not None else 0.8
+            if verdict.disparate_impact < need:
+                fired = True; msg = f"disparate-impact {verdict.disparate_impact:.2f} < {need:.2f}"
+        elif kind == "DATA_LOCALISATION":
             if getattr(model, "jurisdiction", "ZA") != "ZA" or ev.storage < 1.0:
                 fired = True; msg = "data-localisation signal not satisfied"
-        elif r.kind == "KEYWORD_FLAG":
-            fired = True; msg = "obligation flagged for evidence"  # informational
-        findings.append({"code": r.code, "kind": r.kind, "severity": r.severity,
-                         "fired": fired, "message": msg, "excerpt": (r.source_excerpt or "")[:160]})
+        elif kind == "KEYWORD_FLAG":
+            fired = True; msg = "obligation flagged for evidence"
+
+        findings.append({"code": code, "kind": kind, "severity": sev,
+                         "fired": fired, "message": msg, "excerpt": excerpt})
 
     blockers = [f for f in findings if f["fired"] and f["severity"] == "BLOCK"]
     reviewers = [f for f in findings if f["fired"] and f["severity"] == "REVIEW"]
@@ -216,6 +242,9 @@ def apply(db: Session, ev, model, verdict) -> Dict:
         decision = "BLOCK"
     elif reviewers and decision in ("APPROVE", "RESTRICT"):
         decision = "REVIEW"
+    # EVA engine may already BLOCK on DI; keep the stronger outcome
+    if decision == "BLOCK" or verdict.decision == "BLOCK":
+        decision = "BLOCK"
     return {
         "adjusted_decision": decision,
         "policy_enforced": bool(rules),
