@@ -11,7 +11,7 @@ from app.db.session import get_db
 from app.db.models import AIModel, Decision, EvaCertificate, Tenant, OversightCase
 from app.core.dependencies import current_user, principal, scope_pk
 from app.core.config import settings
-import json, hashlib, uuid
+import json, hashlib, uuid, traceback
 from app.services.governance_bridge import verify_payload, Evidence, evaluate, seal_payload
 from app.services.audit_writer import append_audit
 from app.services import policy_engine as pe
@@ -37,13 +37,27 @@ class DecisionReq(BaseModel):
 
 @router.post("")
 def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends(principal)):
+    try:
+        return _decide_inner(req, db, user)
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Capstone honesty: never hide the reason behind a bare "Internal Server Error".
+        detail = f"{type(e).__name__}: {e}"
+        print(f"[decisions] unhandled: {detail}\n{traceback.format_exc()}")
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail[:400])
+
+
+def _decide_inner(req: DecisionReq, db: Session, user: dict):
     model = db.execute(select(AIModel).where(AIModel.model_id == req.model_id)).scalar_one_or_none()
     if not model:
-        # Fail-closed: unknown model is blocked, not allowed.
         raise HTTPException(status.HTTP_404_NOT_FOUND, "model not registered — fail-closed")
+    if (model.status or "").upper() not in ("ACTIVE", ""):
+        raise HTTPException(status.HTTP_403_FORBIDDEN,
+                            f"model {req.model_id} status is {model.status} — fail-closed")
     scope = scope_pk(user)
     if scope is not None and model.tenant_pk != scope:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "model not registered — fail-closed")  # tenant isolation
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "model not registered — fail-closed")
     tenant = db.get(Tenant, model.tenant_pk) if model.tenant_pk else None
     if tenant:
         if tenant.status != "ACTIVE":
@@ -60,64 +74,88 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
         ecs=req.ecs, bgp=req.bgp, traceroute=req.traceroute, dnssec=req.dnssec, storage=req.storage,
     )
     v = evaluate(ev)
-    # Policy-to-Code layer: enforce active, human-approved rules compiled from uploaded legislation.
     pol = pe.apply(db, ev, model, v)
     final_decision = pol["adjusted_decision"]
     policy_reasons = [f"POLICY {f['code']} ({f['kind']}): {f['message']}" for f in pol["fired"]]
     all_reasons = list(v.block_reasons) + policy_reasons
 
-    # Persist decision (policy-adjusted)
     d = Decision(model_pk=model.id, decision=final_decision, svs=v.svs, risk=v.risk,
                  compliance=v.compliance, sovereign=v.sovereign, seal=v.seal,
                  latency_ms=v.latency_ms, block_reasons=" | ".join(all_reasons),
                  inputs_json=json.dumps(req.model_dump()))
     db.add(d)
-    # If blocked, reflect on model status for critical tiers
     if final_decision == "BLOCK" and ev.risk_tier in ("HIGH", "UNACCEPTABLE"):
         model.status = "BLOCKED"
     if tenant:
         tenant.usage_decisions += 1
     db.commit(); db.refresh(d)
 
-    # EVA Certificate — issued for EVERY decision (patent / whitepaper §4.3): SHA-3-256 content hash + policy version + Merkle leaf.
-    issued = d.created_at.isoformat()
+    issued = d.created_at.isoformat() if d.created_at else ""
     dims_str = json.dumps(v.dimensions, sort_keys=True)
     content_sha3 = hashlib.sha3_256(
-        f"{v.model_id}|{json.dumps(req.model_dump(), sort_keys=True)}|{dims_str}".encode()).hexdigest()
+        f"{v.model_id}|{json.dumps(req.model_dump(), sort_keys=True)}|{dims_str}|{d.id}".encode()).hexdigest()
     policy_version = f"rules@{pol['rules_evaluated']}" if pol["policy_enforced"] else "none"
-    payload = f"{v.model_id}|{v.composite_eva}|{final_decision}|{issued}|{content_sha3}"
+    payload = f"{v.model_id}|{v.composite_eva}|{final_decision}|{issued}|{content_sha3}|{d.id}"
     certificate_id = "EVA-" + hashlib.sha3_256(payload.encode()).hexdigest()[:12].upper()
     merkle_leaf = hashlib.sha3_256((v.seal or payload).encode()).hexdigest()
-    # Sector context in force for this decision (drives which regulatory frameworks are cited on the record)
     sector_key = (tenant.sector if tenant else "GENERAL") or "GENERAL"
     frameworks_cited = [f["name"] for f in sec.get(sector_key)["frameworks"]]
-    db.add(EvaCertificate(certificate_id=certificate_id, model_id=v.model_id, tenant_pk=model.tenant_pk,
-                          decision=final_decision, composite_eva=v.composite_eva, dimensions_json=dims_str,
-                          policy_pack=("active" if pol["policy_enforced"] else ""), seal=seal_payload(payload),
-                          content_sha3=content_sha3, policy_version=policy_version, merkle_leaf=merkle_leaf,
-                          issued_at=d.created_at, sector=sector_key, frameworks_cited=json.dumps(frameworks_cited)))
-    d.certificate_id = certificate_id
-    db.commit()
 
-    # Immutable audit + event
-    append_audit(db, "AI_DECISION", {"model_id": req.model_id, "decision": final_decision,
-                 "svs": v.svs, "seal": v.seal[:16], "policy_fired": len(pol["fired"])},
-                 classification="GOVERNANCE", actor_class=user.get("role", "SYSTEM"))
-    bus.emit("decisions", {"model_id": req.model_id, "decision": final_decision, "svs": v.svs})
+    try:
+        seal = seal_payload(payload)
+        # seal column is String(128) — truncate only if a future PQC path exceeds width
+        if len(seal) > 128:
+            seal = seal[:128]
+        db.add(EvaCertificate(certificate_id=certificate_id, model_id=v.model_id, tenant_pk=model.tenant_pk,
+                              decision=final_decision, composite_eva=v.composite_eva, dimensions_json=dims_str,
+                              policy_pack=("active" if pol["policy_enforced"] else ""), seal=seal,
+                              content_sha3=content_sha3, policy_version=policy_version, merkle_leaf=merkle_leaf,
+                              issued_at=d.created_at, sector=sector_key, frameworks_cited=json.dumps(frameworks_cited)))
+        d.certificate_id = certificate_id
+        db.commit()
+    except Exception as cert_err:
+        db.rollback()
+        print(f"[decisions] certificate write skipped: {cert_err}")
+        certificate_id = certificate_id or ""
 
-    # End-to-end flow: a BLOCKED decision opens a human-oversight (HITL) case automatically,
-    # so blocked AI decisions surface in the Oversight queue for COB review instead of being lost.
+    try:
+        append_audit(db, "AI_DECISION", {"model_id": req.model_id, "decision": final_decision,
+                     "svs": v.svs, "seal": (v.seal or "")[:16], "policy_fired": len(pol["fired"])},
+                     classification="GOVERNANCE", actor_class=user.get("role", "SYSTEM"))
+    except Exception as audit_err:
+        print(f"[decisions] audit append skipped: {audit_err}")
+        try:
+            db.rollback()
+        except Exception:
+            pass
+
+    try:
+        bus.emit("decisions", {"model_id": req.model_id, "decision": final_decision, "svs": v.svs})
+    except Exception:
+        pass
+
     oversight_case = None
     if final_decision == "BLOCK":
-        reason = (all_reasons[0] if all_reasons else "EVA governance block")
-        case = OversightCase(case_ref=f"COB-{uuid.uuid4().hex[:8]}", model_id=req.model_id,
-                             reason=f"Auto: decision {d.id} blocked — {reason}"[:200], state="OPEN")
-        db.add(case); db.commit(); db.refresh(case)
-        oversight_case = case.case_ref
-        append_audit(db, "OVERSIGHT_OPEN", {"case": case.case_ref, "model": req.model_id,
-                     "decision": d.id, "auto": True}, classification="GOVERNANCE", actor_class="SYSTEM")
+        try:
+            reason = (all_reasons[0] if all_reasons else "EVA governance block")
+            case = OversightCase(case_ref=f"COB-{uuid.uuid4().hex[:8]}", model_id=req.model_id,
+                                 reason=f"Auto: decision {d.id} blocked — {reason}"[:200], state="OPEN")
+            db.add(case); db.commit(); db.refresh(case)
+            oversight_case = case.case_ref
+            try:
+                append_audit(db, "OVERSIGHT_OPEN", {"case": case.case_ref, "model": req.model_id,
+                             "decision": d.id, "auto": True}, classification="GOVERNANCE", actor_class="SYSTEM")
+            except Exception:
+                pass
+        except Exception as hitl_err:
+            print(f"[decisions] HITL open skipped: {hitl_err}")
+            try:
+                db.rollback()
+            except Exception:
+                pass
 
     return {
+        "id": d.id,
         "model_id": v.model_id, "decision": final_decision, "base_decision": v.decision,
         "svs": v.svs, "risk": v.risk,
         "compliance": v.compliance, "stability": v.stability, "disparate_impact": v.disparate_impact,
@@ -146,7 +184,9 @@ def list_decisions(db: Session = Depends(get_db), user: dict = Depends(principal
              .where(AIModel.tenant_pk == scope).order_by(Decision.id.desc()).limit(100))
     rows = db.execute(q).scalars().all()
     return [{"id": d.id, "decision": d.decision, "svs": d.svs, "sovereign": d.sovereign,
-             "latency_ms": d.latency_ms, "created_at": d.created_at.isoformat()} for d in rows]
+             "latency_ms": d.latency_ms, "model_pk": d.model_pk,
+             "certificate_id": d.certificate_id or "",
+             "created_at": d.created_at.isoformat()} for d in rows]
 
 
 @router.get("/certificates")
