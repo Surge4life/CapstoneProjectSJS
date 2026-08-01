@@ -1,12 +1,15 @@
 # Client Intelligence · Private Knowledge Substrate
 
-**Updated:** 2026-07-31  
+**Updated:** 2026-08-01  
 **Audience:** Capstone assessors · Client package builders  
-**Neon check (2026-07-31):** ~**35 MB** used of 500 MB free · compute ACTIVE — headroom for text corpus, not bulk media archives.
+**Neon:** text-first under ≤500MB · not a foundation-model farm  
+**Authority doc for separation of layers:** `CLIENT_GOVERNANCE_INTELLIGENCE.md`
 
-## Intent (EDR-002)
+## Intent
 
-Each **tenant** owns a private knowledge base. Answers are grounded only in that tenant’s active documents. This is the Capstone slice of “own your intelligence” — not a shared GODS internal corpus and not a rented general LLM product claim.
+Each **tenant** owns a private business corpus. That corpus is the **reference material** for grounded assistance and, over time, for Knowledge Compiler objects that **deterministic** UDOC / GBS-aligned engines can cite.
+
+**Not in this path:** client agentic / generic / recursive LLMs as controllers of UDOC. Those are **Layer A** (client operational AI). UDOC is **Layer B** (governance). GODS Intelligence / GIS is **Layer C** (Holdings constitutional substrate). See `CLIENT_GOVERNANCE_INTELLIGENCE.md`.
 
 ```
 Client (JWT role=client · tenant_pk set)
@@ -16,9 +19,15 @@ POST /client/knowledge/ingest-text | /ingest
 ClientKBDoc rows WHERE tenant_pk = caller
         │
 POST /client/knowledge/ask  → retrieval-grounded answer + citations
+        │
+(UDOC Primacy) Govern / decisions / policy — usage only for any client model
 ```
 
 Staff (`admin` / `operator` / …) are **refused** on this surface (403). Internal GODS corpus remains `/intel` — separate table and path.
+
+## Growth rule
+
+As the client **expands the business corpus**, the **substrate** available to grounded ask (and later Compiler → engine attachment) expands. That is **document growth under governance**, not automatic LLM weight training on Neon.
 
 ## Isolation (by construction)
 
@@ -26,12 +35,13 @@ Staff (`admin` / `operator` / …) are **refused** on this surface (403). Intern
 |------|----------------|
 | Every read/write filtered by `tenant_pk` | `scope_pk(user)` → `_tenant()` in router |
 | Cross-tenant doc id cannot leak | `get_doc` requires matching `tenant_pk` |
-| Staff cannot browse client KB via this API | `scope_pk` returns `None` for platform roles → 403 |
+| Staff cannot browse client KB via this API | platform roles → 403 |
 | Audit events tagged CLIENT | `CLIENT_KB_INGEST` / `QUERY` / `REMOVE` |
+| Client models cannot amend UDOC engines | Primacy controller — usage APIs only |
 
-**Same Neon database, different rows.** Not a second Neon project per client (would exhaust free quota). Logical isolation is the Capstone model; proven automated cross-tenant tests remain a P1 gap (`UDOC_SAAS_READINESS_GAP.md`).
+**Same Neon database, different rows.** Logical isolation is the Capstone model.
 
-## API (Core · already live)
+## API (Core · live)
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -40,32 +50,34 @@ Staff (`admin` / `operator` / …) are **refused** on this surface (403). Intern
 | GET | `/client/knowledge/docs/{id}` | Full text (own tenant only) |
 | POST | `/client/knowledge/ingest-text` | Title + text |
 | POST | `/client/knowledge/ingest` | File upload (PDF/DOCX/TXT · 25MB cap) |
-| POST | `/client/knowledge/ask` | Grounded ask |
+| POST | `/client/knowledge/ask` | Grounded ask (deterministic retrieval) |
 | DELETE | `/client/knowledge/docs/{id}` | Remove own doc |
 
 ## Client UI
 
-- **Client Web:** `udoc-public` → **Company Knowledge** (Client package only)  
-- **Client App:** Intelligence / tenancy tabs under `UDOC_PACKAGE=client`  
-- Rest of UDOC (Govern, Registry, Sentinel, portals) stays on shared Core governance host — **only KB rows are tenant-private**.
+- **Client Web:** **Company Knowledge** (Client package only)  
+- **Client App:** Intelligence / tenancy under `UDOC_PACKAGE=client`  
+- Shared UDOC host for Govern / Registry / Sentinel — **KB rows tenant-private**
 
 ## What is *not* claimed
 
-- Per-client physical database or separate Neon branch per tenant  
-- Unlimited file corpora on free 500MB  
-- Finished custom foundation-model training product  
-- Staff backdoor into client documents via `/client/knowledge`
+- Per-client physical DB or Neon branch  
+- Client LLM fine-tune product on free tier  
+- Client model control of GIS / constitutional packs  
+- Staff backdoor into client documents via `/client/knowledge`  
+- Equivalence of GODS Intelligence with “just another UDOC EVA call”
 
 ## How to demo
 
-1. Sign in as a user with **role `client`** and a real **`tenant_pk`** (not platform admin).  
-2. Client → Company Knowledge → add text or upload a small policy/SOP.  
-3. Ask a question using terms from that text → citations from **your** docs only.  
-4. `admin@gods.local` will correctly get **403** on this surface (staff use `/intel`).
+1. Sign in as **role `client`** with **`tenant_pk`**.  
+2. Company Knowledge → add SOP / policy text.  
+3. Ask with terms from that text → citations from **your** docs.  
+4. Govern: fair ≠ BLOCK · biased = BLOCK (UDOC engines, not the KB LLM).  
+5. `admin@gods.local` → **403** on Client KB (correct).
 
 ## Related
 
+- `CLIENT_GOVERNANCE_INTELLIGENCE.md` (layers · Primacy · engines · patent posture)  
 - `EDR-002-knowledge-substrate.md`  
 - `platform-core/app/routers/client_knowledge.py`  
 - `platform-core/app/services/client_knowledge.py`  
-- `ENGINEERING_ROADMAP_CAPSTONE.md` phase D  
