@@ -1,4 +1,4 @@
-/* Intelligence density overlay — GODS archive ingest/ask/remove */
+/* Intelligence density overlay — GODS archive ingest/ask/remove + re-label */
 (function () {
   "use strict";
 
@@ -106,6 +106,22 @@
     }
   };
 
+  window.intelRelabel = async function (id) {
+    var sel = document.getElementById("ix-cat-" + id);
+    if (!sel) return;
+    var cat = sel.value;
+    try {
+      await api("/intel/docs/" + id, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category: cat }),
+      });
+      nav("intelligence");
+    } catch (e) {
+      alert(e.message || String(e));
+    }
+  };
+
   window.vIntelligence = async function (m) {
     await safe(m, async function () {
       var st = {},
@@ -201,12 +217,12 @@
         esc(pillar) +
         "</div>" +
         (guard ? '<ul style="margin:8px 0 0 18px">' + guard + "</ul>" : "") +
-        '<div class="muted small" style="margin-top:8px">Client Company Knowledge is a separate tenant-private table. Internal paste does not appear on client SaaS.</div></div>' +
+        '<div class="muted small" style="margin-top:8px">Client Company Knowledge is a separate tenant-private table. Internal paste does not appear on client SaaS. Re-label GENERAL → EIF/GBS to improve gap coverage.</div></div>' +
         gapsPanel +
         '<div class="panel"><h3>Ingest text · GODS archive</h3>' +
         '<div class="row" style="gap:8px;flex-wrap:wrap">' +
         '<div class="f" style="min-width:160px"><label class="small muted">Title</label><input id="ix-t" placeholder="Document title"></div>' +
-        '<div class="f" style="min-width:120px"><label class="small muted">Category</label><select id="ix-cat"><option>GENERAL</option><option>GBS</option><option>CANON</option><option>POLICY</option><option>SOP</option><option>CONSTITUTION</option><option>EIF</option></select></div>' +
+        '<div class="f" style="min-width:120px"><label class="small muted">Category</label><select id="ix-cat"><option>GENERAL</option><option>GBS</option><option>CANON</option><option>EIF</option><option>POLICY</option><option>SOP</option><option>CONSTITUTION</option><option>PATENT</option></select></div>' +
         '<div class="f" style="min-width:120px"><label class="small muted">Division</label><select id="ix-div"><option>GODS</option><option>SETHS</option><option>MADIBA</option><option>TS</option><option>UDOC</option><option>GBS</option></select></div>' +
         '<div class="f" style="min-width:120px"><label class="small muted">Tags</label><input id="ix-tags" placeholder="optional tags"></div></div>' +
         '<label class="small muted">Text (extract only — not full Drive portfolio)</label>' +
@@ -250,6 +266,20 @@
             h: "Chars",
             r: function (x) {
               return esc(x.char_len != null ? x.char_len : "—");
+            },
+          },
+          {
+            h: "Re-label",
+            r: function (x) {
+              var id = Number(x.id);
+              var cur = String(x.category || "GENERAL");
+              var opts = ["GENERAL","GBS","CANON","EIF","POLICY","SOP","CONSTITUTION","PATENT","SPEC","MANDATE","LEGAL"];
+              var html = '<select id="ix-cat-' + id + '" style="width:auto;padding:3px 6px;font-size:11px">';
+              opts.forEach(function (o) {
+                html += "<option" + (o === cur ? " selected" : "") + ">" + o + "</option>";
+              });
+              html += '</select> <button class="btn sm cyan" onclick="intelRelabel(' + id + ')">Set</button>';
+              return html;
             },
           },
           {
