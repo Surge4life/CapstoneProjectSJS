@@ -59,13 +59,13 @@ a.citizen-link:hover{text-decoration:underline}
 <div id="login"><div class="card">
 <h1>UDOC</h1><div class="sub">CLIENT PACKAGE · TENANT SAAS</div>
 <p class="muted" style="font-size:12px;margin:12px 0 0"><b>Models</b> · <b>Reports</b> (decisions) · <b>Policy/Compliance</b> · <b>EVA Govern</b> · Audit · Bias · Sovereignty. Staff admin is a separate package.</p>
-<label>Email</label><input id="li-email" value="admin@gods.local"/>
-<label>Password</label><input id="li-pass" type="password" value="admin123" onkeydown="if(event.key==='Enter')doLogin()"/>
+<label>Email</label><input id="li-email" value="client@udoc.demo"/>
+<label>Password</label><input id="li-pass" type="password" value="client123" onkeydown="if(event.key==='Enter')doLogin()"/>
 <div style="margin-top:14px"><button class="btn" style="width:100%" id="li-btn" onclick="doLogin()">Sign in</button></div>
 <div class="err" id="li-err"></div>
 <label>API</label><input id="li-api" class="mono" style="font-size:11px"/>
 <a class="citizen-link" href="/citizen.html">Citizen Portal · AI Rights · no login →</a>
-<div class="pkg">Desktop Client = <code>udoc-desktop-client</code> · Mobile/App = same client CAPS · Internal staff = Admin Desktop/Web</div>
+<div class="pkg">Desktop Client = <code>udoc-desktop-client</code> · Mobile/App = same client CAPS · Internal staff = Admin Desktop/Web · KB demo: client@udoc.demo</div>
 </div></div>
 <div id="app">
 <header>
@@ -95,5 +95,6 @@ a.citizen-link:hover{text-decoration:underline}
 <main id="main"><div class="loading">Loading…</div></main>
 </div>
 <script src="/app-client.js"></script>
+<script src="/client-knowledge-density.js"></script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})});}</script>
 </body></html>
