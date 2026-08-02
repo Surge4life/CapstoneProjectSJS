@@ -4,6 +4,7 @@ Never exposed to SaaS clients. Manages the archive (add/remove data), reports th
 ladder + 250-year mandate, and answers questions grounded strictly in the G.O.D.S corpus,
 hard-wired to Pillar VIII (Human Primacy).
 """
+from typing import Optional
 import hashlib
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
@@ -85,12 +86,36 @@ async def ingest_file(file: UploadFile = File(...), title: str = Form(""),
             "note": "Document added to the G.O.D.S archive — knowledge updated immediately."}
 
 
+class DocPatch(BaseModel):
+    active: Optional[bool] = None
+    category: Optional[str] = None
+    title: Optional[str] = None
+    division: Optional[str] = None
+    tags: Optional[str] = None
+
+
 @router.patch("/docs/{doc_id}")
-def toggle_doc(doc_id: int, active: bool, db: Session = Depends(get_db), user: dict = Depends(current_user)):
+def patch_doc(doc_id: int, body: DocPatch, db: Session = Depends(get_db), user: dict = Depends(current_user)):
+    """Toggle active and/or re-label category (e.g. GENERAL → EIF/GBS for gap coverage)."""
     _gate(user, write=True)
-    d = gi.set_active(db, doc_id, active)
+    d = db.get(KnowledgeDoc, doc_id)
     if not d:
         raise HTTPException(404, "doc not found")
+    if body.active is not None:
+        d = gi.set_active(db, doc_id, body.active) or d
+    changed = False
+    if body.category is not None and body.category.strip():
+        d.category = body.category.strip().upper(); changed = True
+    if body.title is not None and body.title.strip():
+        d.title = body.title.strip(); changed = True
+    if body.division is not None and body.division.strip():
+        d.division = body.division.strip().upper(); changed = True
+    if body.tags is not None:
+        d.tags = body.tags; changed = True
+    if changed:
+        db.commit(); db.refresh(d)
+        append_audit(db, "INTEL_RELABEL", {"doc": d.id, "category": d.category, "title": d.title},
+                     classification="INTERNAL", actor_class=user.get("role", "SYSTEM"))
     return _doc_out(d)
 
 
