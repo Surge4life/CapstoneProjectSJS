@@ -1,6 +1,12 @@
-/* Intelligence density overlay — GODS archive ingest/ask/remove + re-label */
+/* Intelligence density overlay — GODS archive ingest/ask/remove + re-label + quick-ask */
 (function () {
   "use strict";
+
+  window.intelQuickAsk = function (q) {
+    var el = document.getElementById("iq");
+    if (el) el.value = q;
+    askIntel();
+  };
 
   window.askIntel = async function () {
     var a = document.getElementById("ians");
@@ -231,6 +237,9 @@
         (errMsg ? "disabled" : "") +
         '>Add to GODS archive</button> <label class="btn" style="display:inline-block;cursor:pointer">Upload file<input type="file" id="ix-file" style="display:none" onchange="intelUpload(this)"></label> <span id="ix-msg" class="muted small"></span></div></div>' +
         '<div class="panel"><h3>Ask the knowledge base</h3>' +
+        '<div class="small" style="margin-bottom:8px">Try: <button class="btn sm cyan" type="button" onclick="intelQuickAsk(\'What is EIF instruction?\')">EIF instruction?</button> ' +
+        '<button class="btn sm" type="button" onclick="intelQuickAsk(\'human primacy pillar\')">Human primacy</button> ' +
+        '<button class="btn sm" type="button" onclick="intelQuickAsk(\'constitutional governance\')">Constitutional governance</button></div>' +
         '<div class="row"><div class="f"><input id="iq" placeholder="Ask grounded in the GODS archive…"></div>' +
         '<button class="btn cyan" onclick="askIntel()">Ask</button></div>' +
         '<div id="ians" class="small" style="margin-top:10px;white-space:pre-wrap;color:var(--txt2)"></div></div>' +

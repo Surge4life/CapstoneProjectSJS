@@ -1,8 +1,8 @@
 # Intelligence dual path · Client vs Internal
 
 **Updated:** 2026-08-02  
-**Live Admin:** https://gods-udoc-admin.onrender.com → **Intelligence** (hard-refresh for SW v7)  
-**Live Client:** https://gods-udoc-client.onrender.com → **Company Knowledge** (density + demo chips)
+**Live Admin:** https://gods-udoc-admin.onrender.com → **Intelligence** (hard-refresh)  
+**Live Client:** https://gods-udoc-client.onrender.com → **Company Knowledge**
 
 ---
 
@@ -24,13 +24,24 @@ Drive (~11GB) stays **external**. Neon holds working excerpts only.
 
 ## Live demo proof (2026-08-02)
 
+### Client
+
 | Check | Result |
 |--------|--------|
-| Client seed | 2 docs · Leave SOP + POPIA note · ~689 chars |
-| Client ask *leave advance notice* | Grounded: **five working days** |
-| Client UI | Empty-state when 0 docs · **Demo proof** chips when seeded |
-| Internal | EIF paste may show as **GENERAL** until re-labelled |
-| Gaps | Prefer category **EIF / GBS / CANON** so maturity % rises |
+| Seed | 2 docs · Leave SOP + POPIA · ~689 chars |
+| Ask *leave advance notice* | Grounded: **five working days** |
+| Admin on Client KB | **403 Forbidden** (correct isolation) |
+
+### Internal
+
+| Check | Result |
+|--------|--------|
+| Archive | 1 doc · **EIF** · 14 205 chars · Stage 1 Assistive · `client_exposed: false` |
+| Gaps | **EIF = THIN** (1 doc; COVERED needs ≥2) |
+| Ask *What is EIF instruction?* | Grounded + citation |
+| Ask *human primacy pillar* | Grounded + citation |
+| Ask *constitutional governance* | Grounded + citation |
+| Re-label | `PATCH /intel/docs/{id}` GENERAL→EIF verified live |
 
 ---
 
@@ -38,23 +49,27 @@ Drive (~11GB) stays **external**. Neon holds working excerpts only.
 
 ### Internal (staff)
 
-1. Open Admin → hard-refresh (`intel-density.js` + SW **v7**).  
-2. **Intelligence** → document list.  
-3. **Re-label** dropdown: set **GENERAL → EIF** (or GBS/CANON) → **Set** (`PATCH /intel/docs/{id}`).  
-4. Prefer **Category** on ingest: GBS · CANON · EIF · POLICY · SOP · CONSTITUTION.  
-5. Ask using words that appear in the extract.  
-6. Gap table: ABSENT / THIN / COVERED by institutional category.
+1. Admin → hard-refresh (`intel-density.js`).  
+2. **Intelligence** → list; use **Re-label** → **EIF/GBS/CANON** → **Set**.  
+3. Prefer category on ingest.  
+4. Quick-ask chips or free text (words must appear in the extract).  
+5. Gap table: ABSENT / THIN / COVERED.
 
 ### Client (tenant)
 
-1. Sign in **`client@udoc.demo` / `client123`** (default on Client login form).  
-2. **Company Knowledge** → green **Demo proof** strip if seed present.  
-3. Click **Leave notice?** or **POPIA safeguards?** for grounded answers.  
-4. Admin **cannot** open this surface (403) — correct.
+1. `client@udoc.demo` / `client123`.  
+2. **Company Knowledge** → Demo proof chips.  
+3. Admin cannot open this surface (403).
 
-### Governance engines (shared host, not the KB)
+### Governance engines
 
-EVA / policy-to-code / Sentinel remain **platform** governance. Client models get **usage only** (see `CLIENT_GOVERNANCE_INTELLIGENCE.md`).
+EVA / policy-to-code / Sentinel = platform governance. Client models = **usage only**.
+
+---
+
+## Freeze note (Intelligence track)
+
+Dual path is **operable for Capstone evidence**: isolation, grounded retrieval, Neon-light extracts, no LLM-as-controller. Further corpus growth = short extracts only under 500 MB.
 
 ---
 
