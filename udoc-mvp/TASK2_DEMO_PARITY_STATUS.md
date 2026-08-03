@@ -1,37 +1,45 @@
-# Task 2 status — DEMO PARITY (2026-07-30)
+# Task 2 status — DEMO PARITY (2026-08-03)
 
 ## Source of truth
-- `docs/ENGINEERING_CANON.md` · Netlify demos
-- `P6_ASSESSOR_SIDE_BY_SIDE.md` (surfaces 1–5 required)
-- `UDOC_SMOKE_PASS.md`
-- `PORTAL_LIVE_CORE.md`
+- Netlify demos · `P6_ASSESSOR_SIDE_BY_SIDE.md` · `UDOC_SMOKE_PASS.md`
+- Live Core: `https://gods-platform-core.onrender.com`
+
+## Priority vs Task 1
+**Task 2 first.** Task 1 (Engineering Canon volume work / GIS–GBS production docs under GODS Holdings) starts only after Task 2 minimum live smoke is green and surfaces 1–5 are operator-checkable.
+
+## Minimum live smoke (Core API · 2026-08-03)
+
+| Check | Result |
+|--------|--------|
+| `GET /health` | ok |
+| `GET /udoc/demo/ready` | **ready: true** · model-001 ACTIVE · 5 rules |
+| EVA fair · model-001 | **APPROVE** |
+| EVA biased · model-001 | **BLOCK** (DI + SPD policy) |
+| EVA high · model-001 | **BLOCK** (risk + HITL policy) |
+| Citizen health | surface live |
+| Sentinel / Client / Admin hosts | HTTP 200 |
+
+**TASK2_MIN_SMOKE = PASS** on Core API.
+
+## Demo-seed protection (this session)
+High-risk BLOCK no longer permanently sets `model-001` to BLOCKED (other models still fail-closed). Keeps Full EVA matrix re-runnable for assessors.
 
 ## Phase progress
 
-| Phase | Focus | Status | Latest commits |
-|-------|--------|--------|----------------|
-| **P1** | Sentinel | Density | `bc4496e` Full EVA matrix + esc fix |
-| **P2** | Client | Density | `c2ada6a` Govern batch + Dashboard |
-| **P3** | Admin | Density | `4c3dffe` batch + SW `v4` |
-| **P4** | Sector | Density | `06fa828` Full EVA batch + KPIs |
-| **P5** | Citizen | Live | public `/citizen.html` + Core `/citizen/*` |
-| **P6** | Assessor matrix | Updated | this file + P6 |
-| **Portals** | 24 dual-path | Complete | `bcb3ce7` data-driven OversightCase |
+| Phase | Focus | Status |
+|-------|--------|--------|
+| P1 Sentinel | Density + smoke | Live |
+| P2 Client | Density + mini-smoke + KB | Live |
+| P3 Admin | Density + Intelligence | Live |
+| P4 Sector | Density | Live (operator UI check) |
+| P5 Citizen | Public path | Live |
+| P6 Assessor matrix | Doc + Core API green | **Core API green; operator hard-refresh 1–5 still recommended** |
+| Portals | Dual-path | Live |
 
-## Density wave (2026-07-30)
-
-Every primary surface now has:
-- Scenario chips Fair / Biased→BLOCK / High-risk / Sovereignty
-- **Run Full EVA batch** (or matrix) with outcome KPIs
-- Live `/decisions` only (no simulated scores)
-- Prefer `model-001` · DEMO READY banner where applicable
-
-## Close rule (unchanged)
-
-Surfaces **1–5** green on **live** Render after hard-refresh.  
-**Do not mark Task 2 complete** until biased = BLOCK is observed on Client + Sentinel + Admin + Sector.  
-**Task 1** (docs/ Engineering Canon volume commits) only after Task 2.
+## Close rule (honest)
+- **Core minimum** (health + ready + fair≠BLOCK + biased=BLOCK): **PASS 2026-08-03**
+- **Full Task 2 close**: operator confirms biased=BLOCK on Client Govern + Sentinel + Admin EVA after hard-refresh
+- Then **Task 1** may open (Canon / GIS–GBS documentation track)
 
 ## Honesty
-
-Wiring + density upgrades are in repo. Live matrix pass is **operator-verified**, not assumed.
+Pixel parity with every Netlify demo screen is not claimed. Live fail-closed EVA + policy-to-code + dual Intelligence + portals path is the Capstone evidence spine under Neon ≤500MB.
