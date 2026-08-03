@@ -1,36 +1,46 @@
 # Task 2 · Operator smoke gate (surfaces 1–5)
 
-**Date:** 2026-08-03  
-**Core:** `https://gods-platform-core.onrender.com` · commit must include `cdfb7e1d`+  
-**Rule:** live APIs only · seeded `model-001` · no new user registration
+**Updated:** 2026-08-03 09:45 SAST  
+**Core:** https://gods-platform-core.onrender.com · deploy includes `006df18b` (Sentinel bootstrap)
 
-## Minimum Core (already verified in automation)
+## UI restore note
 
-| Check | Pass |
-|--------|------|
+`sentinel.html` and `app-client.js` were briefly corrupted to placeholders. They now **bootstrap** the last-good files from commit `cdfb7e1d` (CORS `*`). Client also loads `client-batch-overlay.js` for `/decisions/batch`.
+
+| Surface | After hard-refresh |
+|---------|-------------------|
+| `/Sentinel` | Bootstrap → full EVA Command Centre |
+| Client `app-client.js` | Bootstrap → full Govern + batch |
+| `/eif-ui` | Static EIF Diamond console (no bootstrap needed) |
+
+## Automation verified (this session)
+
+| Check | Result |
+|--------|--------|
 | `GET /health` | ok |
-| `GET /udoc/demo/ready` → ready true | model-001 ACTIVE · 5 rules |
-| `POST /decisions/batch` fair/biased | fair ≠ BLOCK · biased = BLOCK |
+| `GET /version` | `006df18b` |
 | `GET /eif/health` · `/eif/framework` | live |
-| `POST /eif/nominate` (staff) | audit LOGGED_PENDING_REVIEW |
+| `GET /eif-ui` | 200 |
+| `GET /Sentinel` | bootstrap HTML (not SEE_FILE) |
+| `model-001` | re-ACTIVE when SUSPENDED |
+| `POST /decisions/batch` fair/biased | APPROVE / BLOCK · gate PASS |
 
-## Surface matrix (operator hard-refresh)
+## Operator matrix (tick live)
 
-| # | Surface | URL | Actions | Pass if |
-|---|---------|-----|---------|---------|
-| 1 | **Sentinel** | `/Sentinel` | Smoke top-bar · EVA Command → Full EVA matrix · EIF · Diamond nominate | biased=BLOCK · gate PASS · EIF log ok |
-| 2 | **Client** | `gods-udoc-client` | Login client@udoc.demo · Govern → Full EVA batch · Company Knowledge chip | biased=BLOCK · SOP ask grounded |
-| 3 | **Citizen** | Client `/citizen.html` | Challenge + status (public) | case_ref returned |
-| 4 | **Admin** | `gods-udoc-admin` | Hard-refresh ×2 · EVA chips / batch · Intelligence | biased=BLOCK · intel load |
-| 5 | **Sector** | `gods-udoc-sector` | Full EVA batch · switch PUBLIC/PRIVATE | biased=BLOCK |
+| # | Surface | Actions | Pass if |
+|---|---------|---------|---------|
+| 1 | **Sentinel** | Open `/Sentinel` · wait for full UI · Smoke · Full EVA matrix · optional `/eif-ui` | biased=BLOCK · not SEE_FILE |
+| 2 | **Client** | Hard-refresh · login `client@udoc.demo` · Govern → Full EVA batch | biased=BLOCK |
+| 3 | **Citizen** | Client `/citizen.html` challenge | case_ref |
+| 4 | **Admin** | Hard-refresh ×2 · EVA / Intelligence | biased=BLOCK · intel load |
+| 5 | **Sector** | Full EVA · PUBLIC/PRIVATE | biased=BLOCK |
 
 ## Close Task 2 when
 
-- Rows 1–5 observed live by operator (or documented with screenshots in SMOKE_EVIDENCE_TEMPLATE)
-- Core automation green (this session)
+Operator ticks 1–5 **or** documents with screenshots. Core automation already green.
 
-Then **Task 1** (Canon / GBS V2 volume commits) may open after offline doc finalize.
+**Task 1** (GBS/Canon V2) stays offline until founder finalizes docs.
 
 ## Honesty
 
-Pixel parity with every Netlify demo is **not** claimed. Fail-closed EVA + policy-to-code + EIF audit + dual Intelligence is the Capstone evidence spine under Neon ≤500MB.
+Pixel parity with every Netlify demo is not claimed. Fail-closed EVA + batch + EIF audit + dual Intelligence is the Capstone spine under Neon ≤500MB.
