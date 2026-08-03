@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UDOC · EIF Diamond</title>
+<style>
+body{margin:0;font:14px/1.45 system-ui;background:#060E1C;color:#F1F5F9;padding:20px}
+.panel{background:#0D1A2E;border:1px solid #1A2D4A;border-radius:10px;padding:14px;margin-bottom:12px}
+h1{color:#E8C97A;font-size:20px} h3{color:#C9A84C;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.in,textarea,select{width:100%;background:#091022;border:1px solid #1A2D4A;color:#F1F5F9;border-radius:8px;padding:10px;margin:4px 0 10px;box-sizing:border-box}
+.btn{background:#C9A84C;color:#1a1305;border:0;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer}
+.muted{color:#94A3B8;font-size:12px}.ok{color:#22C55E}.bad{color:#EF4444}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px;border-bottom:1px solid #1A2D4A;text-align:left}
+a{color:#00C2D4}
+</style></head><body>
+<h1>EIF · Diamond</h1>
+<p class="muted">M.A.D.I.B.A. Exceptional Individual Fund · UDOC assurance · no capital on free tier</p>
+<p><a href="/Sentinel">← Sentinel</a> · <a href="/eif/framework">API /eif/framework</a></p>
+<div class="panel" id="fw">Loading framework…</div>
+<div class="panel">
+<h3>Nominate (audit only)</h3>
+<label class="muted">Nominee</label><input class="in" id="name"/>
+<label class="muted">Domain</label><select class="in" id="dom"></select>
+<label class="muted">Contribution</label><textarea id="sum" rows="3" class="in"></textarea>
+<label class="muted">Evidence</label><input class="in" id="ev"/>
+<button class="btn" type="button" onclick="nominate()">Log nomination</button>
+<span id="msg" class="muted"></span>
+</div>
+<script>
+async function api(path,opts={}){
+  const t=localStorage.getItem("udoc_sent_tok")||"";
+  const h=Object.assign({},opts.headers||{});
+  if(t) h.Authorization="Bearer "+t;
+  const base=localStorage.getItem("udoc_sent_api")||"";
+  const r=await fetch(base+path,{...opts,headers:h});
+  const b=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(typeof b.detail==="string"?b.detail:(r.status+""));
+  return b;
+}
+(async()=>{
+  try{
+    const fw=await api("/eif/framework");
+    const h=fw.honesty||{};
+    document.getElementById("fw").innerHTML=
+      "<h3>"+(fw.instrument||"EIF")+"</h3><p class=muted>"+((fw.philosophy||{}).funds||"")+"</p>"+
+      "<p class=muted>proven: "+(h.proven||"")+"</p>"+
+      "<table><tr><th>Domain</th><th>Id</th></tr>"+
+      (fw.domains||[]).map(d=>"<tr><td>"+d.label+"</td><td class=muted>"+d.id+"</td></tr>").join("")+
+      "</table><h3 style=\"margin-top:12px\">Tiers</h3><table>"+
+      (fw.passport_tiers||[]).map(t=>"<tr><td><b>"+t.tier+"</b></td><td>"+t.recognises+"</td></tr>").join("")+
+      "</table>";
+    document.getElementById("dom").innerHTML=(fw.domains||[]).map(d=>"<option value=\""+d.id+"\">"+d.label+"</option>").join("");
+  }catch(e){
+    document.getElementById("fw").innerHTML="<span class=bad>"+e.message+" — sign in on /Sentinel first (stores token)</span>";
+  }
+})();
+async function nominate(){
+  const msg=document.getElementById("msg"); msg.textContent="…";
+  try{
+    const d=await api("/eif/nominate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+      nominee_label:document.getElementById("name").value.trim(),
+      domain:document.getElementById("dom").value,
+      contribution_summary:document.getElementById("sum").value.trim(),
+      evidence_note:document.getElementById("ev").value.trim(),
+      pathway:"open"
+    })});
+    msg.innerHTML="<span class=ok>"+d.status+"</span>";
+  }catch(e){ msg.innerHTML="<span class=bad>"+e.message+"</span>"; }
+}
+</script>
+</body></html>
