@@ -116,188 +116,84 @@ def _ensure_bootstrap_admin():
 
 
 def _ensure_udoc_demo_seed():
-    """Neon-light UDOC showcase seed: model-001 + one ACTIVE platform policy pack.
-    No new human users. Idempotent. Re-activates model-001 if SUSPENDED so smoke stays green
-    after kill-switch demos (fail-closed is correct in product; Capstone seed must stay ACTIVE)."""
     from datetime import datetime, timezone
     from sqlalchemy import select
     from app.db.session import SessionLocal
     from app.db.models import AIModel, PolicyPack, PolicyRule
     from app.services import policy_engine as pe
-
     db = SessionLocal()
     try:
         m = db.execute(select(AIModel).where(AIModel.model_id == "model-001")).scalar_one_or_none()
         if not m:
-            db.add(AIModel(
-                model_id="model-001", name="UDOC Showcase Model",
-                operator_id="platform", risk_tier="NOTABLE",
-                use_case="capstone eva demonstration", jurisdiction="ZA", status="ACTIVE",
-            ))
+            db.add(AIModel(model_id="model-001", name="UDOC Showcase Model", operator_id="platform",
+                           risk_tier="NOTABLE", use_case="capstone eva demonstration", jurisdiction="ZA", status="ACTIVE"))
             db.commit()
-            print("[bootstrap] seeded AIModel model-001")
         elif (m.status or "").upper() != "ACTIVE":
-            prev = m.status
-            m.status = "ACTIVE"
-            db.commit()
-            print(f"[bootstrap] re-activated model-001 (was {prev})")
-
-        pack = db.execute(
-            select(PolicyPack).where(PolicyPack.name == "UDOC Demo · POPIA + Fairness")
-        ).scalar_one_or_none()
+            m.status = "ACTIVE"; db.commit()
+        pack = db.execute(select(PolicyPack).where(PolicyPack.name == "UDOC Demo · POPIA + Fairness")).scalar_one_or_none()
         if not pack:
-            pack = PolicyPack(
-                name="UDOC Demo · POPIA + Fairness",
-                source_filename="seed://udoc-demo-pack",
-                jurisdiction="ZA", sector="GENERAL", tenant_pk=None,
-                status="ACTIVE", uploaded_by="system",
-                sha256="seed-udoc-demo", summary="Minimal showcase pack: fairness, HITL, sovereignty, localisation.",
-                rule_count=5, current_version=1,
-                activated_at=datetime.now(timezone.utc),
-            )
+            pack = PolicyPack(name="UDOC Demo · POPIA + Fairness", source_filename="seed://udoc-demo-pack",
+                              jurisdiction="ZA", sector="GENERAL", tenant_pk=None, status="ACTIVE", uploaded_by="system",
+                              sha256="seed-udoc-demo", summary="Minimal showcase pack", rule_count=5, current_version=1,
+                              activated_at=datetime.now(timezone.utc))
             db.add(pack); db.commit(); db.refresh(pack)
-            rules = [
-                dict(code="PR-001", kind="MAX_DISPARATE_IMPACT", target="fairness bias",
-                     operator=">=", threshold=0.8, severity="BLOCK",
-                     description="Non-discrimination — disparate-impact floor (EVA whitepaper).",
-                     source_excerpt="Seed: systems must not produce unlawful discrimination against protected groups.",
-                     confidence=0.95, enabled=True),
-                dict(code="PR-002", kind="REQUIRE_HITL", target="human oversight",
-                     operator=">=", threshold=None, severity="REVIEW",
-                     description="High-risk systems require human-in-the-loop review.",
-                     source_excerpt="Seed: high-risk AI decisions shall be subject to meaningful human oversight.",
-                     confidence=0.9, enabled=True),
-                dict(code="PR-003", kind="MIN_SOVEREIGNTY", target="sovereignty jurisdiction",
-                     operator=">=", threshold=1.0, severity="BLOCK",
-                     description="Sovereignty signals must be clean (Pillar III).",
-                     source_excerpt="Seed: decisioning must execute under in-jurisdiction sovereignty signals.",
-                     confidence=0.9, enabled=True),
-                dict(code="PR-004", kind="DATA_LOCALISATION", target="popia localisation",
-                     operator=">=", threshold=1.0, severity="REVIEW",
-                     description="Data localisation / POPIA cross-border posture.",
-                     source_excerpt="Seed: personal information processed subject to localisation and POPIA s72.",
-                     confidence=0.85, enabled=True),
-                dict(code="PR-005", kind="RISK_TIER_CAP", target="high risk",
-                     operator=">=", threshold=0.8, severity="REVIEW",
-                     description="High-risk tier requires conformity review before approval.",
-                     source_excerpt="Seed: high-risk systems require conformity assessment prior to approval.",
-                     confidence=0.88, enabled=True),
-            ]
-            for r in rules:
+            for r in [
+                dict(code="PR-001", kind="MAX_DISPARATE_IMPACT", target="fairness bias", operator=">=", threshold=0.8, severity="BLOCK",
+                     description="DI floor", source_excerpt="Seed DI", confidence=0.95, enabled=True),
+                dict(code="PR-002", kind="REQUIRE_HITL", target="human oversight", operator=">=", threshold=None, severity="REVIEW",
+                     description="HITL", source_excerpt="Seed HITL", confidence=0.9, enabled=True),
+                dict(code="PR-003", kind="MIN_SOVEREIGNTY", target="sovereignty jurisdiction", operator=">=", threshold=1.0, severity="BLOCK",
+                     description="Sovereignty", source_excerpt="Seed sov", confidence=0.9, enabled=True),
+                dict(code="PR-004", kind="DATA_LOCALISATION", target="popia localisation", operator=">=", threshold=1.0, severity="REVIEW",
+                     description="Localisation", source_excerpt="Seed POPIA", confidence=0.85, enabled=True),
+                dict(code="PR-005", kind="RISK_TIER_CAP", target="high risk", operator=">=", threshold=0.8, severity="REVIEW",
+                     description="Risk cap", source_excerpt="Seed risk", confidence=0.88, enabled=True),
+            ]:
                 db.add(PolicyRule(pack_id=pack.id, **r))
-            pack.rule_count = len(rules)
-            db.commit()
-            pe.invalidate()
-            print(f"[bootstrap] seeded ACTIVE policy pack id={pack.id} rules={len(rules)}")
+            pack.rule_count = 5; db.commit(); pe.invalidate()
         elif pack.status != "ACTIVE":
-            pack.status = "ACTIVE"
-            pack.activated_at = datetime.now(timezone.utc)
-            db.commit()
-            pe.invalidate()
-            print(f"[bootstrap] re-activated demo policy pack id={pack.id}")
+            pack.status = "ACTIVE"; pack.activated_at = datetime.now(timezone.utc); db.commit(); pe.invalidate()
     finally:
         db.close()
 
 
 def _ensure_client_kb_demo_seed():
-    """Neon-light client corpus samples + optional client login for Company Knowledge demo.
-
-    Does NOT import Google Drive (11GB). Drive stays external; Neon only holds short text
-    extracts so grounded ask is demonstrable under ≤500MB. Idempotent.
-    """
     import hashlib
     from sqlalchemy import select, func
     from app.db.session import SessionLocal
     from app.db.models import Tenant, ClientKBDoc, User
     from app.core.security import hash_password
-
     samples = [
-        {
-            "title": "UDOC Capstone · Leave SOP extract",
-            "category": "SOP",
-            "text": (
-                "Company leave policy extract for Capstone demonstration. "
-                "Employees must submit leave requests at least five working days in advance "
-                "except for medical emergencies. Annual leave accrues at 1.25 days per month. "
-                "Managers approve or decline within three working days. "
-                "This text lives in Neon as a short extract only. The full portfolio remains on Google Drive."
-            ),
-        },
-        {
-            "title": "UDOC Capstone · POPIA automated decision note",
-            "category": "POLICY",
-            "text": (
-                "POPIA section 71 note for Capstone. Where a decision with legal or significant effect "
-                "is based solely on automated processing, the responsible party must implement appropriate "
-                "safeguards including meaningful human intervention on request. "
-                "UDOC enforces this via EVA, policy-to-code, and HITL on BLOCK — not via a client LLM override."
-            ),
-        },
+        {"title": "UDOC Capstone · Leave SOP extract", "category": "SOP",
+         "text": "Company leave policy extract for Capstone demonstration. Employees must submit leave requests at least five working days in advance except for medical emergencies. Annual leave accrues at 1.25 days per month. Managers approve or decline within three working days."},
+        {"title": "UDOC Capstone · POPIA automated decision note", "category": "POLICY",
+         "text": "POPIA section 71 note for Capstone. Where a decision with legal or significant effect is based solely on automated processing, the responsible party must implement appropriate safeguards including meaningful human intervention on request."},
     ]
-
     db = SessionLocal()
     try:
         tenants = db.execute(select(Tenant).where(Tenant.status == "ACTIVE").order_by(Tenant.id)).scalars().all()
         if not tenants:
-            print("[bootstrap] client kb seed skipped — no ACTIVE tenants")
             return
-
         for t in tenants[:3]:
-            existing = db.execute(
-                select(func.count()).select_from(ClientKBDoc).where(
-                    ClientKBDoc.tenant_pk == t.id,
-                    ClientKBDoc.source == "seed://udoc-client-kb",
-                )
-            ).scalar() or 0
-            if existing >= len(samples):
-                continue
             for s in samples:
                 title = f"{s['title']} · {t.tenant_id}"
-                if db.execute(
-                    select(ClientKBDoc).where(
-                        ClientKBDoc.tenant_pk == t.id,
-                        ClientKBDoc.title == title,
-                    )
-                ).scalar_one_or_none():
+                if db.execute(select(ClientKBDoc).where(ClientKBDoc.tenant_pk == t.id, ClientKBDoc.title == title)).scalar_one_or_none():
                     continue
                 body = s["text"]
-                db.add(ClientKBDoc(
-                    tenant_pk=t.id,
-                    title=title,
-                    source="seed://udoc-client-kb",
-                    category=s["category"],
-                    sha256=hashlib.sha256(body.encode()).hexdigest(),
-                    content_text=body,
-                    char_len=len(body),
-                    tags="capstone seed neon-light",
-                    added_by="system",
-                    active=True,
-                ))
+                db.add(ClientKBDoc(tenant_pk=t.id, title=title, source="seed://udoc-client-kb", category=s["category"],
+                                   sha256=hashlib.sha256(body.encode()).hexdigest(), content_text=body, char_len=len(body),
+                                   tags="capstone seed", added_by="system", active=True))
             db.commit()
-            print(f"[bootstrap] client kb samples for tenant {t.tenant_id} (pk={t.id})")
-
         demo_email = os.environ.get("UDOC_CLIENT_DEMO_EMAIL", "client@udoc.demo")
         demo_pw = os.environ.get("UDOC_CLIENT_DEMO_PASSWORD", "client123")
         u = db.execute(select(User).where(User.email == demo_email)).scalar_one_or_none()
         primary = tenants[0]
         if not u:
-            db.add(User(
-                email=demo_email,
-                password_hash=hash_password(demo_pw),
-                role="client",
-                division="UDOC",
-                tenant_id=primary.tenant_id,
-                tenant_pk=primary.id,
-                active=True,
-            ))
+            db.add(User(email=demo_email, password_hash=hash_password(demo_pw), role="client", division="UDOC",
+                        tenant_id=primary.tenant_id, tenant_pk=primary.id, active=True))
             db.commit()
-            print(f"[bootstrap] client demo user {demo_email} → tenant {primary.tenant_id}")
         elif not u.tenant_pk:
-            u.role = "client"
-            u.tenant_id = primary.tenant_id
-            u.tenant_pk = primary.id
-            db.commit()
-            print(f"[bootstrap] linked {demo_email} to tenant {primary.tenant_id}")
+            u.role = "client"; u.tenant_id = primary.tenant_id; u.tenant_pk = primary.id; db.commit()
     finally:
         db.close()
 
@@ -321,20 +217,24 @@ def portals_console():
     return FileResponse(_static("portals.html"))
 
 
+@app.get("/eif-ui", tags=["root"], include_in_schema=False)
+def eif_ui():
+    """EIF Diamond assurance console (staff token from Sentinel login)."""
+    return FileResponse(_static("eif.html"))
+
+
 @app.get("/Sentinel", tags=["root"], include_in_schema=False)
 @app.get("/sentinel", tags=["root"], include_in_schema=False)
 def sentinel_console():
-    """Client SaaS runtime: EVA evaluate + policy-to-code + conformance (pre-registration path)."""
     return FileResponse(_static("sentinel.html"))
 
 
 @app.get("/", tags=["root"])
 def root():
-    return {"system": "G.O.D.S Platform Core", "status": "live",
-            "environment": settings.environment,
+    return {"system": "G.O.D.S Platform Core", "status": "live", "environment": settings.environment,
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
-            "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin",
-                         "portals": "/portals", "sentinel": "/Sentinel"},
+            "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "portals": "/portals",
+                         "sentinel": "/Sentinel", "eif": "/eif-ui"},
             "governance": "EVA 6-D + policy-to-code + conformance, fail-closed for critical"}
 
 
