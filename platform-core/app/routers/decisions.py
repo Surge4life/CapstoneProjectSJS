@@ -219,3 +219,133 @@ def verify_certificate(cid: str, db: Session = Depends(get_db), _: dict = Depend
             "issued_at": c.issued_at.isoformat(),
             "sector": getattr(c, "sector", "GENERAL"),
             "frameworks_cited": json.loads(getattr(c, "frameworks_cited", None) or "[]")}
+
+
+# ── Multi-option EVA runtime (Task 2) ─────────────────────────────────────────
+# Named scenario packs for Full EVA matrix / Client batch / assessor smoke.
+# Same non-bypassable path as POST /decisions — sequential live evaluations.
+
+_SCENARIO_PRESETS = {
+    "fair": {
+        "raw_confidence": 0.94, "compliance": 1.0,
+        "priv_favorable": 480, "priv_total": 1000,
+        "unpriv_favorable": 470, "unpriv_total": 1000,
+        "bgp": 1.0, "traceroute": 1.0, "dnssec": 1.0, "storage": 1.0,
+    },
+    "biased": {
+        "raw_confidence": 0.88, "compliance": 0.95,
+        "priv_favorable": 900, "priv_total": 1000,
+        "unpriv_favorable": 120, "unpriv_total": 1000,
+        "bgp": 1.0, "traceroute": 1.0, "dnssec": 1.0, "storage": 1.0,
+    },
+    "high": {
+        "raw_confidence": 0.70, "compliance": 0.85, "risk_tier": "HIGH",
+        "priv_favorable": 480, "priv_total": 1000,
+        "unpriv_favorable": 470, "unpriv_total": 1000,
+        "bgp": 1.0, "traceroute": 1.0, "dnssec": 1.0, "storage": 1.0,
+    },
+    "sov": {
+        "raw_confidence": 0.90, "compliance": 1.0,
+        "priv_favorable": 480, "priv_total": 1000,
+        "unpriv_favorable": 470, "unpriv_total": 1000,
+        "bgp": 0.4, "traceroute": 0.5, "dnssec": 0.6, "storage": 0.7,
+    },
+}
+
+
+class BatchItem(BaseModel):
+    option: str  # fair | biased | high | sov | custom
+    model_id: str = "model-001"
+    risk_tier: str | None = None
+    raw_confidence: float | None = None
+    compliance: float | None = None
+    priv_favorable: int | None = None
+    priv_total: int | None = None
+    unpriv_favorable: int | None = None
+    unpriv_total: int | None = None
+    bgp: float | None = None
+    traceroute: float | None = None
+    dnssec: float | None = None
+    storage: float | None = None
+
+
+class BatchRequest(BaseModel):
+    options: list[str] | None = None
+    items: list[BatchItem] | None = None
+    model_id: str = "model-001"
+
+
+@router.post("/batch")
+def decide_batch(req: BatchRequest, db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Run multiple EVA options sequentially on the same non-bypassable path.
+
+    Default pack: fair · biased · high · sov (Capstone Full EVA matrix).
+    Each row is a live decision — not simulated scores.
+    """
+    items: list[BatchItem] = []
+    if req.items:
+        items = req.items
+    else:
+        names = req.options or ["fair", "biased", "high", "sov"]
+        for name in names:
+            items.append(BatchItem(option=name, model_id=req.model_id))
+
+    results = []
+    counts = {"APPROVE": 0, "BLOCK": 0, "ESCALATE": 0, "OTHER": 0, "ERROR": 0}
+    for it in items[:12]:
+        name = (it.option or "custom").lower().strip()
+        preset = dict(_SCENARIO_PRESETS.get(name, {}))
+        body = {
+            "model_id": it.model_id or req.model_id or "model-001",
+            "raw_confidence": it.raw_confidence if it.raw_confidence is not None else preset.get("raw_confidence", 0.9),
+            "compliance": it.compliance if it.compliance is not None else preset.get("compliance", 1.0),
+            "priv_favorable": it.priv_favorable if it.priv_favorable is not None else preset.get("priv_favorable", 480),
+            "priv_total": it.priv_total if it.priv_total is not None else preset.get("priv_total", 1000),
+            "unpriv_favorable": it.unpriv_favorable if it.unpriv_favorable is not None else preset.get("unpriv_favorable", 470),
+            "unpriv_total": it.unpriv_total if it.unpriv_total is not None else preset.get("unpriv_total", 1000),
+            "ecs": preset.get("ecs", 0.75),
+            "bgp": it.bgp if it.bgp is not None else preset.get("bgp", 1.0),
+            "traceroute": it.traceroute if it.traceroute is not None else preset.get("traceroute", 1.0),
+            "dnssec": it.dnssec if it.dnssec is not None else preset.get("dnssec", 1.0),
+            "storage": it.storage if it.storage is not None else preset.get("storage", 1.0),
+        }
+        if it.risk_tier or preset.get("risk_tier"):
+            body["risk_tier"] = it.risk_tier or preset.get("risk_tier")
+        try:
+            out = _decide_inner(DecisionReq(**body), db, user)
+            dec = str(out.get("decision") or "OTHER").upper()
+            if dec in counts:
+                counts[dec] += 1
+            else:
+                counts["OTHER"] += 1
+            results.append({
+                "option": name,
+                "ok": True,
+                "decision": out.get("decision"),
+                "composite_eva": out.get("composite_eva"),
+                "policy_enforced": out.get("policy_enforced"),
+                "block_reasons": (out.get("block_reasons") or [])[:4],
+                "certificate_id": out.get("certificate_id"),
+                "id": out.get("id"),
+                "dimensions": out.get("dimensions"),
+            })
+        except HTTPException as he:
+            counts["ERROR"] += 1
+            results.append({"option": name, "ok": False, "decision": None,
+                            "error": he.detail if isinstance(he.detail, str) else str(he.detail)})
+        except Exception as e:
+            counts["ERROR"] += 1
+            results.append({"option": name, "ok": False, "decision": None, "error": str(e)[:200]})
+
+    return {
+        "matrix": "UDOC EVA multi-option runtime",
+        "model_id": req.model_id,
+        "count": len(results),
+        "outcomes": counts,
+        "results": results,
+        "gate": {
+            "fair_neq_block": any(r.get("option") == "fair" and r.get("decision") != "BLOCK" for r in results),
+            "biased_eq_block": any(r.get("option") == "biased" and r.get("decision") == "BLOCK" for r in results),
+        },
+        "note": "Live sequential decisions · same path as POST /decisions · model-001 protected from permanent high-risk BLOCKED",
+    }
