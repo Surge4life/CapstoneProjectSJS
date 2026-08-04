@@ -225,6 +225,13 @@ def portals_console():
     return FileResponse(_static("portals.html"))
 
 
+@app.get("/divisions", tags=["root"], include_in_schema=False)
+@app.get("/divisions/", tags=["root"], include_in_schema=False)
+def divisions_console():
+    """GODS Holdings division live truth — SETHS / MADIBA / TS / UDOC / GIS metrics from Core APIs (zeros honest)."""
+    return FileResponse(_static("divisions.html"))
+
+
 @app.get("/eif-ui", tags=["root"], include_in_schema=False)
 def eif_ui():
     """EIF Diamond assurance console (staff token from Sentinel login)."""
@@ -242,8 +249,8 @@ def root():
     return {"system": "G.O.D.S Platform Core", "status": "live", "environment": settings.environment,
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
             "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "udoc_admin_alias": "/udoc_admin",
-                         "portals": "/portals", "sentinel": "/Sentinel", "eif": "/eif-ui",
-                         "note": "Filename udoc_admin_v93.html · URL hyphen preferred · underscore aliased"},
+                         "portals": "/portals", "divisions": "/divisions", "sentinel": "/Sentinel", "eif": "/eif-ui",
+                         "note": "Division metrics: /divisions live truth (zeros honest). Admin HTML may still carry static narrative copy."},
             "governance": "EVA 6-D + policy-to-code + conformance, fail-closed for critical"}
 
 
