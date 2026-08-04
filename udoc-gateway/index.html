@@ -48,6 +48,8 @@ a.surf.pub{border-color:rgba(16,185,129,.35)}
       <a class="surf int" href="https://gods-platform-core.onrender.com/admin" target="_blank" rel="noopener"><b>Core /admin</b>constitutional</a>
       <a class="surf int" href="https://gods-udoc-operator.onrender.com/" target="_blank" rel="noopener"><b>Operator</b>workspace</a>
       <a class="surf int" href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noopener"><b>Sentinel</b>EVA smoke</a>
+      <a class="surf int" href="https://gods-platform-core.onrender.com/divisions" target="_blank" rel="noopener"><b>Divisions</b>SETHS·MADIBA·TS live</a>
+      <a class="surf int" href="https://gods-platform-core.onrender.com/portals" target="_blank" rel="noopener"><b>Core Portals</b>24 profiles</a>
       <a class="surf int" href="https://gods-udoc-sector.onrender.com/" target="_blank" rel="noopener"><b>Sector</b>public/private</a>
     </div>
   </div>
@@ -65,7 +67,7 @@ a.surf.pub{border-color:rgba(16,185,129,.35)}
       <a class="surf pub" href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener"><b>Citizen</b>AI Rights</a>
     </div>
   </div>
-  <p class="note">Filename on disk: udoc_admin_v93.html · URL canonical: /udoc-admin (hyphen). Underscore path aliased. gods-udoc-admin host is separate denser package.</p>
+  <p class="note"><b>Holdings truth:</b> <a href="https://gods-platform-core.onrender.com/divisions" style="color:var(--cyan)">/divisions</a> = live API metrics (zeros allowed). Admin static KPIs are narrative only. Filename on disk: udoc_admin_v93.html · URL canonical: /udoc-admin (hyphen).</p>
 </div>
 <script>
 const CORE="https://gods-platform-core.onrender.com";
@@ -87,7 +89,7 @@ async function doLogin(){
     const d=await r.json();
     const role=(d.role||"").toLowerCase();
     let dest=PKG.operator;
-    if(role==="admin"||role==="exec"||role==="auditor") dest=PKG.adminCore; // prefer Core path that always serves SPA
+    if(role==="admin"||role==="exec"||role==="auditor") dest=PKG.adminCore;
     else if(role==="gov") dest=PKG.sector;
     else if(role==="client") dest=PKG.client;
     const tok=d.access_token||"";
