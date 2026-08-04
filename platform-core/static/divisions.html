@@ -1,1 +1,159 @@
-PLACEHOLDER_DIV
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · Divisions · Internal Portal Stack</title>
+<style>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--warn:#E8A13A;--udoc:#7C5CBF;--green:#10B981}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}
+a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
+.wrap{max-width:1140px;margin:0 auto;padding:16px 18px 40px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input,select{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px}
+button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+button.cyan{background:rgba(0,194,212,.15);color:var(--cyan);border:1px solid rgba(0,194,212,.4)}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.4)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.tabs button{background:transparent;color:var(--mut);border:1px solid var(--line)}
+.tabs button.on{color:var(--gold);border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.card.seths{border-top:3px solid var(--cyan)}.card.madiba{border-top:3px solid var(--gold)}.card.ts{border-top:3px solid var(--green)}.card.udoc{border-top:3px solid var(--udoc)}.card.gis{border-top:3px solid #6366F1}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.kv span:first-child{color:var(--mut)}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:15px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row .f{flex:1;min-width:140px}.row .f label{display:block;font-size:11px;color:var(--mut);margin-bottom:4px}
+.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#9fb4dd;min-height:100px;max-height:240px;overflow:auto;white-space:pre-wrap;margin-top:10px}
+.banner{background:rgba(45,155,90,.1);border:1px solid rgba(45,155,90,.35);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+.zero{color:var(--warn)}.live{color:#7fe3ab}.err{color:var(--bad)}.mut{color:var(--mut)}
+.note{font-size:12px;color:var(--mut);margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.side{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}@media(max-width:900px){.side{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--mut);font-size:11px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">G.O.D.S · <b>Divisions Portal Stack</b></span>
+  <span class="tag ok">LIVE TRUTH · zeros allowed</span>
+  <span class="tag">Internal · Capstone</span>
+  <span style="flex:1"></span>
+  <a class="nav" href="/portals">24 Portals</a>
+  <a class="nav" href="/udoc-admin">UDOC Admin</a>
+  <a class="nav" href="/admin">GODS Admin</a>
+  <a class="nav" href="/Sentinel">Sentinel</a>
+</header>
+<div class="wrap">
+  <div class="banner"><b>Honesty:</b> MADIBA is demo ledger only (not AUM). Empty = <span class="zero">0</span>. Preload from Portals via shared token.</div>
+  <div class="bar" id="login">
+    <input id="api" placeholder="API (blank = same origin)" style="width:200px"/>
+    <input id="email" value="admin@gods.local" style="width:170px"/>
+    <input id="pass" type="password" value="admin123" style="width:110px" onkeydown="if(event.key==='Enter')connect()"/>
+    <button type="button" onclick="connect()">Connect</button>
+    <button class="cyan" type="button" onclick="document.getElementById('email').value='admin@gods.local';document.getElementById('pass').value='admin123';connect()">GODS Admin</button>
+    <span id="who" class="mut"></span>
+  </div>
+  <div id="app" class="hidden">
+    <div class="tabs" id="tabs">
+      <button type="button" class="on" data-t="overview" onclick="tab(this,'overview')">Overview</button>
+      <button type="button" data-t="seths" onclick="tab(this,'seths')">SETHS</button>
+      <button type="button" data-t="madiba" onclick="tab(this,'madiba')">MADIBA</button>
+      <button type="button" data-t="ts" onclick="tab(this,'ts')">T.S.</button>
+      <button type="button" data-t="udoc" onclick="tab(this,'udoc')">UDOC</button>
+      <button type="button" data-t="gis" onclick="tab(this,'gis')">GIS / GBS</button>
+      <button type="button" data-t="portals" onclick="tab(this,'portals')">Portals bridge</button>
+    </div>
+    <div id="v-overview"></div>
+    <div id="v-seths" class="hidden"></div>
+    <div id="v-madiba" class="hidden"></div>
+    <div id="v-ts" class="hidden"></div>
+    <div id="v-udoc" class="hidden"></div>
+    <div id="v-gis" class="hidden"></div>
+    <div id="v-portals" class="hidden"></div>
+  </div>
+  <div class="note" id="foot">Preloaded: admin@gods.local / admin123 · or open from Portals after GODS Admin sign-in.</div>
+</div>
+<script>
+let API="", TOK="";
+function _ls(){ try{ return localStorage; }catch(e){ return null; } }
+const $=id=>document.getElementById(id);
+const esc=s=>{const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;};
+function num(v){ if(v==null||v==="") return "—"; const n=Number(v); if(Number.isFinite(n)) return n===0?'<span class="zero">0</span>':esc(String(n)); return esc(v); }
+function term(line){ const t=$("term"); if(!t) return; const ts=new Date().toISOString().slice(11,19); t.textContent="["+ts+"] "+line+"\n"+t.textContent.split("\n").slice(0,40).join("\n"); }
+async function api(path, opts={}){
+  const h=Object.assign({}, opts.headers||{}); if(TOK) h.Authorization="Bearer "+TOK;
+  const r=await fetch(API+path, Object.assign({}, opts, {headers:h}));
+  const body=(r.headers.get("content-type")||"").includes("json")?await r.json().catch(()=>({})):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail&&(typeof body.detail==="string"?body.detail:JSON.stringify(body.detail)))||("HTTP "+r.status));
+  return body;
+}
+async function safe(path, opts){ try{ return await api(path, opts); }catch(e){ return {_err:e.message}; } }
+async function connect(){
+  API=($("api").value||"").trim().replace(/\/$/,""); if(!API) API=location.origin;
+  try{
+    const b=new URLSearchParams({username:$("email").value.trim(),password:$("pass").value});
+    const r=await fetch(API+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:b});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.access_token) throw new Error("login failed");
+    TOK=d.access_token;
+    try{ localStorage.setItem("gods_tok",TOK); localStorage.setItem("gods_email",$("email").value); localStorage.setItem("gods_api",API); }catch(e){}
+    $("who").innerHTML='<span class="live">'+esc($("email").value)+" · "+esc(d.role||"")+"</span>";
+    $("app").classList.remove("hidden"); await refreshAll();
+  }catch(e){ $("who").innerHTML='<span class="err">'+esc(e.message)+'</span>'; }
+}
+function tab(el, name){ ["overview","seths","madiba","ts","udoc","gis","portals"].forEach(n=>{ const p=$("v-"+n); if(p) p.classList.toggle("hidden", n!==name); }); document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on", b.dataset.t===name)); if(el) el.classList.add("on"); }
+function card(cls, title, rows, note){ return '<div class="card '+cls+'"><h3>'+esc(title)+'</h3>'+rows.map(([k,v])=>'<div class="kv"><span>'+esc(k)+'</span><span>'+v+'</span></div>').join("")+(note?'<div class="mut" style="margin-top:8px;font-size:12px">'+note+'</div>':'')+'</div>'; }
+async function refreshAll(){ $("foot").textContent="Loading…"; await Promise.all([renderOverview(),renderSeths(),renderMadiba(),renderTs(),renderUdoc(),renderGis(),renderPortals()]); $("foot").textContent="Pulled "+new Date().toISOString(); }
+async function renderOverview(){
+  const [aS,mM,aT,reg,demo]=await Promise.all([safe("/analytics/SETHS/kpis"),safe("/madiba/metrics"),safe("/analytics/TS/kpis"),safe("/udoc/regulator/summary"),safe("/udoc/demo/ready")]);
+  $("v-overview").innerHTML='<div class="grid">'+card("seths","SETHS",[["Enrolled",num(aS.enrolled)],["Placed",num(aS.placed)]])+card("madiba","MADIBA ledger",[["Cycles",num(mM.cycles)],["Inflow",num(mM.total_inflow)],["Recycled",num(mM.cumulative_recycled)]],esc(mM.honesty||"ledger_only"))+card("ts","T.S.",[["Revenue",num(aT.total_revenue)],["Workers",num(aT.workers_absorbed)]])+card("udoc","UDOC",[["Ready",demo.ready?'<span class="live">true</span>':'false'],["Decisions",num(reg.decisions&&reg.decisions.total)]])+'</div><div class="panel"><button class="cyan" type="button" onclick="refreshAll()">Refresh</button></div>';
+}
+async function renderSeths(){
+  const m=await safe("/seths/metrics");
+  $("v-seths").innerHTML='<div class="side"><div><div class="panel"><h3>SETHS</h3><div class="grid">'+card("seths","Learners",[["Total",num(m.total)],["Placed",num(m.placed)]])+'</div></div><div class="panel"><h3>Enrol</h3><div class="row"><div class="f"><label>Qualification</label><input id="se-q" value="Digital Operations & AI Literacy"/></div><div class="f"><label>Count</label><input id="se-c" type="number" value="1"/></div><button type="button" onclick="sethEnrol()">Enrol</button></div><div class="row" style="margin-top:8px"><div class="f"><label>Ref</label><input id="se-ref" placeholder="SETHS-…"/></div><button class="cyan" type="button" onclick="sethAdvance()">Advance</button></div></div></div><div><div class="panel"><h3>Terminal</h3><div class="term" id="term">SETHS ready.</div></div></div></div>';
+}
+async function sethEnrol(){ try{ const body={qualification:$("se-q").value,nqf_level:5,count:parseInt($("se-c").value,10)||1}; term("POST /seths/enrol"); const r=await api("/seths/enrol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); term("✓ "+(r.refs||[]).join(", ")); if(r.refs&&r.refs[0]) $("se-ref").value=r.refs[0]; await renderSeths(); await renderOverview(); }catch(e){ term("✗ "+e.message); } }
+async function sethAdvance(){ const ref=($("se-ref").value||"").trim(); if(!ref) return; try{ const r=await api("/seths/"+encodeURIComponent(ref)+"/advance",{method:"POST"}); term("✓ "+r.ref+" → "+r.status); await renderSeths(); await renderOverview(); }catch(e){ term("✗ "+e.message); } }
+async function renderMadiba(){
+  const m=await safe("/madiba/metrics");
+  $("v-madiba").innerHTML='<div class="side"><div><div class="panel"><h3>MADIBA · demo ledger (not AUM)</h3><p class="mut" style="font-size:12px">'+esc(m.honesty||"ledger_only")+'</p><div class="grid">'+card("madiba","Ledger",[["Cycles",num(m.cycles)],["Inflow",num(m.total_inflow)],["Recycled",num(m.cumulative_recycled)]])+'</div></div><div class="panel"><h3>Allocate / Reset</h3><div class="row"><div class="f"><label>Month</label><input id="ma-m" type="number" value="8"/></div><div class="f"><label>Inflow R</label><input id="ma-i" type="number" value="100000"/></div><button type="button" onclick="madAllocate()">Allocate</button><button class="ghost" type="button" onclick="madReset()">Reset → 0</button></div></div></div><div><div class="panel"><h3>Terminal</h3><div class="term" id="term">MADIBA ready.</div></div></div></div>';
+}
+async function madAllocate(){ try{ const body={month:parseInt($("ma-m").value,10)||1,total_inflow:parseFloat($("ma-i").value)||0}; const r=await api("/madiba/allocate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); term("✓ recycled "+r.recycled_to_seths); await renderMadiba(); await renderOverview(); }catch(e){ term("✗ "+e.message); } }
+async function madReset(){ if(!confirm("Clear MADIBA ledger?")) return; try{ const r=await api("/madiba/reset-ledger",{method:"POST"}); term("✓ cleared "+r.cleared_cycles); await renderMadiba(); await renderOverview(); }catch(e){ term("✗ "+e.message); } }
+async function renderTs(){
+  const [m,proj,subs]=await Promise.all([safe("/ts/metrics"),safe("/ts/projects"),safe("/ts/subsidiaries")]);
+  const list=Array.isArray(proj)?proj:[]; const subList=(subs.subsidiaries||[]).map(s=>'<option>'+esc(s)+'</option>').join("")||'<option>ENERGY</option>';
+  $("v-ts").innerHTML='<div class="side"><div><div class="panel"><h3>T.S.</h3><div class="grid">'+card("ts","Pipeline",[["Projects",num(m.projects)],["Workers",num(m.workers_absorbed)]])+'</div>'+(list.length?'<table><thead><tr><th>SPV</th><th>Name</th></tr></thead><tbody>'+list.map(p=>'<tr><td>'+esc(p.spv_id)+'</td><td>'+esc(p.name)+'</td></tr>').join("")+'</tbody></table>':'<p class="mut"><span class="zero">0 projects</span></p>')+'</div><div class="panel"><h3>Deploy</h3><div class="row"><div class="f"><label>Name</label><input id="ts-n" value="Capstone Demo SPV"/></div><div class="f"><label>Sector</label><input id="ts-s" value="ENERGY"/></div><div class="f"><label>Sub</label><select id="ts-sub">'+subList+'</select></div><button type="button" onclick="tsDeploy()">Deploy</button></div></div></div><div><div class="panel"><h3>Terminal</h3><div class="term" id="term">TS ready.</div></div></div></div>';
+}
+async function tsDeploy(){ try{ const body={name:$("ts-n").value,sector:$("ts-s").value,subsidiary:$("ts-sub").value,equity_pct:0.3,workers_deployed:0,monthly_revenue:0,operating_margin:0.3}; const r=await api("/ts/projects",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); term("✓ "+r.spv_id); await renderTs(); await renderOverview(); }catch(e){ term("✗ "+e.message); } }
+async function renderUdoc(){
+  const [reg,demo]=await Promise.all([safe("/udoc/regulator/summary"),safe("/udoc/demo/ready")]);
+  $("v-udoc").innerHTML='<div class="panel"><h3>UDOC</h3><div class="grid">'+card("udoc","Demo",[["Ready",demo.ready?'<span class="live">true</span>':'false']])+card("udoc","Regulator",[["Decisions",num(reg.decisions&&reg.decisions.total)],["Blocked",num(reg.decisions&&reg.decisions.blocked)]])+'</div><div class="row" style="margin-top:10px"><button class="cyan" type="button" onclick="window.open(API+\'/Sentinel\',\'_blank\')">Sentinel</button><button class="green" type="button" onclick="udocBatch()">fair/biased</button></div><div class="term" id="term">UDOC ready.</div></div>';
+}
+async function udocBatch(){ try{ const r=await api("/decisions/batch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({options:["fair","biased"],model_id:"model-001"})}); term("✓ "+JSON.stringify(r.outcomes||{})); }catch(e){ term("✗ "+e.message); } }
+async function renderGis(){ const [pill,nodes]=await Promise.all([safe("/gis/gbs/pillars"),safe("/gis/gbs/nodes")]); const pc=pill.constitutional_pillars?pill.constitutional_pillars.length:0; const nl=Array.isArray(nodes)?nodes.length:0; $("v-gis").innerHTML='<div class="panel"><h3>GIS/GBS</h3><div class="grid">'+card("gis","Layer",[["Pillars",num(pc)],["Nodes",num(nl)]])+'</div><div class="term" id="term">GIS ready.</div></div>'; }
+async function renderPortals(){ $("v-portals").innerHTML='<div class="panel"><h3>Portals bridge</h3><button class="cyan" type="button" onclick="window.open(API+\'/portals\',\'_blank\')">Open /portals</button><div class="term" id="term">Bridge ready.</div></div>'; }
+async function tryPreload(){
+  const ls=_ls(); if(!ls) return;
+  const t=ls.getItem("gods_tok"); if(!t) return;
+  TOK=t; const e=ls.getItem("gods_email")||""; const a=ls.getItem("gods_api")||"";
+  if(a && a!==location.origin){ API=a; const ai=$("api"); if(ai) ai.value=a; } else API=location.origin;
+  const em=$("email"); if(em&&e) em.value=e;
+  const who=$("who"); const app=$("app");
+  if(who) who.innerHTML='<span class="live">preloaded · '+esc(e||"token")+'</span>';
+  if(app) app.classList.remove("hidden");
+  try{ await refreshAll(); }catch(err){ if(who) who.innerHTML='<span class="err">preload expired — Connect</span>'; TOK=""; }
+}
+tryPreload();
+</script>
+</body>
+</html>
