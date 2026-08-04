@@ -1,46 +1,46 @@
-# Task 2 · Operator smoke gate (surfaces 1–5)
+# Task 2 · Operator smoke (surfaces 1–5)
 
-**Updated:** 2026-08-03 09:45 SAST  
-**Core:** https://gods-platform-core.onrender.com · deploy includes `006df18b` (Sentinel bootstrap)
+**Updated:** 2026-08-04 · Core automation green
 
-## UI restore note
+## Before UI checks
 
-`sentinel.html` and `app-client.js` were briefly corrupted to placeholders. They now **bootstrap** the last-good files from commit `cdfb7e1d` (CORS `*`). Client also loads `client-batch-overlay.js` for `/decisions/batch`.
+1. Open `https://gods-platform-core.onrender.com/health` (wake free tier if cold).
+2. Optional: `GET /udoc/demo/ready` (auth) — should report `ready: true` (auto-heals model-001).
 
-| Surface | After hard-refresh |
-|---------|-------------------|
-| `/Sentinel` | Bootstrap → full EVA Command Centre |
-| Client `app-client.js` | Bootstrap → full Govern + batch |
-| `/eif-ui` | Static EIF Diamond console (no bootstrap needed) |
+## Matrix
 
-## Automation verified (this session)
+### 1 · Sentinel
+- URL: `https://gods-platform-core.onrender.com/Sentinel`
+- Wait for full UI (bootstrap loads last-good page).
+- Run **Smoke** or **Full EVA**.
+- **Pass:** biased → **BLOCK**, fair ≠ BLOCK.
 
-| Check | Result |
-|--------|--------|
-| `GET /health` | ok |
-| `GET /version` | `006df18b` |
-| `GET /eif/health` · `/eif/framework` | live |
-| `GET /eif-ui` | 200 |
-| `GET /Sentinel` | bootstrap HTML (not SEE_FILE) |
-| `model-001` | re-ACTIVE when SUSPENDED |
-| `POST /decisions/batch` fair/biased | APPROVE / BLOCK · gate PASS |
+### 2 · Client
+- URL: Client host (gods-udoc-client).
+- Hard-refresh once.
+- Login `client@udoc.demo` (or operator).
+- **Govern** → Full EVA batch / Biased chip.
+- **Pass:** biased → **BLOCK**.
 
-## Operator matrix (tick live)
+### 3 · Citizen
+- URL: `https://gods-udoc-client.onrender.com/citizen.html`
+- Submit a challenge.
+- **Pass:** receives `case_ref` / status lookup works.
 
-| # | Surface | Actions | Pass if |
-|---|---------|---------|---------|
-| 1 | **Sentinel** | Open `/Sentinel` · wait for full UI · Smoke · Full EVA matrix · optional `/eif-ui` | biased=BLOCK · not SEE_FILE |
-| 2 | **Client** | Hard-refresh · login `client@udoc.demo` · Govern → Full EVA batch | biased=BLOCK |
-| 3 | **Citizen** | Client `/citizen.html` challenge | case_ref |
-| 4 | **Admin** | Hard-refresh ×2 · EVA / Intelligence | biased=BLOCK · intel load |
-| 5 | **Sector** | Full EVA · PUBLIC/PRIVATE | biased=BLOCK |
+### 4 · Admin
+- URL: gods-udoc-admin.
+- Hard-refresh **twice** (SW pwa-v8).
+- Nav **EIF · Diamond** loads framework.
+- **EVA Command** → Full EVA batch.
+- **Pass:** biased → **BLOCK** + EIF panel loads.
 
-## Close Task 2 when
+### 5 · Sector
+- URL: gods-udoc-sector.
+- **Decisions · EVA** → Run Full EVA batch (uses `/decisions/batch` overlay).
+- **Pass:** biased → **BLOCK**.
 
-Operator ticks 1–5 **or** documents with screenshots. Core automation already green.
+## Close
 
-**Task 1** (GBS/Canon V2) stays offline until founder finalizes docs.
+Tick all five or attach screenshots to Capstone evidence pack.
 
-## Honesty
-
-Pixel parity with every Netlify demo is not claimed. Fail-closed EVA + batch + EIF audit + dual Intelligence is the Capstone spine under Neon ≤500MB.
+**Task 1** remains founder GBS/Canon offline track.
