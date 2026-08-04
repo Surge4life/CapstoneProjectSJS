@@ -1,33 +1,50 @@
-# Task 2 status — 2026-08-04
+# Task 2 status — 2026-08-04 (later session)
 
-**Operator:** Render + GitHub verified working.
+**Operator:** Render + GitHub verified OK.
 
-## Core automation
+## Core automation (re-verified)
 
 | Check | Result |
 |--------|--------|
-| Deploy | `041ddd18`+ |
 | `/health` | ok |
 | `/udoc/demo/ready` | **true** · auto-heal SUSPENDED→ACTIVE |
 | `/decisions/batch` gate | **PASS** |
-| `/eif` | live |
-| Admin SW | pwa-v8 + EIF · Diamond |
-| Sector | `sector-batch-overlay.js` wired in `index.html` (commit `116989f7`) |
+| EIF | live |
+| Admin | pwa-v8 + EIF · Diamond |
+| Sector | overlay wired (`116989f7`) |
 
-## Surfaces 1–5
+## UI recovery posture
 
-| # | Surface | Live path |
-|---|---------|-----------|
-| 1 | Sentinel | Core `/Sentinel` (bootstrap → full UI) |
-| 2 | Client | Govern + batch overlay |
-| 3 | Citizen | Client `/citizen.html` |
-| 4 | Admin | EIF · Diamond + EVA batch |
-| 5 | Sector | Decisions · Full EVA → `/decisions/batch` |
+| File | Live approach |
+|------|----------------|
+| `sentinel.html` | Bootstrap → loads `cdfb7e1d` full page |
+| `app-client.js` | Bootstrap → `cdfb7e1d` + `client-batch-overlay.js` |
 
-**Close Task 2** when biased=BLOCK confirmed on 1–5 (or screenshots).
+**Permanent full embeds** (replace bootstrap) should be done **from your PC** with local git so large files are not truncated:
 
-**Task 1** = offline GBS V2 / Canon finalize (founder).
+```bash
+# from repo root, with artifacts or last-good trees
+cp path/to/sentinel_EIF_BATCH.html platform-core/static/sentinel.html
+cp path/to/app-client_BATCH.js udoc-public/app-client.js
+git add platform-core/static/sentinel.html udoc-public/app-client.js
+git commit -m "fix(ui): permanent Sentinel + Client embeds"
+git push origin main
+```
+
+Do **not** push PLACEHOLDER text via partial tool writes.
+
+## Surfaces 1–5 — close Task 2
+
+| # | Surface | Pass if |
+|---|---------|---------|
+| 1 | Sentinel | biased=BLOCK |
+| 2 | Client | biased=BLOCK |
+| 3 | Citizen | case_ref |
+| 4 | Admin | biased=BLOCK + EIF nav |
+| 5 | Sector | biased=BLOCK |
+
+**Task 1** = GBS V2 / Canon offline finalize (founder).
 
 ## Honesty
 
-Bootstrap loaders remain on Sentinel/Client until permanent full-file embeds. Capstone smoke path auto-heals demo seed. Neon ≤500MB · no new registration.
+Automation gate is green. Bootstrap is intentional recovery, not demo pixel claim. Neon ≤500MB.
