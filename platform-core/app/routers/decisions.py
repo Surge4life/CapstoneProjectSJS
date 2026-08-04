@@ -34,6 +34,11 @@ class DecisionReq(BaseModel):
     traceroute: float = 1.0
     dnssec: float = 1.0
     storage: float = 1.0
+    sector: str | None = None
+    explainability: float = 0.85
+    audit_trail: float = 0.90
+    inclusion_access: float = 0.85
+    human_oversight_present: bool = True
 
 @router.post("")
 def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends(principal)):
@@ -42,7 +47,6 @@ def decide(req: DecisionReq, db: Session = Depends(get_db), user: dict = Depends
     except HTTPException:
         raise
     except Exception as e:
-        # Capstone honesty: never hide the reason behind a bare "Internal Server Error".
         detail = f"{type(e).__name__}: {e}"
         print(f"[decisions] unhandled: {detail}\n{traceback.format_exc()}")
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail[:400])
@@ -66,12 +70,16 @@ def _decide_inner(req: DecisionReq, db: Session, user: dict):
             raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS,
                                 f"decision quota reached for tier {tenant.tier} ({tenant.decision_quota}/period)")
 
+    sector_key = (req.sector or (tenant.sector if tenant else None) or "GENERAL")
     ev = Evidence(
         model_id=req.model_id, risk_tier=req.risk_tier or model.risk_tier,
         raw_confidence=req.raw_confidence, compliance=req.compliance,
         priv_favorable=req.priv_favorable, priv_total=req.priv_total,
         unpriv_favorable=req.unpriv_favorable, unpriv_total=req.unpriv_total,
         ecs=req.ecs, bgp=req.bgp, traceroute=req.traceroute, dnssec=req.dnssec, storage=req.storage,
+        sector=sector_key,
+        explainability=req.explainability, audit_trail=req.audit_trail,
+        inclusion_access=req.inclusion_access, human_oversight_present=req.human_oversight_present,
     )
     v = evaluate(ev)
     pol = pe.apply(db, ev, model, v)
@@ -99,12 +107,11 @@ def _decide_inner(req: DecisionReq, db: Session, user: dict):
     payload = f"{v.model_id}|{v.composite_eva}|{final_decision}|{issued}|{content_sha3}|{d.id}"
     certificate_id = "EVA-" + hashlib.sha3_256(payload.encode()).hexdigest()[:12].upper()
     merkle_leaf = hashlib.sha3_256((v.seal or payload).encode()).hexdigest()
-    sector_key = (tenant.sector if tenant else "GENERAL") or "GENERAL"
+    sector_key = sector_key or ((tenant.sector if tenant else "GENERAL") or "GENERAL")
     frameworks_cited = [f["name"] for f in sec.get(sector_key)["frameworks"]]
 
     try:
         seal = seal_payload(payload)
-        # seal column is String(128) — truncate only if a future PQC path exceeds width
         if len(seal) > 128:
             seal = seal[:128]
         db.add(EvaCertificate(certificate_id=certificate_id, model_id=v.model_id, tenant_pk=model.tenant_pk,
@@ -167,6 +174,11 @@ def _decide_inner(req: DecisionReq, db: Session, user: dict):
         "policy_enforced": pol["policy_enforced"], "policy_rules_evaluated": pol["rules_evaluated"],
         "policy_findings": pol["fired"],
         "composite_eva": v.composite_eva, "dimensions": v.dimensions,
+        "sector_eva": getattr(v, "sector", sector_key),
+        "scales": getattr(v, "scales", {}),
+        "controllers": getattr(v, "controllers", []),
+        "weights_used": getattr(v, "weights_used", {}),
+        "duty": getattr(v, "duty", ""),
         "validity": v.validity, "reliability": v.reliability, "impact": v.impact,
         "certificate_id": certificate_id, "content_sha3": content_sha3,
         "policy_version": policy_version, "signature_alg": "HMAC-SHA256 (PQC/Dilithium-ref)",
@@ -221,10 +233,6 @@ def verify_certificate(cid: str, db: Session = Depends(get_db), _: dict = Depend
             "frameworks_cited": json.loads(getattr(c, "frameworks_cited", None) or "[]")}
 
 
-# ── Multi-option EVA runtime (Task 2) ─────────────────────────────────────────
-# Named scenario packs for Full EVA matrix / Client batch / assessor smoke.
-# Same non-bypassable path as POST /decisions — sequential live evaluations.
-
 _SCENARIO_PRESETS = {
     "fair": {
         "raw_confidence": 0.94, "compliance": 1.0,
@@ -254,7 +262,7 @@ _SCENARIO_PRESETS = {
 
 
 class BatchItem(BaseModel):
-    option: str  # fair | biased | high | sov | custom
+    option: str
     model_id: str = "model-001"
     risk_tier: str | None = None
     raw_confidence: float | None = None
@@ -267,28 +275,25 @@ class BatchItem(BaseModel):
     traceroute: float | None = None
     dnssec: float | None = None
     storage: float | None = None
+    sector: str | None = None
 
 
 class BatchRequest(BaseModel):
     options: list[str] | None = None
     items: list[BatchItem] | None = None
     model_id: str = "model-001"
+    sector: str | None = None
 
 
 @router.post("/batch")
 def decide_batch(req: BatchRequest, db: Session = Depends(get_db), user: dict = Depends(principal)):
-    """Run multiple EVA options sequentially on the same non-bypassable path.
-
-    Default pack: fair · biased · high · sov (Capstone Full EVA matrix).
-    Each row is a live decision — not simulated scores.
-    """
     items: list[BatchItem] = []
     if req.items:
         items = req.items
     else:
         names = req.options or ["fair", "biased", "high", "sov"]
         for name in names:
-            items.append(BatchItem(option=name, model_id=req.model_id))
+            items.append(BatchItem(option=name, model_id=req.model_id, sector=req.sector))
 
     results = []
     counts = {"APPROVE": 0, "BLOCK": 0, "ESCALATE": 0, "OTHER": 0, "ERROR": 0}
@@ -308,6 +313,7 @@ def decide_batch(req: BatchRequest, db: Session = Depends(get_db), user: dict = 
             "traceroute": it.traceroute if it.traceroute is not None else preset.get("traceroute", 1.0),
             "dnssec": it.dnssec if it.dnssec is not None else preset.get("dnssec", 1.0),
             "storage": it.storage if it.storage is not None else preset.get("storage", 1.0),
+            "sector": it.sector or req.sector,
         }
         if it.risk_tier or preset.get("risk_tier"):
             body["risk_tier"] = it.risk_tier or preset.get("risk_tier")
@@ -328,6 +334,8 @@ def decide_batch(req: BatchRequest, db: Session = Depends(get_db), user: dict = 
                 "certificate_id": out.get("certificate_id"),
                 "id": out.get("id"),
                 "dimensions": out.get("dimensions"),
+                "sector_eva": out.get("sector_eva"),
+                "controllers_fired": [c for c in (out.get("controllers") or []) if c.get("fired")],
             })
         except HTTPException as he:
             counts["ERROR"] += 1
@@ -340,6 +348,7 @@ def decide_batch(req: BatchRequest, db: Session = Depends(get_db), user: dict = 
     return {
         "matrix": "UDOC EVA multi-option runtime",
         "model_id": req.model_id,
+        "sector": req.sector,
         "count": len(results),
         "outcomes": counts,
         "results": results,
@@ -347,5 +356,5 @@ def decide_batch(req: BatchRequest, db: Session = Depends(get_db), user: dict = 
             "fair_neq_block": any(r.get("option") == "fair" and r.get("decision") != "BLOCK" for r in results),
             "biased_eq_block": any(r.get("option") == "biased" and r.get("decision") == "BLOCK" for r in results),
         },
-        "note": "Live sequential decisions · same path as POST /decisions · model-001 protected from permanent high-risk BLOCKED",
+        "note": "Live sequential decisions · multi-sector EVA · model-001 protected from permanent high-risk BLOCKED",
     }
