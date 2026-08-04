@@ -1,1 +1,50 @@
-PLACEHOLDER
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · UDOC Admin</title>
+<meta name="theme-color" content="#0A1628">
+<style>
+:root{--navy:#0A1628;--navy2:#0D1F3C;--gold:#C9A84C;--cyan:#00C2D4;--txt:#EDE7D6;--muted:#8A9BB0;--bd:rgba(201,168,76,.22)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(1000px 500px at 50% -20%,#10224a,var(--navy));color:var(--txt);font-family:system-ui,sans-serif}
+.card{max-width:420px;margin:12vh auto;padding:28px;border:1px solid var(--bd);border-radius:14px;background:linear-gradient(180deg,var(--navy2),var(--navy))}
+h1{color:var(--gold);font-size:22px;margin:0 0 8px}label{display:block;font-size:11px;color:var(--muted);margin:12px 0 4px}
+input{width:100%;padding:10px;border-radius:8px;border:1px solid var(--bd);background:#091022;color:var(--txt)}
+button{margin-top:14px;width:100%;padding:12px;border-radius:8px;border:1px solid var(--gold);background:rgba(201,168,76,.15);color:var(--gold);font-weight:600;cursor:pointer}
+.err{color:#fda4a4;font-size:13px;min-height:18px;margin-top:8px}.note{font-size:12px;color:var(--muted);margin-top:16px}
+a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>G.O.D.S · UDOC Admin</h1>
+  <p style="color:var(--muted);font-size:13px">Internal package · dense mainframe temporarily routed via Core controller (same credentials).</p>
+  <label>Operator email</label>
+  <input id="email" value="admin@gods.local"/>
+  <label>Password</label>
+  <input id="pass" type="password" value="admin123" onkeydown="if(event.key==='Enter')go()"/>
+  <label>API</label>
+  <input id="api" value="https://gods-platform-core.onrender.com"/>
+  <button type="button" onclick="go()">Authenticate → Core /udoc-admin</button>
+  <div class="err" id="err"></div>
+  <p class="note">Full dense Admin SPA is being restored after a script SyntaxError. Core <a href="https://gods-platform-core.onrender.com/udoc-admin">/udoc-admin</a> is the live surface-4 controller (smoke passed).</p>
+</div>
+<script>
+async function go(){
+  const err=document.getElementById("err"); err.textContent="";
+  const api=(document.getElementById("api").value||"").replace(/\/+$/,"");
+  const email=document.getElementById("email").value.trim().toLowerCase();
+  const pass=document.getElementById("pass").value;
+  try{
+    const form=new URLSearchParams({username:email,password:pass});
+    const r=await fetch(api+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+    if(!r.ok) throw new Error(r.status===401?"Invalid credentials":"Login failed "+r.status);
+    const d=await r.json();
+    const q="#sso="+encodeURIComponent(d.access_token)+"&email="+encodeURIComponent(email)+"&role="+encodeURIComponent(d.role||"admin")+"&api="+encodeURIComponent(api);
+    location.href="https://gods-platform-core.onrender.com/udoc-admin"+q;
+  }catch(e){ err.textContent=e.message||String(e); }
+}
+</script>
+</body>
+</html>
