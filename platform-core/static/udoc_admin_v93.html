@@ -53,7 +53,7 @@
     <input id="api" placeholder="API base (blank = same origin)" style="width:240px">
     <input id="email" placeholder="email" value="admin@gods.local" style="width:180px">
     <input id="pass" type="password" placeholder="password" value="admin123" style="width:140px">
-    <button onclick="login()">Connect</button>
+    <button type="button" onclick="login()">Connect</button>
     <span id="who" style="color:var(--mut)"></span>
   </div>
   <div class="tabs" id="tabs"></div>
@@ -76,16 +76,22 @@ async function api(path,opts={}){
   return r.json();
 }
 async function login(){
-  API=$("api").value.trim().replace(/\/$/,"");
+  API=($("api").value||"").trim().replace(/\/$/,"");
+  if(!API) API=location.origin;
+  $("who").textContent="Connecting…";
   try{
-    const b=new URLSearchParams({username:$("email").value,password:$("pass").value});
+    const b=new URLSearchParams({username:$("email").value.trim(),password:$("pass").value});
     const r=await fetch(API+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:b});
-    const d=await r.json(); if(!d.access_token) throw new Error("login failed");
-    TOK=d.access_token; $("who").textContent=`${$("email").value} · ${d.role}${d.tenant_id?(" · "+d.tenant_id):" · platform"}`;
-    $("conn").className="dot live"; render();
-  }catch(e){$("who").innerHTML=`<span class="err">${e.message}</span>`;}
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.access_token) throw new Error((d.detail&&(typeof d.detail==="string"?d.detail:JSON.stringify(d.detail)))||("login failed HTTP "+r.status));
+    TOK=d.access_token;
+    $("who").textContent=$("email").value+" · "+(d.role||"?")+(d.tenant_id?(" · "+d.tenant_id):" · platform");
+    var c=$("conn"); if(c) c.className="dot live";
+    drawTabs();
+    await render();
+  }catch(e){$("who").innerHTML='<span class="err">'+String(e.message||e)+'</span>';}
 }
-const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&","<":"<",">":">",'"':"""}[c]));
+const esc=s=>String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");
 function pill(s){return `<span class="pill ${esc(s)}">${esc(s)}</span>`;}
 function kv(o){return Object.entries(o).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${typeof v==="object"?esc(JSON.stringify(v)):esc(v)}</span></div>`).join("");}
 
