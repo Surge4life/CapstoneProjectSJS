@@ -1,10 +1,9 @@
 /* UDOC Admin — Internal package density
  * Staff-only identity · nav relabel · Command Centre · EVA batch · HITL · infra links
  * Intelligence density loaded from /intel-density.js (SW inject)
+ * EIF density loaded from /eif-density.js (SW inject)
  */
 (function () {
-  "use strict";
-
   window.esc = function (s) {
     var d = document.createElement("div");
     d.textContent = String(s == null ? "" : s);
@@ -12,62 +11,35 @@
   };
 
   function stampInternalPackage() {
-    document.documentElement.setAttribute("data-udoc-package", "internal");
-    if (document.title && !/Internal/i.test(document.title)) {
-      document.title = "UDOC Internal · GODS Staff";
-    }
-    var tag = document.getElementById("org-tag");
-    if (tag) tag.textContent = "INTERNAL · STAFF";
-    if (document.getElementById("udoc-internal-ribbon")) return;
-    var rib = document.createElement("div");
-    rib.id = "udoc-internal-ribbon";
-    rib.setAttribute(
-      "style",
-      "background:#060E1C;color:#C9A84C;font:10px/1.4 'IBM Plex Mono',Consolas,monospace;" +
-        "letter-spacing:.08em;text-align:center;padding:6px 10px;border-bottom:1px solid #1A2D4A;"
-    );
-    rib.textContent =
-      "UDOC INTERNAL PACKAGE · STAFF ONLY · NOT CLIENT SAAS · KILL-SWITCH · HITL · JOBS · CORE API";
-    var body = document.body;
-    if (body && body.firstChild) body.insertBefore(rib, body.firstChild);
-    else if (body) body.appendChild(rib);
+    try {
+      var bar = document.getElementById("v7-staff-ribbon");
+      if (bar) return;
+      bar = document.createElement("div");
+      bar.id = "v7-staff-ribbon";
+      bar.style.cssText =
+        "background:#1a1305;color:#E8C97A;font-size:11px;padding:6px 12px;border-bottom:1px solid #3d2e0a;letter-spacing:.04em";
+      bar.textContent =
+        "UDOC INTERNAL PACKAGE · STAFF ONLY · NOT CLIENT SAAS · KILL-SWITCH · HITL · JOBS · CORE API";
+      var app = document.getElementById("app") || document.body;
+      app.insertBefore(bar, app.firstChild);
+    } catch (e) {}
   }
 
   function relabelNav() {
     var map = {
       overview: "Command Centre",
-      systems: "AI Registry",
-      control: "Kill-switch",
       decisions: "EVA Command",
-      lifecycle: "AI Lifecycle",
-      evidence: "Evidence · Replay",
-      policy: "Policy Engine",
       oversight: "HITL Queue",
-      audit: "Audit Trail",
-      governance: "Constitution",
-      compliance: "Compliance",
-      sovereignty: "Sovereignty",
       incidents: "Incident Command",
       intelligence: "Intelligence",
-      tenants: "Clients / Tenants",
-      divisions: "Division Ops",
-      sectors: "Sectors",
-      access: "User Management",
-      roles: "Roles & Profiles",
     };
     document.querySelectorAll("#nav .navitem").forEach(function (n) {
-      var v = n.dataset.view;
-      if (!map[v]) return;
-      var ico = n.querySelector(".ico");
-      var iconHtml = ico ? ico.outerHTML : '<span class="ico">·</span>';
-      n.innerHTML = iconHtml + " " + map[v];
+      var v = n.getAttribute("data-view");
+      if (map[v] && n.childNodes.length) {
+        var t = n.querySelector(".txt") || n;
+        /* keep icon; set text node if present */
+      }
     });
-    var sech = document.querySelectorAll("#nav .sech");
-    if (sech[0]) sech[0].textContent = "PLATFORM";
-    if (sech[1]) sech[1].textContent = "UDOC GOVERNANCE";
-    if (sech[2]) sech[2].textContent = "INTELLIGENCE";
-    if (sech[3]) sech[3].textContent = "ECOSYSTEM";
-    if (sech[4]) sech[4].textContent = "ACCESS";
   }
 
   function injectInfraLinks() {
@@ -75,8 +47,12 @@
     if (!nav || document.getElementById("v7-infra")) return;
     var div = document.createElement("div");
     div.id = "v7-infra";
+    var base =
+      typeof apiBase === "function"
+        ? apiBase()
+        : "https://gods-platform-core.onrender.com";
     div.innerHTML =
-      '<div class="sech">INFRASTRUCTURE · INTERNAL</div>' +
+      '<div class="sech">INFRA · CORE</div>' +
       '<div class="navitem" data-view="_sentinel"><span class="ico">◎</span> Sentinel runtime</div>' +
       '<div class="navitem" data-view="_coreadmin"><span class="ico">⚖</span> Core /admin constitutional</div>' +
       '<div class="navitem" data-view="_apihealth"><span class="ico">⚡</span> API Health</div>' +
@@ -87,21 +63,19 @@
     nav.appendChild(div);
     div.querySelectorAll(".navitem").forEach(function (n) {
       n.addEventListener("click", function () {
-        var v = n.dataset.view;
-        var base =
-          typeof apiBase === "function"
-            ? apiBase()
-            : "https://gods-platform-core.onrender.com";
+        var v = n.getAttribute("data-view");
         if (v === "_sentinel") window.open(base + "/Sentinel", "_blank");
         else if (v === "_coreadmin") window.open(base + "/admin", "_blank");
         else if (v === "_apihealth") window.location.href = "/api-health.html";
         else if (v === "_jobs") window.location.href = "/jobs.html";
         else if (v === "_portals") window.open(base + "/portals", "_blank");
-        else if (v === "_citizen") {
-          window.open("https://gods-udoc-client.onrender.com/citizen.html", "_blank");
-        } else if (v === "_client") {
+        else if (v === "_citizen")
+          window.open(
+            "https://gods-udoc-client.onrender.com/citizen.html",
+            "_blank"
+          );
+        else if (v === "_client")
           window.open("https://gods-udoc-client.onrender.com/", "_blank");
-        }
       });
     });
   }
@@ -112,48 +86,28 @@
     window.vOverview = async function (m) {
       await _orig(m);
       try {
-        var ready = await api("/udoc/demo/ready");
-        var sum = {};
+        var ready = null;
         try {
-          sum = await api("/udoc/regulator/summary");
-        } catch (e2) {}
-        var oc = (sum.decisions && sum.decisions.by_outcome) || {};
-        var banner = document.createElement("div");
-        banner.className = "panel";
-        banner.style.borderLeft = "3px solid #C9A84C";
-        banner.innerHTML =
+          ready = await api("/udoc/demo/ready");
+        } catch (e) {}
+        var bar = document.createElement("div");
+        bar.className = "panel";
+        bar.style.borderLeft = "3px solid #C9A84C";
+        bar.innerHTML =
           "<h3>Command Centre · Internal boot posture</h3><div class=\"small\">" +
-          (ready.ready
-            ? '<span class="tag2 t-ok">DEMO READY</span> · active rules ' +
-              esc(String(ready.active_rules)) +
-              ' · prefer <span class="mono">model-001</span>'
-            : '<span class="tag2 t-bad">SEED PENDING</span> · ' +
-              esc((ready.missing || []).join("; ") || "check Core")) +
-          '</div><div class="small" style="margin-top:10px">' +
-          "APPROVE <b>" +
-          esc(oc.APPROVE || 0) +
-          "</b> · BLOCK <b>" +
-          esc(oc.BLOCK || 0) +
-          "</b> · ESCALATE <b>" +
-          esc(oc.ESCALATE || 0) +
-          "</b> · HITL open <b>" +
-          esc(sum.oversight && sum.oversight.open != null ? sum.oversight.open : "—") +
-          "</b></div>" +
-          '<div class="small muted" style="margin-top:8px">Internal package · live Core · Neon ≤500MB · ' +
-          '<a href="#" onclick="if(typeof showPage===\'function\')showPage(\'decisions\');return false">EVA Command</a></div>';
+          (ready && ready.ready
+            ? '<span class="t-ok">DEMO READY</span>'
+            : '<span class="t-bad">SEED PENDING</span>') +
+          " · model-001 · policy pack · fail-closed</div>";
         var main = document.getElementById("main");
         if (main) {
-          var pgh = main.querySelector(".pgh");
-          if (pgh && pgh.nextSibling) main.insertBefore(banner, pgh.nextSibling);
-          else main.appendChild(banner);
+          var first = main.querySelector(".panel");
+          if (first) main.insertBefore(bar, first);
+          else main.appendChild(bar);
         }
       } catch (e) {}
       var h2 = document.querySelector("#main .pgh h2");
       if (h2) h2.textContent = "Command Centre";
-      var desc = document.querySelector("#main .pgh .desc");
-      if (desc)
-        desc.textContent =
-          "Staff control plane · registry · kill-switch · HITL · fail-closed governance";
     };
     window.vOverview._v7 = true;
   }
@@ -248,7 +202,7 @@
         out.innerHTML =
           "<b>" +
           esc(kind) +
-          "</b> → <span class=\"tag2\">" +
+          '</b> → <span class="tag2">' +
           esc(decision) +
           "</span> · EVA " +
           esc(d.composite_eva != null ? d.composite_eva : "—") +
@@ -259,10 +213,12 @@
       if (term) {
         var lines = ["SCENARIO: " + kind + " · " + body.model_id];
         if (d.dimensions) {
-          ["Validity", "Confidence", "Risk", "Compliance", "Stability", "Impact"].forEach(function (k) {
-            if (d.dimensions[k] != null)
-              lines.push("  " + k + " = " + Number(d.dimensions[k]).toFixed(3));
-          });
+          ["Validity", "Confidence", "Risk", "Compliance", "Stability", "Impact"].forEach(
+            function (k) {
+              if (d.dimensions[k] != null)
+                lines.push("  " + k + " = " + Number(d.dimensions[k]).toFixed(3));
+            }
+          );
         }
         lines.push("  Composite = " + (d.composite_eva != null ? d.composite_eva : "—"));
         lines.push("  Policy = " + (d.policy_enforced ? "ENFORCED" : "off"));
@@ -281,34 +237,43 @@
     var out = document.getElementById("v7-eva-out");
     var term = document.getElementById("v7-eva-term");
     var kpis = document.getElementById("v7-eva-kpis");
-    if (out) out.textContent = "Running Full EVA batch…";
+    if (out) out.textContent = "POST /decisions/batch …";
     if (term) {
       term.style.display = "block";
-      term.textContent = "matrix · fair · biased · high · sov";
+      term.textContent = "batch…";
     }
     var midEl = document.getElementById("ev-mid");
     var mid = midEl ? midEl.value.trim() : "model-001";
-    var kinds = ["fair", "biased", "high", "sov"];
     var results = [];
-    for (var i = 0; i < kinds.length; i++) {
-      var k = kinds[i];
-      try {
-        var d = await api("/decisions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(scenarioBody(k, mid)),
-        });
+    try {
+      var pack = await api("/decisions/batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model_id: mid,
+          options: ["fair", "biased", "high", "sov"],
+        }),
+      });
+      (pack.results || []).forEach(function (r) {
         results.push({
-          kind: k,
-          ok: true,
-          decision: d.decision,
-          eva: d.composite_eva,
-          policy: d.policy_enforced,
-          reasons: d.block_reasons || [],
+          kind: r.option,
+          ok: !!r.ok,
+          decision: r.decision || r.error,
+          eva: r.composite_eva,
+          policy: r.policy_enforced,
+          reasons: r.block_reasons || [],
         });
-      } catch (e) {
-        results.push({ kind: k, ok: false, decision: e.message });
-      }
+      });
+      var g = pack.gate || {};
+      if (kpis)
+        kpis.innerHTML =
+          '<div class="small">Gate fair≠BLOCK: <b>' +
+          (g.fair_neq_block ? "PASS" : "FAIL") +
+          "</b> · biased=BLOCK: <b>" +
+          (g.biased_eq_block ? "PASS" : "FAIL") +
+          "</b></div>";
+    } catch (e) {
+      if (out) out.innerHTML = '<span class="t-bad">' + esc(e.message) + "</span>";
     }
     var counts = { APPROVE: 0, BLOCK: 0, ESCALATE: 0, OTHER: 0 };
     results.forEach(function (r) {
@@ -316,23 +281,24 @@
       if (d === "APPROVE") counts.APPROVE++;
       else if (d === "BLOCK") counts.BLOCK++;
       else if (d === "ESCALATE") counts.ESCALATE++;
-      else if (r.ok) counts.OTHER++;
+      else counts.OTHER++;
     });
-    if (kpis) {
-      kpis.innerHTML =
-        '<div class="small">Batch <b>' +
+    if (out)
+      out.innerHTML =
+        "Batch <b>" +
         results.filter(function (r) {
           return r.ok;
         }).length +
-        "/4</b> · APPROVE <b>" +
+        "/" +
+        results.length +
+        "</b> · APPROVE <b>" +
         counts.APPROVE +
         "</b> · BLOCK <b>" +
         counts.BLOCK +
         "</b> · ESCALATE <b>" +
         counts.ESCALATE +
-        "</b></div>";
-    }
-    var lines = ["FULL EVA BATCH · " + (mid || "model-001")];
+        "</b>";
+    var lines = ["FULL EVA BATCH · " + (mid || "model-001") + " · /decisions/batch"];
     results.forEach(function (r) {
       lines.push(
         "[" +
@@ -347,9 +313,6 @@
       });
     });
     if (term) term.textContent = lines.join("\n");
-    if (out)
-      out.innerHTML =
-        "Matrix complete · biased should be <span class=\"tag2 t-bad\">BLOCK</span>";
   };
 
   function wrapOversight() {
@@ -359,10 +322,6 @@
       await _orig(m);
       var h2 = document.querySelector("#main .pgh h2");
       if (h2) h2.textContent = "HITL Queue";
-      var desc = document.querySelector("#main .pgh .desc");
-      if (desc)
-        desc.textContent =
-          "Human-in-the-loop · escalated & blocked · COB · portal dual-path (Internal)";
       try {
         var base =
           typeof apiBase === "function"
@@ -404,7 +363,7 @@
   if (typeof _enter === "function") {
     window.enterApp = async function () {
       await _enter.apply(this, arguments);
-      setTimeout(run, 80);
+      run();
     };
   }
 })();
