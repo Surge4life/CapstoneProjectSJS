@@ -1,9 +1,8 @@
-/* G.O.D.S UDOC Internal PWA — enhance + intel + eif + policy density */
-const CACHE = 'gods-udoc-pwa-v10';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png',
-  '/admin-v7-enhance.js', '/intel-density.js', '/eif-density.js', '/policy-density.js'];
+/* G.O.D.S UDOC Internal PWA — network-first navigate; soft inject density scripts */
+const CACHE = 'gods-udoc-pwa-v11';
+const SHELL = ['/', '/index.html', '/manifest.webmanifest'];
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(() => {})).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(
@@ -21,19 +20,14 @@ function injectEnhance(html) {
   if (html.indexOf('policy-density.js') === -1)
     tags += '<script src="/policy-density.js"><\/script>\n';
   if (!tags) return html;
-  if (html.indexOf('serviceWorker') !== -1) {
-    return html.replace(
-      '<script>if("serviceWorker"',
-      tags + '<script>if("serviceWorker"'
-    );
-  }
-  return html.replace('</body>', tags + '</body>');
+  if (html.indexOf('</body>') !== -1) return html.replace('</body>', tags + '</body>');
+  return html + tags;
 }
 self.addEventListener('fetch', e => {
   const r = e.request;
   const u = new URL(r.url);
   if (r.method !== 'GET' || u.origin !== location.origin) return;
-  if (r.mode === 'navigate') {
+  if (r.mode === 'navigate' || (r.headers.get('accept') || '').includes('text/html')) {
     e.respondWith(
       fetch(r)
         .then(resp => {
@@ -41,36 +35,30 @@ self.addEventListener('fetch', e => {
           if (!ct.includes('text/html')) return resp;
           return resp.text().then(t => {
             const body = injectEnhance(t);
-            return new Response(body, {
-              status: resp.status,
-              statusText: resp.statusText,
-              headers: resp.headers
-            });
+            const headers = new Headers(resp.headers);
+            headers.set('Cache-Control', 'no-store');
+            return new Response(body, { status: resp.status, statusText: resp.statusText, headers: headers });
           });
         })
-        .catch(() => caches.match('/index.html'))
+        .catch(() => caches.match('/index.html').then(c => c || caches.match('/')))
     );
     return;
   }
-  if (u.pathname.endsWith('/admin-v7-enhance.js') || u.pathname.endsWith('/intel-density.js') ||
-      u.pathname.endsWith('/eif-density.js') || u.pathname.endsWith('/policy-density.js')) {
+  if (/\.(js)$/i.test(u.pathname)) {
     e.respondWith(
       fetch(r).then(resp => {
         const cp = resp.clone();
-        caches.open(CACHE).then(cc => cc.put(r, cp));
+        caches.open(CACHE).then(cc => cc.put(r, cp)).catch(() => {});
         return resp;
       }).catch(() => caches.match(r))
     );
     return;
   }
   e.respondWith(
-    caches.match(r).then(c =>
-      c ||
-      fetch(r).then(resp => {
-        const cp = resp.clone();
-        caches.open(CACHE).then(cc => cc.put(r, cp));
-        return resp;
-      }).catch(() => c)
-    )
+    fetch(r).then(resp => {
+      const cp = resp.clone();
+      caches.open(CACHE).then(cc => cc.put(r, cp)).catch(() => {});
+      return resp;
+    }).catch(() => caches.match(r))
   );
 });
