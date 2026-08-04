@@ -1,30 +1,33 @@
 # Task 2 status — 2026-08-04
 
-## Core automation (verified this session)
+**Operator:** Render + GitHub verified working.
+
+## Core automation
 
 | Check | Result |
 |--------|--------|
-| Deploy | `041ddd18` |
+| Deploy | `041ddd18`+ |
 | `/health` | ok |
-| `/udoc/demo/ready` | **true** · auto-heal `model-001 SUSPENDED→ACTIVE` |
-| `/decisions/batch` fair/biased | gate **PASS** (fair≠BLOCK, biased=BLOCK) |
-| `/eif/framework` | live |
-| Admin SW | pwa-v8 + eif-density live |
+| `/udoc/demo/ready` | **true** · auto-heal SUSPENDED→ACTIVE |
+| `/decisions/batch` gate | **PASS** |
+| `/eif` | live |
+| Admin SW | pwa-v8 + EIF · Diamond |
+| Sector | `sector-batch-overlay.js` wired in `index.html` (commit `116989f7`) |
 
-## Surfaces 1–5 (operator)
+## Surfaces 1–5
 
-| # | Surface | Status |
-|---|---------|--------|
-| 1 | Sentinel | Bootstrap → full UI; Smoke + EVA |
-| 2 | Client | Bootstrap app-client + batch overlay |
-| 3 | Citizen | `/citizen.html` on Client host |
-| 4 | Admin | EIF · Diamond nav + EVA batch |
-| 5 | Sector | EVA chips; Full EVA should call `/decisions/batch` |
+| # | Surface | Live path |
+|---|---------|-----------|
+| 1 | Sentinel | Core `/Sentinel` (bootstrap → full UI) |
+| 2 | Client | Govern + batch overlay |
+| 3 | Citizen | Client `/citizen.html` |
+| 4 | Admin | EIF · Diamond + EVA batch |
+| 5 | Sector | Decisions · Full EVA → `/decisions/batch` |
 
-**Close Task 2** when operator confirms biased=BLOCK on 1–5 (or screenshots).
+**Close Task 2** when biased=BLOCK confirmed on 1–5 (or screenshots).
 
-**Task 1** still offline (GBS V2 / Canon founder finalize).
+**Task 1** = offline GBS V2 / Canon finalize (founder).
 
 ## Honesty
 
-Bootstrap loaders for Sentinel/Client are temporary recovery after placeholder corruption. Neon ≤500MB · no new registration · Capstone smoke path auto-heals suspended demo seed.
+Bootstrap loaders remain on Sentinel/Client until permanent full-file embeds. Capstone smoke path auto-heals demo seed. Neon ≤500MB · no new registration.
