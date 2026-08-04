@@ -91,7 +91,7 @@ async function login(){
     await render();
   }catch(e){$("who").innerHTML='<span class="err">'+String(e.message||e)+'</span>';}
 }
-const esc=s=>String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">").replace(/"/g,""");
+const esc=s=>{const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;};
 function pill(s){return `<span class="pill ${esc(s)}">${esc(s)}</span>`;}
 function kv(o){return Object.entries(o).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${typeof v==="object"?esc(JSON.stringify(v)):esc(v)}</span></div>`).join("");}
 
