@@ -200,7 +200,29 @@ def decision_replay(decision_id: int, db: Session = Depends(get_db), user: dict 
     d, m = _decision_or_404(db, decision_id, scope)
     inp = json.loads(d.inputs_json or "{}")
     if not inp:
-        raise HTTPException(409, "no stored inputs for this decision (pre-dates input capture)")
+        q = select(Decision).where(Decision.inputs_json.isnot(None)).order_by(Decision.id.desc()).limit(20)
+        if scope is not None and scope != -1:
+            q = (select(Decision).join(AIModel, Decision.model_pk == AIModel.id)
+                 .where(AIModel.tenant_pk == scope, Decision.inputs_json.isnot(None))
+                 .order_by(Decision.id.desc()).limit(20))
+        candidates = []
+        for row in db.execute(q).scalars().all():
+            try:
+                if json.loads(row.inputs_json or "{}"):
+                    candidates.append(row.id)
+            except Exception:
+                pass
+            if len(candidates) >= 5:
+                break
+        return {
+            "decision_id": d.id,
+            "replayable": False,
+            "original": {"outcome": d.decision, "svs": d.svs, "risk": d.risk},
+            "replayed": None,
+            "drift": None,
+            "note": "No stored inputs for this decision (pre-dates input capture). Pick a newer id from Incidents or suggested_decision_ids.",
+            "suggested_decision_ids": candidates,
+        }
     ev = Evidence(
         model_id=m.model_id, risk_tier=inp.get("risk_tier") or m.risk_tier,
         raw_confidence=inp.get("raw_confidence", 0.9), compliance=inp.get("compliance", 1.0),
@@ -213,7 +235,7 @@ def decision_replay(decision_id: int, db: Session = Depends(get_db), user: dict 
     current = pol["adjusted_decision"]
     drift = (current != d.decision) or abs(v.svs - d.svs) > 1e-3 or abs(v.risk - d.risk) > 1e-3
     return {
-        "decision_id": d.id, "model_id": m.model_id,
+        "decision_id": d.id, "model_id": m.model_id, "replayable": True,
         "original": {"outcome": d.decision, "svs": round(d.svs, 4), "risk": round(d.risk, 4),
                      "compliance": round(d.compliance, 4), "at": d.created_at.isoformat()},
         "replayed": {"outcome": current, "svs": round(v.svs, 4), "risk": round(v.risk, 4),
@@ -251,10 +273,23 @@ def incidents(db: Session = Depends(get_db), user: dict = Depends(principal)):
 
 @router.get("/exchange")
 def data_exchange(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Sovereignty / localisation posture. active_rules returns dict rows."""
     scope = scope_pk(user)
-    rules = pe.active_rules(db, tenant_pk=(scope if scope and scope != -1 else None))
-    loc = [{"code": r.code, "kind": r.kind, "target": r.target} for r in rules
-           if r.kind in ("DATA_LOCALISATION", "MIN_SOVEREIGNTY")]
+    try:
+        rules = pe.active_rules(db, tenant_pk=(scope if scope and scope != -1 else None)) or []
+    except Exception as e:
+        rules = []
+        print(f"[udoc/exchange] active_rules: {e}")
+    loc = []
+    for r in rules:
+        if isinstance(r, dict):
+            kind = r.get("kind") or ""
+            if kind in ("DATA_LOCALISATION", "MIN_SOVEREIGNTY"):
+                loc.append({"code": r.get("code"), "kind": kind, "target": r.get("target")})
+        else:
+            kind = getattr(r, "kind", "") or ""
+            if kind in ("DATA_LOCALISATION", "MIN_SOVEREIGNTY"):
+                loc.append({"code": getattr(r, "code", None), "kind": kind, "target": getattr(r, "target", None)})
     return {"jurisdiction": "ZA", "cross_border_transfer": "denied by default (sovereign-first)",
             "data_localisation": "enforced", "sovereignty_recheck_hours": 6,
             "localisation_rules": loc, "rules_active": len(loc),
