@@ -208,7 +208,15 @@ def admin_console():
 
 
 @app.get("/udoc-admin", tags=["root"], include_in_schema=False)
+@app.get("/udoc-admin/", tags=["root"], include_in_schema=False)
+@app.get("/udoc_admin", tags=["root"], include_in_schema=False)
+@app.get("/udoc_admin/", tags=["root"], include_in_schema=False)
 def udoc_admin_console():
+    """UDOC Internal controller SPA.
+    File on disk: static/udoc_admin_v93.html (underscore in filename).
+    Canonical URL: /udoc-admin (hyphen). Underscore /udoc_admin kept as alias.
+    Separate host gods-udoc-admin.onrender.com is denser Internal package (udoc-internal/).
+    """
     return FileResponse(_static("udoc_admin_v93.html"))
 
 
@@ -233,8 +241,9 @@ def sentinel_console():
 def root():
     return {"system": "G.O.D.S Platform Core", "status": "live", "environment": settings.environment,
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
-            "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "portals": "/portals",
-                         "sentinel": "/Sentinel", "eif": "/eif-ui"},
+            "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "udoc_admin_alias": "/udoc_admin",
+                         "portals": "/portals", "sentinel": "/Sentinel", "eif": "/eif-ui",
+                         "note": "Filename udoc_admin_v93.html · URL hyphen preferred · underscore aliased"},
             "governance": "EVA 6-D + policy-to-code + conformance, fail-closed for critical"}
 
 
