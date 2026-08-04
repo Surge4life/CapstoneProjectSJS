@@ -3,147 +3,177 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>G.O.D.S · Holdings Divisions · Live Truth</title>
+<title>G.O.D.S · Divisions · Internal Portal Stack</title>
 <style>
-:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--udoc:#7C5CBF;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--warn:#E8A13A}
-*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
-header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--warn:#E8A13A;--udoc:#7C5CBF;--green:#10B981}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:linear-gradient(180deg,#0a1428,var(--navy))}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
-.tag.honest{border-color:var(--ok);color:#7fe3ab}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
-.wrap{max-width:1100px;margin:0 auto;padding:18px 22px}
-.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
-input{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px}
+.wrap{max-width:1140px;margin:0 auto;padding:16px 18px 40px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input,select,textarea{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
 button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+button.cyan{background:rgba(0,194,212,.15);color:var(--cyan);border:1px solid rgba(0,194,212,.4)}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.green{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.4)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.tabs button{background:transparent;color:var(--mut);border:1px solid var(--line)}
+.tabs button.on{color:var(--gold);border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px}
-.card h3{margin:0 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.card.seths{border-top:3px solid #00C2D4}.card.madiba{border-top:3px solid #C9A84C}.card.ts{border-top:3px solid #10B981}.card.udoc{border-top:3px solid #7C5CBF}.card.gis{border-top:3px solid #6366F1}
+.card h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.card.seths{border-top:3px solid var(--cyan)}.card.madiba{border-top:3px solid var(--gold)}.card.ts{border-top:3px solid var(--green)}.card.udoc{border-top:3px solid var(--udoc)}.card.gis{border-top:3px solid #6366F1}
 .kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
 .kv span:first-child{color:var(--mut)}
-.note{color:var(--mut);font-size:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
-.err{color:var(--bad)}.zero{color:var(--warn)}.live{color:#7fe3ab}
-.banner{background:rgba(45,155,90,.12);border:1px solid rgba(45,155,90,.35);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:15px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row .f{flex:1;min-width:140px}.row .f label{display:block;font-size:11px;color:var(--mut);margin-bottom:4px}
+.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#9fb4dd;min-height:100px;max-height:240px;overflow:auto;white-space:pre-wrap;margin-top:10px}
+.banner{background:rgba(45,155,90,.1);border:1px solid rgba(45,155,90,.35);border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+.zero{color:var(--warn)}.live{color:#7fe3ab}.err{color:var(--bad)}.mut{color:var(--mut)}
+.note{font-size:12px;color:var(--mut);margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.side{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}@media(max-width:900px){.side{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--mut);font-size:11px}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <header>
-  <span class="brand">G.O.D.S · <b>Holdings Divisions</b></span>
-  <span class="tag honest">LIVE TRUTH · zeros allowed</span>
-  <span class="tag">Capstone ecosystem view</span>
+  <span class="brand">G.O.D.S · <b>Divisions Portal Stack</b></span>
+  <span class="tag ok">LIVE TRUTH · zeros allowed</span>
+  <span class="tag">Internal · Capstone</span>
   <span style="flex:1"></span>
+  <a class="nav" href="/portals">24 Portals</a>
   <a class="nav" href="/udoc-admin">UDOC Admin</a>
   <a class="nav" href="/admin">GODS Admin</a>
-  <a class="nav" href="/portals">24 Portals</a>
   <a class="nav" href="/Sentinel">Sentinel</a>
 </header>
 <div class="wrap">
-  <div class="banner">
-    <b>Honesty rule:</b> Numbers below come from Core APIs only. Empty pipelines show <span class="zero">0</span> —
-    that is correct Capstone posture (TS projects / full SETHS cohorts not seeded). Prefer real zeros over demo fiction.
+  <div class="banner"><b>Honesty:</b> Metrics and lists from Core + Neon only. Empty pipelines show <span class="zero">0</span>. Prefer real zeros over demo fiction.</div>
+  <div class="bar" id="login">
+    <input id="api" placeholder="API (blank = same origin)" style="width:220px"/>
+    <input id="email" value="admin@gods.local" style="width:170px"/>
+    <input id="pass" type="password" value="admin123" style="width:110px" onkeydown="if(event.key==='Enter')connect()"/>
+    <button type="button" onclick="connect()">Connect</button>
+    <span id="who" class="mut"></span>
   </div>
-  <div class="bar">
-    <input id="api" placeholder="API (blank = same origin)" style="width:240px"/>
-    <input id="email" value="admin@gods.local" style="width:180px"/>
-    <input id="pass" type="password" value="admin123" style="width:120px"/>
-    <button type="button" onclick="connect()">Connect · load live</button>
-    <span id="who" style="color:var(--mut)"></span>
+  <div id="app" class="hidden">
+    <div class="tabs" id="tabs">
+      <button type="button" class="on" data-t="overview" onclick="tab(this,'overview')">Overview</button>
+      <button type="button" data-t="seths" onclick="tab(this,'seths')">SETHS</button>
+      <button type="button" data-t="madiba" onclick="tab(this,'madiba')">MADIBA</button>
+      <button type="button" data-t="ts" onclick="tab(this,'ts')">T.S.</button>
+      <button type="button" data-t="udoc" onclick="tab(this,'udoc')">UDOC</button>
+      <button type="button" data-t="gis" onclick="tab(this,'gis')">GIS / GBS</button>
+      <button type="button" data-t="portals" onclick="tab(this,'portals')">Portals bridge</button>
+    </div>
+    <div id="v-overview"></div>
+    <div id="v-seths" class="hidden"></div>
+    <div id="v-madiba" class="hidden"></div>
+    <div id="v-ts" class="hidden"></div>
+    <div id="v-udoc" class="hidden"></div>
+    <div id="v-gis" class="hidden"></div>
+    <div id="v-portals" class="hidden"></div>
   </div>
-  <div class="grid" id="grid">
-    <div class="card"><div class="mut">Connect to load SETHS · MADIBA · TS · UDOC · GIS/GBS from Neon-backed Core.</div></div>
-  </div>
-  <div class="note" id="foot">
-    Capstone = whole GODS Holdings ecosystem under free-tier limits. UDOC governs decisions; divisions are hooks + metrics, not fabricated commercial scale.
-  </div>
+  <div class="note" id="foot">Connect to load the internal division portal stack.</div>
 </div>
 <script>
 let API="", TOK="";
 const $=id=>document.getElementById(id);
 const esc=s=>{const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;};
 function num(v){ if(v==null||v==="") return "—"; const n=Number(v); if(Number.isFinite(n)) return n===0?'<span class="zero">0</span>':esc(String(n)); return esc(v); }
-function pct(v){ if(v==null) return "—"; const n=Number(v); if(!Number.isFinite(n)) return esc(v); return (n<=1&&n>=0)?(n*100).toFixed(1)+"%":n.toFixed(2); }
-async function api(path){
-  const r=await fetch(API+path,{headers:{Authorization:"Bearer "+TOK}});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error((d.detail&&String(d.detail))||("HTTP "+r.status+" "+path));
-  return d;
+function term(line){
+  const t=$("term"); if(!t) return;
+  const ts=new Date().toISOString().slice(11,19);
+  t.textContent="["+ts+"] "+line+"\n"+t.textContent.split("\n").slice(0,40).join("\n");
 }
+async function api(path, opts={}){
+  const h=Object.assign({}, opts.headers||{});
+  if(TOK) h.Authorization="Bearer "+TOK;
+  const r=await fetch(API+path, Object.assign({}, opts, {headers:h}));
+  const ct=r.headers.get("content-type")||"";
+  const body=ct.includes("json")?await r.json().catch(()=>({})):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail&&(typeof body.detail==="string"?body.detail:JSON.stringify(body.detail)))||("HTTP "+r.status));
+  return body;
+}
+async function safe(path, opts){ try{ return await api(path, opts); }catch(e){ return {_err:e.message}; } }
 async function connect(){
   API=($("api").value||"").trim().replace(/\/$/,"");
   if(!API) API=location.origin;
-  $("who").textContent="Connecting…";
+  $("who").textContent="…";
   try{
     const b=new URLSearchParams({username:$("email").value.trim(),password:$("pass").value});
     const r=await fetch(API+"/auth/login",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:b});
     const d=await r.json().catch(()=>({}));
     if(!r.ok||!d.access_token) throw new Error("login failed");
     TOK=d.access_token;
-    $("who").innerHTML='<span class="live">'+esc($("email").value)+" · "+esc(d.role||"")+" · live</span>";
-    await loadAll();
+    $("who").innerHTML='<span class="live">'+esc($("email").value)+" · "+esc(d.role||"")+"</span>";
+    $("app").classList.remove("hidden");
+    await refreshAll();
   }catch(e){ $("who").innerHTML='<span class="err">'+esc(e.message)+'</span>'; }
 }
-function card(cls, title, rows, note){
-  return '<div class="card '+cls+'"><h3>'+esc(title)+'</h3>'+
-    rows.map(([k,v])=>'<div class="kv"><span>'+esc(k)+'</span><span>'+v+'</span></div>').join("")+
-    (note?'<div class="note" style="border:0;padding:8px 0 0;margin:0">'+note+'</div>':'')+'</div>';
+function tab(el, name){
+  ["overview","seths","madiba","ts","udoc","gis","portals"].forEach(n=>{ const p=$("v-"+n); if(p) p.classList.toggle("hidden", n!==name); });
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on", b.dataset.t===name));
+  if(el) el.classList.add("on");
 }
-async function loadAll(){
-  const g=$("grid"); g.innerHTML='<div class="card">Loading live division metrics…</div>';
-  const safe=async(path)=>{ try{ return await api(path); }catch(e){ return {_err:e.message}; } };
-  const [aS,aM,aT,aU,mS,mM,mT,reg,pill,demo]=await Promise.all([
-    safe("/analytics/SETHS/kpis"), safe("/analytics/MADIBA/kpis"), safe("/analytics/TS/kpis"), safe("/analytics/UDOC/kpis"),
-    safe("/seths/metrics"), safe("/madiba/metrics"), safe("/ts/metrics"),
-    safe("/udoc/regulator/summary"), safe("/gis/gbs/pillars"), safe("/udoc/demo/ready")
-  ]);
-  let html="";
-  html+=card("seths","SETHS · Human capital pathway",[
-    ["Analytics enrolled", num(aS.enrolled)],
-    ["Analytics placed", num(aS.placed)],
-    ["Placement rate", esc(pct(aS.placement_rate))],
-    ["Monthly output", num(aS.monthly_output)],
-    ["Metrics total / completed", num(mS.total)+" / "+num(mS.completed)],
-    ["Metrics placed", num(mS.placed)],
-  ], aS._err||mS._err?'<span class="err">'+esc(aS._err||mS._err)+'</span>':'Live API · zeros = no cohort pipeline seeded (honest)');
-  html+=card("madiba","MADIBA · Capital recycle / EIF",[
-    ["Total inflow (analytics)", num(aM.total_inflow)],
-    ["Total recycled", num(aM.total_recycled)],
-    ["Recycle ratio", esc(aM.recycle_ratio!=null?Number(aM.recycle_ratio).toFixed(2):"—")],
-    ["Metrics cycles", num(mM.cycles)],
-    ["Cumulative recycled", num(mM.cumulative_recycled)],
-  ], aM._err||mM._err?'<span class="err">'+esc(aM._err||mM._err)+'</span>':'Seed ledger metrics · not a claim of live institutional funds under management');
-  html+=card("ts","T.S. · Trusted Systems / SPV",[
-    ["Revenue", num(aT.total_revenue)],
-    ["Profit", num(aT.total_profit)],
-    ["Workers absorbed", num(aT.workers_absorbed)],
-    ["Avg margin", esc(pct(aT.avg_margin))],
-    ["Projects (metrics)", num(mT.projects)],
-    ["Monthly operating profit", num(mT.monthly_operating_profit)],
-  ], aT._err||mT._err?'<span class="err">'+esc(aT._err||mT._err)+'</span>':'<span class="zero">0 projects</span> is correct until SPVs are registered — preferred over false demo counts');
-  const sys=(reg.systems&&reg.systems.total!=null)?reg.systems.total:"—";
-  const dec=(reg.decisions&&reg.decisions.total!=null)?reg.decisions.total:(aU.decisions);
-  const blk=(reg.decisions&&reg.decisions.blocked!=null)?reg.decisions.blocked:aU.blocked;
-  html+=card("udoc","UDOC · Governance control plane",[
-    ["Demo ready", demo.ready?'<span class="live">true</span>':'<span class="err">false</span>'],
-    ["Registered systems", num(sys)],
-    ["Decisions", num(dec)],
-    ["Blocked", num(blk)],
-    ["Block rate", esc(aU.block_rate!=null?(Number(aU.block_rate)*100).toFixed(1)+"%":"—")],
-    ["Avg EVA", num(aU.avg_eva)],
-    ["Certificates", num(aU.certificates)],
-  ], 'UDOC is the live Capstone control plane · EVA fail-closed verified');
+function card(cls, title, rows, note){
+  return '<div class="card '+cls+'"><h3>'+esc(title)+'</h3>'+rows.map(([k,v])=>'<div class="kv"><span>'+esc(k)+'</span><span>'+v+'</span></div>').join("")+(note?'<div class="mut" style="margin-top:8px;font-size:12px">'+note+'</div>':'')+'</div>';
+}
+async function refreshAll(){
+  $("foot").textContent="Loading…";
+  await Promise.all([renderOverview(), renderSeths(), renderMadiba(), renderTs(), renderUdoc(), renderGis(), renderPortals()]);
+  $("foot").textContent="Pulled "+new Date().toISOString()+" · "+API;
+}
+async function renderOverview(){
+  const [aS,aM,aT,reg,demo]=await Promise.all([safe("/analytics/SETHS/kpis"),safe("/analytics/MADIBA/kpis"),safe("/analytics/TS/kpis"),safe("/udoc/regulator/summary"),safe("/udoc/demo/ready")]);
+  $("v-overview").innerHTML='<div class="grid">'+card("seths","SETHS",[["Enrolled",num(aS.enrolled)],["Placed",num(aS.placed)]],"Human capital")+card("madiba","MADIBA",[["Inflow",num(aM.total_inflow)],["Recycled",num(aM.total_recycled)],["Ratio",esc(aM.recycle_ratio!=null?Number(aM.recycle_ratio).toFixed(2):"—")]],"Capital recycle")+card("ts","T.S.",[["Revenue",num(aT.total_revenue)],["Workers",num(aT.workers_absorbed)]],aT.total_revenue===0?'<span class="zero">0 projects is honest</span>':"")+card("udoc","UDOC",[["Ready",demo.ready?'<span class="live">true</span>':'false'],["Systems",num(reg.systems&&reg.systems.total)],["Decisions",num(reg.decisions&&reg.decisions.total)],["Blocked",num(reg.decisions&&reg.decisions.blocked)]],"Governance")+'</div><div class="panel"><button class="cyan" type="button" onclick="refreshAll()">Refresh all</button></div>';
+}
+async function renderSeths(){
+  const m=await safe("/seths/metrics");
+  $("v-seths").innerHTML='<div class="side"><div><div class="panel"><h3>SETHS · metrics</h3><div class="grid">'+card("seths","Learners",[["Total",num(m.total)],["Completed",num(m.completed)],["Placed",num(m.placed)],["Output",num(m.monthly_economic_output)]])+'</div></div><div class="panel"><h3>Enrol / advance</h3><div class="row"><div class="f"><label>Qualification</label><input id="se-q" value="Digital Operations & AI Literacy"/></div><div class="f"><label>NQF</label><input id="se-nqf" type="number" value="5"/></div><div class="f"><label>Count</label><input id="se-c" type="number" value="1" min="1" max="10"/></div><button type="button" onclick="sethEnrol()">Enrol</button></div><div class="row" style="margin-top:10px"><div class="f"><label>Learner ref</label><input id="se-ref" placeholder="SETHS-…"/></div><button class="cyan" type="button" onclick="sethAdvance()">Advance</button></div><p class="mut" style="font-size:12px">ENROLLED → COMPLETED → PLACED. Small Capstone demos only.</p></div></div><div><div class="panel"><h3>Terminal</h3><div class="term" id="term">SETHS ready.</div></div></div></div>';
+}
+async function sethEnrol(){
+  try{ const body={qualification:$("se-q").value,nqf_level:parseInt($("se-nqf").value,10)||5,count:parseInt($("se-c").value,10)||1}; term("POST /seths/enrol"); const r=await api("/seths/enrol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); term("✓ "+r.enrolled+" · "+(r.refs||[]).join(", ")); if(r.refs&&r.refs[0]) $("se-ref").value=r.refs[0]; await renderSeths(); await renderOverview(); }catch(e){ term("✗ "+e.message); }
+}
+async function sethAdvance(){
+  const ref=($("se-ref").value||"").trim(); if(!ref){ term("Need ref"); return; }
+  try{ term("POST /seths/"+ref+"/advance"); const r=await api("/seths/"+encodeURIComponent(ref)+"/advance",{method:"POST"}); term("✓ "+r.ref+" → "+r.status); await renderSeths(); await renderOverview(); }catch(e){ term("✗ "+e.message); }
+}
+async function renderMadiba(){
+  const m=await safe("/madiba/metrics");
+  $("v-madiba").innerHTML='<div class="side"><div><div class="panel"><h3>MADIBA · cycles</h3><div class="grid">'+card("madiba","Ledger",[["Cycles",num(m.cycles)],["Cumulative recycled",num(m.cumulative_recycled)]])+'</div></div><div class="panel"><h3>Allocate (demo)</h3><div class="row"><div class="f"><label>Month</label><input id="ma-m" type="number" value="8" min="1" max="12"/></div><div class="f"><label>Inflow R</label><input id="ma-i" type="number" value="100000"/></div><button type="button" onclick="madAllocate()">Allocate</button></div><p class="mut" style="font-size:12px">DFI 20% · reserve 15% · holdings 10% · rest → SETHS. Small demo amounts.</p></div></div><div><div class="panel"><h3>Terminal</h3><div class="term" id="term">MADIBA ready.</div></div></div></div>';
+}
+async function madAllocate(){
+  try{ const body={month:parseInt($("ma-m").value,10)||1,total_inflow:parseFloat($("ma-i").value)||0}; term("POST /madiba/allocate"); const r=await api("/madiba/allocate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); term("✓ recycled_to_seths "+r.recycled_to_seths+" · pillar2_ok "+r.pillar2_ok); await renderMadiba(); await renderOverview(); }catch(e){ term("✗ "+e.message); }
+}
+async function renderTs(){
+  const [m,proj,subs]=await Promise.all([safe("/ts/metrics"),safe("/ts/projects"),safe("/ts/subsidiaries")]);
+  const list=Array.isArray(proj)?proj:[]; const subList=(subs.subsidiaries||[]).map(s=>'<option>'+esc(s)+'</option>').join("")||'<option>ENERGY</option>';
+  $("v-ts").innerHTML='<div class="side"><div><div class="panel"><h3>T.S. · SPVs</h3><div class="grid">'+card("ts","Pipeline",[["Projects",num(m.projects)],["Workers",num(m.workers_absorbed)],["Op. profit",num(m.monthly_operating_profit)]])+'</div>'+(list.length?'<table style="margin-top:10px"><thead><tr><th>SPV</th><th>Name</th><th>Workers</th></tr></thead><tbody>'+list.map(p=>'<tr><td class="live">'+esc(p.spv_id)+'</td><td>'+esc(p.name)+'</td><td>'+num(p.workers)+'</td></tr>').join("")+'</tbody></table>':'<p class="mut" style="margin-top:8px"><span class="zero">0 projects</span> until you deploy below.</p>')+'</div><div class="panel"><h3>Deploy SPV</h3><div class="row"><div class="f"><label>Name</label><input id="ts-n" value="Capstone Demo SPV"/></div><div class="f"><label>Sector</label><input id="ts-s" value="ENERGY"/></div><div class="f"><label>Subsidiary</label><select id="ts-sub">'+subList+'</select></div><div class="f"><label>Equity</label><input id="ts-e" type="number" step="0.01" value="0.30"/></div><button type="button" onclick="tsDeploy()">Deploy</button></div></div></div><div><div class="panel"><h3>Terminal</h3><div class="term" id="term">TS ready.</div></div></div></div>';
+}
+async function tsDeploy(){
+  try{ const body={name:$("ts-n").value,sector:$("ts-s").value,subsidiary:$("ts-sub").value,equity_pct:parseFloat($("ts-e").value)||0.3,workers_deployed:0,monthly_revenue:0,operating_margin:0.3}; term("POST /ts/projects"); const r=await api("/ts/projects",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); term("✓ "+r.spv_id); await renderTs(); await renderOverview(); }catch(e){ term("✗ "+e.message); }
+}
+async function renderUdoc(){
+  const [reg,demo,ex]=await Promise.all([safe("/udoc/regulator/summary"),safe("/udoc/demo/ready"),safe("/udoc/exchange")]);
+  $("v-udoc").innerHTML='<div class="panel"><h3>UDOC control plane</h3><div class="grid">'+card("udoc","Demo",[["Ready",demo.ready?'<span class="live">true</span>':'false'],["Rules",num(demo.active_rules)]])+card("udoc","Regulator",[["Systems",num(reg.systems&&reg.systems.total)],["Decisions",num(reg.decisions&&reg.decisions.total)],["Blocked",num(reg.decisions&&reg.decisions.blocked)]])+card("udoc","Exchange",[["Jurisdiction",esc(ex.jurisdiction||"—")],["Localisation",esc(ex.data_localisation||"—")]])+'</div><div class="row" style="margin-top:12px"><button class="cyan" type="button" onclick="window.open(API+\'/Sentinel\',\'_blank\')">Sentinel</button><button class="cyan" type="button" onclick="window.open(API+\'/udoc-admin\',\'_blank\')">UDOC Admin</button><button class="green" type="button" onclick="udocBatch()">fair/biased batch</button></div><div class="term" id="term">UDOC ready.</div></div>';
+}
+async function udocBatch(){
+  try{ term("POST /decisions/batch"); const r=await api("/decisions/batch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({options:["fair","biased"],model_id:"model-001"})}); term("✓ "+JSON.stringify(r.outcomes||{})); (r.results||[]).forEach(x=>term("  "+x.option+" → "+x.decision)); await renderOverview(); }catch(e){ term("✗ "+e.message); }
+}
+async function renderGis(){
+  const [pill,nodes]=await Promise.all([safe("/gis/gbs/pillars"),safe("/gis/gbs/nodes")]);
   const pc=pill.constitutional_pillars?pill.constitutional_pillars.length:(pill.count||0);
-  html+=card("gis","GIS / GBS · Constitutional layer",[
-    ["GBS pillars returned", num(pc)],
-    ["GBS nodes (list)", "load nodes…"],
-  ], 'Pillars readable · node list may be empty on free-tier Neon');
-  g.innerHTML=html;
-  try{
-    const nodes=await safe("/gis/gbs/nodes");
-    const n=Array.isArray(nodes)?nodes.length:(nodes._err?nodes._err:"?");
-    g.innerHTML=g.innerHTML.replace("load nodes…", typeof n==="number"?num(n):('<span class="err">'+esc(n)+'</span>'));
-  }catch(e){}
-  $("foot").innerHTML="Pulled "+new Date().toISOString()+" · API "+esc(API)+" · Capstone honesty: empty divisions show zero, not theatre.";
+  const nl=Array.isArray(nodes)?nodes.length:(nodes._err||"?");
+  $("v-gis").innerHTML='<div class="panel"><h3>GIS / GBS</h3><div class="grid">'+card("gis","Layer",[["Pillars",num(pc)],["Nodes",typeof nl==="number"?num(nl):esc(String(nl))]])+'</div><p class="mut" style="margin-top:10px;font-size:12px">Empty nodes is correct until GBS population — UDOC still governs.</p><div class="term" id="term">GIS ready.</div></div>';
+}
+async function renderPortals(){
+  $("v-portals").innerHTML='<div class="panel"><h3>24 Sovereign Portals bridge</h3><p class="mut">Division stack = Holdings truth. Portals = HITL / Regulator / Citizen control plane on same Core.</p><div class="row" style="margin-top:10px"><button class="cyan" type="button" onclick="window.open(API+\'/portals\',\'_blank\')">Open /portals</button></div><div class="term" id="term">Bridge ready.</div></div>';
 }
 </script>
 </body>
