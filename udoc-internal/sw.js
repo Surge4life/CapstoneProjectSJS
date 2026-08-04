@@ -1,5 +1,5 @@
 /* G.O.D.S UDOC Internal PWA — enhance + intel + eif + policy density */
-const CACHE = 'gods-udoc-pwa-v9';
+const CACHE = 'gods-udoc-pwa-v10';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png',
   '/admin-v7-enhance.js', '/intel-density.js', '/eif-density.js', '/policy-density.js'];
 self.addEventListener('install', e => {
