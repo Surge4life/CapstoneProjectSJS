@@ -1,33 +1,36 @@
-# Eight-week environment finish plan
+# Environment finish plan · Capstone due **30 October 2026**
 
-**Context:** Capstone due **30 Oct 2027** · next two months = finish live UDOC environments before deep GBS build.
+**Corrected deadline:** 30 Oct **2026** (not 2027).  
+~**12 weeks** total · first **8 weeks** = environments must be done.
 
 ## Goal
 
-Assessor can open Gateway → run smoke on five surfaces → see policy-to-code + multi-sector EVA → understand Internal vs Client packages — without new Render services.
+Assessor opens Gateway → five surfaces smoke → policy-to-code + EVA visible → Internal vs Client clear — **no new Render services**.
 
-## Week checklist
+## Weeks 1–8
 
-| Week | Outcome |
-|------|---------|
-| 1 | Task 2 matrix ticked (or gaps listed with owner) |
-| 2 | Smoke evidence screenshots stored |
-| 3 | Policy upload → activate → matrix demo recorded |
-| 4 | Multi-sector EVA demo (PUBLIC vs FINANCE) recorded |
-| 5 | Environment classification + gateway verified |
-| 6 | Client package vs Admin package story frozen |
-| 7 | Limitations register + cover note draft |
-| 8 | Task 1 (GBS docs) kickoff only if Task 2 closed |
+| Week | Must complete |
+|------|----------------|
+| 1 | Task 2 matrix attempted; list any fail |
+| 2 | All fails fixed OR documented as limitation |
+| 3 | Smoke screenshots filed |
+| 4 | Policy upload → activate → matrix once |
+| 5 | Multi-sector EVA once (PUBLIC vs FINANCE) |
+| 6 | Classification + gateway URLs verified |
+| 7 | Evidence pack + cover note draft |
+| 8 | Freeze claims list; stop environment feature work |
+
+Weeks 9–12: polish evidence, optional GBS **docs only**, submission freeze.
+
+## Definition of done (environments)
+
+1. Core health + demo/ready  
+2. Surfaces 1–5 smoke green **or** honest gap in limitations  
+3. Policy-to-Code path works once  
+4. EVA returns sector + controllers  
+5. Classification matches live URLs  
 
 ## Do / don’t
 
-**Do:** harden existing hosts, document honesty, short Neon extracts.  
-**Don’t:** add services, expand GIS runtime, rewrite architecture for aesthetics.
-
-## Definition of “environments finished”
-
-1. Core health + demo/ready true  
-2. Surfaces 1–5 smoke green  
-3. Policy-to-Code UI path works once  
-4. EVA returns sector + controllers  
-5. Classification doc matches live URLs  
+**Do:** close Task 2, evidence, honesty.  
+**Don’t:** new services, GIS product depth, architecture rewrites.

@@ -1,70 +1,65 @@
-# Capstone submission timeline · due **30 October 2027**
+# Capstone submission timeline · due **30 October 2026**
 
 **Updated:** 2026-08-04  
-**Previous target:** March 2027 (superseded)  
-**New deadline:** **30 October 2027**  
+**Deadline:** **30 October 2026** (corrected — not 2027)  
+**Prior notes:** March 2027 and Oct 2027 targets were errors; **ignore them**  
 **Constraint:** Free-tier Render + Neon ≤500MB · intent documented · no commercial SaaS claim required for grade
 
-Runway from Aug 2026 → Oct 2027 ≈ **14–15 months**.  
-**Immediate focus (next 8 weeks):** finish UDOC environments + close Task 2 smoke · then GBS/docs (Task 1) without new service sprawl.
+Runway from **4 Aug 2026 → 30 Oct 2026 ≈ 12 weeks.**  
+Everything non-essential is deferred.
 
 ---
 
-## Phase map
+## Priority order (strict)
 
-| Phase | Window | Focus | Exit criteria |
-|-------|--------|--------|----------------|
-| **P0 Finish environments** | **Now → ~8 weeks** | Task 2 operator green; EVA multi-sector stable; policy upload UI; no extra Render services | Surfaces 1–5 biased=BLOCK; evidence screenshots |
-| **P1 Evidence pack** | +2 months | Assessor walkthrough, smoke template filled, environment classification current | `CAPSTONE_EVIDENCE_PACK` usable by a stranger |
-| **P2 GBS / Canon (Task 1)** | After P0 | Founder GBS V2 docs → selective routes; S.E.T.H.S / M.A.D.I.B.A / T.S. framing | Docs frozen; runtime only if quota allows |
-| **P3 Hardening (optional)** | Mid 2027 | Identity/tenancy docs + minimal tests if claimed | Honest gap register |
-| **P4 Submission freeze** | Sep–Oct 2027 | Claims match live; video; cover note | Limitations register current · no last-week features |
+1. **Close Task 2** — live smoke on surfaces 1–5 (biased=BLOCK) + screenshots  
+2. **Freeze environment story** — classification doc + gateway match live hosts  
+3. **Evidence pack** — assessor can follow without you present  
+4. **Task 1 GBS/Canon** — founder docs only if time; no new runtime sprawl  
+5. **Optional polish** — permanent UI embeds, multi-sector demos  
 
----
-
-## Next 8 weeks (environment finish)
-
-### Week 1–2 — Close Task 2
-- Operator ticks: Sentinel · Client · Citizen · Admin · Sector (biased=BLOCK)
-- File screenshots into smoke evidence template
-- Admin Policy-to-Code upload → activate → runtime-matrix once
-
-### Week 3–4 — Stability
-- Permanent UI embeds (local git) if bootstrap flash still annoys
-- Exercise multi-sector EVA (`sector`: PUBLIC/PRIVATE/HEALTH/FINANCE) once each
-- Keep Neon lean; no bulk Drive ingest
-
-### Week 5–6 — Package honesty
-- Re-read `UDOC_LIVE_ENVIRONMENT_CLASSIFICATION` + gateway links
-- Client vs Internal package story matches live hosts
-- Freeze “what we claim” list for assessors
-
-### Week 7–8 — Handoff to Task 1
-- Only after Task 2 closed: start GBS V2 / Canon alignment docs
-- No new Render services unless one existing host is replaced
+**Do not:** add Render services · full GIS/GBS product · commercial SaaS · hardware field build
 
 ---
 
-## Explicit non-goals before submission
+## 12-week map
+
+| Weeks | Dates (approx) | Focus | Exit |
+|-------|----------------|--------|------|
+| **1–2** | Aug | Task 2 operator ticks + smoke evidence | 1–5 green or gap list |
+| **3–4** | late Aug | Policy-to-code path once · EVA multi-sector once · fix only fails | Demo path recorded |
+| **5–6** | Sep | Environment classification + package story freeze | Gateway honest |
+| **7–8** | mid Sep | Evidence pack + cover note + limitations | Stranger-readable |
+| **9–10** | late Sep | Task 1 docs only if Task 2 closed | Canon/GBS intent only |
+| **11–12** | Oct | Submission freeze · video walkthrough · no new features | Claims = live |
+
+---
+
+## Week 1 checklist (start now)
+
+- [ ] Sentinel smoke biased=BLOCK  
+- [ ] Client Govern biased=BLOCK  
+- [ ] Citizen challenge → case_ref  
+- [ ] Admin EIF + Policy-to-Code + EVA batch  
+- [ ] Sector Full EVA biased=BLOCK  
+- [ ] Screenshots into smoke evidence template  
+
+---
+
+## Explicit non-goals before 30 Oct 2026
 
 - Guaranteed commercial multi-tenant SaaS  
-- Full GIS/GBS product depth on free Neon  
-- Hardware field deployment  
-- 24 separate portal services  
+- Full GIS/GBS runtime on free Neon  
+- Hardware appliance ops  
+- 24 portal microservices  
 - LLM as governance controller  
-
----
-
-## Weekly habit
-
-1. Direction change → EDR/roadmap **before** large code.  
-2. Smoke fails → fix that surface only.  
-3. New subsystem → *which documented intent does this implement?*  
+- Scope expansion in October  
 
 ---
 
 ## Live checkpoint (2026-08-04)
 
-- Core commit includes multi-sector EVA (`134ccce3`)  
-- Batch gate fair≠BLOCK / biased=BLOCK **PASS**  
-- Decision response includes `sector_eva`, `controllers`, `scales`  
+- Multi-sector EVA live (`134ccce3`) · batch gate PASS  
+- Policy-to-code + Admin uploader on main  
+- Environment classification doc exists  
+- **Blocking item:** operator Task 2 surface ticks + evidence  
