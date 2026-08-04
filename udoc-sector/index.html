@@ -189,7 +189,6 @@ function scenarioBody(kind,mid,conf,comp){
   return body;
 }
 async function safe(host,fn){ try{ return await fn(); }catch(e){ host.innerHTML='<div class="panel"><div class="t-bad small">⚠ '+esc(e.message)+'</div></div>'; } }
-
 async function vOverview(m){
   await loadSector();
   const S=SECTOR||{}; const acc=S.accent||"#00C2D4";
@@ -337,8 +336,8 @@ async function vSwitch(m){
 }
 function setForce(s){ FORCE=s; const url=new URL(location.href); if(s) url.searchParams.set("sector",s); else url.searchParams.delete("sector");
   history.replaceState(null,"",url.pathname+url.search); loadSector().then(()=>nav("overview")); }
-
 if(token()){ try{ enterApp(); }catch(e){ logout(); } }
 </script>
+<script src="/sector-batch-overlay.js"></script>
 </body>
 </html>
