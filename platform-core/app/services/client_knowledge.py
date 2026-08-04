@@ -52,20 +52,23 @@ def get_doc(db: Session, tenant_pk: int, doc_id: int) -> ClientKBDoc:
 
 def ingest(db: Session, tenant_pk: int, title: str, source: str, category: str,
            text: str, added_by: str, tags: str = "") -> ClientKBDoc:
-    text = text or ""
-    d = ClientKBDoc(tenant_pk=tenant_pk, title=title or "Untitled",
-                    source=source or "inline", category=(category or "GENERAL").upper(),
-                    sha256=hashlib.sha256(text.encode()).hexdigest(),
-                    content_text=text[:200000], char_len=len(text), tags=tags,
-                    added_by=added_by, active=True)
+    text = (text or "").strip()
+    title = (title or "Untitled").strip()[:200]
+    h = hashlib.sha256(text.encode("utf-8", errors="ignore")).hexdigest()
+    d = ClientKBDoc(tenant_pk=tenant_pk, title=title, source=(source or "upload")[:120],
+                    category=(category or "GENERAL")[:40], content_text=text,
+                    content_sha3=h, char_len=len(text), active=True,
+                    added_by=(added_by or "")[:120], tags=(tags or "")[:240])
     db.add(d); db.commit(); db.refresh(d)
     return d
 
 
 def set_active(db: Session, tenant_pk: int, doc_id: int, active: bool) -> ClientKBDoc:
     d = get_doc(db, tenant_pk, doc_id)
-    if d:
-        d.active = active; db.commit(); db.refresh(d)
+    if not d:
+        return None
+    d.active = bool(active)
+    db.commit(); db.refresh(d)
     return d
 
 
@@ -124,12 +127,15 @@ def ask(db: Session, tenant_pk: int, query: str, k: int = 4) -> Dict:
         if best:
             covered |= (qset & set(_tok(best)))
             citations.append({"doc_id": d.id, "title": d.title, "category": d.category,
-                              "snippet": best})
+                              "snippet": best, "match": score})
     coverage = round(len(covered) / max(1, len(qset)), 2)
     if not citations:
         return {"answer": "No passage in your documents matches that query. Try different terms or upload more material.",
                 "blocked": False, "citations": [], "coverage": 0}
-    answer = ("Grounded in " + str(len(citations)) + " passage(s) from your knowledge base: "
-              + " ".join(c["snippet"] for c in citations[:2]))
+    # Same presentation pattern as G.O.D.S Intelligence (gods_intelligence.ask):
+    # citeable bullets from matched passages — tenant corpus only, never invents.
+    snippets = [f"• {c['snippet']}  [{c['title']}]" for c in citations[:4] if c.get("snippet")]
+    answer = ("From your company knowledge base:\n" + "\n".join(snippets)) if snippets else (
+        "Grounded in " + str(len(citations)) + " passage(s) from your knowledge base.")
     return {"answer": answer, "blocked": False, "citations": citations, "coverage": coverage,
-            "matched_docs": len(scored)}
+            "matched_docs": len(scored), "engine": "client_kb_deterministic_v1"}
