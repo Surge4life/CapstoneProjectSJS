@@ -71,19 +71,21 @@ class AssignReq(BaseModel):
 class AffirmationReq(BaseModel):
     what_do_you_want_to_change: str = ""
     why_now: str = ""
-    who_are_you_becoming: str = ""
+    what_are_you_willing_to_do: str = ""
 
 
 class AIReadinessReq(BaseModel):
-    stage: int
+    score: float = Field(ge=0.0, le=1.0)
 
 
 @router.post("/participants/{ref}/assign")
 def assign(ref: str, req: AssignReq, db: Session = Depends(get_db),
-           _=Depends(require_role("operator", "admin"))):
+            _=Depends(require_role("operator", "admin"))):
     try:
         return cetcte_engine.assign_cohort_stream(db, ref, req.cohort, req.stream)
-    except (ValueError, LookupError) as e:
+    except LookupError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(e))
+    except ValueError as e:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e))
 
 
@@ -98,20 +100,22 @@ def self_affirmation(ref: str, req: AffirmationReq, db: Session = Depends(get_db
 
 @router.post("/participants/{ref}/advance")
 def advance(ref: str, db: Session = Depends(get_db),
-            _=Depends(require_role("operator", "admin"))):
+             _=Depends(require_role("operator", "admin"))):
     try:
         return cetcte_engine.advance_stage(db, ref)
     except LookupError as e:
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(e))
+    except ValueError as e:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e))
 
 
 @router.post("/participants/{ref}/ai-readiness")
 def ai_readiness(ref: str, req: AIReadinessReq, db: Session = Depends(get_db),
                   _=Depends(require_role("operator", "admin"))):
     try:
-        return cetcte_engine.update_ai_readiness(db, ref, req.stage)
-    except (ValueError, LookupError) as e:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(e))
+        return cetcte_engine.record_ai_readiness(db, ref, req.score)
+    except LookupError as e:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(e))
 
 
 @router.get("/participants/{ref}/journey")
@@ -123,6 +127,19 @@ def journey(ref: str, db: Session = Depends(get_db)):
 
 
 # ───────────────────────── GBS pillars & franchise registry ─────────────────────────
+
+
+@router.get("/gbs/overview")
+def gbs_overview(db: Session = Depends(get_db)):
+    """Honest GBS snapshot: pillars, layers, node counts, division bindings (SETHS/MADIBA/TS/UDOC/EIF)."""
+    return gbs_engine.overview(db)
+
+
+@router.get("/gbs/layers")
+def gbs_layers():
+    return {"layers": [{"layer": k, "name": v} for k, v in gbs_engine.LAYERS.items()],
+            "note": "Layer 1 is GBS Global itself — not a registrable franchise node"}
+
 
 @router.get("/gbs/pillars")
 def pillars():
@@ -139,7 +156,7 @@ class NodeReq(BaseModel):
 
 @router.post("/gbs/nodes")
 def register_node(req: NodeReq, db: Session = Depends(get_db),
-                   _=Depends(require_role("admin"))):
+                   _=Depends(require_role("operator", "admin"))):
     try:
         return gbs_engine.register_node(db, req.layer, req.name, req.territory, req.parent_node_ref)
     except ValueError as e:
