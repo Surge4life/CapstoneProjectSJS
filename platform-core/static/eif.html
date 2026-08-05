@@ -1,70 +1,186 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UDOC · EIF Diamond</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · EIF Diamond · MADIBA recognition</title>
 <style>
-body{margin:0;font:14px/1.45 system-ui;background:#060E1C;color:#F1F5F9;padding:20px}
-.panel{background:#0D1A2E;border:1px solid #1A2D4A;border-radius:10px;padding:14px;margin-bottom:12px}
-h1{color:#E8C97A;font-size:20px} h3{color:#C9A84C;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-.in,textarea,select{width:100%;background:#091022;border:1px solid #1A2D4A;color:#F1F5F9;border-radius:8px;padding:10px;margin:4px 0 10px;box-sizing:border-box}
-.btn{background:#C9A84C;color:#1a1305;border:0;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer}
-.muted{color:#94A3B8;font-size:12px}.ok{color:#22C55E}.bad{color:#EF4444}
-table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px;border-bottom:1px solid #1A2D4A;text-align:left}
-a{color:#00C2D4}
-</style></head><body>
-<h1>EIF · Diamond</h1>
-<p class="muted">M.A.D.I.B.A. Exceptional Individual Fund · UDOC assurance · no capital on free tier</p>
-<p><a href="/Sentinel">← Sentinel</a> · <a href="/eif/framework">API /eif/framework</a></p>
-<div class="panel" id="fw">Loading framework…</div>
-<div class="panel">
-<h3>Nominate (audit only)</h3>
-<label class="muted">Nominee</label><input class="in" id="name"/>
-<label class="muted">Domain</label><select class="in" id="dom"></select>
-<label class="muted">Contribution</label><textarea id="sum" rows="3" class="in"></textarea>
-<label class="muted">Evidence</label><input class="in" id="ev"/>
-<button class="btn" type="button" onclick="nominate()">Log nomination</button>
-<span id="msg" class="muted"></span>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--bad:#EF4444;--madiba:#C9A84C}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}.tag.warn{border-color:var(--warn);color:var(--warn)}
+a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
+.banner{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.panel h3{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.mut{color:var(--mut)}.live{color:#7fe3ab}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.kv span:first-child{color:var(--mut)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:4px 10px;margin:3px;font-size:12px;cursor:pointer;background:#091022}
+.chip.on{border-color:var(--gold);color:var(--gold)}
+input,textarea,select{width:100%;background:#091022;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px;margin:4px 0 10px}
+button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;margin:2px 4px 2px 0}
+button.ghost{background:transparent;color:var(--cyan);border:1px solid rgba(0,194,212,.4)}
+button.green{background:#1a8f4a;color:#fff}
+.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#9fb4dd;min-height:48px;white-space:pre-wrap;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
+.login{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:12px}
+.login label{font-size:11px;color:var(--mut);display:block}
+.login input{width:180px;margin:0}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">G.O.D.S · <b>EIF Diamond</b></span>
+  <span class="tag warn" id="capTag">capital not_deployed</span>
+  <span class="tag" id="authTag">auth —</span>
+  <span style="flex:1"></span>
+  <a class="nav" href="/gbs">GBS freeze</a>
+  <a class="nav" href="/divisions">Divisions</a>
+  <a class="nav" href="/Sentinel">Sentinel</a>
+  <a class="nav" href="/portals">Portals</a>
+</header>
+<div class="wrap">
+  <div class="banner"><b>Recognition plane (MADIBA):</b> EIF Diamond is the individual-side parallel to <b>GBS-UDOC Sovereign-Verified</b> (systems). Nomination logs to sealed audit only — no funding, no Diamond grant on free-tier Capstone. Staff: <code>madiba@gods.local</code> · <code>staff123</code></div>
+
+  <div class="panel login">
+    <div><label>Email</label><input id="email" value="madiba@gods.local"/></div>
+    <div><label>Password</label><input id="pw" type="password" value="staff123"/></div>
+    <button type="button" class="green" onclick="login()">Sign in</button>
+    <button type="button" class="ghost" onclick="load()">Refresh APIs</button>
+    <span class="mut" id="loginMsg"></span>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Parallel recognition</h3>
+      <div class="kv"><span>Individuals</span><span class="live">EIF Diamond</span></div>
+      <div class="kv"><span>Systems</span><span>Sovereign-Verified</span></div>
+      <div class="kv"><span>Baseline exceeded</span><span>SETHS Platinum · GBS-T.S.</span></div>
+      <div class="kv"><span>Authority</span><span>MADIBA review + UDOC audit</span></div>
+      <p class="mut" style="margin:10px 0 0;font-size:12px">Capstone: Diamond process designed; audit nomination live; capital not_deployed.</p>
+    </div>
+    <div class="panel">
+      <h3>Health</h3>
+      <div id="health">—</div>
+    </div>
+    <div class="panel">
+      <h3>Honesty</h3>
+      <div id="honesty">—</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Six domains</h3>
+    <div id="domains" class="mut">Loading…</div>
+  </div>
+
+  <div class="panel">
+    <h3>Passport → Diamond tiers</h3>
+    <div id="tiers">Loading…</div>
+  </div>
+
+  <div class="panel">
+    <h3>Nominate (audit only)</h3>
+    <label class="mut">Nominee</label>
+    <input id="name" placeholder="Display name or ref"/>
+    <label class="mut">Domain</label>
+    <div id="domChips"></div>
+    <input type="hidden" id="dom" value="intellectual"/>
+    <label class="mut">Pathway</label>
+    <select id="path">
+      <option value="open">Open nomination</option>
+      <option value="seths_platinum">SETHS Platinum → exceptional contribution</option>
+    </select>
+    <label class="mut">Contribution summary</label>
+    <textarea id="sum" rows="3" placeholder="What was contributed and why it is exceptional…"></textarea>
+    <label class="mut">Evidence note</label>
+    <input id="ev" placeholder="Link, case ref, or independent source note"/>
+    <button type="button" onclick="nominate()">Log nomination → sealed audit</button>
+    <div class="term" id="term">Ready · staff login required for nominate</div>
+  </div>
 </div>
 <script>
+const API=location.origin;
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+function tok(){return localStorage.getItem('udoc_eif_tok')||localStorage.getItem('udoc_sent_tok')||'';}
+function setAuth(ok){document.getElementById('authTag').textContent=ok?'auth OK':'auth —';document.getElementById('authTag').className='tag '+(ok?'ok':'');}
 async function api(path,opts={}){
-  const t=localStorage.getItem("udoc_sent_tok")||"";
-  const h=Object.assign({},opts.headers||{});
-  if(t) h.Authorization="Bearer "+t;
-  const base=localStorage.getItem("udoc_sent_api")||"";
-  const r=await fetch(base+path,{...opts,headers:h});
+  const h=Object.assign({'Content-Type':'application/json'},opts.headers||{});
+  const t=tok(); if(t) h.Authorization='Bearer '+t;
+  const r=await fetch(API+path,{...opts,headers:h});
   const b=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(typeof b.detail==="string"?b.detail:(r.status+""));
+  if(!r.ok) throw new Error(typeof b.detail==='string'?b.detail:JSON.stringify(b.detail||r.status));
   return b;
 }
-(async()=>{
+async function login(){
+  const msg=document.getElementById('loginMsg');
   try{
-    const fw=await api("/eif/framework");
-    const h=fw.honesty||{};
-    document.getElementById("fw").innerHTML=
-      "<h3>"+(fw.instrument||"EIF")+"</h3><p class=muted>"+((fw.philosophy||{}).funds||"")+"</p>"+
-      "<p class=muted>proven: "+(h.proven||"")+"</p>"+
-      "<table><tr><th>Domain</th><th>Id</th></tr>"+
-      (fw.domains||[]).map(d=>"<tr><td>"+d.label+"</td><td class=muted>"+d.id+"</td></tr>").join("")+
-      "</table><h3 style=\"margin-top:12px\">Tiers</h3><table>"+
-      (fw.passport_tiers||[]).map(t=>"<tr><td><b>"+t.tier+"</b></td><td>"+t.recognises+"</td></tr>").join("")+
-      "</table>";
-    document.getElementById("dom").innerHTML=(fw.domains||[]).map(d=>"<option value=\""+d.id+"\">"+d.label+"</option>").join("");
-  }catch(e){
-    document.getElementById("fw").innerHTML="<span class=bad>"+e.message+" — sign in on /Sentinel first (stores token)</span>";
-  }
-})();
-async function nominate(){
-  const msg=document.getElementById("msg"); msg.textContent="…";
-  try{
-    const d=await api("/eif/nominate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-      nominee_label:document.getElementById("name").value.trim(),
-      domain:document.getElementById("dom").value,
-      contribution_summary:document.getElementById("sum").value.trim(),
-      evidence_note:document.getElementById("ev").value.trim(),
-      pathway:"open"
-    })});
-    msg.innerHTML="<span class=ok>"+d.status+"</span>";
-  }catch(e){ msg.innerHTML="<span class=bad>"+e.message+"</span>"; }
+    const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email:document.getElementById('email').value.trim(),password:document.getElementById('pw').value})});
+    const t=d.access_token||d.token; if(!t) throw new Error('no token');
+    localStorage.setItem('udoc_eif_tok',t); localStorage.setItem('udoc_sent_tok',t);
+    setAuth(true); msg.innerHTML='<span class="live">signed in</span>'; load();
+  }catch(e){ setAuth(false); msg.innerHTML='<span class="bad">'+esc(e.message)+'</span>'; }
 }
+function pickDom(id,el){
+  document.getElementById('dom').value=id;
+  document.querySelectorAll('#domChips .chip').forEach(c=>c.classList.remove('on'));
+  if(el) el.classList.add('on');
+}
+async function load(){
+  setAuth(!!tok());
+  try{
+    const [h,fw,sov]=await Promise.all([
+      api('/eif/health').catch(e=>({status:'err',error:e.message})),
+      api('/eif/framework').catch(e=>({error:e.message})),
+      api('/gis/gbs/sovereign-tier').catch(()=>({}))
+    ]);
+    document.getElementById('capTag').textContent='capital '+(h.capital||'not_deployed');
+    document.getElementById('health').innerHTML=
+      '<div class="kv"><span>Surface</span><span class="live">'+esc(h.surface||'eif')+'</span></div>'+
+      '<div class="kv"><span>Status</span><span>'+esc(h.status||'—')+'</span></div>'+
+      '<div class="kv"><span>Assurance</span><span>'+esc(h.assurance||'—')+'</span></div>'+
+      '<div class="kv"><span>Capital</span><span class="warn">'+esc(h.capital||'not_deployed')+'</span></div>';
+    const hon=fw.honesty||{};
+    document.getElementById('honesty').innerHTML=
+      '<div class="kv"><span>Instrument</span><span>'+esc(fw.instrument||'EIF')+'</span></div>'+
+      '<div class="kv"><span>Systems parallel</span><span>'+esc(sov.name||'Sovereign-Verified')+'</span></div>'+
+      '<div class="kv"><span>Systems status</span><span class="warn">'+esc(sov.status||'designed_not_built')+'</span></div>'+
+      '<p class="mut" style="margin-top:8px;font-size:12px">'+esc(hon.proven||hon.note||'Framework + nominate audit-only on Capstone')+'</p>';
+    const domains=fw.domains||[];
+    document.getElementById('domains').innerHTML=domains.map(d=>
+      '<div style="margin-bottom:10px"><b>'+esc(d.label)+'</b> <span class="mut">('+esc(d.id)+')</span><div class="mut" style="font-size:12px">'+esc(d.examples||'')+'</div></div>'
+    ).join('')||'<span class="bad">'+esc(fw.error||'no domains')+'</span>';
+    document.getElementById('domChips').innerHTML=domains.map((d,i)=>
+      '<span class="chip'+(i===0?' on':'')+'" onclick="pickDom(\''+d.id+'\',this)">'+esc(d.label)+'</span>'
+    ).join('');
+    if(domains[0]) document.getElementById('dom').value=domains[0].id;
+    const tiers=fw.passport_tiers||fw.tiers||[];
+    document.getElementById('tiers').innerHTML='<table><tr><th>Tier</th><th>Recognises</th></tr>'+
+      tiers.map(t=>'<tr><td><b>'+esc(t.tier)+'</b></td><td class="mut">'+esc(t.recognises)+'</td></tr>').join('')+'</table>';
+  }catch(e){
+    document.getElementById('term').textContent='Load error: '+e.message;
+  }
+}
+async function nominate(){
+  const term=document.getElementById('term');
+  term.textContent='…';
+  try{
+    const d=await api('/eif/nominate',{method:'POST',body:JSON.stringify({
+      nominee_label:document.getElementById('name').value.trim(),
+      domain:document.getElementById('dom').value,
+      contribution_summary:document.getElementById('sum').value.trim(),
+      evidence_note:document.getElementById('ev').value.trim(),
+      pathway:document.getElementById('path').value
+    })});
+    term.textContent=JSON.stringify(d,null,2);
+  }catch(e){ term.textContent='✗ '+e.message; }
+}
+load();
 </script>
-</body></html>
+</body>
+</html>
