@@ -34,10 +34,11 @@ a.surf.pub{border-color:rgba(16,185,129,.35)}
   <div class="sub">Package router · Capstone · Core API shared</div>
   <div class="card">
     <p class="intro">Sign-on routes by <b>role</b>. <b>Internal</b> = staff (Admin / Operator / Sentinel). <b>Client</b> = tenant SaaS. <b>Citizen</b> = public. Same Core · no extra Render services for Admin path aliases.</p>
-    <p class="intro"><b>admin / exec</b> → Internal Admin · <b>operator / auditor</b> → Operator · <b>gov</b> → Sector · <b>client</b> → Client · <b>viewer</b> → Operator</p>
-    <label>Email</label><input id="li-email" type="email" value="admin@gods.local"/>
-    <label>Password</label><input id="li-pass" type="password" value="admin123" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <button class="btn" type="button" onclick="doLogin()">Sign in · open package</button>
+    <label>Email</label>
+    <input id="li-email" type="email" placeholder="admin@gods.local" autocomplete="username"/>
+    <label>Password</label>
+    <input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+    <button class="btn" type="button" onclick="doLogin()">Sign in · route by role</button>
   </div>
   <div class="card">
     <b style="color:var(--gold)">Internal</b>
@@ -49,12 +50,14 @@ a.surf.pub{border-color:rgba(16,185,129,.35)}
       <a class="surf int" href="https://gods-udoc-operator.onrender.com/" target="_blank" rel="noopener"><b>Operator</b>workspace</a>
       <a class="surf int" href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noopener"><b>Sentinel</b>EVA smoke</a>
       <a class="surf int" href="https://gods-platform-core.onrender.com/divisions" target="_blank" rel="noopener"><b>Divisions</b>SETHS·MADIBA·TS live</a>
+      <a class="surf int" href="https://gods-platform-core.onrender.com/gbs" target="_blank" rel="noopener"><b>GBS freeze</b>four-division · Sovereign-Verified</a>
+      <a class="surf int" href="https://gods-platform-core.onrender.com/eif-ui" target="_blank" rel="noopener"><b>EIF</b>Diamond / nominate</a>
       <a class="surf int" href="https://gods-platform-core.onrender.com/portals" target="_blank" rel="noopener"><b>Core Portals</b>24 profiles</a>
       <a class="surf int" href="https://gods-udoc-sector.onrender.com/" target="_blank" rel="noopener"><b>Sector</b>public/private</a>
     </div>
   </div>
   <div class="card">
-    <b style="color:var(--gold)">Client</b>
+    <b style="color:var(--gold)">Client SaaS</b>
     <div class="grid">
       <a class="surf cli" href="https://gods-udoc-client.onrender.com/" target="_blank" rel="noopener"><b>Client Web</b>models · govern</a>
       <a class="surf cli" href="https://gods-udoc-portals.onrender.com/" target="_blank" rel="noopener"><b>SaaS Portals</b>roles</a>
@@ -67,7 +70,7 @@ a.surf.pub{border-color:rgba(16,185,129,.35)}
       <a class="surf pub" href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank" rel="noopener"><b>Citizen</b>AI Rights</a>
     </div>
   </div>
-  <p class="note"><b>Holdings truth:</b> <a href="https://gods-platform-core.onrender.com/divisions" style="color:var(--cyan)">/divisions</a> = live API metrics (zeros allowed). Admin static KPIs are narrative only. Filename on disk: udoc_admin_v93.html · URL canonical: /udoc-admin (hyphen).</p>
+  <p class="note"><b>Holdings truth:</b> <a href="https://gods-platform-core.onrender.com/gbs" style="color:var(--cyan)">/gbs</a> = four-division freeze (SETHS+TS develop · MADIBA/EIF+UDOC recognise). <a href="https://gods-platform-core.onrender.com/divisions" style="color:var(--cyan)">/divisions</a> = operator metrics (zeros allowed). Sovereign-Verified = designed_not_built. Admin static KPIs are narrative only.</p>
 </div>
 <script>
 const CORE="https://gods-platform-core.onrender.com";
