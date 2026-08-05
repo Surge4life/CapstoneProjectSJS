@@ -18,26 +18,35 @@ class EnrolReq(BaseModel):
 
 
 def _heal_learner_cols():
-    cols = [
-        ("cohort", "VARCHAR(4)", "'COHORT_1'"),
-        ("stream", "VARCHAR(24)", "'DIGITAL_OPERATIONS'"),
-        ("cetcte_stage", "VARCHAR(24)", "'STABILISATION'"),
-        ("self_affirmation_json", "TEXT", "'{}'"),
-        ("monthly_value", "DOUBLE PRECISION", "0"),
-    ]
+    """Add missing Capstone columns; widen cohort so COHORT_1 fits (was VARCHAR(4))."""
     with engine.begin() as conn:
         existing = {r[0] for r in conn.execute(text(
             "SELECT column_name FROM information_schema.columns WHERE table_name = 'seths_learners'"
         )).fetchall()}
         if not existing:
             return
+        cols = [
+            ("cohort", "VARCHAR(24)", "'COHORT_1'"),
+            ("stream", "VARCHAR(24)", "'DIGITAL_OPERATIONS'"),
+            ("cetcte_stage", "VARCHAR(24)", "'STABILISATION'"),
+            ("self_affirmation_json", "TEXT", "'{}'"),
+            ("monthly_value", "DOUBLE PRECISION", "0"),
+        ]
         for name, typ, default in cols:
-            if name in existing:
-                continue
-            try:
-                conn.execute(text(f'ALTER TABLE seths_learners ADD COLUMN IF NOT EXISTS "{name}" {typ} DEFAULT {default}'))
-            except Exception:
-                pass
+            if name not in existing:
+                try:
+                    conn.execute(text(
+                        f'ALTER TABLE seths_learners ADD COLUMN IF NOT EXISTS "{name}" {typ} DEFAULT {default}'
+                    ))
+                except Exception:
+                    pass
+        # Always widen cohort if present (String(4) model bug vs COHORT_1)
+        try:
+            conn.execute(text(
+                "ALTER TABLE seths_learners ALTER COLUMN cohort TYPE VARCHAR(24)"
+            ))
+        except Exception:
+            pass
 
 
 @router.post("/enrol")
