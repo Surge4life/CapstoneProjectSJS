@@ -52,35 +52,48 @@ def register_node(db: Session, layer: int, name: str, territory: str, parent_nod
     node = FranchiseNode(
         node_ref=f"GBS-{LAYERS[layer].split()[0].upper()}-{uuid.uuid4().hex[:6].upper()}",
         layer=layer, name=name, territory=territory, parent_node_ref=parent_node_ref,
-        licence_status="PROVISIONAL",
+        licence_status="PENDING",
     )
-    db.add(node); db.commit(); db.refresh(node)
-    append_audit(db, event_type="GBS_NODE_REGISTER", actor_email="system", entity_ref=node.node_ref,
-                 detail=f"layer={layer} territory={territory}")
+    db.add(node)
+    db.commit()
+    db.refresh(node)
+    append_audit(db, event_type="FRANCHISE_NODE_REGISTERED",
+                 payload={"node_ref": node.node_ref, "layer": layer, "name": name},
+                 classification="INSTITUTIONAL", actor_class="gbs_engine")
     return _node_dict(node)
 
 
 def set_licence_status(db: Session, node_ref: str, status: str, reason: str = "") -> dict:
+    valid = {"PENDING", "ACTIVE", "PROBATION", "SUSPENDED", "REVOKED"}
+    if status not in valid:
+        raise ValueError(f"status must be one of {valid}")
     node = db.query(FranchiseNode).filter(FranchiseNode.node_ref == node_ref).one_or_none()
-    if not node:
+    if node is None:
         raise LookupError(f"node not found: {node_ref}")
     node.licence_status = status
-    db.commit(); db.refresh(node)
-    append_audit(db, event_type="GBS_NODE_STATUS", actor_email="system", entity_ref=node_ref,
-                 detail=f"status={status} reason={reason[:120]}")
+    db.commit()
+    append_audit(db, event_type="FRANCHISE_LICENCE_STATUS_CHANGE",
+                 payload={"node_ref": node_ref, "status": status, "reason": reason},
+                 classification="INSTITUTIONAL", actor_class="gbs_engine")
     return _node_dict(node)
 
 
 def record_compliance_audit(db: Session, node_ref: str, compliance_score: float,
                             curriculum_fidelity_pct: float) -> dict:
     node = db.query(FranchiseNode).filter(FranchiseNode.node_ref == node_ref).one_or_none()
-    if not node:
+    if node is None:
         raise LookupError(f"node not found: {node_ref}")
-    node.compliance_score = compliance_score
-    node.curriculum_fidelity_pct = curriculum_fidelity_pct
-    db.commit(); db.refresh(node)
-    append_audit(db, event_type="GBS_NODE_AUDIT", actor_email="system", entity_ref=node_ref,
-                 detail=f"compliance={compliance_score} fidelity={curriculum_fidelity_pct}")
+    node.compliance_score = float(compliance_score)
+    node.curriculum_fidelity_pct = float(curriculum_fidelity_pct)
+    # Auto-probation when fidelity drops below constitutional threshold (Document 00 §11.2).
+    if curriculum_fidelity_pct < MIN_CURRICULUM_FIDELITY * 100 and node.licence_status == "ACTIVE":
+        node.licence_status = "PROBATION"
+    db.commit()
+    append_audit(db, event_type="FRANCHISE_COMPLIANCE_AUDIT",
+                 payload={"node_ref": node_ref, "compliance_score": compliance_score,
+                          "curriculum_fidelity_pct": curriculum_fidelity_pct,
+                          "licence_status": node.licence_status},
+                 classification="INSTITUTIONAL", actor_class="gbs_engine")
     return _node_dict(node)
 
 
