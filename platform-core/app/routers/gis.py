@@ -129,9 +129,21 @@ def journey(ref: str, db: Session = Depends(get_db)):
 # ───────────────────────── GBS pillars & franchise registry ─────────────────────────
 
 
+@router.get("/gbs/architecture")
+def gbs_architecture():
+    """Four-divisional GBS: SETHS+TS develop; MADIBA/EIF+UDOC recognise (GBS-UDOC v1.0)."""
+    return gbs_engine.architecture()
+
+
+@router.get("/gbs/sovereign-tier")
+def gbs_sovereign_tier():
+    """GBS-UDOC Sovereign-Verified tier — designed_not_built; parallel to EIF Diamond."""
+    return gbs_engine.sovereign_tier()
+
+
 @router.get("/gbs/overview")
 def gbs_overview(db: Session = Depends(get_db)):
-    """Honest GBS snapshot: pillars, layers, node counts, division bindings (SETHS/MADIBA/TS/UDOC/EIF)."""
+    """Honest GBS snapshot: pillars, layers, nodes, division bindings, GBS-UDOC v1.0."""
     return gbs_engine.overview(db)
 
 
