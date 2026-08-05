@@ -44,14 +44,15 @@ table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{pa
 <body>
 <header>
   <span class="brand">G.O.D.S · <b>Operator Functions</b></span>
-  <span class="tag ok">SETHS · MADIBA · TS · staff123</span>
+  <span class="tag ok">SETHS · MADIBA · TS · GBS freeze · staff123</span>
   <span style="flex:1"></span>
+  <a class="nav" href="/gbs">GBS freeze</a>
   <a class="nav" href="/portals">24 Portals</a>
   <a class="nav" href="/udoc-admin">UDOC Admin</a>
   <a class="nav" href="/Sentinel">Sentinel</a>
 </header>
 <div class="wrap">
-  <div class="banner"><b>Operator functions:</b> enrol/advance · MADIBA allocate + investor engage · TS SPV + assign worker + project submit. MADIBA ledger ≠ AUM.</div>
+  <div class="banner"><b>Operator functions:</b> enrol/advance · MADIBA allocate + engage · TS SPV + assign · <b>GIS/GBS</b> four-division freeze. MADIBA ledger ≠ AUM. Sovereign-Verified = designed_not_built.</div>
   <div class="bar" id="login">
     <input id="api" placeholder="API blank=same origin" style="width:160px"/>
     <input id="email" value="seths@gods.local" style="width:150px"/>
@@ -70,12 +71,14 @@ table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{pa
       <button type="button" data-t="madiba" onclick="tab(this,'madiba')">MADIBA ops</button>
       <button type="button" data-t="ts" onclick="tab(this,'ts')">TS ops</button>
       <button type="button" data-t="udoc" onclick="tab(this,'udoc')">UDOC</button>
+      <button type="button" data-t="gis" onclick="tab(this,'gis')">GIS / GBS</button>
     </div>
     <div id="v-overview"></div>
     <div id="v-seths" class="hidden"></div>
     <div id="v-madiba" class="hidden"></div>
     <div id="v-ts" class="hidden"></div>
     <div id="v-udoc" class="hidden"></div>
+    <div id="v-gis" class="hidden"></div>
   </div>
   <div class="note" id="foot">Operator role required for mutations · staff123</div>
 </div>
@@ -109,9 +112,9 @@ async function connect(){
     if(map[DIVISION]){ const btn=document.querySelector('#tabs button[data-t="'+map[DIVISION]+'"]'); if(btn) tab(btn, map[DIVISION]); }
   }catch(e){ $("who").innerHTML='<span class="err">'+esc(e.message)+'</span>'; }
 }
-function tab(el, name){ ["overview","seths","madiba","ts","udoc"].forEach(n=>{ const p=$("v-"+n); if(p) p.classList.toggle("hidden", n!==name); }); document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on", b.dataset.t===name)); if(el) el.classList.add("on"); }
+function tab(el, name){ ["overview","seths","madiba","ts","udoc","gis"].forEach(n=>{ const p=$("v-"+n); if(p) p.classList.toggle("hidden", n!==name); }); document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on", b.dataset.t===name)); if(el) el.classList.add("on"); }
 function card(cls, title, rows, note){ return '<div class="card '+cls+'"><h3>'+esc(title)+'</h3>'+rows.map(([k,v])=>'<div class="kv"><span>'+esc(k)+'</span><span>'+v+'</span></div>').join("")+(note?'<div class="mut" style="margin-top:6px;font-size:12px">'+note+'</div>':'')+'</div>'; }
-async function refreshAll(){ $("foot").textContent="Loading…"; await Promise.all([renderOverview(),renderSeths(),renderMadiba(),renderTs(),renderUdoc()]); $("foot").textContent="Ops · "+new Date().toISOString().slice(11,19)+" · "+(DIVISION||"—"); }
+async function refreshAll(){ $("foot").textContent="Loading…"; await Promise.all([renderOverview(),renderSeths(),renderMadiba(),renderTs(),renderUdoc(),renderGis()]); $("foot").textContent="Ops · "+new Date().toISOString().slice(11,19)+" · "+(DIVISION||"—"); }
 async function renderOverview(){
   const [aS,mM,aT,sa,demo]=await Promise.all([safe("/analytics/SETHS/kpis"),safe("/madiba/metrics"),safe("/analytics/TS/kpis"),safe("/madiba/series-a-status"),safe("/udoc/demo/ready")]);
   const tr=sa.triggers||{};
@@ -146,6 +149,19 @@ async function renderUdoc(){
   const [reg,demo]=await Promise.all([safe("/udoc/regulator/summary"),safe("/udoc/demo/ready")]);
   $("v-udoc").innerHTML='<div class="panel"><h3>UDOC</h3><div class="grid">'+card("udoc","Demo",[["Ready",demo.ready?'<span class="live">true</span>':'false']])+card("udoc","Regulator",[["Decisions",num(reg.decisions&&reg.decisions.total)],["Blocked",num(reg.decisions&&reg.decisions.blocked)]])+'</div><div class="row" style="margin-top:10px"><button class="cyan" type="button" onclick="window.open(API+\'/Sentinel\',\'_blank\')">Sentinel</button><button class="green" type="button" onclick="udocBatch()">fair/biased</button></div><div class="term" id="term">UDOC ready.</div></div>';
 }
+async function renderGis(){
+  const [arch,sov,ov]=await Promise.all([safe("/gis/gbs/architecture"),safe("/gis/gbs/sovereign-tier"),safe("/gis/gbs/overview")]);
+  const divs=arch.divisions||[];
+  const binds=ov.division_bindings||[];
+  $("v-gis").innerHTML='<div class="panel"><h3>GBS four-division freeze</h3><p class="mut" style="font-size:12px">'+esc((arch.symmetry&&arch.symmetry.note)||"")+'</p><div class="grid">'+
+    divs.map(x=>{const b=binds.find(z=>z.division===x.division)||{};const cls={SETHS:"seths",MADIBA:"madiba",TS:"ts",UDOC:"udoc"}[x.division]||"udoc";
+      return card(cls,x.division+" · "+(x.mode||""),[["Proposition",esc(x.proposition||"")],["Assures",esc(x.assures||"")]],esc(b.honesty||""));}).join("")+
+    '</div></div><div class="panel"><h3>Sovereign-Verified</h3><div class="grid">'+
+    card("udoc","Tier",[["Name",esc(sov.name||"—")],["Status",'<span class="zero">'+(esc(sov.status||"designed_not_built"))+'</span>'],["Parallel",esc(sov.parallel_to||"")]])+
+    card("udoc","Nodes",[["Total",num(ov.nodes&&ov.nodes.total)],["Empty OK",(ov.honesty&&ov.honesty.nodes_empty_ok)?'<span class="live">yes</span>':'no']])+
+    '</div><div class="row" style="margin-top:10px"><button class="cyan" type="button" onclick="window.open(API+\'/gbs\',\'_blank\')">Open /gbs freeze page</button><button class="green" type="button" onclick="gbsRegDemo()">Register demo node L4</button></div><div class="term" id="term">GBS ready · GBS-UDOC v1.0</div></div>';
+}
+async function gbsRegDemo(){ try{ const r=await api("/gis/gbs/nodes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({layer:4,name:"Capstone Delivery Demo",territory:"South Africa"})}); term("✓ "+r.node_ref+" · "+r.licence_status); await renderGis(); }catch(e){ term("✗ "+e.message); } }
 async function udocBatch(){ try{ const r=await api("/decisions/batch",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({options:["fair","biased"],model_id:"model-001"})}); term("✓ "+JSON.stringify(r.outcomes||{})); }catch(e){ term("✗ "+e.message); } }
 </script>
 </body>
