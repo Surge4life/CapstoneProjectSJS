@@ -1,43 +1,49 @@
-# GBS pre-UDOC alignment (Capstone)
+# GBS full alignment — four divisions + GBS-UDOC v1.0
 
 **Date:** 2026-08-05  
-**Awaiting:** founder **UDOC GBS** document (after 10:00 SAST) for freeze refinements.
+**Source:** GBS-UDOC Constitutional Proposition v1.0 (July 2026) + GBS-SETHS, GBS-T.S., GBS-M.A.D.I.B.A./EIF
 
-## Live surfaces
+## Four-divisional architecture (complete set)
+
+| Division | Proposition | Assures | Mode |
+|----------|-------------|---------|------|
+| **S.E.T.H.S.** | GBS-SETHS | Human capability | **Develops** |
+| **M.A.D.I.B.A.** | GBS-M.A.D.I.B.A. / EIF | Exceptional individual contribution | **Recognises** |
+| **T.S. Industries** | GBS-T.S. | Trusted systems | **Develops** |
+| **UDOC** | GBS-UDOC | Exceptional systems platforms | **Recognises** |
+
+Symmetry: two build (people / systems); two recognise exceptional achievement in what was built (individuals / platforms).
+
+## Live API surface
 
 | Endpoint | Purpose |
 |----------|---------|
-| `GET /gis/gbs/overview` | Honest snapshot: pillars, layers, node counts, division bindings |
-| `GET /gis/gbs/pillars` | 12 constitutional + 7 universal pillars |
-| `GET /gis/gbs/layers` | Layers 2–5 (Layer 1 = GBS Global, not a node) |
+| `GET /gis/gbs/architecture` | Four-divisional develops/recognises map |
+| `GET /gis/gbs/sovereign-tier` | Sovereign-Verified definition + honesty (`designed_not_built`) |
+| `GET /gis/gbs/overview` | Full snapshot: pillars, layers, nodes, bindings, tier |
+| `GET /gis/gbs/pillars` | 12 constitutional + 7 universal |
+| `GET /gis/gbs/layers` | Layers 2–5 |
 | `GET/POST /gis/gbs/nodes` | Franchise registry (zeros honest) |
-| `POST /gis/gbs/nodes/{ref}/status` | Licence status (admin) |
-| `POST /gis/gbs/nodes/{ref}/audit` | Compliance + curriculum fidelity (admin) |
-| `GET /eif/*` | MADIBA Diamond / UDOC assurance (nominate audit-only) |
+| `GET /eif/*` | Individual recognition (EIF Diamond parallel) |
 
-## Division bindings (pre-UDOC-GBS)
+## GBS-UDOC Sovereign-Verified
 
-| Division | Constitutional | Universal | Honesty |
-|----------|----------------|-----------|---------|
-| **SETHS** | I, II, IX, XII | 1–4 | Learners + PLACED→TS loop live |
-| **MADIBA** | IV, V, VI, XI | 4, 6, 7 | Demo ledger ≠ AUM |
-| **TS** | II, IV, IX | 3–5 | SPV + assign-worker live |
-| **UDOC** | V, VI, VIII, XII | 5, 7 | EVA + policy-to-code on free tier |
-| **EIF** | I, II, VI, XI | 1, 4, 7 | Nominate → sealed audit only |
+- **Parallel:** EIF Diamond (individuals) ↔ Sovereign-Verified (systems)
+- **Exceeds:** GBS-T.S. baseline compliance
+- **Authority:** UDOC via EVA 6-D + sealed audit trail
+- **Status:** `designed_not_built` — process and 6-month baseline proposed; not operational on Capstone free tier
+- **Proven/live:** EVA evaluation + audit trail infrastructure (partial Capstone path)
+- **Aspirational:** External ISO-like recognition at commercial scale
 
-## Intentional empties
+## Honesty (non-negotiable)
 
-- Franchise **nodes total may be 0** — correct Capstone posture until funded geographic scale.
-- EIF **capital not_deployed** on Neon free tier.
-- GIS hardware attestation / enclave enforcement is **documented**, not claimed on Render free.
+- Franchise **nodes may be 0**
+- MADIBA **demo ledger ≠ AUM**
+- EIF **capital not_deployed**
+- Sovereign-Verified **not claimed as live certification**
+- Hardware enforcement **documented**, not claimed on Render free
 
-## After UDOC GBS arrives
+## Operator staff
 
-1. Diff `DIVISION_BINDINGS` against founder text.
-2. Adjust pillar names only if Document 01 lists change (byte-identical rule).
-3. Freeze UDOC SaaS claim set; Holdings website Capstone tab.
-4. Optional: one demo National (layer 2) node for assessor walkthrough — still not fabricated scale.
-
-## Operator UI
-
-https://gods-platform-core.onrender.com/divisions — GIS / GBS tab (after UI densify deploy).
+`seths@` / `madiba@` / `ts@` **gods.local** · **staff123**  
+UI: https://gods-platform-core.onrender.com/divisions
