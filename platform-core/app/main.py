@@ -40,6 +40,10 @@ def _startup():
     except Exception as e:
         print(f"[startup] schema-heal error (continuing): {e}")
     try:
+        _heal_seths_learners()
+    except Exception as e:
+        print(f"[startup] seths-learners heal error (continuing): {e}")
+    try:
         _ensure_bootstrap_admin()
     except Exception as e:
         print(f"[startup] bootstrap-admin skipped: {e}")
@@ -60,6 +64,40 @@ def _startup():
         start_scheduler()
     except Exception as e:
         print(f"[startup] conformance scanner not started: {e}")
+
+
+def _heal_seths_learners():
+    """Ensure Capstone Learner columns exist on Neon (enrol 500 if missing)."""
+    from sqlalchemy import text
+    from app.db.session import engine
+    cols = [
+        ("cohort", "VARCHAR(4)", "'COHORT_1'"),
+        ("stream", "VARCHAR(24)", "'DIGITAL_OPERATIONS'"),
+        ("cetcte_stage", "VARCHAR(24)", "'STABILISATION'"),
+        ("self_affirmation_json", "TEXT", "'{}'"),
+        ("monthly_value", "DOUBLE PRECISION", "0"),
+        ("nqf_level", "INTEGER", "5"),
+        ("status", "VARCHAR(20)", "'ENROLLED'"),
+        ("qualification", "VARCHAR(120)", "'Digital Operations & AI Literacy'"),
+        ("created_at", "TIMESTAMP", "NOW()"),
+    ]
+    with engine.begin() as conn:
+        existing = {r[0] for r in conn.execute(text(
+            "SELECT column_name FROM information_schema.columns "
+            "WHERE table_name = 'seths_learners'"
+        )).fetchall()}
+        if not existing:
+            print("[heal-seths] table seths_learners missing — init_db should create it")
+            return
+        for name, typ, default in cols:
+            if name in existing:
+                continue
+            ddl = f'ALTER TABLE seths_learners ADD COLUMN IF NOT EXISTS "{name}" {typ} DEFAULT {default}'
+            try:
+                conn.execute(text(ddl))
+                print(f"[heal-seths] added seths_learners.{name}")
+            except Exception as e:
+                print(f"[heal-seths] skip {name}: {str(e)[:100]}")
 
 
 def _heal_schema():
@@ -191,7 +229,7 @@ def _ensure_udoc_demo_seed():
 
 def _ensure_client_kb_demo_seed():
     import hashlib
-    from sqlalchemy import select, func
+    from sqlalchemy import select
     from app.db.session import SessionLocal
     from app.db.models import Tenant, ClientKBDoc, User
     from app.core.security import hash_password
