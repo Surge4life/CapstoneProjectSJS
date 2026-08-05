@@ -71,7 +71,7 @@ def _heal_seths_learners():
     from sqlalchemy import text
     from app.db.session import engine
     cols = [
-        ("cohort", "VARCHAR(4)", "'COHORT_1'"),
+        ("cohort", "VARCHAR(24)", "'COHORT_1'"),
         ("stream", "VARCHAR(24)", "'DIGITAL_OPERATIONS'"),
         ("cetcte_stage", "VARCHAR(24)", "'STABILISATION'"),
         ("self_affirmation_json", "TEXT", "'{}'"),
@@ -98,6 +98,10 @@ def _heal_seths_learners():
                 print(f"[heal-seths] added seths_learners.{name}")
             except Exception as e:
                 print(f"[heal-seths] skip {name}: {str(e)[:100]}")
+        try:
+            conn.execute(text("ALTER TABLE seths_learners ALTER COLUMN cohort TYPE VARCHAR(24)"))
+        except Exception:
+            pass
 
 
 def _heal_schema():
@@ -290,6 +294,14 @@ def portals_console():
     return FileResponse(_static("portals.html"))
 
 
+@app.get("/gbs", tags=["root"], include_in_schema=False)
+@app.get("/gbs/", tags=["root"], include_in_schema=False)
+@app.get("/holdings", tags=["root"], include_in_schema=False)
+def gbs_freeze_console():
+    """Capstone GBS four-division freeze page (GBS-UDOC v1.0)."""
+    return FileResponse(_static("gbs.html"))
+
+
 @app.get("/divisions", tags=["root"], include_in_schema=False)
 @app.get("/divisions/", tags=["root"], include_in_schema=False)
 def divisions_console():
@@ -313,7 +325,8 @@ def root():
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
             "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "udoc_admin_alias": "/udoc_admin",
                          "portals": "/portals", "divisions": "/divisions", "sentinel": "/Sentinel", "eif": "/eif-ui",
-                         "note": "Division staff: seths@/madiba@/ts@ gods.local · staff123"},
+                         "gbs": "/gbs", "holdings": "/holdings",
+                         "note": "Division staff: seths@/madiba@/ts@ gods.local · staff123 · GBS freeze: /gbs"},
             "governance": "EVA 6-D + policy-to-code + conformance, fail-closed for critical"}
 
 
