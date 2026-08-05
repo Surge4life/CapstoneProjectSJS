@@ -1,9 +1,9 @@
 """SETHS — workforce reintegration: enrol, complete, place learners."""
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from app.db.session import get_db
+from app.db.session import get_db, engine
 from app.db.models import Learner
 from app.core.dependencies import require_role
 from app.services import analytics_engine as ae
@@ -16,15 +16,54 @@ class EnrolReq(BaseModel):
     nqf_level: int = 5
     count: int = 1
 
+
+def _heal_learner_cols():
+    cols = [
+        ("cohort", "VARCHAR(4)", "'COHORT_1'"),
+        ("stream", "VARCHAR(24)", "'DIGITAL_OPERATIONS'"),
+        ("cetcte_stage", "VARCHAR(24)", "'STABILISATION'"),
+        ("self_affirmation_json", "TEXT", "'{}'"),
+        ("monthly_value", "DOUBLE PRECISION", "0"),
+    ]
+    with engine.begin() as conn:
+        existing = {r[0] for r in conn.execute(text(
+            "SELECT column_name FROM information_schema.columns WHERE table_name = 'seths_learners'"
+        )).fetchall()}
+        if not existing:
+            return
+        for name, typ, default in cols:
+            if name in existing:
+                continue
+            try:
+                conn.execute(text(f'ALTER TABLE seths_learners ADD COLUMN IF NOT EXISTS "{name}" {typ} DEFAULT {default}'))
+            except Exception:
+                pass
+
+
 @router.post("/enrol")
 def enrol(req: EnrolReq, db: Session = Depends(get_db), _=Depends(require_role("operator", "admin"))):
-    created = []
-    for _i in range(req.count):
-        l = Learner(ref=f"SETHS-{uuid.uuid4().hex[:8]}", qualification=req.qualification, nqf_level=req.nqf_level)
-        db.add(l); created.append(l.ref)
-    db.commit()
+    count = max(1, min(int(req.count or 1), 20))
+    def _create():
+        created = []
+        for _i in range(count):
+            l = Learner(ref=f"SETHS-{uuid.uuid4().hex[:8]}", qualification=req.qualification, nqf_level=req.nqf_level)
+            db.add(l); created.append(l.ref)
+        db.commit()
+        return created
+    try:
+        created = _create()
+    except Exception:
+        db.rollback()
+        _heal_learner_cols()
+        try:
+            created = _create()
+        except Exception as second:
+            db.rollback()
+            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                f"enrol failed (schema?): {str(second)[:240]}")
     ae.record(db, "SETHS", "ENROL", metric_name="enrolled", metric_value=len(created))
     return {"enrolled": len(created), "refs": created[:20]}
+
 
 @router.post("/{ref}/advance")
 def advance(ref: str, monthly_value: float = 12000.0, db: Session = Depends(get_db),
@@ -40,6 +79,7 @@ def advance(ref: str, monthly_value: float = 12000.0, db: Session = Depends(get_
         ae.record(db, "SETHS", "PLACE", entity_ref=ref, metric_name="placed", metric_value=1)
         ae.record(db, "SETHS", "OUTPUT", entity_ref=ref, metric_name="monthly_value", metric_value=l.monthly_value)
     return {"ref": ref, "status": l.status, "monthly_value": l.monthly_value}
+
 
 @router.get("/metrics")
 def metrics(db: Session = Depends(get_db)):
