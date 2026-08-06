@@ -4,6 +4,8 @@ export function Overview(){
   const [s,setS]=useState<any>(null); const [loop,setLoop]=useState<any>(null);
   const [chain,setChain]=useState<any>(null); const [sov,setSov]=useState<any>(null);
   const [bias,setBias]=useState<any>(null); const [audit,setAudit]=useState<any[]>([]);
+  const [seths,setSeths]=useState<any>(null); const [ts,setTs]=useState<any>(null);
+  const [demo,setDemo]=useState<any>(null);
   async function load(){
     api.get("/admin/status").then(setS).catch(()=>{});
     api.get("/intelligence/loop-snapshot").then(setLoop).catch(()=>{});
@@ -11,6 +13,9 @@ export function Overview(){
     api.get("/sovereignty/posture").then(setSov).catch(()=>{});
     api.get("/bias/scan").then(setBias).catch(()=>{});
     api.get("/audit/records").then(setAudit).catch(()=>{});
+    api.get("/analytics/SETHS/kpis").then(setSeths).catch(()=>{});
+    api.get("/ts/metrics").then(setTs).catch(()=>{});
+    api.get("/udoc/demo/ready").then(setDemo).catch(()=>{});
   }
   useEffect(()=>{ load(); const t=setInterval(load,8000); return ()=>clearInterval(t); },[]);
   const sovPct = sov ? (sov.sovereign_rate*100).toFixed(0)+"%" : "—";
@@ -20,25 +25,20 @@ export function Overview(){
       <div className="card"><h3>Decisions</h3><div className="metric">{s?.decisions??"—"}</div></div>
       <div className="card"><h3>Open Oversight</h3><div className="metric">{s?.open_oversight??"—"}</div></div>
       <div className="card"><h3>Sovereignty</h3><div className="metric">{sovPct}</div></div>
-      <div className="card"><h3>Bias Flags</h3><div className="metric">{bias?.fairness_flagged??"—"}<small>of {bias?.decisions_scanned??0} scanned</small></div></div>
-      <div className="card"><h3>Audit Chain</h3><div className="metric" style={{color:chain?.intact?"var(--ok)":"var(--bad)"}}>{chain?(chain.intact?"INTACT":"BROKEN"):"—"}<small>{chain?.records??0} records</small></div></div>
-      <div className="card"><h3>SETHS Learners</h3><div className="metric">{s?.learners??"—"}</div></div>
-      <div className="card"><h3>TS Projects</h3><div className="metric">{s?.ts_projects??"—"}</div></div>
+      <div className="card"><h3>Demo ready</h3><div className="metric" style={{color:demo?.ready?"var(--ok)":"var(--warn)"}}>{demo?String(demo.ready):"—"}</div></div>
+      <div className="card"><h3>Chain intact</h3><div className="metric" style={{color:chain?.intact?"var(--ok)":"var(--bad)"}}>{chain?String(chain.intact):"—"}</div></div>
+      <div className="card"><h3>SETHS enrolled</h3><div className="metric">{seths?.enrolled??"—"}</div></div>
+      <div className="card"><h3>SETHS placed</h3><div className="metric">{seths?.placed??"—"}</div></div>
+      <div className="card"><h3>TS projects</h3><div className="metric">{ts?.projects??"—"}</div></div>
+      <div className="card"><h3>TS workers</h3><div className="metric">{ts?.workers_absorbed??"—"}</div></div>
     </div>
-    <div className="panel"><h3>Closed-Loop Economic Snapshot</h3>
-      {loop?<p style={{color:"var(--white)",fontSize:".85rem"}}>{loop.loop} — SETHS placed <b>{loop.seths_placed}</b> ·
-        TS monthly profit <b>R{(loop.ts_monthly_profit||0).toLocaleString()}</b> ·
-        MADIBA recycled <b>R{(loop.madiba_cumulative_recycled||0).toLocaleString()}</b> ·
-        UDOC decisions <b>{loop.udoc_decisions}</b></p>:<p>Loading…</p>}
+    <div className="panel"><h3>Live posture</h3>
+      <p style={{fontSize:".82rem"}}>Bias scan: {bias?JSON.stringify(bias).slice(0,160):"—"}</p>
+      <p style={{fontSize:".82rem"}}>Intelligence loop: {loop?JSON.stringify(loop).slice(0,160):"—"}</p>
+      <p style={{fontSize:".76rem",color:"var(--warn)"}}>Pre-registration forecast · honest empties valid · MADIBA ledger ≠ AUM</p>
     </div>
-    <div className="panel"><h3>Live Audit Stream</h3>
-      <div style={{maxHeight:300,overflow:"auto"}}>
-        {audit.length? audit.slice(0,14).map((r:any,i:number)=>(
-          <div key={i} style={{display:"flex",gap:10,padding:"6px 2px",borderBottom:"1px solid rgba(29,48,80,.5)",fontSize:".76rem"}}>
-            <span style={{color:"var(--rule)",fontFamily:"monospace",minWidth:62}}>{String(r.created_at||"").slice(11,19)}</span>
-            <span style={{color:"var(--gold)",minWidth:128,fontFamily:"monospace"}}>{r.event_type||r.event||"EVENT"}</span>
-            <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{typeof r.detail==="string"?r.detail:JSON.stringify(r.detail||r.classification||"")}</span>
-          </div>)) : <p style={{color:"var(--rule)",fontSize:".8rem"}}>No audit events yet — run a governance decision in UDOC.</p>}
-      </div>
-    </div></>);
+    <div className="panel"><h3>Recent audit</h3>
+      <pre style={{fontSize:".7rem",maxHeight:160,overflow:"auto"}}>{Array.isArray(audit)?JSON.stringify(audit.slice(0,8),null,2):"—"}</pre>
+    </div>
+  </>);
 }
