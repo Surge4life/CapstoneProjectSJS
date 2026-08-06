@@ -4,6 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>G.O.D.S · Divisions · Operator Functions</title>
+<!-- densify-crosslinks-2026-08-06 -->
 <style>
 :root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--warn:#E8A13A;--udoc:#7C5CBF;--green:#10B981}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
@@ -156,8 +157,8 @@ async function tsListWorkers(){ const spv=($("tw-spv").value||"").trim(); if(!sp
 async function tsSubmit(){ try{ const r=await api("/ts/submit/project",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title:$("su-t").value,sector:$("su-s").value,capex_estimate:parseFloat($("su-c").value)||0,submitter_type:"OPERATOR",submitter_name:"TS Staff",description:"Capstone operator submission"})}); term("✓ "+(r.submission_ref||r.ref)+" · "+r.stage); $("su-ref").value=r.submission_ref||r.ref||""; await renderTs(); }catch(e){ term("✗ "+e.message); } }
 async function tsSubmitAdv(){ const ref=($("su-ref").value||"").trim(); if(!ref) return; try{ const r=await api("/ts/submit/project/"+encodeURIComponent(ref)+"/advance",{method:"POST"}); term("✓ "+(r.submission_ref||ref)+" → "+r.stage); await renderTs(); }catch(e){ term("✗ "+e.message); } }
 async function renderUdoc(){
-  const [reg,demo]=await Promise.all([safe("/udoc/regulator/summary"),safe("/udoc/demo/ready")]);
-  $("v-udoc").innerHTML='<div class="panel"><h3>UDOC</h3><div class="grid">'+card("udoc","Demo",[["Ready",demo.ready?'<span class="live">true</span>':'false']])+card("udoc","Regulator",[["Decisions",num(reg.decisions&&reg.decisions.total)],["Blocked",num(reg.decisions&&reg.decisions.blocked)]])+'</div><div class="row" style="margin-top:10px"><button class="cyan" type="button" onclick="window.open(API+\'/Sentinel\',\'_blank\')">Sentinel</button><button class="green" type="button" onclick="udocBatch()">fair/biased</button></div><div class="term" id="term">UDOC ready</div></div>';
+  const [reg,demo,sov]=await Promise.all([safe("/udoc/regulator/summary"),safe("/udoc/demo/ready"),safe("/gis/gbs/sovereign-tier")]);
+  $("v-udoc").innerHTML='<div class="panel"><h3>UDOC · GBS-UDOC (recognises exceptional systems)</h3><p class="mut" style="font-size:12px">EVA + policy-to-code live · Sovereign-Verified = '+esc(sov.status||"designed_not_built")+' · parallel '+esc(sov.parallel_to||"EIF Diamond")+'</p><div class="grid">'+card("udoc","Demo",[["Ready",demo.ready?'<span class="live">true</span>':'false']])+card("udoc","Regulator",[["Decisions",num(reg.decisions&&reg.decisions.total)],["Blocked",num(reg.decisions&&reg.decisions.blocked)]])+'</div><div class="row" style="margin-top:10px"><button class="cyan" type="button" onclick="window.open(API+\'/Sentinel\',\'_blank\')">Sentinel EVA</button><button class="green" type="button" onclick="udocBatch()">fair/biased batch</button><button class="cyan" type="button" onclick="window.open(API+\'/gbs\',\'_blank\')">GBS freeze</button><button class="cyan" type="button" onclick="window.open(API+\'/eif-ui\',\'_blank\')">EIF</button><button type="button" onclick="tab(document.querySelector(\'#tabs button[data-t=gis]\'),\'gis\')">GIS tab</button></div><div class="term" id="term">UDOC ready · cross-links OK</div></div>';
 }
 async function renderGis(){
   const [arch,sov,ov]=await Promise.all([safe("/gis/gbs/architecture"),safe("/gis/gbs/sovereign-tier"),safe("/gis/gbs/overview")]);
