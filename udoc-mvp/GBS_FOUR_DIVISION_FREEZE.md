@@ -1,6 +1,6 @@
 # GBS four-division Capstone freeze
 
-**Date:** 2026-08-05  
+**Date:** 2026-08-05 · **Extended:** 2026-08-06 (pre-seed densify)  
 **Status:** Frozen for Capstone narrative (intent + live honesty)
 
 ## Freeze statement
@@ -23,18 +23,27 @@ Capstone status: `designed_not_built` — EVA + audit trail live; tier process n
 |-----|------|
 | https://gods-platform-core.onrender.com/gbs | Four-division freeze page |
 | https://gods-platform-core.onrender.com/holdings | Alias of /gbs |
-| https://gods-platform-core.onrender.com/divisions | Operator stack + GIS/GBS tab |
+| https://gods-platform-core.onrender.com/divisions | Pre-seed operator densify |
 | `GET /gis/gbs/architecture` | JSON architecture |
 | `GET /gis/gbs/sovereign-tier` | Sovereign-Verified honesty |
 | `GET /gis/gbs/overview` | Full snapshot |
 
+## Pre-seed operator densify (2026-08-06)
+
+- Loader + chunked payload on Core `/divisions`  
+- Guided path: Enrol → Place → SPV → Assign → MADIBA allocate  
+- Archive map: `DIVISIONS_DOCUMENTATION_ARCHIVE.md`  
+- Smoke: `PRESEED_DIVISIONS_SMOKE.md`  
+
+Honesty rules unchanged (zeros · ledger ≠ AUM · designed_not_built).
+
 ## Not claimed on free tier
 
-- Geographic franchise scale (nodes may be 0)
-- Institutional AUM (MADIBA demo ledger only)
-- EIF capital deployment
-- Live Sovereign-Verified certifications
-- Hardware-enforced governance on arbitrary cloud hosts
+- Geographic franchise scale (nodes may be 0)  
+- Institutional AUM (MADIBA demo ledger only)  
+- EIF capital deployment  
+- Live Sovereign-Verified certifications  
+- Hardware-enforced governance on arbitrary cloud hosts  
 
 ## Founder open item
 
