@@ -49,10 +49,11 @@ table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}th,td{pa
   <a class="nav" href="/gbs">GBS freeze</a>
   <a class="nav" href="/portals">24 Portals</a>
   <a class="nav" href="/udoc-admin">UDOC Admin</a>
+  <a class="nav" href="/eif-ui">EIF</a>
   <a class="nav" href="/Sentinel">Sentinel</a>
 </header>
 <div class="wrap">
-  <div class="banner"><b>Operator functions:</b> enrol/advance · MADIBA allocate + engage · TS SPV + assign · <b>GIS/GBS</b> four-division freeze. MADIBA ledger ≠ AUM. Sovereign-Verified = designed_not_built.</div>
+  <div class="banner"><b>Operator functions:</b> SETHS journey (enrol→CET/CTE→place) · MADIBA allocate + engage · TS SPV + assign · GIS/GBS freeze. MADIBA ledger ≠ AUM. Sovereign-Verified = designed_not_built.</div>
   <div class="bar" id="login">
     <input id="api" placeholder="API blank=same origin" style="width:160px"/>
     <input id="email" value="seths@gods.local" style="width:150px"/>
@@ -122,10 +123,113 @@ async function renderOverview(){
 }
 async function renderSeths(){
   const m=await safe("/seths/metrics");
-  $("v-seths").innerHTML='<div class="side"><div><div class="panel"><h3>SETHS metrics</h3><div class="grid">'+card("seths","Learners",[["Total",num(m.total)],["Completed",num(m.completed)],["Placed",num(m.placed)]])+'</div></div><div class="panel"><h3>Enrol / Advance</h3><div class="row"><div class="f"><label>Qualification</label><input id="se-q" value="Digital Operations & AI Literacy"/></div><div class="f"><label>Count</label><input id="se-c" type="number" value="1"/></div><button type="button" onclick="sethEnrol()">Enrol</button></div><div class="row"><div class="f"><label>Learner ref</label><input id="se-ref" placeholder="SETHS-…"/></div><button class="cyan" type="button" onclick="sethAdvance()">Advance → PLACED</button></div><p class="mut" style="font-size:12px">Placed learners assignable to TS SPVs.</p></div></div><div><div class="panel"><h3>Terminal</h3><div class="term" id="term">SETHS ops ready.</div></div></div></div>';
+  const rate=((m.placement_rate||0)*100).toFixed(1);
+  $("v-seths").innerHTML=`
+  <div class="side">
+    <div>
+      <div class="panel">
+        <h3>SETHS · GBS-SETHS (develops human capability)</h3>
+        <p class="mut" style="font-size:12px;margin:0 0 8px">Enrol → COMPLETED → PLACED · CET/CTE journey on same ref · placed learners assignable on TS tab. Zeros honest.</p>
+        <div class="grid">
+          ${card("seths","Learners",[["Total",num(m.total)],["Completed",num(m.completed)],["Placed",num(m.placed)]])}
+          ${card("seths","Outcomes",[["Placement rate",rate+"%"],["Monthly output",num(m.monthly_economic_output)]])}
+        </div>
+      </div>
+      <div class="panel">
+        <h3>1 · Enrol</h3>
+        <div class="row">
+          <div class="f"><label>Qualification</label><input id="se-q" value="Digital Operations & AI Literacy"/></div>
+          <div class="f"><label>NQF</label><input id="se-nqf" type="number" value="5" style="width:70px"/></div>
+          <div class="f"><label>Count</label><input id="se-c" type="number" value="1" style="width:70px"/></div>
+          <button type="button" onclick="sethEnrol()">Enrol</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>2 · Status advance (Skills path)</h3>
+        <div class="row">
+          <div class="f" style="flex:1"><label>Learner ref</label><input id="se-ref" placeholder="SETHS-…"/></div>
+          <button class="cyan" type="button" onclick="sethAdvance()">Advance ENROLLED→COMPLETED→PLACED</button>
+        </div>
+        <p class="mut" style="font-size:12px;margin:6px 0 0">Each call moves one step. PLACED sets monthly_value for economic output metrics.</p>
+      </div>
+      <div class="panel">
+        <h3>3 · CET/CTE journey (GIS participant)</h3>
+        <div class="row">
+          <div class="f"><label>Cohort</label><input id="se-cohort" value="COHORT_1"/></div>
+          <div class="f"><label>Stream</label><input id="se-stream" value="DIGITAL_OPERATIONS"/></div>
+          <button class="cyan" type="button" onclick="sethAssign()">Assign cohort/stream</button>
+        </div>
+        <div class="row">
+          <button type="button" onclick="sethStage()">Advance CET stage</button>
+          <button type="button" onclick="sethAffirm()">Self-affirmation demo</button>
+          <button type="button" onclick="sethAI()">AI readiness 0.75</button>
+          <button class="green" type="button" onclick="sethJourney()">Load journey</button>
+        </div>
+        <p class="mut" style="font-size:12px;margin:6px 0 0">Uses /gis/participants/{ref}/… · same ref as enrol · empty until assigned.</p>
+      </div>
+      <div class="panel">
+        <h3>Cross-links</h3>
+        <div class="row">
+          <button class="cyan" type="button" onclick="window.open(API+'/gbs','_blank')">GBS freeze</button>
+          <button class="cyan" type="button" onclick="window.open(API+'/eif-ui','_blank')">EIF</button>
+          <button type="button" onclick="tab(document.querySelector('#tabs button[data-t=ts]'),'ts')">→ TS ops (place workers)</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel"><h3>Terminal</h3><div class="term" id="term">SETHS journey ready · GBS-SETHS develops · zeros OK</div></div>
+      <div class="panel"><h3>Journey JSON</h3><div class="term" id="se-journey" style="min-height:120px">—</div></div>
+    </div>
+  </div>`;
 }
-async function sethEnrol(){ try{ const r=await api("/seths/enrol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({qualification:$("se-q").value,nqf_level:5,count:parseInt($("se-c").value,10)||1})}); term("✓ "+(r.refs||[]).join(", ")); if(r.refs&&r.refs[0]) $("se-ref").value=r.refs[0]; await renderSeths(); await renderOverview(); }catch(e){ term("✗ "+e.message); } }
-async function sethAdvance(){ const ref=($("se-ref").value||"").trim(); if(!ref) return; try{ const r=await api("/seths/"+encodeURIComponent(ref)+"/advance",{method:"POST"}); term("✓ "+r.ref+" → "+r.status); await renderSeths(); await renderOverview(); }catch(e){ term("✗ "+e.message); } }
+async function sethEnrol(){
+  try{
+    const r=await api("/seths/enrol",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({qualification:$("se-q").value,nqf_level:parseInt($("se-nqf").value,10)||5,count:parseInt($("se-c").value,10)||1})});
+    term("✓ enrolled "+r.enrolled+" · "+(r.refs||[]).join(", "));
+    if(r.refs&&r.refs[0]) $("se-ref").value=r.refs[0];
+    await renderSeths(); await renderOverview();
+  }catch(e){ term("✗ "+e.message); }
+}
+async function sethAdvance(){
+  const ref=($("se-ref").value||"").trim(); if(!ref) return term("✗ ref required");
+  try{
+    const r=await api("/seths/"+encodeURIComponent(ref)+"/advance",{method:"POST"});
+    term("✓ "+r.ref+" → "+r.status+(r.monthly_value!=null?" · monthly R"+r.monthly_value:""));
+    await renderSeths(); await renderOverview();
+  }catch(e){ term("✗ "+e.message); }
+}
+async function sethAssign(){
+  const ref=($("se-ref").value||"").trim(); if(!ref) return term("✗ ref required");
+  try{
+    const r=await api("/gis/participants/"+encodeURIComponent(ref)+"/assign",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cohort:$("se-cohort").value,stream:$("se-stream").value})});
+    term("✓ assign "+JSON.stringify(r).slice(0,180));
+  }catch(e){ term("✗ "+e.message); }
+}
+async function sethStage(){
+  const ref=($("se-ref").value||"").trim(); if(!ref) return term("✗ ref required");
+  try{ const r=await api("/gis/participants/"+encodeURIComponent(ref)+"/advance",{method:"POST"}); term("✓ stage "+JSON.stringify(r).slice(0,200)); }
+  catch(e){ term("✗ "+e.message); }
+}
+async function sethAffirm(){
+  const ref=($("se-ref").value||"").trim(); if(!ref) return term("✗ ref required");
+  try{
+    await api("/gis/participants/"+encodeURIComponent(ref)+"/self-affirmation",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({what_do_you_want_to_change:"Employment stability",why_now:"Capstone demo path",what_are_you_willing_to_do:"Complete Digital Operations stream"})});
+    term("✓ affirmation recorded");
+  }catch(e){ term("✗ "+e.message); }
+}
+async function sethAI(){
+  const ref=($("se-ref").value||"").trim(); if(!ref) return term("✗ ref required");
+  try{ const r=await api("/gis/participants/"+encodeURIComponent(ref)+"/ai-readiness",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({score:0.75})}); term("✓ AI readiness "+JSON.stringify(r).slice(0,160)); }
+  catch(e){ term("✗ "+e.message); }
+}
+async function sethJourney(){
+  const ref=($("se-ref").value||"").trim(); if(!ref) return term("✗ ref required");
+  try{
+    const r=await api("/gis/participants/"+encodeURIComponent(ref)+"/journey");
+    $("se-journey").textContent=JSON.stringify(r,null,2).slice(0,4000);
+    term("✓ journey loaded for "+ref);
+  }catch(e){ term("✗ "+e.message); $("se-journey").textContent=e.message; }
+}
 async function renderMadiba(){
   const [m,pipe]=await Promise.all([safe("/madiba/metrics"),safe("/madiba/engage/pipeline")]);
   const list=(pipe.list||[]).slice(0,8);
