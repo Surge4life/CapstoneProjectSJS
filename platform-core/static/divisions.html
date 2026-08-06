@@ -1,1 +1,28 @@
-FILE_CONTENT_PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · Divisions · loading densified UI</title>
+<style>body{font:14px system-ui;background:#060E1C;color:#e8edf6;padding:24px}a{color:#00C2D4}</style>
+</head><body>
+<p id="m">Loading densified divisions UI from repo…</p>
+<script>
+(async()=>{
+  const urls=[
+    "https://cdn.jsdelivr.net/gh/Surge4life/CapstoneProjectSJS@ed1171f9a37b7ec5514bd7a1d0d343920a4c703b/platform-core/static/divisions.html",
+    "https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/ed1171f9a37b7ec5514bd7a1d0d343920a4c703b/platform-core/static/divisions.html"
+  ];
+  for (const u of urls){
+    try{
+      const r=await fetch(u,{cache:"no-store"});
+      if(!r.ok) continue;
+      const t=await r.text();
+      if(t.length<1000 || t.includes("PLACEHOLDER") || t.includes("FILE_CONTENT")) continue;
+      document.open(); document.write(t); document.close();
+      return;
+    }catch(e){}
+  }
+  document.getElementById("m").innerHTML="Could not load densified UI. Open <a href=\"/gbs\">/gbs</a> or hard-refresh after deploy.";
+})();
+</script>
+</body></html>
