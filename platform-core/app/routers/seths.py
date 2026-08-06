@@ -2,6 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, func, text
 from sqlalchemy.orm import Session
+from typing import Optional
 from pydantic import BaseModel
 from app.db.session import get_db, engine
 from app.db.models import Learner
@@ -40,7 +41,6 @@ def _heal_learner_cols():
                     ))
                 except Exception:
                     pass
-        # Always widen cohort if present (String(4) model bug vs COHORT_1)
         try:
             conn.execute(text(
                 "ALTER TABLE seths_learners ALTER COLUMN cohort TYPE VARCHAR(24)"
@@ -99,3 +99,44 @@ def metrics(db: Session = Depends(get_db)):
     return {"total": total, "completed": completed, "placed": placed,
             "placement_rate": round(placed / total, 3) if total else 0.0,
             "monthly_economic_output": output}
+
+
+@router.get("/learners")
+def list_learners(limit: int = 25, status: Optional[str] = None, db: Session = Depends(get_db),
+                  _=Depends(require_role("operator", "admin"))):
+    """Roster for divisions operator surface — newest first, capped for free-tier honesty."""
+    lim = min(max(limit, 1), 50)
+    if status:
+        q = select(Learner).where(Learner.status == status.upper()).order_by(Learner.id.desc()).limit(lim)
+    else:
+        q = select(Learner).order_by(Learner.id.desc()).limit(lim)
+    rows = db.execute(q).scalars().all()
+    out = []
+    for l in rows:
+        out.append({
+            "ref": l.ref,
+            "status": l.status,
+            "qualification": getattr(l, "qualification", None) or "",
+            "nqf_level": getattr(l, "nqf_level", None),
+            "cohort": getattr(l, "cohort", None) or "",
+            "stream": getattr(l, "stream", None) or "",
+            "monthly_value": getattr(l, "monthly_value", None) or 0,
+        })
+    return {"count": len(out), "learners": out}
+
+
+@router.get("/learners/{ref}")
+def get_learner(ref: str, db: Session = Depends(get_db), _=Depends(require_role("operator", "admin"))):
+    l = db.execute(select(Learner).where(Learner.ref == ref)).scalar_one_or_none()
+    if not l:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "learner not found")
+    return {
+        "ref": l.ref,
+        "status": l.status,
+        "qualification": getattr(l, "qualification", None) or "",
+        "nqf_level": getattr(l, "nqf_level", None),
+        "cohort": getattr(l, "cohort", None) or "",
+        "stream": getattr(l, "stream", None) or "",
+        "cetcte_stage": getattr(l, "cetcte_stage", None) or "",
+        "monthly_value": getattr(l, "monthly_value", None) or 0,
+    }
