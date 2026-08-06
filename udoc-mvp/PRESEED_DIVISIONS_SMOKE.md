@@ -1,38 +1,38 @@
-# Pre-seed divisions operator smoke
+# Divisions operator smoke · production path
 
+**Updated:** 2026-08-06  
 **URL:** https://gods-platform-core.onrender.com/divisions  
-**Staff:** `seths@gods.local` · `madiba@gods.local` · `ts@gods.local` · password **staff123**  
-**Also:** `admin@gods.local` / `admin123`
+**Staff:** `seths@` · `madiba@` · `ts@` **gods.local** · **staff123**
 
-## Before demo
+## Live UI
 
-1. Hard-refresh `/divisions` — wait for **Booting…** to resolve into full UI  
-2. If stuck: open DevTools → Network → confirm `divisions_payload_0.b64`…`_4.b64` load (GitHub raw or same-origin)  
-3. Confirm https://gods-platform-core.onrender.com/health → `ok`
+1. Hard-refresh `/divisions` — Booting production → full operator shell  
+2. Connect as `seths@gods.local` / `staff123`  
+3. **▶ Full path** or chips 1→5  
 
-## Guided path (5 chips)
+## API dry-run (2026-08-06) — PASS
 
-| # | Step | Expect |
-|---|------|--------|
-| 1 | **Enrol SETHS** | Terminal ✓ enrolled · ref `SETHS-…` |
-| 2 | **Place learner** | Advance ×2 → **PLACED** |
-| 3 | **Deploy SPV** | Equity 0.2–0.6 · SPV id returned |
-| 4 | **Assign worker** | PLACED learner + SPV · workers count |
-| 5 | **MADIBA allocate** | Demo ledger recycle · **≠ institutional AUM** |
+| Step | Result |
+|------|--------|
+| health | ok |
+| login seths | token |
+| enrol | `SETHS-37496d22` |
+| advance ×2 | COMPLETED → **PLACED** |
+| deploy SPV | `SPV-ENERGY-f1a6889e` |
+| assign worker | workers_deployed **1** |
+| madiba allocate | recycled_to_seths **55000** |
+| seths metrics | total 3 · placed 2 · rate 0.667 |
+| ts metrics | projects 9 · workers 17 |
+| gbs architecture | **4** divisions |
 
-## Honesty lines to speak
+## Honesty lines
 
-- Zeros / empty pipelines are **valid** Capstone posture  
-- MADIBA numbers are **demo ledger**, not AUM  
-- **Sovereign-Verified** = designed_not_built (parallel EIF Diamond)  
-- UDOC EVA path still: Sentinel fair ≠ BLOCK · biased = BLOCK  
-
-## Cross-links in UI
-
-GBS freeze `/gbs` · EIF `/eif-ui` · Sentinel · UDOC Admin · 24 Portals  
+- Zeros / sparse metrics remain valid Capstone posture  
+- MADIBA numbers = **demo ledger ≠ institutional AUM**  
+- Sovereign-Verified = **designed_not_built**  
+- EVA: Sentinel fair ≠ BLOCK · biased = BLOCK  
 
 ## Related
 
-- `CAPSTONE_ASSESSOR_PACK.md` — 20-minute live path  
-- `LIVE_SITE_CORRECTION_PACK.md` §7 — Netlify Holdings paste  
-- Uncompressed densify source: project artifacts `divisions_PRESEED_DENSITY.html`
+- `DIVISIONS_DOCUMENTATION_ARCHIVE.md`  
+- `DIVISION_SURFACE_DENSITY_PLAN.md`  

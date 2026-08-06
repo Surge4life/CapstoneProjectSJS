@@ -1,38 +1,25 @@
 # Division surface density plan
 
 **Updated:** 2026-08-06  
-**Mode:** densify **existing** Core surfaces only — no new Render services.
+**Status:** Production operator shell **live** · guided-path API **PASS**
 
-## CLOSED — live pre-seed densify
+## Live
 
-| Surface | State |
-|---------|--------|
-| `/divisions` | Chunked gzip loader + full pre-seed UI |
-| Payload parts | `divisions_payload_{0..4}.b64` on main |
-| Smoke | `PRESEED_DIVISIONS_SMOKE.md` |
-| Archive map | `DIVISIONS_DOCUMENTATION_ARCHIVE.md` |
+| Item | State |
+|------|--------|
+| Core | `fc35ab47` |
+| `/divisions` | Production loader · payload pin `b6ad6e78` |
+| API dry-run | Enrol → Place → SPV → Assign → Allocate **PASS** |
 
-### Tabs densified
+## Production shell
 
-- **Overview** — four-division KPIs + Series-A honesty  
-- **SETHS** — enrol · advance · CET/CTE journey · terminal  
-- **TS** — SPV deploy · equity gate · assign PLACED · submissions  
-- **MADIBA** — allocate · engage · reset-ledger · ledger ≠ AUM  
-- **UDOC** — demo ready · Sentinel batch · GBS/EIF links  
-- **GIS/GBS** — architecture cards · Sovereign-Verified designed_not_built  
+Status strip · pipeline KPIs · Full path · Activity log · guided chips  
 
-### Guided chips
+## Next (optional)
 
-1 Enrol → 2 Place → 3 Deploy SPV → 4 Assign → 5 MADIBA allocate  
-
-## Still optional
-
-- Same-origin payload routes in `main.py`  
 - Netlify §7 Holdings paste  
-- Assessor screenshots  
+- Assessor screenshots of Full path  
 
 ## Honesty
 
 Zeros OK · MADIBA ≠ AUM · capital not_deployed · Sovereign-Verified designed_not_built  
-
-See `DIVISIONS_DOCUMENTATION_ARCHIVE.md` for full file map.
