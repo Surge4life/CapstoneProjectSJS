@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>G.O.D.S · Divisions · Production</title>
-<!-- prod-chunked-payload-2026-08-06 -->
+<!-- prod-chunked-payload-2026-08-06-v2 -->
 <style>body{margin:0;background:#050b16;color:#8fa0bd;font:14px system-ui;padding:24px}</style>
 </head>
 <body>
@@ -12,6 +12,7 @@
 <script>
 (async function(){
   const N = 5;
+  const PIN = "b6ad6e78b09dc8bdb2f210337492f8d5d96bf1fb";
   async function loadParts(base) {
     const parts = [];
     for (let i = 0; i < N; i++) {
@@ -26,8 +27,9 @@
   let b64 = null;
   const strategies = [
     (i) => "/divisions-payload-"+i+".b64",
-    (i) => "https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/divisions_payload_"+i+".b64",
-    (i) => "https://cdn.jsdelivr.net/gh/Surge4life/CapstoneProjectSJS@main/platform-core/static/divisions_payload_"+i+".b64"
+    (i) => "https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/"+PIN+"/platform-core/static/divisions_payload_"+i+".b64",
+    (i) => "https://cdn.jsdelivr.net/gh/Surge4life/CapstoneProjectSJS@"+PIN.slice(0,7)+"/platform-core/static/divisions_payload_"+i+".b64",
+    (i) => "https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/divisions_payload_"+i+".b64"
   ];
   for (const base of strategies) {
     try { b64 = await loadParts(base); break; } catch (e) { console.warn(e); }
