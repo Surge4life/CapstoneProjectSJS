@@ -4,49 +4,34 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>G.O.D.S · Divisions · Production</title>
-<!-- prod-multipart-payload-2026-08-06-ops -->
+<!-- prod-4part-2026-08-06-ops -->
 <style>body{margin:0;background:#050b16;color:#8fa0bd;font:14px system-ui;padding:24px}</style>
 </head>
 <body>
 <p id="m">Booting production divisions UI…</p>
 <script>
 (async function(){
-  const singles = [
-    "/divisions-payload.b64",
-    "https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/divisions_payload.b64"
-  ];
-  let b64 = null;
-  for (const url of singles) {
-    try {
-      const r = await fetch(url, {cache:"no-store"});
-      if (!r.ok) throw new Error("HTTP "+r.status);
-      const t = (await r.text()).trim();
-      if (t.length < 500 || t.includes("PLACEHOLDER")) throw new Error("bad");
-      b64 = t; break;
-    } catch (e) { console.warn(url, e); }
-  }
-  if (!b64) {
-    try {
-      const chunks = [];
-      for (let i=0;i<3;i++){
-        const r = await fetch("https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/divisions_payload_"+i+".b64", {cache:"no-store"});
-        if (!r.ok) throw new Error("part "+i+" "+r.status);
-        chunks.push((await r.text()).trim());
-      }
-      b64 = chunks.join("");
-    } catch (e) {
-      document.getElementById("m").innerHTML = "Payload missing. Open <a style=color:#00C2D4 href=/gbs>/gbs</a> · "+e.message;
-      return;
-    }
-  }
+  const base="https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/";
+  let b64=null;
   try {
-    const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-    const stream = new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
-    const html = await new Response(stream).text();
-    document.open(); document.write(html); document.close();
-  } catch (e) {
-    document.getElementById("m").textContent = "Inflate failed: "+e.message;
+    const chunks=[];
+    for (let i=0;i<4;i++){
+      const r=await fetch(base+"divisions_payload_"+i+".b64",{cache:"no-store"});
+      if(!r.ok) throw new Error("part "+i+" HTTP "+r.status);
+      chunks.push((await r.text()).trim());
+    }
+    b64=chunks.join("");
+    if(b64.length<500||b64.includes("PLACEHOLDER")) throw new Error("bad payload");
+  } catch(e){
+    document.getElementById("m").innerHTML="Payload missing · <a style=color:#00C2D4 href=/gbs>/gbs</a> · "+e.message;
+    return;
   }
+  try{
+    const bin=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    const stream=new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
+    const html=await new Response(stream).text();
+    document.open();document.write(html);document.close();
+  }catch(e){ document.getElementById("m").textContent="Inflate failed: "+e.message; }
 })();
 </script>
 </body>
