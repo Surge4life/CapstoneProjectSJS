@@ -4,30 +4,45 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>G.O.D.S · Divisions · Pre-seed</title>
-<!-- preseed-gzip-embed-2026-08-06 -->
-<style>body{margin:0;background:#060E1C;color:#8fa0bd;font:14px system-ui;padding:24px}#m{max-width:40rem}</style>
+<!-- preseed-chunked-payload-2026-08-06 -->
+<style>body{margin:0;background:#060E1C;color:#8fa0bd;font:14px system-ui;padding:24px}</style>
 </head>
 <body>
 <p id="m">Booting pre-seed divisions UI…</p>
 <script>
 (async function(){
-  const B64 = "PLACEHOLDER_B64";
-  try {
-    const bin = Uint8Array.from(atob(B64), c => c.charCodeAt(0));
-    let html;
-    if (typeof DecompressionStream !== "undefined") {
-      const stream = new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
-      html = await new Response(stream).text();
-    } else {
-      throw new Error("DecompressionStream not supported");
+  const N = 5;
+  async function loadParts(base) {
+    const parts = [];
+    for (let i = 0; i < N; i++) {
+      const r = await fetch(base(i), {cache:"no-store"});
+      if (!r.ok) throw new Error("part "+i+" HTTP "+r.status);
+      const t = (await r.text()).trim();
+      if (t.length < 10 || t.includes("PLACEHOLDER")) throw new Error("bad part "+i);
+      parts.push(t);
     }
-    document.open();
-    document.write(html);
-    document.close();
+    return parts.join("");
+  }
+  let b64 = null;
+  const strategies = [
+    (i) => "/divisions-payload-"+i+".b64",
+    (i) => "https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/divisions_payload_"+i+".b64",
+    (i) => "https://cdn.jsdelivr.net/gh/Surge4life/CapstoneProjectSJS@main/platform-core/static/divisions_payload_"+i+".b64"
+  ];
+  for (const base of strategies) {
+    try { b64 = await loadParts(base); break; } catch (e) { console.warn(e); }
+  }
+  if (!b64) {
+    document.getElementById("m").innerHTML = "Payload missing. Open <a style=color:#00C2D4 href=/gbs>/gbs</a>";
+    return;
+  }
+  try {
+    const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+    const stream = new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
+    const html = await new Response(stream).text();
+    document.open(); document.write(html); document.close();
   } catch (e) {
-    document.getElementById("m").innerHTML =
-      "Could not inflate densified UI ("+e.message+"). " +
-      "Fallback: <a style=color:#00C2D4 href=\"/gbs\">/gbs</a>";
+    document.getElementById("m").textContent = "Inflate failed: " + e.message;
   }
 })();
 </script>
