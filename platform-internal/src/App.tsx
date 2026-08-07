@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { BrowserRouter, Routes, Route, NavLink, Navigate, useNavigate } from "react-router-dom";
 import { api, getToken, setToken } from "./api";
 import { Overview } from "./consoles/Overview";
@@ -68,7 +68,6 @@ function Login({ onAuth }: { onAuth: () => void }) {
   );
 }
 
-// The G.O.D.S core launcher — shows ONLY the systems this user may open.
 function Launcher({ profile }: { profile: Profile }) {
   const nav = useNavigate();
   const accent: Record<string,string> = { "seths-ops":"var(--seths)","madiba-ops":"var(--madiba)","ts-ops":"var(--ts)","udoc-gov":"var(--udoc)","holdings-overview":"var(--gold)" };
@@ -93,14 +92,14 @@ function Launcher({ profile }: { profile: Profile }) {
   </div>);
 }
 
-function Guarded({ profile, sysKey, children }: { profile: Profile; sysKey: string; children: React.ReactNode }) {
+function Guarded({ profile, sysKey, children }: { profile: Profile; sysKey: string; children: ReactNode }) {
   if (!profile.systems.some(s => s.key === sysKey) && !profile.is_admin) {
     return <div className="main"><div className="top"><h2>Access denied</h2><span className="badge">🔒 403</span></div></div>;
   }
   return <>{children}</>;
 }
 
-function Shell({ profile, children }: { profile: Profile; children: React.ReactNode }) {
+function Shell({ profile, children }: { profile: Profile; children: ReactNode }) {
   const nav = useNavigate();
   return (
     <div className="shell">
