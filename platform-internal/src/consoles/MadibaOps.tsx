@@ -1,32 +1,39 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 
+const STAGES = ["INTRODUCED", "DD", "TERM_SHEET", "COMMITTED", "FUNDED"];
+
 export function MadibaOps() {
   const [pipe, setPipe] = useState<any>(null);
   const [metrics, setMetrics] = useState<any>(null);
   const [sa, setSa] = useState<any>(null);
+  const [records, setRecords] = useState<any[]>([]);
   const [inflow, setInflow] = useState(100000);
   const [month, setMonth] = useState(8);
   const [investor, setInvestor] = useState("Capstone Demo LP");
   const [amount, setAmount] = useState(250000);
   const [active, setActive] = useState("");
-  const [msg, setMsg] = useState("");
-  const [err, setErr] = useState("");
+  const [log, setLog] = useState<string[]>(["MADIBA ready · demo ledger ≠ AUM · capital not_deployed"]);
   const [busy, setBusy] = useState(false);
 
+  function push(line: string) {
+    setLog((prev) => [`${new Date().toLocaleTimeString()}  ${line}`, ...prev].slice(0, 24));
+  }
+
   async function load() {
-    setErr("");
     try {
-      const [p, m, series] = await Promise.all([
+      const [p, m, series, rec] = await Promise.all([
         api.get("/madiba/engage/pipeline").catch(() => null),
         api.get("/madiba/metrics").catch(() => null),
         api.get("/madiba/series-a-status").catch(() => null),
+        api.get("/analytics/MADIBA/records").catch(() => []),
       ]);
       setPipe(p);
       setMetrics(m);
       setSa(series);
+      setRecords(Array.isArray(rec) ? rec : rec?.records || []);
     } catch (e: any) {
-      setErr(e.message || String(e));
+      push(`ERROR ${e.message}`);
     }
   }
 
@@ -34,25 +41,8 @@ export function MadibaOps() {
     load();
   }, []);
 
-  async function allocate() {
-    setBusy(true);
-    setMsg("");
-    setErr("");
-    try {
-      const r = await api.post("/madiba/allocate", { month, total_inflow: inflow });
-      setMsg(`Recycled to SETHS: R${Number(r.recycled_to_seths || 0).toLocaleString()}`);
-      await load();
-    } catch (e: any) {
-      setErr(e.message || String(e));
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function createEngage() {
     setBusy(true);
-    setMsg("");
-    setErr("");
     try {
       const r = await api.post("/madiba/engage", {
         investor_name: investor,
@@ -61,10 +51,10 @@ export function MadibaOps() {
         indicated_amount: amount,
       });
       setActive(r.engagement_ref || "");
-      setMsg(`Engagement ${r.engagement_ref} · ${r.stage}`);
+      push(`ENGAGE ${r.engagement_ref} stage=${r.stage} amount=${amount}`);
       await load();
     } catch (e: any) {
-      setErr(e.message || String(e));
+      push(`FAIL engage ${e.message}`);
     } finally {
       setBusy(false);
     }
@@ -73,18 +63,29 @@ export function MadibaOps() {
   async function advance() {
     const ref = active.trim();
     if (!ref) {
-      setErr("Select or enter engagement ref");
+      push("FAIL select engagement ref");
       return;
     }
     setBusy(true);
-    setMsg("");
-    setErr("");
     try {
       const r = await api.post(`/madiba/engage/${encodeURIComponent(ref)}/advance`);
-      setMsg(`${ref} → ${r.stage}`);
+      push(`ADVANCE ${ref} → ${r.stage}`);
       await load();
     } catch (e: any) {
-      setErr(e.message || String(e));
+      push(`FAIL advance ${e.message}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function allocate() {
+    setBusy(true);
+    try {
+      const r = await api.post("/madiba/allocate", { month, total_inflow: inflow });
+      push(`ALLOCATE month=${month} inflow=${inflow} recycled=${r.recycled_to_seths ?? "?"}`);
+      await load();
+    } catch (e: any) {
+      push(`FAIL allocate ${e.message}`);
     } finally {
       setBusy(false);
     }
@@ -93,6 +94,7 @@ export function MadibaOps() {
   const list = pipe?.list || [];
   const by = pipe?.by_stage || {};
   const triggers = sa?.triggers || {};
+  const series = metrics?.series || [];
 
   return (
     <>
@@ -100,13 +102,34 @@ export function MadibaOps() {
         <h2>
           <span className="acc-madiba">MADIBA</span> Operations
         </h2>
-        <span className="badge">🔒 STAFF</span>
+        <span className="badge">🔒 STAFF · LIVE</span>
       </div>
 
-      <div className="panel" style={{ borderLeft: "3px solid var(--warn)" }}>
-        <p style={{ fontSize: ".76rem", margin: 0, color: "var(--warn)" }}>
-          Demo ledger only — not institutional AUM. Capital not_deployed. EIF Diamond nominations are audit-only on Capstone.
-        </p>
+      <div className="banner warn">
+        Demo ledger only — not institutional AUM. Capital not_deployed. EIF Diamond = audit nomination only on Capstone free tier.
+        {metrics?.honesty ? ` · ${metrics.honesty}` : ""}
+        {metrics?.note ? ` · ${metrics.note}` : ""}
+      </div>
+
+      <div className="guide">
+        <h3>MADIBA command path</h3>
+        <div className="row" style={{ marginBottom: 0 }}>
+          <button className="btn" disabled={busy} onClick={createEngage}>
+            Create engagement
+          </button>
+          <button className="btn" disabled={busy} onClick={advance}>
+            Advance stage
+          </button>
+          <button className="btn" disabled={busy} onClick={allocate}>
+            Allocate recycle
+          </button>
+          <a className="btn ghost" href="https://gods-platform-core.onrender.com/eif-ui" target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
+            EIF Diamond
+          </a>
+          <button className="btn ghost" disabled={busy} onClick={load}>
+            ↻ Refresh
+          </button>
+        </div>
       </div>
 
       <div className="grid">
@@ -115,32 +138,40 @@ export function MadibaOps() {
           <div className="metric">{metrics?.cycles ?? "—"}</div>
         </div>
         <div className="card">
+          <h3>Total inflow</h3>
+          <div className="metric">R{Number(metrics?.total_inflow ?? 0).toLocaleString()}</div>
+        </div>
+        <div className="card">
           <h3>Recycled → SETHS</h3>
           <div className="metric">R{Number(metrics?.cumulative_recycled ?? 0).toLocaleString()}</div>
         </div>
         <div className="card">
+          <h3>Recycle ratio</h3>
+          <div className="metric">{metrics?.recycle_ratio != null ? `${(metrics.recycle_ratio * 100).toFixed(0)}%` : "—"}</div>
+        </div>
+        <div className="card">
           <h3>Engagements</h3>
-          <div className="metric">{pipe?.engagements ?? list.length ?? "—"}</div>
+          <div className="metric">{pipe?.engagements ?? list.length}</div>
         </div>
         <div className="card">
           <h3>Committed</h3>
           <div className="metric">R{Number(pipe?.committed_total ?? 0).toLocaleString()}</div>
         </div>
         <div className="card">
-          <h3>Series-A</h3>
-          <div className="metric">{sa?.all_conditions_met ? "met" : "not met"}</div>
+          <h3>Indicated</h3>
+          <div className="metric">R{Number(pipe?.indicated_total ?? 0).toLocaleString()}</div>
         </div>
         <div className="card">
-          <h3>Indicated total</h3>
-          <div className="metric">R{Number(pipe?.indicated_total ?? 0).toLocaleString()}</div>
+          <h3>Series-A</h3>
+          <div className="metric">{sa?.all_conditions_met ? "met" : "not met"}</div>
         </div>
       </div>
 
       <div className="panel">
         <h3>Pipeline stages</h3>
-        <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
-          {["INTRODUCED", "DD", "TERM_SHEET", "COMMITTED", "FUNDED"].map((s) => (
-            <span key={s} className="badge" style={{ fontSize: ".72rem" }}>
+        <div className="row">
+          {STAGES.map((s) => (
+            <span key={s} className={`tag ${s}`}>
               {s}: {by[s] ?? 0}
             </span>
           ))}
@@ -149,98 +180,109 @@ export function MadibaOps() {
 
       <div className="panel">
         <h3>New engagement</h3>
-        <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
-          <input value={investor} onChange={(e) => setInvestor(e.target.value)} placeholder="Investor name" style={{ minWidth: 160 }} />
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(parseFloat(e.target.value || "0"))}
-            placeholder="Indicated amount"
-            style={{ width: 140 }}
-          />
+        <div className="row">
+          <input value={investor} onChange={(e) => setInvestor(e.target.value)} placeholder="Investor" style={{ minWidth: 160 }} />
+          <input type="number" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value || "0"))} style={{ width: 140 }} />
           <button className="btn" disabled={busy} onClick={createEngage}>
-            Create engagement
+            Create
           </button>
-        </div>
-        <div className="row" style={{ marginTop: 10, gap: 8, flexWrap: "wrap" }}>
-          <input value={active} onChange={(e) => setActive(e.target.value)} placeholder="ENG-…" style={{ minWidth: 160 }} />
+          <input value={active} onChange={(e) => setActive(e.target.value)} placeholder="ENG-…" style={{ minWidth: 140 }} />
           <button className="btn" disabled={busy} onClick={advance}>
-            Advance stage
+            Advance
           </button>
-          <button className="btn" disabled={busy} onClick={load}>
-            ↻ Refresh
-          </button>
-          <a className="btn" href="https://gods-platform-core.onrender.com/eif-ui" target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
-            Open EIF Diamond
-          </a>
         </div>
       </div>
 
       <div className="panel">
         <h3>Engage pipeline</h3>
         {list.length === 0 ? (
-          <p style={{ fontSize: ".82rem" }}>No engagements — create one above (honest empty OK).</p>
+          <p style={{ fontSize: ".82rem" }}>No engagements — create above</p>
         ) : (
-          <div style={{ maxHeight: 220, overflow: "auto" }}>
-            {list.slice(0, 20).map((e: any) => (
-              <div
-                key={e.ref}
-                onClick={() => setActive(e.ref)}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 8,
-                  padding: "8px 6px",
-                  borderBottom: "1px solid var(--rule)",
-                  cursor: "pointer",
-                  background: active === e.ref ? "rgba(245,165,36,.08)" : "transparent",
-                }}
-              >
-                <span style={{ fontFamily: "ui-monospace,monospace", fontSize: ".75rem" }}>{e.ref}</span>
-                <span style={{ fontSize: ".75rem" }}>
-                  {e.investor} · {e.stage} · R{Number(e.amount || 0).toLocaleString()}
-                </span>
-              </div>
-            ))}
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ref</th>
+                <th>Investor</th>
+                <th>Stage</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.slice(0, 25).map((e: any) => (
+                <tr key={e.ref} onClick={() => setActive(e.ref)} style={{ cursor: "pointer", background: active === e.ref ? "rgba(155,109,214,.12)" : undefined }}>
+                  <td style={{ fontFamily: "ui-monospace,monospace" }}>{e.ref}</td>
+                  <td>{e.investor}</td>
+                  <td>
+                    <span className={`tag ${e.stage}`}>{e.stage}</span>
+                  </td>
+                  <td>R{Number(e.amount || 0).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
       <div className="panel">
         <h3>Allocate (demo ledger)</h3>
-        <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+        <div className="row">
           <label style={{ fontSize: ".72rem" }}>
-            Month{" "}
-            <input type="number" value={month} onChange={(e) => setMonth(parseInt(e.target.value || "1", 10))} style={{ width: 64 }} />
+            Month <input type="number" value={month} onChange={(e) => setMonth(parseInt(e.target.value || "1", 10))} style={{ width: 64 }} />
           </label>
           <label style={{ fontSize: ".72rem" }}>
-            Inflow R{" "}
-            <input type="number" value={inflow} onChange={(e) => setInflow(parseFloat(e.target.value || "0"))} style={{ width: 120 }} />
+            Inflow R <input type="number" value={inflow} onChange={(e) => setInflow(parseFloat(e.target.value || "0"))} style={{ width: 120 }} />
           </label>
           <button className="btn" disabled={busy} onClick={allocate}>
             Allocate
           </button>
         </div>
+        {series.length > 0 && (
+          <div className="term" style={{ marginTop: 10 }}>
+            {JSON.stringify(series.slice(-6), null, 2).slice(0, 700)}
+          </div>
+        )}
       </div>
 
       <div className="panel">
         <h3>Series-A triggers (honest)</h3>
-        {Object.keys(triggers).length === 0 ? (
-          <p style={{ fontSize: ".82rem" }}>—</p>
-        ) : (
-          Object.entries(triggers).map(([k, v]: any) => (
-            <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--rule)", fontSize: ".78rem" }}>
-              <span>{k}</span>
-              <span>
-                {v?.actual ?? "—"} / {v?.target ?? "—"} · {v?.met ? "met" : "not met"}
-              </span>
-            </div>
-          ))
-        )}
+        <table>
+          <thead>
+            <tr>
+              <th>Trigger</th>
+              <th>Actual</th>
+              <th>Target</th>
+              <th>Met</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(triggers).map(([key, v]: any) => (
+              <tr key={key}>
+                <td>{key}</td>
+                <td>{v?.actual ?? "—"}</td>
+                <td>{v?.target ?? "—"}</td>
+                <td>
+                  <span className={`tag ${v?.met ? "ACTIVE" : "OPEN"}`}>{v?.met ? "met" : "not met"}</span>
+                </td>
+              </tr>
+            ))}
+            {!Object.keys(triggers).length && (
+              <tr>
+                <td colSpan={4}>—</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {msg && <div className="ok">{msg}</div>}
-      {err && <div className="err">{err}</div>}
+      <div className="panel">
+        <h3>Ops terminal</h3>
+        <div className="term">{log.join("\n")}</div>
+      </div>
+
+      <div className="panel">
+        <h3>Analytics records</h3>
+        <div className="term">{records.length ? JSON.stringify(records.slice(0, 5), null, 2).slice(0, 800) : "—"}</div>
+      </div>
     </>
   );
 }
