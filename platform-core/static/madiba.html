@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · MADIBA · Division Operator</title>
+<style>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--red:#E85D5D}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
+.tag.ok{border-color:rgba(201,168,76,.5);color:#f0d78c;background:rgba(201,168,76,.08)}
+a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
+.banner{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.card h3{margin:0 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.35rem;font-weight:700}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:220px;overflow:auto}
+.btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.danger{background:transparent;border:1px solid var(--red);color:#fca5a5}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.mut{color:var(--mut)}.warn{color:var(--warn)}.ok{color:#6ee7b7}
+input,select{background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 10px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:2px 8px;font-size:11px;cursor:pointer;margin:2px}
+.chip:hover{border-color:var(--gold)}
+.login-box{max-width:360px;margin:40px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
+.trig{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(28,42,69,.6);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">G.O.D.S · <b>MADIBA</b></span>
+  <span class="tag ok">recognises · EIF parallel</span>
+  <span style="flex:1"></span>
+  <a class="nav" href="/divisions">All divisions</a>
+  <a class="nav" href="/ts">TS</a>
+  <a class="nav" href="/eif-ui">EIF</a>
+  <a class="nav" href="/gbs">GBS</a>
+  <a class="nav" href="/Sentinel">Sentinel</a>
+</header>
+<div class="wrap">
+  <div class="login-box" id="login">
+    <h2 style="margin:0 0 8px;color:var(--gold)">MADIBA staff login</h2>
+    <p class="mut" style="font-size:12px;margin:0 0 12px">madiba@gods.local · staff123 · allocate needs operator/admin</p>
+    <div class="row" style="margin-bottom:8px">
+      <input id="email" value="madiba@gods.local" style="flex:1"/>
+      <input id="pass" type="password" value="staff123" style="width:110px"/>
+    </div>
+    <div class="row">
+      <button class="btn" onclick="doLogin()">Sign in</button>
+      <span class="chip" onclick="fill('madiba@gods.local')">madiba@</span>
+      <span class="chip" onclick="fill('seths@gods.local')">seths@</span>
+      <span class="chip" onclick="fill('ts@gods.local')">ts@</span>
+    </div>
+    <p id="li-err" style="color:#fca5a5;margin-top:8px;font-size:12px"></p>
+  </div>
+
+  <div id="ops" style="display:none">
+    <div class="banner"><b>MADIBA recognises</b> exceptional achievement via EIF (individuals) and capital-cycle ledger (demo). <span class="warn">Ledger ≠ institutional AUM</span> · capital <b>not_deployed</b> · prefer honest zeros over fiction · admin can reset theatre rows.</div>
+
+    <div class="grid">
+      <div class="card"><h3>Cycles</h3><div class="metric" id="k-c">—</div></div>
+      <div class="card"><h3>Total inflow</h3><div class="metric" id="k-in">—</div></div>
+      <div class="card"><h3>Recycled → SETHS</h3><div class="metric" id="k-re">—</div></div>
+      <div class="card"><h3>Recycle ratio</h3><div class="metric" id="k-rr">—</div></div>
+      <div class="card"><h3>EIF</h3><div class="metric" id="k-eif" style="font-size:1rem">—</div></div>
+      <div class="card"><h3>Session</h3><div class="metric" id="k-who" style="font-size:1rem">—</div></div>
+    </div>
+
+    <div class="panel">
+      <h3>Command path</h3>
+      <div class="row">
+        <button class="btn" onclick="refresh()">↻ Refresh live</button>
+        <button class="btn ghost" onclick="allocateDemo()">Allocate demo cycle</button>
+        <button class="btn danger" onclick="resetLedger()">Reset ledger (admin)</button>
+        <button class="btn ghost" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Allocate capital cycle (demo ledger)</h3>
+      <div class="row">
+        <input id="month" type="number" min="1" max="12" value="8" style="width:70px" title="month"/>
+        <input id="inflow" type="number" min="1" max="5000000" value="250000" style="width:120px" title="inflow ≤5M"/>
+        <input id="dfi" type="number" step="0.05" min="0" max="0.5" value="0.20" style="width:70px" title="dfi %"/>
+        <input id="reserve" type="number" step="0.05" value="0.15" style="width:70px" title="reserve %"/>
+        <input id="holdings" type="number" step="0.05" value="0.10" style="width:70px" title="holdings %"/>
+        <button class="btn" onclick="allocateCustom()">Write cycle</button>
+      </div>
+      <p class="mut" style="font-size:11px;margin:8px 0 0">Remainder recycles to SETHS · max single inflow R5,000,000 · note=capstone_demo_ledger</p>
+    </div>
+
+    <div class="panel">
+      <h3>Series-A readiness (honest gates)</h3>
+      <div id="series">—</div>
+    </div>
+
+    <div class="panel">
+      <h3>EIF framework (UDOC assurance)</h3>
+      <div id="eif">—</div>
+    </div>
+
+    <div class="panel">
+      <h3>Ops terminal</h3>
+      <div class="term" id="term">MADIBA · live Core probes · ledger_only_not_institutional_funds</div>
+    </div>
+  </div>
+</div>
+<script>
+const API=location.origin;
+let TOK="";
+const log=(m)=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+function fill(e){document.getElementById('email').value=e;}
+async function j(path,opts={}){
+  const h=Object.assign({},opts.headers||{});
+  if(TOK) h.Authorization='Bearer '+TOK;
+  const r=await fetch(API+path,Object.assign({},opts,{headers:h}));
+  const ct=r.headers.get('content-type')||'';
+  const body=ct.includes('json')?await r.json().catch(()=>null):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail)||(typeof body==='string'?body.slice(0,120):('HTTP '+r.status)));
+  return body;
+}
+async function doLogin(){
+  document.getElementById('li-err').textContent='';
+  try{
+    const f=new URLSearchParams({username:document.getElementById('email').value.trim().toLowerCase(),password:document.getElementById('pass').value});
+    const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f});
+    if(!r.ok) throw new Error(r.status===401?'Invalid credentials':'Login failed');
+    const d=await r.json();
+    TOK=d.access_token||'';
+    localStorage.setItem('madiba_tok',TOK);
+    localStorage.setItem('madiba_who',document.getElementById('email').value.trim().toLowerCase());
+    document.getElementById('login').style.display='none';
+    document.getElementById('ops').style.display='block';
+    document.getElementById('k-who').textContent=(localStorage.getItem('madiba_who')||'').split('@')[0];
+    log('LOGIN ok · role='+(d.role||''));
+    await refresh();
+  }catch(e){document.getElementById('li-err').textContent=e.message;}
+}
+function logout(){TOK='';localStorage.removeItem('madiba_tok');document.getElementById('ops').style.display='none';document.getElementById('login').style.display='block';}
+async function refresh(){
+  try{
+    const [m,series,eifh,eiff]=await Promise.all([
+      j('/madiba/metrics'),
+      j('/madiba/series-a-status').catch(()=>({})),
+      j('/eif/health').catch(()=>({})),
+      j('/eif/framework').catch(()=>({})),
+    ]);
+    document.getElementById('k-c').textContent=m.cycles??'—';
+    document.getElementById('k-in').textContent=m.total_inflow!=null?('R'+Number(m.total_inflow).toLocaleString()):'—';
+    document.getElementById('k-re').textContent=m.cumulative_recycled!=null?('R'+Number(m.cumulative_recycled).toLocaleString()):'—';
+    document.getElementById('k-rr').textContent=m.recycle_ratio!=null?(Number(m.recycle_ratio)*100).toFixed(0)+'%':'—';
+    document.getElementById('k-eif').textContent=eifh.status||eiff.instrument||'—';
+    const triggers=series.triggers||series||{};
+    const keys=Object.keys(triggers).filter(k=>typeof triggers[k]==='object');
+    document.getElementById('series').innerHTML=keys.length
+      ? keys.map(k=>{const t=triggers[k]||{};const met=t.met?'ok':'warn';
+          return '<div class="trig"><span>'+esc(k)+'</span><span class="'+met+'">'+(t.met?'MET':'OPEN')+' · actual '+(t.actual!=null?t.actual:'—')+(t.target!=null?(' / '+t.target):'')+'</span></div>';}).join('')
+      : '<span class="mut">'+esc(JSON.stringify(series).slice(0,200))+'</span>';
+    document.getElementById('eif').innerHTML=
+      '<div class="trig"><span>Instrument</span><span>'+esc(eiff.instrument||'—')+'</span></div>'+
+      '<div class="trig"><span>Division</span><span>'+esc(eiff.division||'M.A.D.I.B.A.')+'</span></div>'+
+      '<div class="trig"><span>Assurance</span><span>'+esc(eifh.assurance||'—')+'</span></div>'+
+      '<div class="trig"><span>Capital</span><span class="warn">'+esc(eifh.capital||'not_deployed')+'</span></div>';
+    log('REFRESH ok · cycles='+(m.cycles||0)+' · honesty='+(m.honesty||m.note||'ledger_only'));
+  }catch(e){log('REFRESH FAIL '+e.message);}
+}
+async function allocateCustom(){
+  try{
+    const body={
+      month:Number(document.getElementById('month').value)||1,
+      total_inflow:Number(document.getElementById('inflow').value)||1000,
+      dfi_pct:Number(document.getElementById('dfi').value)||0.2,
+      reserve_pct:Number(document.getElementById('reserve').value)||0.15,
+      holdings_pct:Number(document.getElementById('holdings').value)||0.1,
+      note:'capstone_demo_ledger'
+    };
+    const d=await j('/madiba/allocate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    log('ALLOCATE '+JSON.stringify(d).slice(0,180));
+    await refresh();
+  }catch(e){log('ALLOCATE FAIL '+e.message);}
+}
+async function allocateDemo(){
+  document.getElementById('month').value=String(new Date().getMonth()+1);
+  document.getElementById('inflow').value='250000';
+  await allocateCustom();
+}
+async function resetLedger(){
+  if(!confirm('Admin: clear all MADIBA CapitalCycle rows? Prefer zeros over fiction.')) return;
+  try{
+    const d=await j('/madiba/reset-ledger',{method:'POST'});
+    log('RESET '+JSON.stringify(d));
+    await refresh();
+  }catch(e){log('RESET FAIL '+e.message+' · needs admin role');}
+}
+(function(){
+  const t=localStorage.getItem('madiba_tok');
+  if(t){TOK=t;document.getElementById('login').style.display='none';document.getElementById('ops').style.display='block';
+    document.getElementById('k-who').textContent=(localStorage.getItem('madiba_who')||'').split('@')[0];
+    refresh();}
+})();
+</script>
+</body>
+</html>
