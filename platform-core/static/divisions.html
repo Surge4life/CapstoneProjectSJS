@@ -3,36 +3,212 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>G.O.D.S · Divisions · Production</title>
-<!-- prod-4part-2026-08-06-ops -->
-<style>body{margin:0;background:#050b16;color:#8fa0bd;font:14px system-ui;padding:24px}</style>
+<!-- live-truth-dense-2026-08-07 self-contained -->
+<title>G.O.D.S · Divisions · Internal Portal Stack</title>
+<style>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--warn:#E8A13A;--udoc:#7C5CBF;--green:#10B981}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}
+a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
+.wrap{max-width:1140px;margin:0 auto;padding:16px 18px 40px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input,select{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px}
+.btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h3{margin:0 0 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.5rem;font-weight:700}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:14px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.tabs button{background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:6px 10px;cursor:pointer}
+.tabs button.on{border-color:var(--gold);color:var(--gold)}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:220px;overflow:auto}
+.ok{color:#7fe3ab}.err{color:#ff8f8f}.mut{color:var(--mut)}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:6px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--gold);font-size:11px;text-transform:uppercase}
+.banner{background:rgba(232,161,58,.08);border:1px solid rgba(232,161,58,.35);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;color:var(--warn)}
+</style>
 </head>
 <body>
-<p id="m">Booting production divisions UI…</p>
+<header>
+  <div class="brand">G.O.D.S · <b>Divisions</b></div>
+  <span class="tag ok" id="ready">checking…</span>
+  <a class="nav" href="/gbs">GBS freeze</a>
+  <a class="nav" href="/Sentinel">Sentinel</a>
+  <a class="nav" href="/eif-ui">EIF</a>
+  <a class="nav" href="/udoc-admin">UDOC Admin</a>
+  <a class="nav" href="/portals">Portals</a>
+  <a class="nav" href="https://gods-platform-internal.onrender.com" target="_blank" rel="noreferrer">Internal Ops</a>
+</header>
+<div class="wrap">
+  <div class="banner">Capstone live operator · honest zeros OK · MADIBA ledger ≠ AUM · capital not_deployed · staff: seths@ / madiba@ / ts@ gods.local · staff123</div>
+  <div class="bar">
+    <input id="email" value="seths@gods.local" placeholder="email" style="min-width:180px"/>
+    <input id="pw" type="password" value="staff123" placeholder="password" style="width:120px"/>
+    <button class="btn" id="login">Connect staff</button>
+    <button class="btn ghost" id="refresh">↻ Refresh KPIs</button>
+    <span class="mut" id="who">not signed in</span>
+  </div>
+  <div class="grid" id="kpis">
+    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-demo">—</div></div>
+    <div class="card"><h3>SETHS enrolled</h3><div class="metric" id="k-enr">—</div></div>
+    <div class="card"><h3>SETHS placed</h3><div class="metric" id="k-plc">—</div></div>
+    <div class="card"><h3>TS projects</h3><div class="metric" id="k-tsp">—</div></div>
+    <div class="card"><h3>TS workers</h3><div class="metric" id="k-tsw">—</div></div>
+    <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mc">—</div></div>
+    <div class="card"><h3>MADIBA recycled</h3><div class="metric" id="k-mr">—</div></div>
+    <div class="card"><h3>Engagements</h3><div class="metric" id="k-eng">—</div></div>
+  </div>
+  <div class="tabs">
+    <button class="on" data-tab="seths">SETHS</button>
+    <button data-tab="ts">TS</button>
+    <button data-tab="madiba">MADIBA</button>
+    <button data-tab="udoc">UDOC EVA</button>
+    <button data-tab="gbs">GBS</button>
+  </div>
+  <div id="tab-seths" class="panel">
+    <h3>SETHS · Enrol → Advance → PLACED</h3>
+    <div class="bar">
+      <input id="s-count" type="number" value="3" min="1" max="20" style="width:70px"/>
+      <button class="btn" id="s-enrol">Enrol cohort</button>
+      <input id="s-ref" placeholder="SETHS-…" style="min-width:160px"/>
+      <button class="btn" id="s-adv">Advance</button>
+      <button class="btn" id="s-place">Force → PLACED</button>
+    </div>
+    <div class="term" id="s-list">roster loads after connect</div>
+  </div>
+  <div id="tab-ts" class="panel" style="display:none">
+    <h3>TS · Deploy SPV · Assign PLACED</h3>
+    <div class="bar">
+      <input id="t-name" value="Capstone Demo SPV"/>
+      <select id="t-sec"><option>ENERGY</option><option>WATER</option><option>AGRI</option><option>HOUSING</option><option>DIGITAL</option></select>
+      <input id="t-eq" type="number" step="0.05" value="0.3" style="width:70px"/>
+      <button class="btn" id="t-dep">Deploy SPV</button>
+    </div>
+    <div class="bar">
+      <input id="t-spv" placeholder="SPV-…" style="min-width:140px"/>
+      <input id="t-lrn" placeholder="SETHS-… PLACED" style="min-width:160px"/>
+      <button class="btn" id="t-asg">Assign worker</button>
+    </div>
+    <div class="term" id="t-list">SPVs / PLACED after connect</div>
+  </div>
+  <div id="tab-madiba" class="panel" style="display:none">
+    <h3>MADIBA · Engage · Allocate (demo ledger)</h3>
+    <div class="bar">
+      <input id="m-inv" value="Capstone Demo LP"/>
+      <input id="m-amt" type="number" value="250000" style="width:120px"/>
+      <button class="btn" id="m-eng">Create engagement</button>
+      <input id="m-ref" placeholder="ENG-…" style="min-width:140px"/>
+      <button class="btn" id="m-adv">Advance</button>
+      <button class="btn" id="m-all">Allocate</button>
+    </div>
+    <div class="term" id="m-list">pipeline after connect</div>
+  </div>
+  <div id="tab-udoc" class="panel" style="display:none">
+    <h3>UDOC · EVA batch (fair ≠ BLOCK · biased = BLOCK)</h3>
+    <div class="bar">
+      <button class="btn" id="u-batch">Run Full EVA batch</button>
+      <button class="btn ghost" id="u-ready">Check demo/ready</button>
+    </div>
+    <div class="term" id="u-out">batch output…</div>
+  </div>
+  <div id="tab-gbs" class="panel" style="display:none">
+    <h3>GBS architecture · live nodes</h3>
+    <div class="term" id="g-out">loading…</div>
+  </div>
+  <div class="panel">
+    <h3>Ops terminal</h3>
+    <div class="term" id="log">ready</div>
+  </div>
+</div>
 <script>
-(async function(){
-  const base="https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/";
-  let b64=null;
+const $ = (id) => document.getElementById(id);
+let TOK = localStorage.getItem('gods_div_tok') || '';
+const log = (m) => { const el=$('log'); el.textContent = new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent; };
+async function api(path, opts={}) {
+  const h = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if (TOK) h.Authorization = 'Bearer '+TOK;
+  const r = await fetch(path, Object.assign({}, opts, {headers:h}));
+  const t = await r.text();
+  let j; try { j=JSON.parse(t);} catch { j={raw:t}; }
+  if (!r.ok) throw new Error((j && (j.detail||j.message)) || t.slice(0,160) || r.status);
+  return j;
+}
+async function login() {
+  const body = new URLSearchParams({username:$('email').value, password:$('pw').value});
+  const r = await fetch('/auth/login', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body});
+  const j = await r.json();
+  if (!r.ok) throw new Error(JSON.stringify(j));
+  TOK = j.access_token; localStorage.setItem('gods_div_tok', TOK);
+  $('who').textContent = $('email').value + ' · connected';
+  log('LOGIN ok');
+  await refresh();
+}
+async function refresh() {
   try {
-    const chunks=[];
-    for (let i=0;i<4;i++){
-      const r=await fetch(base+"divisions_payload_"+i+".b64",{cache:"no-store"});
-      if(!r.ok) throw new Error("part "+i+" HTTP "+r.status);
-      chunks.push((await r.text()).trim());
-    }
-    b64=chunks.join("");
-    if(b64.length<500||b64.includes("PLACEHOLDER")) throw new Error("bad payload");
-  } catch(e){
-    document.getElementById("m").innerHTML="Payload missing · <a style=color:#00C2D4 href=/gbs>/gbs</a> · "+e.message;
-    return;
-  }
-  try{
-    const bin=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
-    const stream=new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
-    const html=await new Response(stream).text();
-    document.open();document.write(html);document.close();
-  }catch(e){ document.getElementById("m").textContent="Inflate failed: "+e.message; }
-})();
+    const ready = await fetch('/udoc/demo/ready').then(r=>r.json()).catch(()=>null);
+    $('k-demo').textContent = ready ? String(ready.ready) : '—';
+    $('ready').textContent = ready && ready.ready ? 'DEMO READY' : 'CHECK SEED';
+    $('ready').className = 'tag '+(ready&&ready.ready?'ok':'');
+    if (!TOK) { log('KPIs partial · not signed in'); return; }
+    const [sk, tm, mm, pipe] = await Promise.all([
+      api('/analytics/SETHS/kpis').catch(()=>null),
+      api('/ts/metrics').catch(()=>null),
+      api('/madiba/metrics').catch(()=>null),
+      api('/madiba/engage/pipeline').catch(()=>null),
+    ]);
+    $('k-enr').textContent = sk?.enrolled ?? '—';
+    $('k-plc').textContent = sk?.placed ?? '—';
+    $('k-tsp').textContent = tm?.projects ?? '—';
+    $('k-tsw').textContent = tm?.workers_absorbed ?? '—';
+    $('k-mc').textContent = mm?.cycles ?? '—';
+    $('k-mr').textContent = 'R'+Number(mm?.cumulative_recycled||0).toLocaleString();
+    $('k-eng').textContent = pipe?.engagements ?? '—';
+    // lists
+    const learners = await api('/seths/learners?limit=30').catch(()=>({learners:[]}));
+    const rows = (learners.learners||[]).map(l=>l.ref+'  '+l.status+'  R'+Number(l.monthly_value||0).toLocaleString()).join('\n');
+    $('s-list').textContent = rows || 'empty roster';
+    const spvs = await api('/ts/projects').catch(()=>[]);
+    const list = Array.isArray(spvs)?spvs:(spvs.projects||[]);
+    const placed = await api('/seths/learners?status=PLACED&limit=20').catch(()=>({learners:[]}));
+    $('t-list').textContent = 'SPVs:\n'+(list.slice(0,12).map(p=>(p.spv_id||'')+' w:'+(p.workers??p.workers_deployed??0)).join('\n')||'none')
+      +'\n\nPLACED:\n'+((placed.learners||[]).map(l=>l.ref).join('\n')||'none');
+    const pl = pipe?.list||[];
+    $('m-list').textContent = pl.slice(0,15).map(e=>(e.ref||'')+'  '+(e.stage||'')+'  '+(e.investor||'')).join('\n') || 'no engagements';
+    const gbs = await fetch('/gis/gbs/architecture').then(r=>r.json()).catch(()=>null);
+    $('g-out').textContent = gbs ? JSON.stringify(gbs,null,2).slice(0,2000) : '—';
+    log('REFRESH ok');
+  } catch(e) { log('REFRESH '+e.message); }
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  ['seths','ts','madiba','udoc','gbs'].forEach(t=>{ const el=$('tab-'+t); if(el) el.style.display = (t===b.dataset.tab)?'block':'none'; });
+});
+$('login').onclick=()=>login().catch(e=>log('LOGIN '+e.message));
+$('refresh').onclick=()=>refresh();
+$('s-enrol').onclick=async()=>{ try{ const r=await api('/seths/enrol',{method:'POST',body:JSON.stringify({count:+$('s-count').value||3,qualification:'Digital Operations & AI Literacy',nqf_level:5})}); if(r.refs&&r.refs[0]) $('s-ref').value=r.refs[0]; log('ENROL '+JSON.stringify(r).slice(0,120)); await refresh();}catch(e){log('ENROL '+e.message);} };
+$('s-adv').onclick=async()=>{ try{ const ref=$('s-ref').value.trim(); const r=await api('/seths/'+encodeURIComponent(ref)+'/advance',{method:'POST',body:'{}'}); log('ADV '+ref+' '+r.status); await refresh();}catch(e){log('ADV '+e.message);} };
+$('s-place').onclick=async()=>{ try{ const ref=$('s-ref').value.trim(); let r=await api('/seths/'+encodeURIComponent(ref)+'/advance',{method:'POST',body:'{}'}); if(r.status!=='PLACED') r=await api('/seths/'+encodeURIComponent(ref)+'/advance',{method:'POST',body:'{}'}); log('PLACE '+ref+' '+r.status); await refresh();}catch(e){log('PLACE '+e.message);} };
+$('t-dep').onclick=async()=>{ try{ const r=await api('/ts/projects',{method:'POST',body:JSON.stringify({name:$('t-name').value,sector:$('t-sec').value,subsidiary:$('t-sec').value,equity_pct:+$('t-eq').value,workers_deployed:0,monthly_revenue:0,operating_margin:0.3})}); $('t-spv').value=r.spv_id||''; log('DEPLOY '+r.spv_id); await refresh();}catch(e){log('DEPLOY '+e.message);} };
+$('t-asg').onclick=async()=>{ try{ const r=await api('/ts/projects/'+encodeURIComponent($('t-spv').value)+'/assign-worker',{method:'POST',body:JSON.stringify({learner_ref:$('t-lrn').value,role:'technician',monthly_wage:0})}); log('ASSIGN '+JSON.stringify(r).slice(0,120)); await refresh();}catch(e){log('ASSIGN '+e.message);} };
+$('m-eng').onclick=async()=>{ try{ const r=await api('/madiba/engage',{method:'POST',body:JSON.stringify({investor_name:$('m-inv').value,investor_type:'INSTITUTIONAL',instrument:'blended',indicated_amount:+$('m-amt').value})}); $('m-ref').value=r.engagement_ref||''; log('ENGAGE '+r.engagement_ref); await refresh();}catch(e){log('ENGAGE '+e.message);} };
+$('m-adv').onclick=async()=>{ try{ const r=await api('/madiba/engage/'+encodeURIComponent($('m-ref').value)+'/advance',{method:'POST'}); log('MADV '+r.stage); await refresh();}catch(e){log('MADV '+e.message);} };
+$('m-all').onclick=async()=>{ try{ const r=await api('/madiba/allocate',{method:'POST',body:JSON.stringify({month:8,total_inflow:100000})}); log('ALLOC '+JSON.stringify(r).slice(0,120)); await refresh();}catch(e){log('ALLOC '+e.message);} };
+$('u-batch').onclick=async()=>{ try{ const r=await api('/decisions/batch',{method:'POST',body:JSON.stringify({scenarios:['fair','biased','high','sov']})}); $('u-out').textContent=JSON.stringify(r,null,2).slice(0,2500); log('EVA batch ok'); }catch(e){log('EVA '+e.message);} };
+$('u-ready').onclick=async()=>{ try{ const r=await fetch('/udoc/demo/ready').then(x=>x.json()); $('u-out').textContent=JSON.stringify(r,null,2); log('demo/ready '+r.ready);}catch(e){log('ready '+e.message);} };
+// preload token
+async function tryPreload(){
+  if(TOK){ $('who').textContent='token restored'; try{ await refresh(); }catch(e){ $('who').innerHTML='<span class="err">preload expired — Connect</span>'; TOK=''; localStorage.removeItem('gods_div_tok'); } }
+  else { fetch('/udoc/demo/ready').then(r=>r.json()).then(j=>{ $('k-demo').textContent=String(j.ready); $('ready').textContent=j.ready?'DEMO READY':'CHECK SEED'; $('ready').className='tag '+(j.ready?'ok':''); }).catch(()=>{}); }
+}
+tryPreload();
 </script>
 </body>
 </html>
