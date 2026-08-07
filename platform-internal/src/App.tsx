@@ -16,14 +16,56 @@ function Login({ onAuth }: { onAuth: () => void }) {
   const [email, setEmail] = useState("admin@gods.local");
   const [pw, setPw] = useState("admin123");
   const [err, setErr] = useState("");
-  async function go(){ try{ await api.login(email,pw); onAuth(); }catch(e:any){ setErr(e.message); } }
-  return (<div className="login"><h1>G.O.D.S Internal</h1>
-    <span className="lock">🔒 Network-locked · role-based access</span>
-    <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="staff email"/>
-    <input type="password" value={pw} onChange={e=>setPw(e.target.value)} placeholder="password"/>
-    <button className="btn" onClick={go}>Sign in</button>{err&&<div className="err">{err}</div>}
-    <p style={{fontSize:".68rem",color:"var(--rule)",marginTop:14}}>Try: seths.op@gods.local · ts.op@gods.local · auditor@gods.local · viewer@gods.local (pw staff123)</p>
-  </div>);
+  const [busy, setBusy] = useState(false);
+  const staff = [
+    { email: "admin@gods.local", pw: "admin123", label: "Admin" },
+    { email: "seths@gods.local", pw: "staff123", label: "SETHS" },
+    { email: "madiba@gods.local", pw: "staff123", label: "MADIBA" },
+    { email: "ts@gods.local", pw: "staff123", label: "TS" },
+  ];
+  async function go(e?: string, p?: string) {
+    setBusy(true); setErr("");
+    try {
+      await api.login(e ?? email, p ?? pw);
+      onAuth();
+    } catch (ex: any) {
+      setErr(ex.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="login">
+      <h1>G.O.D.S Internal</h1>
+      <span className="lock">🔒 Network-locked · role-based access</span>
+      <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff email" />
+      <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="password" />
+      <button className="btn" disabled={busy} onClick={() => go()}>
+        Sign in
+      </button>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12, justifyContent: "center" }}>
+        {staff.map((s) => (
+          <button
+            key={s.email}
+            className="btn"
+            disabled={busy}
+            style={{ fontSize: ".72rem", opacity: 0.9 }}
+            onClick={() => {
+              setEmail(s.email);
+              setPw(s.pw);
+              go(s.email, s.pw);
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+      {err && <div className="err">{err}</div>}
+      <p style={{ fontSize: ".68rem", color: "var(--rule)", marginTop: 14 }}>
+        Division staff · staff123 · admin · admin123
+      </p>
+    </div>
+  );
 }
 
 // The G.O.D.S core launcher — shows ONLY the systems this user may open.
@@ -48,51 +90,55 @@ function Launcher({ profile }: { profile: Profile }) {
         <h3 style={{color:"#7C5CBF",fontSize:".95rem",marginBottom:6,textTransform:"none",letterSpacing:0}}>G.O.D.S Intelligence</h3>
         <p style={{fontSize:".72rem"}}>Internal · Open →</p></div>}
     </div>
-    <div style={{textAlign:"center",marginTop:30}}>
-      <a onClick={()=>{setToken(null);location.reload();}} style={{color:"var(--bad)",fontSize:".8rem",cursor:"pointer"}}>Sign out</a></div>
   </div>);
 }
 
+function Guarded({ profile, sysKey, children }: { profile: Profile; sysKey: string; children: React.ReactNode }) {
+  if (!profile.systems.some(s => s.key === sysKey) && !profile.is_admin) {
+    return <div className="main"><div className="top"><h2>Access denied</h2><span className="badge">🔒 403</span></div></div>;
+  }
+  return <>{children}</>;
+}
+
 function Shell({ profile, children }: { profile: Profile; children: React.ReactNode }) {
-  return (<div className="app">
-    <aside className="side">
-      <div className="brand"><h1>G.O.D.S</h1><span>Internal Operating Core</span>
-        <span className="lock">🔒 {profile.role}/{profile.division}</span></div>
-      <nav className="nav">
-        <NavLink to="/launcher" className={({isActive})=>isActive?"active":""}>⌂ Launcher</NavLink>
+  const nav = useNavigate();
+  return (
+    <div className="shell">
+      <aside className="side">
+        <div className="logo">G.O.D.S</div>
+        <div className="sub">INTERNAL OPERATING CORE</div>
+        <div className="who">{profile.email}<br/>{profile.role}/{profile.division}</div>
+        <NavLink to="/launcher" className={({isActive})=>isActive?"active":""}>Launcher</NavLink>
         {profile.systems.some(s=>s.key==="holdings-overview") && <NavLink to="/overview" className={({isActive})=>isActive?"active":""}>Holdings Overview</NavLink>}
         {(profile.systems.some(s=>["seths-ops","madiba-ops","ts-ops"].includes(s.key))) && <div className="sec">Division Operations</div>}
         {profile.systems.some(s=>s.key==="seths-ops") && <NavLink to="/seths" className={({isActive})=>isActive?"active":""}>SETHS Ops</NavLink>}
         {profile.systems.some(s=>s.key==="madiba-ops") && <NavLink to="/madiba" className={({isActive})=>isActive?"active":""}>MADIBA Ops</NavLink>}
         {profile.systems.some(s=>s.key==="ts-ops") && <NavLink to="/ts" className={({isActive})=>isActive?"active":""}>TS Industries Ops</NavLink>}
-        {profile.systems.some(s=>s.key==="udoc-gov") && <><div className="sec">Governance</div>
-          <NavLink to="/udoc" className={({isActive})=>isActive?"active":""}>UDOC Governance</NavLink></>}
-        {isInternal(profile) && <><div className="sec">Intelligence</div>
-          <NavLink to="/intelligence" className={({isActive})=>isActive?"active":""}>G.O.D.S Intelligence</NavLink></>}
-        <a onClick={()=>{setToken(null);location.reload();}} style={{color:"var(--bad)",marginTop:16}}>Sign out</a>
-      </nav>
-    </aside>
-    <main className="main">{children}</main>
-  </div>);
+        {profile.systems.some(s=>s.key==="udoc-gov") && <><div className="sec">Governance</div><NavLink to="/udoc" className={({isActive})=>isActive?"active":""}>UDOC Governance</NavLink></>}
+        {isInternal(profile) && <><div className="sec">Intelligence</div><NavLink to="/intelligence" className={({isActive})=>isActive?"active":""}>G.O.D.S Intelligence</NavLink></>}
+        <button className="btn" style={{marginTop:24}} onClick={()=>{ setToken(null); nav("/"); window.location.reload(); }}>Sign out</button>
+      </aside>
+      <div className="main">{children}</div>
+    </div>
+  );
 }
 
-// Guard wrapper: a console only renders if the system is in the user's profile.
-function Guarded({ profile, sysKey, children }: { profile: Profile; sysKey: string; children: React.ReactNode }) {
-  const allowed = profile.systems.some(s=>s.key===sysKey);
-  if(!allowed) return <div className="main"><div className="top"><h2>Access denied</h2><span className="badge">🔒 403</span></div>
-    <div className="panel"><p style={{fontSize:".85rem"}}>Your role ({profile.role}/{profile.division}) may not open this system. The backend enforces this too.</p></div></div>;
-  return <>{children}</>;
-}
-
-export function App(){
-  const [authed,setAuthed]=useState(!!getToken());
-  const [profile,setProfile]=useState<Profile|null>(null);
-  const [err,setErr]=useState("");
-  useEffect(()=>{ if(authed){ api.get("/access/profile").then(setProfile).catch(e=>setErr(e.message)); } },[authed]);
-  if(!authed) return <Login onAuth={()=>setAuthed(true)}/>;
-  if(err) return <div className="login"><h1>G.O.D.S</h1><div className="err">{err}</div>
-    <button className="btn" onClick={()=>{setToken(null);location.reload();}}>Back to sign in</button></div>;
-  if(!profile) return <div className="login"><h1>G.O.D.S</h1><p>Opening your systems…</p></div>;
+export default function App() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [booting, setBooting] = useState(true);
+  async function boot() {
+    if (!getToken()) { setBooting(false); return; }
+    try {
+      const me = await api.get("/auth/me");
+      setProfile(me);
+    } catch {
+      setToken(null);
+    }
+    setBooting(false);
+  }
+  useEffect(() => { boot(); }, []);
+  if (booting) return <div className="login"><p>Loading…</p></div>;
+  if (!profile) return <Login onAuth={() => boot()} />;
   return (<BrowserRouter><Shell profile={profile}><Routes>
     <Route path="/launcher" element={<Launcher profile={profile}/>}/>
     <Route path="/overview" element={<Guarded profile={profile} sysKey="holdings-overview"><Overview/></Guarded>}/>

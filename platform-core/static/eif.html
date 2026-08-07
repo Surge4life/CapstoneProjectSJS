@@ -2,35 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>G.O.D.S · EIF Diamond · MADIBA recognition</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>G.O.D.S · EIF Diamond</title>
 <style>
-:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--bad:#EF4444;--madiba:#C9A84C}
-*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
-header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.brand{font-weight:700}.brand b{color:var(--gold)}
-.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
-.tag.ok{border-color:var(--ok);color:#7fe3ab}.tag.warn{border-color:var(--warn);color:var(--warn)}
-a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
-.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
-.banner{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px}
+:root{--bg:#0b1220;--panel:#121a2b;--line:#1e2a3f;--text:#e8eef8;--mut:#8b9bb4;--ok:#3dd68c;--warn:#f5a524;--bad:#f07178;--live:#5b9dff;--brand:#c9a227}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:#0d1524}
+.brand{font-weight:700;letter-spacing:.04em}.brand b{color:var(--brand)}
+.tag{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.tag.ok{color:var(--ok);border-color:#2a6b4a}.tag.warn{color:var(--warn);border-color:#7a5a1a}
+nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+nav a{color:var(--mut);text-decoration:none;font-size:12px;padding:6px 10px;border:1px solid var(--line);border-radius:8px}
+nav a:hover{color:var(--text);border-color:#3a4d6e}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
-.panel h3{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
-.mut{color:var(--mut)}.live{color:#7fe3ab}.warn{color:var(--warn)}.bad{color:var(--bad)}
-.kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
-.kv span:first-child{color:var(--mut)}
-.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:4px 10px;margin:3px;font-size:12px;cursor:pointer;background:#091022}
-.chip.on{border-color:var(--gold);color:var(--gold)}
-input,textarea,select{width:100%;background:#091022;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px;margin:4px 0 10px}
-button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;margin:2px 4px 2px 0}
-button.ghost{background:transparent;color:var(--cyan);border:1px solid rgba(0,194,212,.4)}
-button.green{background:#1a8f4a;color:#fff}
-.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#9fb4dd;min-height:48px;white-space:pre-wrap;margin-top:8px}
-table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
+h3{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv span:last-child{text-align:right}
+.live{color:var(--live)}.mut{color:var(--mut)}.warn{color:var(--warn)}.bad{color:var(--bad)}.ok{color:var(--ok)}
+button,.chip{cursor:pointer;border:1px solid var(--line);background:#182338;color:var(--text);border-radius:8px;padding:8px 12px;font-size:13px}
+button.green{background:#1a3d2e;border-color:#2a6b4a;color:var(--ok)}
+button.ghost{background:transparent}
+.chip{display:inline-block;margin:4px 4px 0 0;font-size:12px}.chip.on{border-color:var(--brand);color:var(--brand)}
+input,textarea,select{background:#0b1220;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 10px;width:100%}
 .login{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:12px}
 .login label{font-size:11px;color:var(--mut);display:block}
 .login input{width:180px;margin:0}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#0b1220;border:1px solid var(--line);border-radius:8px;padding:10px;min-height:48px;white-space:pre-wrap;margin-top:8px}
+.banner{border:1px solid #3a4d6e;background:#101a2e;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -38,14 +40,15 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;b
   <span class="brand">G.O.D.S · <b>EIF Diamond</b></span>
   <span class="tag warn" id="capTag">capital not_deployed</span>
   <span class="tag" id="authTag">auth —</span>
-  <span style="flex:1"></span>
-  <a class="nav" href="/gbs">GBS freeze</a>
-  <a class="nav" href="/divisions">Divisions</a>
-  <a class="nav" href="/Sentinel">Sentinel</a>
-  <a class="nav" href="/portals">Portals</a>
+  <nav>
+    <a href="/gbs">GBS freeze</a>
+    <a href="/divisions">Divisions</a>
+    <a href="/Sentinel">Sentinel</a>
+    <a href="/portals">Portals</a>
+  </nav>
 </header>
-<div class="wrap">
-  <div class="banner"><b>Recognition plane (MADIBA):</b> EIF Diamond is the individual-side parallel to <b>GBS-UDOC Sovereign-Verified</b> (systems). Nomination logs to sealed audit only — no funding, no Diamond grant on free-tier Capstone. Staff: <code>madiba@gods.local</code> · <code>staff123</code></div>
+<main>
+  <div class="banner">Recognition plane (MADIBA): EIF Diamond is the individual-side parallel to GBS-UDOC <b>Sovereign-Verified</b> (systems). Nomination logs to sealed audit only — no funding, no Diamond grant on free-tier Capstone. Staff: <code>madiba@gods.local</code> · <code>staff123</code></div>
 
   <div class="panel login">
     <div><label>Email</label><input id="email" value="madiba@gods.local"/></div>
@@ -62,48 +65,41 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;b
       <div class="kv"><span>Systems</span><span>Sovereign-Verified</span></div>
       <div class="kv"><span>Baseline exceeded</span><span>SETHS Platinum · GBS-T.S.</span></div>
       <div class="kv"><span>Authority</span><span>MADIBA review + UDOC audit</span></div>
-      <p class="mut" style="margin:10px 0 0;font-size:12px">Capstone: Diamond process designed; audit nomination live; capital not_deployed.</p>
+      <p class="mut" style="margin-top:8px;font-size:12px">Capstone: Diamond process designed; audit nomination live; capital not_deployed.</p>
     </div>
     <div class="panel">
       <h3>Health</h3>
-      <div id="health">—</div>
+      <div id="health" class="mut">Loading…</div>
     </div>
     <div class="panel">
       <h3>Honesty</h3>
-      <div id="honesty">—</div>
+      <div id="honesty" class="mut">Loading…</div>
     </div>
   </div>
 
   <div class="panel">
     <h3>Six domains</h3>
-    <div id="domains" class="mut">Loading…</div>
+    <div id="domains">Loading…</div>
   </div>
 
   <div class="panel">
-    <h3>Passport → Diamond tiers</h3>
+    <h3>Passport tiers (SETHS → Diamond)</h3>
     <div id="tiers">Loading…</div>
   </div>
 
   <div class="panel">
     <h3>Nominate (audit only)</h3>
-    <label class="mut">Nominee</label>
-    <input id="name" placeholder="Display name or ref"/>
-    <label class="mut">Domain</label>
-    <div id="domChips"></div>
+    <p class="mut" style="font-size:12px;margin:0 0 8px">Writes sealed audit event — does not move capital or grant Diamond on Capstone free tier.</p>
+    <div id="domChips" style="margin-bottom:8px"></div>
     <input type="hidden" id="dom" value="intellectual"/>
-    <label class="mut">Pathway</label>
-    <select id="path">
-      <option value="open">Open nomination</option>
-      <option value="seths_platinum">SETHS Platinum → exceptional contribution</option>
-    </select>
-    <label class="mut">Contribution summary</label>
-    <textarea id="sum" rows="3" placeholder="What was contributed and why it is exceptional…"></textarea>
-    <label class="mut">Evidence note</label>
-    <input id="ev" placeholder="Link, case ref, or independent source note"/>
-    <button type="button" onclick="nominate()">Log nomination → sealed audit</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <input id="nominee" placeholder="Nominee name / ref"/>
+      <input id="rationale" placeholder="Contribution rationale"/>
+    </div>
+    <button type="button" class="green" onclick="nominate()">Log nomination → sealed audit</button>
     <div class="term" id="term">Ready · staff login required for nominate</div>
   </div>
-</div>
+</main>
 <script>
 const API=location.origin;
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
@@ -120,10 +116,15 @@ async function api(path,opts={}){
 async function login(){
   const msg=document.getElementById('loginMsg');
   try{
-    const d=await api('/auth/login',{method:'POST',body:JSON.stringify({email:document.getElementById('email').value.trim(),password:document.getElementById('pw').value})});
+    const user=document.getElementById('email').value.trim();
+    const pass=document.getElementById('pw').value;
+    const body=new URLSearchParams({username:user,password:pass});
+    const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail||r.status));
     const t=d.access_token||d.token; if(!t) throw new Error('no token');
     localStorage.setItem('udoc_eif_tok',t); localStorage.setItem('udoc_sent_tok',t);
-    setAuth(true); msg.innerHTML='<span class="live">signed in</span>'; load();
+    setAuth(true); msg.innerHTML='<span class="live">signed in as '+esc(user)+'</span>'; load();
   }catch(e){ setAuth(false); msg.innerHTML='<span class="bad">'+esc(e.message)+'</span>'; }
 }
 function pickDom(id,el){
@@ -150,7 +151,9 @@ async function load(){
       '<div class="kv"><span>Instrument</span><span>'+esc(fw.instrument||'EIF')+'</span></div>'+
       '<div class="kv"><span>Systems parallel</span><span>'+esc(sov.name||'Sovereign-Verified')+'</span></div>'+
       '<div class="kv"><span>Systems status</span><span class="warn">'+esc(sov.status||'designed_not_built')+'</span></div>'+
-      '<p class="mut" style="margin-top:8px;font-size:12px">'+esc(hon.proven||hon.note||'Framework + nominate audit-only on Capstone')+'</p>';
+      '<div class="kv"><span>Proven</span><span class="mut">'+esc(hon.proven||'—')+'</span></div>'+
+      '<div class="kv"><span>Designed</span><span class="mut">'+esc(hon.designed||'—')+'</span></div>'+
+      '<div class="kv"><span>Aspirational</span><span class="warn">'+esc(hon.aspirational||'—')+'</span></div>';
     const domains=fw.domains||[];
     document.getElementById('domains').innerHTML=domains.map(d=>
       '<div style="margin-bottom:10px"><b>'+esc(d.label)+'</b> <span class="mut">('+esc(d.id)+')</span><div class="mut" style="font-size:12px">'+esc(d.examples||'')+'</div></div>'
@@ -168,17 +171,18 @@ async function load(){
 }
 async function nominate(){
   const term=document.getElementById('term');
-  term.textContent='…';
+  term.textContent='Nominating…';
   try{
-    const d=await api('/eif/nominate',{method:'POST',body:JSON.stringify({
-      nominee_label:document.getElementById('name').value.trim(),
+    const body={
       domain:document.getElementById('dom').value,
-      contribution_summary:document.getElementById('sum').value.trim(),
-      evidence_note:document.getElementById('ev').value.trim(),
-      pathway:document.getElementById('path').value
-    })});
-    term.textContent=JSON.stringify(d,null,2);
-  }catch(e){ term.textContent='✗ '+e.message; }
+      nominee:document.getElementById('nominee').value.trim()||'anonymous-ref',
+      rationale:document.getElementById('rationale').value.trim()||'Capstone audit nomination'
+    };
+    const r=await api('/eif/nominate',{method:'POST',body:JSON.stringify(body)});
+    term.textContent=JSON.stringify(r,null,2);
+  }catch(e){
+    term.textContent='Error: '+e.message;
+  }
 }
 load();
 </script>
