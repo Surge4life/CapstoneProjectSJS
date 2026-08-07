@@ -10,64 +10,113 @@
 header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
-.tag.ok{border-color:var(--ok);color:#7fe3ab}
+.tag.ok{border-color:rgba(45,155,90,.5);color:#7fe3ab;background:rgba(45,155,90,.08)}
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
 .wrap{max-width:1100px;margin:0 auto;padding:18px 18px 48px}
 .banner{background:rgba(45,155,90,.12);border:1px solid rgba(45,155,90,.4);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px}
-.card h3{margin:0 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.card h3{margin:0 0 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
 .card.seths{border-top:3px solid var(--cyan)}.card.madiba{border-top:3px solid var(--gold)}.card.ts{border-top:3px solid var(--green)}.card.udoc{border-top:3px solid var(--udoc)}
 .mode{display:inline-block;font-size:11px;padding:2px 8px;border-radius:12px;border:1px solid var(--line);color:var(--cyan);margin-bottom:6px}
 .mode.rec{color:var(--gold)}
 .mut{color:var(--mut)}.live{color:#7fe3ab}.warn{color:var(--warn)}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:14px}
 .panel h3{margin:0 0 10px;color:var(--gold)}
-.kv{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
-.kv span:first-child{color:var(--mut)}
-ul.tight{margin:8px 0 0 18px;padding:0;font-size:13px;color:var(--mut)}
-button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;margin-top:8px}
-.term{background:#050a12;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#9fb4dd;min-height:60px;white-space:pre-wrap;margin-top:8px}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:240px;overflow:auto}
+.metric{font-size:1.35rem;font-weight:700}
+.btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kv{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(28,42,69,.6)}
+.kv span:last-child{color:var(--mut);text-align:right}
 </style>
 </head>
 <body>
 <header>
   <span class="brand">G.O.D.S · <b>GBS Capstone Freeze</b></span>
-  <span class="tag ok">Four divisions complete · GBS-UDOC v1.0</span>
+  <span class="tag ok" id="ready">checking…</span>
   <span style="flex:1"></span>
   <a class="nav" href="/divisions">Divisions ops</a>
   <a class="nav" href="/Sentinel">Sentinel</a>
   <a class="nav" href="/eif-ui">EIF</a>
   <a class="nav" href="/portals">Portals</a>
+  <a class="nav" href="https://gods-platform-internal.onrender.com" target="_blank" rel="noreferrer">Internal</a>
 </header>
 <div class="wrap">
-  <div class="banner"><b>Freeze posture:</b> GBS-Global licenses one standard to four divisional propositions. SETHS + TS <b>develop</b>; MADIBA/EIF + UDOC <b>recognise</b> exceptional achievement. Sovereign-Verified (systems) is the parallel to EIF Diamond (individuals) — status <span class="warn">designed_not_built</span> on free-tier Capstone.</div>
-  <div class="grid" id="cards">Loading architecture…</div>
+  <div class="banner"><b>Freeze posture:</b> GBS-Global licenses one standard to four divisional propositions. SETHS + TS <b>develop</b>; MADIBA/EIF + UDOC <b>recognise</b> exceptional achievement. Sovereign-Verified (systems) is parallel to EIF Diamond (individuals) — status <span class="warn">designed_not_built</span> on free-tier Capstone. Honest zeros are valid.</div>
+
+  <div class="grid" id="kpis">
+    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-demo">—</div></div>
+    <div class="card"><h3>SETHS path</h3><div class="metric" id="k-seths">ops live</div></div>
+    <div class="card"><h3>TS projects</h3><div class="metric" id="k-ts">—</div></div>
+    <div class="card"><h3>TS workers</h3><div class="metric" id="k-tsw">—</div></div>
+    <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mc">—</div></div>
+    <div class="card"><h3>Recycled</h3><div class="metric" id="k-mr">—</div></div>
+    <div class="card"><h3>GBS nodes</h3><div class="metric" id="k-nodes">—</div></div>
+    <div class="card"><h3>EVA gate</h3><div class="metric" id="k-gate">—</div></div>
+  </div>
+
+  <div class="panel">
+    <h3>Command path</h3>
+    <div class="row">
+      <button class="btn" onclick="load()">↻ Refresh all</button>
+      <button class="btn ghost" onclick="runGate()">Run EVA gate</button>
+      <a class="btn ghost" href="/divisions" style="text-decoration:none">Open divisions operator</a>
+      <a class="btn ghost" href="/Sentinel" style="text-decoration:none">Sentinel smoke</a>
+    </div>
+  </div>
+
+  <div class="grid" id="cards" style="margin-top:14px">Loading architecture…</div>
+
+  <div class="panel">
+    <h3>Constitutional pillars</h3>
+    <div id="pillars" class="mut">—</div>
+  </div>
+
   <div class="panel">
     <h3>Sovereign-Verified (GBS-UDOC)</h3>
     <div id="sov">Loading…</div>
   </div>
+
   <div class="panel">
-    <h3>Live probe</h3>
-    <button type="button" onclick="load()">Refresh from Core APIs</button>
-    <div class="term" id="term">—</div>
+    <h3>Ops terminal</h3>
+    <div class="term" id="term">GBS freeze · live Core probes</div>
   </div>
-  <p class="mut" style="margin-top:16px;font-size:12px">Staff: seths@ / madiba@ / ts@ gods.local · staff123 · Docs: udoc-mvp/GBS_PRE_UDOC_ALIGNMENT.md</p>
+
+  <p class="mut" style="margin-top:16px;font-size:12px">Staff: seths@ / madiba@ / ts@ gods.local · staff123 · MADIBA ledger ≠ AUM · capital not_deployed · nodes may be demo-only</p>
 </div>
 <script>
 const API=location.origin;
+const log=(m)=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
 async function j(path){const r=await fetch(API+path);if(!r.ok)throw new Error(path+' '+r.status);return r.json();}
 function card(cls,div,prop,mode,assures,honesty){
   return `<div class="card ${cls}"><span class="mode ${mode==='recognises'?'rec':''}">${esc(mode)}</span><h3>${esc(div)}</h3>
   <div class="kv"><span>Proposition</span><span>${esc(prop)}</span></div>
   <div class="kv"><span>Assures</span><span>${esc(assures)}</span></div>
-  <p class="mut" style="font-size:12px;margin:8px 0 0">${esc(honesty||'')}</p></div>`;
+  <div class="kv"><span>Honesty</span><span class="warn">${esc(honesty)}</span></div></div>`;
 }
 async function load(){
-  const term=document.getElementById('term');
   try{
-    const [arch,sov,ov]=await Promise.all([j('/gis/gbs/architecture'),j('/gis/gbs/sovereign-tier'),j('/gis/gbs/overview')]);
+    const [arch,ov,pill,nodes,tm,mm,ready]=await Promise.all([
+      j('/gis/gbs/architecture').catch(e=>({error:String(e)})),
+      j('/gis/gbs/overview').catch(e=>({error:String(e)})),
+      j('/gis/gbs/pillars').catch(e=>({error:String(e)})),
+      j('/gis/gbs/nodes').catch(()=>[]),
+      j('/ts/metrics').catch(()=>({})),
+      j('/madiba/metrics').catch(()=>({})),
+      j('/udoc/demo/ready').catch(()=>({})),
+    ]);
+    document.getElementById('k-demo').textContent=ready.ready!=null?String(ready.ready):'—';
+    document.getElementById('ready').textContent=ready.ready?'DEMO READY':'CHECK SEED';
+    document.getElementById('ready').className='tag '+(ready.ready?'ok':'');
+    document.getElementById('k-ts').textContent=tm.projects??'—';
+    document.getElementById('k-tsw').textContent=tm.workers_absorbed??'—';
+    document.getElementById('k-mc').textContent=mm.cycles??'—';
+    document.getElementById('k-mr').textContent=mm.cumulative_recycled!=null?('R'+Number(mm.cumulative_recycled).toLocaleString()):'—';
+    const nlist=Array.isArray(nodes)?nodes:(nodes.nodes||[]);
+    document.getElementById('k-nodes').textContent=nlist.length;
     const binds={};
     (ov.division_bindings||[]).forEach(b=>binds[b.division]=b);
     const order=['SETHS','MADIBA','TS','UDOC'];
@@ -75,25 +124,32 @@ async function load(){
     document.getElementById('cards').innerHTML=order.map(d=>{
       const a=(arch.divisions||[]).find(x=>x.division===d)||{};
       const b=binds[d]||{};
-      return card(cls[d],d,a.proposition||b.proposition||'',a.mode||b.mode||'',a.assures||b.assures||'',b.honesty||'');
+      return card(cls[d],d,a.proposition||a.prop||b.proposition||'—',
+        a.mode||b.mode||(d==='SETHS'||d==='TS'?'develops':'recognises'),
+        a.assures||b.assures||'—',
+        a.honesty||b.honesty||ov.honesty?.note||'honest empties OK');
     }).join('');
-    const h=sov.honesty||{};
-    document.getElementById('sov').innerHTML=`
-      <div class="kv"><span>Name</span><span class="live">${esc(sov.name)}</span></div>
-      <div class="kv"><span>Status</span><span class="warn">${esc(sov.status)}</span></div>
-      <div class="kv"><span>Parallel</span><span>${esc(sov.parallel_to)}</span></div>
-      <div class="kv"><span>Baseline exceeded</span><span>${esc(sov.baseline_exceeded)}</span></div>
-      <p class="mut" style="margin-top:10px;font-size:12px"><b>Proven/live:</b> ${esc(h.proven_live||'')}</p>
-      <p class="mut" style="font-size:12px"><b>Designed:</b> ${esc(h.designed_not_built||'')}</p>
-      <p class="mut" style="font-size:12px"><b>Aspirational:</b> ${esc(h.aspirational||'')}</p>
-      <ul class="tight">${(sov.safeguards||[]).map(s=>'<li>'+esc(s.safeguard)+' <span class="mut">('+esc(s.pillar)+')</span></li>').join('')}</ul>`;
-    term.textContent=JSON.stringify({
-      gbs_udoc_version:ov.gbs_udoc_version,
-      four_division_set:ov.honesty&&ov.honesty.four_division_set,
-      nodes:ov.nodes&&ov.nodes.total,
-      sovereign_verified:ov.honesty&&ov.honesty.sovereign_verified
-    },null,2);
-  }catch(e){term.textContent='Error: '+e.message;}
+    const pillars=pill.constitutional_pillars||pill.pillars||[];
+    document.getElementById('pillars').innerHTML=pillars.length
+      ? pillars.map(p=>`<span class="tag" style="margin:2px;display:inline-block">${esc(p.numeral||p.id||'')} · ${esc(p.name||p.title||'')}</span>`).join(' ')
+      : '—';
+    const sov=arch.sovereign_verified||ov.sovereign_verified||{status:'designed_not_built'};
+    document.getElementById('sov').innerHTML=`<div class="kv"><span>Status</span><span class="warn">${esc(sov.status||'designed_not_built')}</span></div>
+      <div class="kv"><span>Parallel</span><span>${esc(sov.parallel||'EIF Diamond (individuals)')}</span></div>
+      <div class="mut" style="margin-top:8px;font-size:12px">${esc(sov.note||ov.honesty?.note||'Systems recognition tier — post-seed build')}</div>`;
+    log('REFRESH ok · nodes='+nlist.length+' · doctrine='+(arch.doctrine||'').slice(0,60));
+  }catch(e){log('REFRESH FAIL '+e.message);}
+}
+async function runGate(){
+  try{
+    const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
+    const j=await r.json();
+    if(!r.ok) throw new Error(JSON.stringify(j).slice(0,120));
+    const g=j.gate||{};
+    const pass=g.fair_neq_block&&g.biased_eq_block;
+    document.getElementById('k-gate').textContent=pass?'PASS':'CHECK';
+    log('GATE '+(pass?'PASS':'CHECK')+' '+JSON.stringify(g)+' outcomes='+JSON.stringify(j.outcomes));
+  }catch(e){log('GATE FAIL '+e.message);document.getElementById('k-gate').textContent='ERR';}
 }
 load();
 </script>
