@@ -21,9 +21,12 @@ export function Intelligence() {
   const [ans, setAns] = useState<any>(null);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({ title: "", category: "GBS", text: "", division: "GODS" });
-  const [msg, setMsg] = useState("");
-  const [err, setErr] = useState("");
   const [filterCat, setFilterCat] = useState("");
+  const [log, setLog] = useState<string[]>(["G.O.D.S Intelligence · internal archive only · Pillar VIII"]);
+
+  function push(line: string) {
+    setLog((prev) => [`${new Date().toLocaleTimeString()}  ${line}`, ...prev].slice(0, 24));
+  }
 
   async function load() {
     try {
@@ -35,9 +38,9 @@ export function Intelligence() {
       setSt(state);
       setDocs(Array.isArray(list) ? list : list?.docs || []);
       setGaps(g);
-      setErr("");
+      push(`archive docs=${state?.corpus_docs ?? "?"} chars=${state?.corpus_chars ?? "?"}`);
     } catch (e: any) {
-      setErr(e.message);
+      push(`ERROR ${e.message}`);
     }
   }
 
@@ -51,38 +54,38 @@ export function Intelligence() {
     setQ(queryText);
     setBusy(true);
     setAns(null);
-    setErr("");
     try {
-      setAns(await api.post("/intel/ask", { query: queryText }));
+      const r = await api.post("/intel/ask", { query: queryText });
+      setAns(r);
+      push(`ASK ${queryText.slice(0, 48)}… blocked=${!!r.blocked}`);
     } catch (e: any) {
-      setErr(e.message);
+      push(`FAIL ask ${e.message}`);
     }
     setBusy(false);
   }
 
   async function addDoc() {
     if (!form.title || !form.text) {
-      setErr("title and text required");
+      push("FAIL title and text required");
       return;
     }
-    setMsg("");
-    setErr("");
     try {
       await api.post("/intel/ingest-text", form);
-      setMsg(`Added “${form.title}” to the GODS archive.`);
+      push(`INGEST “${form.title}” [${form.category}]`);
       setForm({ title: "", category: form.category, text: "", division: form.division });
       load();
     } catch (e: any) {
-      setErr(e.message);
+      push(`FAIL ingest ${e.message}`);
     }
   }
 
   async function rm(id: number) {
     try {
       await api.del(`/intel/docs/${id}`);
+      push(`REMOVE doc ${id}`);
       load();
     } catch (e: any) {
-      setErr(e.message);
+      push(`FAIL remove ${e.message}`);
     }
   }
 
@@ -94,20 +97,29 @@ export function Intelligence() {
     <div>
       <div className="top">
         <h2>G.O.D.S Intelligence</h2>
-        <span className="badge" style={{ background: "rgba(124,92,191,.15)", color: "var(--udoc, #7C5CBF)" }}>
-          🔒 INTERNAL ONLY · {st?.pillar || "Pillar VIII"}
-        </span>
+        <span className="badge">🔒 INTERNAL ONLY · {st?.pillar || "Pillar VIII"}</span>
       </div>
 
-      <div className="panel" style={{ borderLeft: "3px solid #7C5CBF" }}>
-        <p style={{ fontSize: ".82rem", margin: 0 }}>
-          Corpus-grounded institutional intelligence over the GODS archive only — not client Company Knowledge.
-          Client KB is tenant-isolated on the SaaS path; this console is staff GODS archive (text ingest, Neon-capped).
-          Human primacy is non-overridable.
-        </p>
+      <div className="banner warn">
+        GODS archive only — not client Company Knowledge. Neon-capped text extracts. Human primacy non-overridable.
       </div>
 
-      <div className="grid" style={{ marginTop: 12 }}>
+      <div className="guide">
+        <h3>Intelligence command path</h3>
+        <div className="row" style={{ marginBottom: 8, flexWrap: "wrap" }}>
+          {QUICK_ASK.map((chip) => (
+            <button key={chip} className="btn sm" disabled={busy} onClick={() => ask(chip)}>
+              {chip.slice(0, 36)}
+              {chip.length > 36 ? "…" : ""}
+            </button>
+          ))}
+          <button className="btn ghost" disabled={busy} onClick={load}>
+            ↻ Refresh
+          </button>
+        </div>
+      </div>
+
+      <div className="grid">
         <div className="card">
           <h3>Maturity stage</h3>
           <div className="metric" style={{ fontSize: "1rem", color: "#7C5CBF" }}>
@@ -132,17 +144,9 @@ export function Intelligence() {
 
       <div className="panel">
         <h3>Ask G.O.D.S Intelligence</h3>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-          {QUICK_ASK.map((chip) => (
-            <button key={chip} className="btn sm" disabled={busy} onClick={() => ask(chip)} style={{ fontSize: ".72rem" }}>
-              {chip.slice(0, 42)}
-              {chip.length > 42 ? "…" : ""}
-            </button>
-          ))}
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="row">
           <input
-            style={{ flex: 1 }}
+            style={{ flex: 1, minWidth: 200 }}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && ask()}
@@ -151,33 +155,15 @@ export function Intelligence() {
           <button className="btn" onClick={() => ask()} disabled={busy}>
             {busy ? "Thinking…" : "Ask"}
           </button>
-          <button className="btn" onClick={load} disabled={busy}>
-            ↻
-          </button>
         </div>
         {ans && (
           <div style={{ marginTop: 12 }}>
-            {ans.blocked && (
-              <div className="err" style={{ marginBottom: 8 }}>
-                ⛔ {ans.pillar || "Pillar VIII"} — refused (non-overridable)
-              </div>
-            )}
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                fontSize: ".82rem",
-                background: "var(--panel,#0c1422)",
-                padding: 12,
-                borderRadius: 8,
-                margin: 0,
-              }}
-            >
-              {ans.answer}
-            </pre>
+            {ans.blocked && <div className="err">⛔ {ans.pillar || "Pillar VIII"} — refused (non-overridable)</div>}
+            <div className="term">{ans.answer}</div>
             {ans.citations?.length > 0 && (
-              <div style={{ marginTop: 8 }}>
+              <div className="row" style={{ marginTop: 8 }}>
                 {ans.citations.map((c: any) => (
-                  <span key={c.id || c.title} className="badge" style={{ marginRight: 6 }}>
+                  <span key={c.id || c.title} className="tag">
                     {c.title}
                   </span>
                 ))}
@@ -190,86 +176,48 @@ export function Intelligence() {
       {gaps && (
         <div className="panel">
           <h3>Corpus gaps</h3>
-          <pre style={{ fontSize: ".72rem", maxHeight: 120, overflow: "auto" }}>{JSON.stringify(gaps, null, 2).slice(0, 800)}</pre>
+          <div className="term">{JSON.stringify(gaps, null, 2).slice(0, 900)}</div>
         </div>
       )}
 
       <div className="panel">
-        <h3>Maturity ladder · AI → AGI → Singularity</h3>
+        <h3>Maturity ladder</h3>
         {(st?.maturity || []).map((m: any) => (
-          <div key={m.stage} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: "1px solid var(--rule,#1c2738)" }}>
+          <div key={m.stage} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: "1px solid var(--rule)" }}>
             <span style={{ fontFamily: "monospace", color: stageColor(m.status), minWidth: 70 }}>{m.status}</span>
             <div>
               <b style={{ fontSize: ".85rem" }}>
                 Stage {m.stage} · {m.name}
               </b>
-              <div style={{ fontSize: ".76rem", color: "var(--text)" }}>{m.summary}</div>
+              <div style={{ fontSize: ".76rem" }}>{m.summary}</div>
               <div style={{ fontSize: ".7rem", color: "var(--warn)" }}>Gate: {m.gate}</div>
             </div>
           </div>
         ))}
-        <p style={{ fontSize: ".7rem", color: "var(--warn)", marginTop: 8 }}>
-          Stages 2–5 are gated roadmap — not present capability. Capstone proves Stage 1 assistive governance intelligence
-          with an auditable track record.
-        </p>
-      </div>
-
-      <div className="panel">
-        <h3>250-Year Mandate</h3>
-        {(st?.mandate || []).map((p: any, i: number) => (
-          <div key={i} style={{ display: "flex", gap: 10, padding: "5px 0" }}>
-            <span className="badge" style={{ minWidth: 70 }}>
-              {p.status}
-            </span>
-            <div>
-              <b style={{ fontSize: ".82rem" }}>{p.phase}</b>{" "}
-              <span style={{ fontSize: ".72rem", color: "var(--text)" }}>· {p.horizon}</span>
-              <div style={{ fontSize: ".76rem", color: "var(--text)" }}>{p.focus}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="panel">
-        <h3>Constitutional guardrails — non-overridable</h3>
-        <ul style={{ margin: 0, paddingLeft: 18, fontSize: ".8rem" }}>
-          {(st?.guardrails || []).map((g: string, i: number) => (
-            <li key={i} style={{ marginBottom: 4 }}>
-              {g}
-            </li>
-          ))}
-        </ul>
       </div>
 
       <div className="panel">
         <h3>Knowledge archive — staff text ingest</h3>
-        <p style={{ fontSize: ".72rem", color: "var(--warn)", marginBottom: 8 }}>
-          Neon ≤500MB — prefer short extracts. 11GB Drive stays external. Client Company Knowledge is a separate
-          tenant-isolated path.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 140px 120px", gap: 8, marginBottom: 8 }}>
-          <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="document title" />
+        <div className="row">
+          <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="title" style={{ flex: 1 }} />
           <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
             {CATEGORIES.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
-          <input value={form.division} onChange={(e) => setForm({ ...form, division: e.target.value })} placeholder="division" />
+          <input value={form.division} onChange={(e) => setForm({ ...form, division: e.target.value })} placeholder="division" style={{ width: 100 }} />
         </div>
         <textarea
           value={form.text}
           onChange={(e) => setForm({ ...form, text: e.target.value })}
-          placeholder="paste document text…"
+          placeholder="paste extract…"
           rows={3}
           style={{ width: "100%", marginBottom: 8 }}
         />
         <button className="btn" onClick={addDoc} disabled={!form.title || !form.text}>
           Add to archive
         </button>
-        {msg && (
-          <div style={{ color: "var(--ok)", fontSize: ".78rem", marginTop: 6 }}>{msg}</div>
-        )}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
+        <div className="row" style={{ marginTop: 10 }}>
           <button className="btn sm" onClick={() => setFilterCat("")}>
             All
           </button>
@@ -293,30 +241,34 @@ export function Intelligence() {
             {visible.map((d) => (
               <tr key={d.id}>
                 <td>{d.title}</td>
-                <td>{d.category}</td>
+                <td>
+                  <span className="tag">{d.category}</span>
+                </td>
                 <td>{d.char_len}</td>
                 <td>{d.active ? "✓" : "—"}</td>
                 <td>
-                  <a style={{ color: "var(--bad)", cursor: "pointer", fontSize: ".75rem" }} onClick={() => rm(d.id)}>
+                  <button className="btn sm danger" onClick={() => rm(d.id)}>
                     remove
-                  </a>
+                  </button>
                 </td>
               </tr>
             ))}
             {!visible.length && (
               <tr>
-                <td colSpan={5} style={{ color: "var(--rule)" }}>
-                  Archive empty for this filter — add extracts above.
-                </td>
+                <td colSpan={5}>Archive empty for filter</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {err && <div className="err">{err}</div>}
+      <div className="panel">
+        <h3>Ops terminal</h3>
+        <div className="term">{log.join("\n")}</div>
+      </div>
+
       <p style={{ fontSize: ".68rem", color: "var(--rule)", marginTop: 14 }}>
-        PRE-REGISTRATION · INTERNAL · © 2026 Sashin J. Singh — corpus-grounded; not client-exposed.
+        PRE-REGISTRATION · INTERNAL · corpus-grounded · not client-exposed
       </p>
     </div>
   );
