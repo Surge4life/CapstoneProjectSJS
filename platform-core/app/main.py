@@ -2,6 +2,7 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
+from app.division_surfaces import register_division_surfaces
 import os
 from app.core.config import settings
 from app.db.session import init_db
@@ -308,6 +309,10 @@ def divisions_console():
     return FileResponse(_static("divisions.html"))
 
 
+# Dedicated division operator surfaces (TS / MADIBA / SETHS)
+register_division_surfaces(app, _static)
+
+
 @app.get("/eif-ui", tags=["root"], include_in_schema=False)
 def eif_ui():
     return FileResponse(_static("eif.html"))
@@ -325,7 +330,7 @@ def root():
             "divisions": ["GODS", "SETHS", "MADIBA", "TS", "UDOC"],
             "surfaces": {"admin": "/admin", "udoc_admin": "/udoc-admin", "udoc_admin_alias": "/udoc_admin",
                          "portals": "/portals", "divisions": "/divisions", "sentinel": "/Sentinel", "eif": "/eif-ui",
-                         "gbs": "/gbs", "holdings": "/holdings",
+                         "gbs": "/gbs", "holdings": "/holdings", "ts": "/ts", "madiba": "/madiba", "seths": "/seths",
                          "note": "Division staff: seths@/madiba@/ts@ gods.local · staff123 · GBS freeze: /gbs"},
             "governance": "EVA 6-D + policy-to-code + conformance, fail-closed for critical"}
 
