@@ -79,8 +79,8 @@ function Launcher({ profile }: { profile: Profile }) {
   };
   const systems = profile.systems || [];
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px" }}>
-      <div style={{ textAlign: "center", marginBottom: 30 }}>
+    <div style={{ maxWidth: 820, margin: "0 auto", padding: "28px 20px" }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
         <h1 style={{ color: "var(--gold)", letterSpacing: ".1em" }}>G.O.D.S</h1>
         <p style={{ fontSize: ".7rem", letterSpacing: ".2em", textTransform: "uppercase", color: "var(--text)" }}>
           Internal Operating Core
@@ -88,8 +88,30 @@ function Launcher({ profile }: { profile: Profile }) {
         <p style={{ fontSize: ".82rem", marginTop: 10 }}>
           Signed in as <b>{profile.email}</b> · {profile.role} / {profile.division}
         </p>
-        <p style={{ fontSize: ".7rem", color: "var(--warn)" }}>🔒 Systems shown are scoped to your access rights</p>
+        <p style={{ fontSize: ".7rem", color: "var(--warn)" }}>🔒 Systems scoped to your access · Capstone pre-registration forecast</p>
       </div>
+
+      <div className="guide">
+        <h3>Production-grade demo path (honest zeros OK)</h3>
+        <ol>
+          <li>
+            <b>SETHS</b> — Enrol cohort → Advance → <b>PLACED</b>
+          </li>
+          <li>
+            <b>TS</b> — Deploy SPV (equity 0.20–0.60) → Assign PLACED learner
+          </li>
+          <li>
+            <b>MADIBA</b> — Create engagement → Advance stages · Allocate demo recycle
+          </li>
+          <li>
+            <b>UDOC</b> — Run Full EVA batch (fair ≠ BLOCK · biased = BLOCK)
+          </li>
+          <li>
+            <b>Overview</b> — Confirm division KPIs · open EIF / GBS / Sentinel links
+          </li>
+        </ol>
+      </div>
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>
         {systems.map((s) => (
           <div
@@ -121,22 +143,9 @@ function Launcher({ profile }: { profile: Profile }) {
           <div
             onClick={() => nav("/intelligence")}
             className="card"
-            style={{
-              cursor: "pointer",
-              borderTop: "3px solid #7C5CBF",
-              textAlign: "center",
-              padding: "24px 16px",
-            }}
+            style={{ cursor: "pointer", borderTop: "3px solid #7C5CBF", textAlign: "center", padding: "24px 16px" }}
           >
-            <h3
-              style={{
-                color: "#7C5CBF",
-                fontSize: ".95rem",
-                marginBottom: 6,
-                textTransform: "none",
-                letterSpacing: 0,
-              }}
-            >
+            <h3 style={{ color: "#7C5CBF", fontSize: ".95rem", marginBottom: 6, textTransform: "none", letterSpacing: 0 }}>
               G.O.D.S Intelligence
             </h3>
             <p style={{ fontSize: ".72rem" }}>Internal · Open →</p>
@@ -219,7 +228,7 @@ function Shell({ profile, children }: { profile: Profile; children: ReactNode })
         )}
         <button
           className="btn"
-          style={{ marginTop: 24 }}
+          style={{ marginTop: 24, marginLeft: 18, marginRight: 18 }}
           onClick={() => {
             setToken(null);
             nav("/");
@@ -265,46 +274,11 @@ export function App() {
       <Shell profile={profile}>
         <Routes>
           <Route path="/launcher" element={<Launcher profile={profile} />} />
-          <Route
-            path="/overview"
-            element={
-              <Guarded profile={profile} sysKey="holdings-overview">
-                <Overview />
-              </Guarded>
-            }
-          />
-          <Route
-            path="/seths"
-            element={
-              <Guarded profile={profile} sysKey="seths-ops">
-                <SethsOps />
-              </Guarded>
-            }
-          />
-          <Route
-            path="/madiba"
-            element={
-              <Guarded profile={profile} sysKey="madiba-ops">
-                <MadibaOps />
-              </Guarded>
-            }
-          />
-          <Route
-            path="/ts"
-            element={
-              <Guarded profile={profile} sysKey="ts-ops">
-                <TSOps />
-              </Guarded>
-            }
-          />
-          <Route
-            path="/udoc"
-            element={
-              <Guarded profile={profile} sysKey="udoc-gov">
-                <UDOCGov />
-              </Guarded>
-            }
-          />
+          <Route path="/overview" element={<Guarded profile={profile} sysKey="holdings-overview"><Overview /></Guarded>} />
+          <Route path="/seths" element={<Guarded profile={profile} sysKey="seths-ops"><SethsOps /></Guarded>} />
+          <Route path="/madiba" element={<Guarded profile={profile} sysKey="madiba-ops"><MadibaOps /></Guarded>} />
+          <Route path="/ts" element={<Guarded profile={profile} sysKey="ts-ops"><TSOps /></Guarded>} />
+          <Route path="/udoc" element={<Guarded profile={profile} sysKey="udoc-gov"><UDOCGov /></Guarded>} />
           <Route
             path="/intelligence"
             element={
