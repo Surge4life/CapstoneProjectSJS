@@ -279,7 +279,24 @@ def _static(name: str) -> str:
 
 @app.get("/admin", tags=["root"], include_in_schema=False)
 def admin_console():
-    return FileResponse(_static("admin.html"))
+    """GODS constitutional admin cockpit — inject live density script."""
+    from fastapi.responses import HTMLResponse
+    path = _static("admin.html")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            html = f.read()
+    except Exception:
+        return FileResponse(path)
+    tag = '<script src="/admin-gods-live.js" defer></script>'
+    if "admin-gods-live.js" not in html:
+        html = html.replace("</body>", tag + "\n</body>") if "</body>" in html else html + tag
+    return HTMLResponse(html, media_type="text/html")
+
+
+@app.get("/admin-gods-live.js", tags=["root"], include_in_schema=False)
+def admin_gods_live_js():
+    """Additive GODS Admin density (constitutional + GBS + division nav)."""
+    return FileResponse(_static("admin-gods-live.js"), media_type="application/javascript")
 
 
 @app.get("/udoc-admin", tags=["root"], include_in_schema=False)
