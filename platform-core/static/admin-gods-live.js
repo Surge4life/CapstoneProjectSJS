@@ -1,4 +1,4 @@
-/* GODS Admin live density — divisions + constitutional + GBS (additive) */
+/* GODS Admin live density — divisions wired + operator actions (additive) */
 (function(){
   if(window.__GODS_ADMIN_DENSITY__) return;
   window.__GODS_ADMIN_DENSITY__=true;
@@ -8,7 +8,11 @@
     const h=Object.assign({'Content-Type':'application/json'}, (opts&&opts.headers)||{});
     const t=tok(); if(t) h.Authorization='Bearer '+t;
     const r=await fetch(String(API).replace(/\/$/,'')+path, Object.assign({}, opts||{}, {headers:h}));
-    if(!r.ok) throw new Error(path+' '+r.status);
+    if(!r.ok){
+      let det='';
+      try{ det=await r.text(); }catch(_){}
+      throw new Error(path+' '+r.status+(det?(' '+det.slice(0,120)):''));
+    }
     const ct=r.headers.get('content-type')||'';
     return ct.includes('json')? r.json(): r.text();
   }
@@ -30,7 +34,7 @@
     el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px">'+
       '<div style="color:#C9A84C;font-weight:700;letter-spacing:.04em;flex:1">'+esc(title)+'</div>'+
       (opHref?('<a href="'+opHref+'" style="color:#00C2D4;text-decoration:none;font-size:11px;border:1px solid #243A5A;padding:4px 8px;border-radius:6px">Open operator →</a>'):'')+
-      '</div><div id="'+panelId+'-body">…</div>';
+      '</div><div id="'+panelId+'-body">…</div><div id="'+panelId+'-term" style="margin-top:8px;font-family:ui-monospace,monospace;font-size:11px;color:#7A7A8A;min-height:14px"></div>';
     const hdr=page.querySelector('.pg-hdr');
     if(hdr && hdr.nextSibling) page.insertBefore(el, hdr.nextSibling);
     else page.appendChild(el);
@@ -40,6 +44,10 @@
     const b=document.getElementById(id+'-body');
     if(b) b.innerHTML=html;
   }
+  function term(id, msg, ok){
+    const t=document.getElementById(id+'-term');
+    if(t){ t.textContent=msg; t.style.color=ok===false?'#E85D5D':(ok?'#2D9B5A':'#7A7A8A'); }
+  }
   function kpiGrid(items){
     return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">'+
       items.map(([l,v,c])=>'<div style="background:#060E1C;border:1px solid #1A3050;border-radius:8px;padding:10px">'+
@@ -47,11 +55,14 @@
         '<div style="font-size:1.25rem;font-weight:700;color:'+(c||'#F5F0E8')+'">'+esc(v)+'</div></div>').join('')+
       '</div>';
   }
+  function btn(label, id){
+    return '<button type="button" id="'+id+'" style="margin:4px 4px 0 0;padding:6px 10px;background:#C9A84C;color:#060E1C;border:0;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer">'+esc(label)+'</button>';
+  }
   function navStrip(){
     if(document.getElementById('gods-div-nav')) return;
     const bar=document.createElement('div');
     bar.id='gods-div-nav';
-    bar.style.cssText='position:fixed;left:12px;bottom:16px;z-index:99999;display:flex;flex-wrap:wrap;gap:6px;max-width:48vw';
+    bar.style.cssText='position:fixed;left:12px;bottom:16px;z-index:99999;display:flex;flex-wrap:wrap;gap:6px;max-width:52vw';
     const links=[
       ['/udoc-admin','UDOC Admin'],['/Sentinel','Sentinel'],['/gbs','GBS'],
       ['/seths','SETHS'],['/ts','TS'],['/madiba','MADIBA'],
@@ -64,7 +75,6 @@
     if(document.getElementById('gods-live-regulator')) return;
     const wrap=document.createElement('div');
     wrap.id='gods-live-global';
-    wrap.style.cssText='position:relative;z-index:1';
     document.body.appendChild(wrap);
     function panel(id,title){
       const el=document.createElement('div');
@@ -84,7 +94,7 @@
     navStrip();
     globalPanels();
     try{
-      const [reg, pillars, gbs, arch, ready, status, sm, tm, mm, projects]=await Promise.all([
+      const [reg, pillars, gbs, arch, ready, status, sm, tm, mm, projects, learners, pipeline]=await Promise.all([
         req('/udoc/regulator/summary').catch(e=>({error:String(e)})),
         req('/udoc/constitutional/pillars').catch(()=>req('/udoc/pillars').catch(e=>({error:String(e)}))),
         req('/gis/gbs/overview').catch(e=>({error:String(e)})),
@@ -95,6 +105,8 @@
         req('/ts/metrics').catch(e=>({error:String(e)})),
         req('/madiba/metrics').catch(e=>({error:String(e)})),
         req('/ts/projects').catch(()=>[]),
+        req('/seths/learners').catch(()=>({learners:[]})),
+        req('/madiba/engage/pipeline').catch(()=>({list:[]})),
       ]);
 
       if(reg.error) setBody('gods-live-regulator','<span style="color:#E8A13A">'+esc(reg.error)+'</span>');
@@ -111,9 +123,7 @@
       const plist=pillars.pillars||pillars.constitutional_pillars||[];
       if(pillars.error) setBody('gods-live-pillars','<span style="color:#E8A13A">'+esc(pillars.error)+'</span>');
       else setBody('gods-live-pillars', plist.map(p=>{
-        const name=p.name||p.title||'';
-        const id=p.id||p.numeral||'';
-        const st=p.status||'operational';
+        const name=p.name||''; const id=p.id||p.numeral||''; const st=p.status||'operational';
         return '<span style="display:inline-block;margin:3px;padding:3px 8px;border:1px solid #243A5A;border-radius:12px;font-size:11px">'+esc(id)+' · '+esc(name)+' <span style="color:#2D9B5A">'+esc(st)+'</span></span>';
       }).join(' ')||'—');
 
@@ -132,12 +142,8 @@
         ['MADIBA cycles', mm.cycles??'—', '#C9A84C'],
         ['MADIBA recycled', fmt(mm.cumulative_recycled), '#C9A84C'],
       ]) +
-        '<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:8px">'+
-        '<a href="/seths" style="color:#00C2D4">SETHS operator</a> · '+
-        '<a href="/ts" style="color:#10B981">TS operator</a> · '+
-        '<a href="/madiba" style="color:#C9A84C">MADIBA operator</a> · '+
-        '<a href="/divisions">All divisions</a> · '+
-        '<a href="/gbs">GBS freeze</a></div>'+
+        '<div style="margin-top:10px">'+
+        '<a href="/seths" style="color:#00C2D4">SETHS</a> · <a href="/ts" style="color:#10B981">TS</a> · <a href="/madiba" style="color:#C9A84C">MADIBA</a> · <a href="/divisions">Divisions</a> · <a href="/gbs">GBS</a></div>'+
         '<p style="color:#7A7A8A;font-size:11px;margin:8px 0 0">Honesty: MADIBA ledger ≠ AUM · capital not_deployed · staff seths@/madiba@/ts@ · staff123</p>');
 
       ensureIn('page-seths-dash','live-seths-metrics','SETHS live metrics · Core API','/seths');
@@ -148,7 +154,17 @@
         ['Completed', sm.completed??0],
         ['Placement rate', sm.placement_rate!=null?Math.round(sm.placement_rate*100)+'%':'—'],
         ['Monthly output', fmt(sm.monthly_economic_output)],
-      ]) + '<p style="color:#7A7A8A;margin:8px 0 0;font-size:11px">Source: GET /seths/metrics · enrol/advance on /seths or /divisions</p>');
+      ]) + '<div style="margin-top:8px">'+btn('Enrol demo learner','btn-seths-enrol')+btn('Refresh metrics','btn-seths-refresh')+'</div>'+
+        '<p style="color:#7A7A8A;margin:8px 0 0;font-size:11px">POST /seths/enrol · advance on /seths</p>');
+
+      ensureIn('page-seths-intake','live-seths-learners','SETHS learner roster · LIVE','/seths');
+      const L=(learners.learners||learners||[]);
+      setBody('live-seths-learners',
+        (Array.isArray(L)&&L.length?
+          ('<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="color:#7A7A8A;text-align:left"><th>Ref</th><th>Status</th><th>Stream</th><th>NQF</th><th>Value</th></tr></thead><tbody>'+
+          L.slice(0,25).map(x=>'<tr style="border-top:1px solid #1A3050"><td class="mono">'+esc(x.ref)+'</td><td>'+esc(x.status)+'</td><td>'+esc(x.stream)+'</td><td>'+esc(x.nqf_level)+'</td><td>'+esc(x.monthly_value)+'</td></tr>').join('')+
+          '</tbody></table>'):'<span style="color:#7A7A8A">No learners</span>')+
+        '<div style="margin-top:8px">'+btn('Enrol demo learner','btn-seths-enrol-2')+'</div>');
 
       ensureIn('page-madiba-dash','live-madiba-metrics','MADIBA live ledger · Core API','/madiba');
       if(mm.error) setBody('live-madiba-metrics','<span style="color:#E8A13A">'+esc(mm.error)+'</span>');
@@ -157,19 +173,32 @@
         ['Total inflow', fmt(mm.total_inflow)],
         ['Recycled → SETHS', fmt(mm.cumulative_recycled), '#C9A84C'],
         ['Recycle ratio', mm.recycle_ratio!=null?Number(mm.recycle_ratio).toFixed(2):'—'],
-      ]) + '<p style="color:#E8A13A;margin:8px 0 0;font-size:11px">Demonstration ledger only · capital not_deployed · allocate on /madiba</p>');
+      ]) + '<div style="margin-top:8px">'+btn('Allocate demo cycle','btn-madiba-alloc')+'</div>'+
+        '<p style="color:#E8A13A;margin:8px 0 0;font-size:11px">Demonstration ledger only · capital not_deployed</p>');
+
+      ensureIn('page-madiba-impact','live-madiba-pipeline','MADIBA engage pipeline · LIVE','/madiba');
+      const eng=pipeline.list||[];
+      setBody('live-madiba-pipeline',
+        kpiGrid([
+          ['Engagements', pipeline.engagements??eng.length],
+          ['Indicated', fmt(pipeline.indicated_total)],
+          ['Committed', fmt(pipeline.committed_total), '#C9A84C'],
+        ])+
+        (eng.length?('<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px"><thead><tr style="color:#7A7A8A;text-align:left"><th>Ref</th><th>Investor</th><th>Stage</th><th>Type</th></tr></thead><tbody>'+
+          eng.slice(0,15).map(x=>'<tr style="border-top:1px solid #1A3050"><td>'+esc(x.ref)+'</td><td>'+esc(x.investor)+'</td><td>'+esc(x.stage||x.state)+'</td><td>'+esc(x.type)+'</td></tr>').join('')+
+          '</tbody></table>'):'<p style="color:#7A7A8A">No engagements</p>'));
 
       ensureIn('page-ts-dash','live-ts-metrics','TS Industries live · Core API','/ts');
       if(tm.error) setBody('live-ts-metrics','<span style="color:#E8A13A">'+esc(tm.error)+'</span>');
       else {
         const by=tm.by_subsidiary||{};
-        const sub=Object.keys(by).map(k=>esc(k)+': '+(by[k].projects||0)+' proj / '+(by[k].workers||0)+' w').join(' · ');
+        const sub=Object.keys(by).map(k=>esc(k)+': '+(by[k].projects||0)+'p/'+(by[k].workers||0)+'w').join(' · ');
         setBody('live-ts-metrics', kpiGrid([
           ['Projects / SPVs', tm.projects??0, '#10B981'],
           ['Workers absorbed', tm.workers_absorbed??0],
           ['Monthly profit', fmt(tm.monthly_operating_profit)],
-        ]) + (sub?'<div style="margin-top:8px;color:#7A7A8A;font-size:11px">By subsidiary: '+sub+'</div>':'') +
-          '<p style="color:#7A7A8A;margin:8px 0 0;font-size:11px">Source: GET /ts/metrics · deploy/assign on /ts</p>');
+        ]) + (sub?'<div style="margin-top:8px;color:#7A7A8A;font-size:11px">'+sub+'</div>':'')+
+          '<div style="margin-top:8px">'+btn('Deploy demo SPV','btn-ts-deploy')+'</div>');
       }
 
       ensureIn('page-ts-projects','live-ts-projects','TS SPV list · LIVE','/ts');
@@ -178,17 +207,64 @@
         ? ('<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr style="color:#7A7A8A;text-align:left"><th>SPV</th><th>Sector</th><th>Sub</th><th>Equity</th><th>Workers</th><th>Revenue</th></tr></thead><tbody>'+
           rows.slice(0,20).map(p=>'<tr style="border-top:1px solid #1A3050"><td class="mono">'+esc(p.spv_id)+'</td><td>'+esc(p.sector)+'</td><td>'+esc(p.subsidiary)+'</td><td>'+esc(p.equity_pct)+'</td><td>'+esc(p.workers)+'</td><td>'+esc(p.monthly_revenue)+'</td></tr>').join('')+
           '</tbody></table>')
-        : '<span style="color:#7A7A8A">No SPVs yet · open /ts → Deploy demo SPV</span>');
+        : '<span style="color:#7A7A8A">No SPVs · Deploy demo SPV</span>')+
+        '<div style="margin-top:8px">'+btn('Deploy demo SPV','btn-ts-deploy-2')+'</div>');
+
+      ensureIn('page-spv','live-spv-panel','SPV live · TS projects','/ts');
+      setBody('live-spv-panel', kpiGrid([
+        ['SPV count', rows.length, '#10B981'],
+        ['Workers', tm.workers_absorbed??0],
+      ]) + '<p style="color:#7A7A8A;font-size:11px;margin-top:8px">Register/deploy on /ts · equity structure documented, capital not_deployed</p>');
 
       ensureIn('page-placements','live-placements','SETHS → TS placement path · LIVE','/divisions');
       setBody('live-placements', kpiGrid([
         ['SETHS placed', sm.placed??0, '#00C2D4'],
         ['TS absorbed', tm.workers_absorbed??0, '#10B981'],
-        ['Loop note', (sm.placed&&tm.workers_absorbed)?'wired':'seed'],
-      ]) + '<p style="color:#7A7A8A;margin:8px 0 0;font-size:11px">Operator path: /seths enrol→PLACED → /ts assign worker → /madiba recycle</p>');
+        ['Loop', (sm.placed&&tm.workers_absorbed)?'wired':'seed'],
+      ]) + '<p style="color:#7A7A8A;margin:8px 0 0;font-size:11px">/seths PLACED → /ts assign-worker → /madiba recycle</p>');
+
+      function once(id, fn){
+        const el=document.getElementById(id);
+        if(el && !el.__wired){ el.__wired=true; el.addEventListener('click', fn); }
+      }
+      once('btn-seths-enrol', async()=>{
+        try{
+          term('live-seths-metrics','Enrolling…');
+          const r=await req('/seths/enrol',{method:'POST',body:JSON.stringify({qualification:'Digital Operations & AI Literacy',stream:'DIGITAL_OPERATIONS',cohort:'COHORT_1'})});
+          term('live-seths-metrics','Enrolled '+ (r.ref||JSON.stringify(r)), true);
+          densify();
+        }catch(e){ term('live-seths-metrics', String(e.message||e), false); }
+      });
+      once('btn-seths-enrol-2', async()=>{
+        try{
+          term('live-seths-learners','Enrolling…');
+          const r=await req('/seths/enrol',{method:'POST',body:JSON.stringify({qualification:'Digital Operations & AI Literacy',stream:'DIGITAL_OPERATIONS',cohort:'COHORT_1'})});
+          term('live-seths-learners','Enrolled '+(r.ref||''), true);
+          densify();
+        }catch(e){ term('live-seths-learners', String(e.message||e), false); }
+      });
+      once('btn-seths-refresh', ()=>densify());
+      once('btn-madiba-alloc', async()=>{
+        try{
+          term('live-madiba-metrics','Allocating demo cycle…');
+          const r=await req('/madiba/allocate',{method:'POST',body:JSON.stringify({inflow:50000,recycled_to_seths:27500,note:'GODS Admin demo allocate'})});
+          term('live-madiba-metrics','Allocated · cycle '+(r.cycle||r.id||'ok'), true);
+          densify();
+        }catch(e){ term('live-madiba-metrics', String(e.message||e), false); }
+      });
+      const deploy=async(panel)=>{
+        try{
+          term(panel,'Deploying demo SPV…');
+          const r=await req('/ts/projects',{method:'POST',body:JSON.stringify({sector:'ENERGY',subsidiary:'ENERGY',name:'Demo SPV',equity_pct:0.3})});
+          term(panel,'Deployed '+(r.spv_id||JSON.stringify(r)), true);
+          densify();
+        }catch(e){ term(panel, String(e.message||e), false); }
+      };
+      once('btn-ts-deploy', ()=>deploy('live-ts-metrics'));
+      once('btn-ts-deploy-2', ()=>deploy('live-ts-projects'));
 
       const m=document.getElementById('gl-msg');
-      if(m){ m.textContent='● GODS densify · divisions + regulator + GBS bound'; m.style.color='#2D9B5A'; }
+      if(m){ m.textContent='● GODS densify · divisions + actions bound'; m.style.color='#2D9B5A'; }
     }catch(e){
       const m=document.getElementById('gl-msg');
       if(m){ m.textContent='GODS densify: '+e.message; m.style.color='#E8A13A'; }
@@ -207,5 +283,5 @@
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(arm,300));
   else setTimeout(arm,300);
-  setInterval(()=>{ if(tok()) densify(); }, 12000);
+  setInterval(()=>{ if(tok()) densify(); }, 15000);
 })();
