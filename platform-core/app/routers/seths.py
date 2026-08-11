@@ -77,17 +77,31 @@ def enrol(req: EnrolReq, db: Session = Depends(get_db), _=Depends(require_role("
 @router.post("/{ref}/advance")
 def advance(ref: str, monthly_value: float = 12000.0, db: Session = Depends(get_db),
             _=Depends(require_role("operator", "admin"))):
+    """Advance learner toward placement.
+
+    Capstone demo path (one click):
+      ENROLLED → PLACED
+      COMPLETED → PLACED  (legacy mid-state still supported)
+
+    PLACED sets monthly_value for economic-output metrics and unlocks
+    TS assign-worker (FK-backed SETHS→TS loop).
+    """
     l = db.execute(select(Learner).where(Learner.ref == ref)).scalar_one_or_none()
     if not l:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "learner not found")
-    l.status = {"ENROLLED": "COMPLETED", "COMPLETED": "PLACED"}.get(l.status, l.status)
-    if l.status == "PLACED":
+    prev = l.status
+    # One-step to PLACED for Capstone loop UX (admin / divisions guided path)
+    if l.status in ("ENROLLED", "COMPLETED"):
+        l.status = "PLACED"
+        l.monthly_value = monthly_value
+    elif l.status == "PLACED":
+        # idempotent refresh of value
         l.monthly_value = monthly_value
     db.commit()
-    if l.status == "PLACED":
+    if l.status == "PLACED" and prev != "PLACED":
         ae.record(db, "SETHS", "PLACE", entity_ref=ref, metric_name="placed", metric_value=1)
         ae.record(db, "SETHS", "OUTPUT", entity_ref=ref, metric_name="monthly_value", metric_value=l.monthly_value)
-    return {"ref": ref, "status": l.status, "monthly_value": l.monthly_value}
+    return {"ref": ref, "status": l.status, "previous": prev, "monthly_value": l.monthly_value}
 
 
 @router.get("/metrics")
