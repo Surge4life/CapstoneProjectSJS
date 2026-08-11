@@ -1,1 +1,118 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>G.O.D.S · GBS Four-Division Freeze · Capstone</title>
+<style>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--green:#10B981}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
+header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
+.tag.ok{border-color:rgba(45,155,90,.5);color:#7fe3ab;background:rgba(45,155,90,.08)}
+a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 18px 48px}
+.banner{background:rgba(45,155,90,.12);border:1px solid rgba(45,155,90,.4);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.card h3{margin:0 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.35rem;font-weight:700}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:200px;overflow:auto}
+.btn{background:var(--gold);color:#0a1220;border:0;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px}
+.mut{color:var(--mut)}.warn{color:var(--warn)}
+.mode{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan)}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">G.O.D.S · <b>GBS Freeze</b></span>
+  <span class="tag" id="ready">—</span>
+  <span style="flex:1"></span>
+  <a class="nav" href="/admin">GODS Admin</a>
+  <a class="nav" href="/divisions">Divisions</a>
+  <a class="nav" href="/seths">SETHS</a>
+  <a class="nav" href="/ts">TS</a>
+  <a class="nav" href="/madiba">MADIBA</a>
+  <a class="nav" href="/udoc-admin">UDOC</a>
+  <a class="nav" href="/Sentinel">Sentinel</a>
+</header>
+<div class="wrap">
+  <div class="banner"><b>GBS-UDOC v1.0</b> four-division constitutional freeze · franchise nodes may be zero (honest Capstone) · capital not_deployed · Sovereign-Verified designed_not_built where noted</div>
+  <div class="grid">
+    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-demo">—</div></div>
+    <div class="card"><h3>TS projects</h3><div class="metric" id="k-ts">—</div></div>
+    <div class="card"><h3>TS workers</h3><div class="metric" id="k-tsw">—</div></div>
+    <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mc">—</div></div>
+    <div class="card"><h3>MADIBA recycled</h3><div class="metric" id="k-mr">—</div></div>
+    <div class="card"><h3>GBS nodes</h3><div class="metric" id="k-nodes">—</div></div>
+  </div>
+  <div class="panel" id="arch"></div>
+  <div class="panel" id="guided-gbs">
+    <h3 style="color:var(--gold);margin:0 0 8px">Operator surfaces</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <a class="nav" href="/seths">SETHS develops</a>
+      <a class="nav" href="/ts">TS develops</a>
+      <a class="nav" href="/madiba">MADIBA recognises</a>
+      <a class="nav" href="/udoc-admin">UDOC assures</a>
+      <a class="nav" href="/divisions">All divisions</a>
+    </div>
+    <button class="btn" id="gbs-eva">Run EVA fair/biased gate</button>
+    <span id="gbs-eva-out" class="mut" style="margin-left:10px;font-size:12px"></span>
+  </div>
+  <div class="panel"><h3 style="color:var(--gold);margin:0 0 8px">Terminal</h3><div class="term" id="term">GBS freeze</div></div>
+</div>
+<script>
+const API=location.origin;
+const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+async function j(path){const r=await fetch(API+path);if(!r.ok)throw new Error(path+' '+r.status);return r.json();}
+async function load(){
+  try{
+    const [arch,ov,pill,nodes,tm,mm,ready]=await Promise.all([
+      j('/gis/gbs/architecture').catch(e=>({error:String(e)})),
+      j('/gis/gbs/overview').catch(e=>({error:String(e)})),
+      j('/gis/gbs/pillars').catch(e=>({error:String(e)})),
+      j('/gis/gbs/nodes').catch(()=>[]),
+      j('/ts/metrics').catch(()=>({})),
+      j('/madiba/metrics').catch(()=>({})),
+      j('/udoc/demo/ready').catch(()=>({})),
+    ]);
+    document.getElementById('k-demo').textContent=ready.ready!=null?String(ready.ready):'—';
+    document.getElementById('ready').textContent=ready.ready?'DEMO READY':'CHECK SEED';
+    document.getElementById('ready').className='tag '+(ready.ready?'ok':'');
+    document.getElementById('k-ts').textContent=tm.projects??'—';
+    document.getElementById('k-tsw').textContent=tm.workers_absorbed??'—';
+    document.getElementById('k-mc').textContent=mm.cycles??'—';
+    document.getElementById('k-mr').textContent=mm.cumulative_recycled!=null?('R'+Number(mm.cumulative_recycled).toLocaleString()):'—';
+    const nlist=Array.isArray(nodes)?nodes:(nodes.nodes||[]);
+    document.getElementById('k-nodes').textContent=nlist.length;
+    const divs=arch.divisions||[];
+    const honesty=(ov.honesty&&ov.honesty.note)||ov.note||'nodes empty OK';
+    document.getElementById('arch').innerHTML='<div class="mut" style="margin-bottom:8px">'+esc(arch.doctrine||'GBS-Global Layer 1')+'</div>'+
+      divs.map(d=>'<div style="border-top:1px solid var(--line);padding:8px 0"><span class="mode">'+esc(d.mode||'')+'</span> <b>'+esc(d.division||d.name||'')+'</b> · '+esc(d.proposition||d.role||'')+'</div>').join('')+
+      '<p class="warn" style="margin-top:10px;font-size:12px">'+esc(honesty)+'</p>';
+    log('GBS load ok · pillars '+(pill.constitutional_pillars||[]).length);
+  }catch(e){log('LOAD FAIL '+e.message);}
+}
+document.getElementById('gbs-eva').onclick=async()=>{
+  const out=document.getElementById('gbs-eva-out'); out.textContent='running…';
+  try{
+    const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
+    const j=await r.json();
+    const items=j.results||j.items||j.decisions||[];
+    const fair=items.find(x=>(x.scenario||x.name)==='fair')||{};
+    const biased=items.find(x=>(x.scenario||x.name)==='biased')||{};
+    const fo=fair.outcome||fair.decision||'';
+    const bo=biased.outcome||biased.decision||'';
+    const pass=fo!=='BLOCK'&&bo==='BLOCK';
+    out.textContent=(pass?'PASS':'CHECK')+' · fair='+fo+' · biased='+bo;
+    out.style.color=pass?'#7fe3ab':'#E8A13A';
+    log('EVA gate '+(pass?'PASS':'CHECK'));
+  }catch(e){out.textContent=String(e.message||e);out.style.color='#E85D5D';}
+};
+load();
+</script>
+</body>
+</html>
