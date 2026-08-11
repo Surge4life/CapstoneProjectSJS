@@ -33,10 +33,6 @@ th{color:var(--mut);font-weight:600}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:2px 8px;font-size:11px;cursor:pointer;margin:2px}
 .chip:hover{border-color:var(--cyan)}
 .login-box{max-width:360px;margin:40px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0}
-.kpi{background:var(--navy2,#0c1830);border:1px solid var(--line,#1c2a45);border-radius:10px;padding:12px}
-.kpi .l{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut,#8fa0bd)}
-.kpi .v{font-size:1.45rem;font-weight:700;margin-top:4px}
 .honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:#E8A13A;font-size:12px}
 .status-bar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 </style>
@@ -95,6 +91,12 @@ th{color:var(--mut);font-weight:600}
       <div id="status-dist" class="row mut">—</div>
       <p class="mut" style="font-size:11px;margin:8px 0 0">PLACED learners are eligible for TS assign-worker (FK-backed). Advance moves pipeline stages toward PLACED.</p>
     </div>
+    <div class="panel" id="stream-panel">
+      <h3>Stream · cohort distribution · LIVE</h3>
+      <div id="stream-dist" class="row mut">—</div>
+      <div id="cohort-dist" class="row mut" style="margin-top:6px">—</div>
+      <p class="mut" style="font-size:11px;margin:8px 0 0">Derived from /seths/learners · PLACED feed TS assign-worker</p>
+    </div>
     <div class="panel">
       <h3>Command path</h3>
       <div class="row">
@@ -117,6 +119,12 @@ th{color:var(--mut);font-weight:600}
     <div class="panel">
       <h3>Learners</h3>
       <div id="list" class="mut">—</div>
+    </div>
+    <div id="placed-handoff" class="panel" style="display:none">
+      <h3>Handoff · PLACED → TS</h3>
+      <p class="mut" style="font-size:12px;margin:0 0 8px">Learners in PLACED are eligible for FK-backed assign-worker on TS.</p>
+      <a class="btn" href="/ts" style="text-decoration:none;display:inline-block">Open TS · Assign workers →</a>
+      <a class="btn ghost" href="/divisions" style="text-decoration:none;display:inline-block">Run full loop on Divisions →</a>
     </div>
     <div class="panel">
       <h3>Ops terminal</h3>
@@ -184,6 +192,17 @@ async function refresh(){
     if(distEl) distEl.innerHTML=Object.keys(counts).length
       ? Object.entries(counts).map(([k,v])=>'<span class="chip">'+esc(k)+' · '+v+'</span>').join(' ')
       : '—';
+    const streams={}, cohorts={};
+    list.forEach(x=>{
+      const st=String(x.stream||x.qualification||'UNKNOWN'); streams[st]=(streams[st]||0)+1;
+      const c=String(x.cohort||'—'); cohorts[c]=(cohorts[c]||0)+1;
+    });
+    const sd=document.getElementById('stream-dist');
+    if(sd) sd.innerHTML=Object.keys(streams).length?Object.entries(streams).map(([k,v])=>'<span class="chip">'+esc(k)+' · '+v+'</span>').join(' '):'—';
+    const cd=document.getElementById('cohort-dist');
+    if(cd) cd.innerHTML=Object.keys(cohorts).length?Object.entries(cohorts).map(([k,v])=>'<span class="chip">'+esc(k)+' · '+v+'</span>').join(' '):'—';
+    const ho=document.getElementById('placed-handoff');
+    if(ho){ ho.style.display=(Number(m.placed||0)>0)?'block':'none'; }
     log('REFRESH ok · total='+(m.total||0)+' placed='+(m.placed||0)+' dist='+JSON.stringify(counts));
   }catch(e){log('REFRESH FAIL '+e.message);}
 }
