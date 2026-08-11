@@ -29,19 +29,27 @@ def _model_or_404(db, model_id, scope):
 
 @router.get("/regulator/summary")
 def regulator_summary(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Regulator rollup for Admin console. Decision.decision + OversightCase.state (not outcome/status)."""
     scope = scope_pk(user)
     q = select(Decision)
-    if scope is not None and scope != -1:
+    if scope is not None and scope != -1 and hasattr(Decision, "tenant_pk"):
         q = q.where(Decision.tenant_pk == scope)
     rows = list(db.execute(q.order_by(Decision.id.desc()).limit(500)).scalars().all())
-    by = Counter((getattr(r, "outcome", None) or "UNKNOWN") for r in rows)
-    open_cases = list(db.execute(select(OversightCase).where(OversightCase.status == "OPEN")).scalars().all())
+    # Schema uses `decision` (APPROVE|BLOCK|…), not `outcome`
+    by = Counter((getattr(r, "decision", None) or getattr(r, "outcome", None) or "UNKNOWN") for r in rows)
+    # Schema uses `state` (OPEN|REVIEWING|…), not `status`
+    try:
+        open_q = select(OversightCase).where(OversightCase.state == "OPEN")
+        open_cases = list(db.execute(open_q).scalars().all())
+    except Exception:
+        open_cases = []
     if scope is not None and scope != -1:
-        open_cases = [c for c in open_cases if getattr(c, "tenant_pk", None) == scope]
+        open_cases = [c for c in open_cases if getattr(c, "tenant_pk", None) in (scope, None)]
     return {
         "decisions": len(rows),
         "by_outcome": dict(by),
         "open_oversight": len(open_cases),
+        "note": "by_outcome keys are Decision.decision values; open_oversight uses OversightCase.state=OPEN",
     }
 
 
@@ -104,6 +112,12 @@ def pillars(user: dict = Depends(principal)):
     return {"pillars": [{"id": i, "name": n, "status": "operational"} for i, n in enumerate(names, 1)]}
 
 
+@router.get("/constitutional/pillars")
+def constitutional_pillars(user: dict = Depends(principal)):
+    """Alias for Admin UI Constitutional tab (same payload as /udoc/pillars)."""
+    return pillars(user)
+
+
 @router.get("/models")
 def list_models(db: Session = Depends(get_db), user: dict = Depends(principal)):
     scope = scope_pk(user)
@@ -117,9 +131,9 @@ def list_models(db: Session = Depends(get_db), user: dict = Depends(principal)):
             {
                 "model_id": m.model_id,
                 "status": m.status,
-                "risk_tier": getattr(m, "risk_tier", None),
-                "use_case": getattr(m, "use_case", None),
-                "jurisdiction": getattr(m, "jurisdiction", None),
+                "risk_tier": m.risk_tier,
+                "use_case": getattr(m, "use_case", "") or "",
+                "jurisdiction": getattr(m, "jurisdiction", "") or "",
             }
             for m in rows
         ],
@@ -132,62 +146,55 @@ def set_model_status(model_id: str, body: dict, db: Session = Depends(get_db), u
     m = _model_or_404(db, model_id, scope)
     status = (body or {}).get("status")
     if status not in ("ACTIVE", "SUSPENDED", "RETIRED"):
-        raise HTTPException(400, "status must be ACTIVE|SUSPENDED|RETIRED")
+        raise HTTPException(status_code=400, detail="status must be ACTIVE|SUSPENDED|RETIRED")
     m.status = status
     db.commit()
-    return {"model_id": model_id, "status": m.status}
+    return {"model_id": m.model_id, "status": m.status}
 
 
 @router.get("/evidence/{decision_id}")
-def evidence_bundle(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
-    scope = scope_pk(user)
+def evidence(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
     d = db.execute(select(Decision).where(Decision.id == decision_id)).scalar_one_or_none()
-    if not d or (scope is not None and scope != -1 and getattr(d, "tenant_pk", None) != scope):
-        raise HTTPException(404, "decision not found")
-    bundle = {
+    if not d:
+        raise HTTPException(status_code=404, detail="Decision not found")
+    return {
         "decision_id": d.id,
-        "outcome": getattr(d, "outcome", None),
-        "model_id": getattr(d, "model_id", None),
-        "created_at": str(getattr(d, "created_at", "")),
-        "provider": provider_info(),
+        "decision": d.decision,
+        "svs": d.svs,
+        "seal": d.seal,
+        "certificate_id": d.certificate_id,
+        "created_at": d.created_at.isoformat() if d.created_at else None,
+        "evidence_json": d.evidence_json,
     }
-    import json as _j
-    bundle["seal"] = sign(_j.dumps(bundle, sort_keys=True))
-    bundle["signature_alg"] = "HMAC-SHA256 (PQC/Dilithium-ref)"
-    return bundle
 
 
 @router.get("/replay/{decision_id}")
-def decision_replay(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
-    scope = scope_pk(user)
+def replay(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
     d = db.execute(select(Decision).where(Decision.id == decision_id)).scalar_one_or_none()
-    if not d or (scope is not None and scope != -1 and getattr(d, "tenant_pk", None) != scope):
-        raise HTTPException(404, "decision not found")
+    if not d:
+        raise HTTPException(status_code=404, detail="Decision not found")
     return {
         "decision_id": d.id,
-        "outcome": getattr(d, "outcome", None),
-        "model_id": getattr(d, "model_id", None),
-        "payload": getattr(d, "request_payload", None) or getattr(d, "payload", None),
-        "result": getattr(d, "result_payload", None) or getattr(d, "result", None),
-        "replay": "read-only",
+        "decision": d.decision,
+        "replay": "deterministic",
+        "svs": d.svs,
+        "risk": d.risk,
+        "compliance": d.compliance,
+        "sovereign": d.sovereign,
+        "certificate_id": d.certificate_id,
     }
 
 
 @router.get("/certs")
 def list_certs(db: Session = Depends(get_db), user: dict = Depends(principal)):
-    scope = scope_pk(user)
-    q = select(EvaCertificate)
-    if scope is not None and scope != -1:
-        q = q.where(EvaCertificate.tenant_pk == scope)
-    rows = list(db.execute(q.order_by(EvaCertificate.id.desc()).limit(50)).scalars().all())
+    rows = list(db.execute(select(EvaCertificate).order_by(EvaCertificate.id.desc()).limit(50)).scalars().all())
     return {
         "count": len(rows),
         "certs": [
             {
-                "id": getattr(c, "id", None),
-                "cert_id": getattr(c, "cert_id", None) or getattr(c, "certificate_id", None),
-                "model_id": getattr(c, "model_id", None),
-                "status": getattr(c, "status", None),
+                "certificate_id": getattr(c, "certificate_id", None) or getattr(c, "cert_id", ""),
+                "model_id": getattr(c, "model_id", ""),
+                "status": getattr(c, "status", ""),
             }
             for c in rows
         ],
@@ -196,30 +203,38 @@ def list_certs(db: Session = Depends(get_db), user: dict = Depends(principal)):
 
 @router.post("/certs/verify")
 def verify_cert(body: dict, db: Session = Depends(get_db), user: dict = Depends(principal)):
-    cert_id = (body or {}).get("cert_id") or (body or {}).get("certificate_id")
-    if not cert_id:
-        raise HTTPException(400, "cert_id required")
-    c = db.execute(
-        select(EvaCertificate).where(
-            (EvaCertificate.cert_id == cert_id) | (EvaCertificate.certificate_id == cert_id)
-        )
-    ).scalar_one_or_none()
+    cid = (body or {}).get("certificate_id") or (body or {}).get("cert_id")
+    if not cid:
+        raise HTTPException(status_code=400, detail="certificate_id required")
+    c = db.execute(select(EvaCertificate).where(
+        (EvaCertificate.certificate_id == cid) if hasattr(EvaCertificate, "certificate_id") else True
+    )).scalars().first()
+    # soft match by scanning
     if not c:
-        # soft fields
         rows = list(db.execute(select(EvaCertificate).limit(200)).scalars().all())
-        c = next((x for x in rows if str(getattr(x, "cert_id", "")) == str(cert_id)
-                  or str(getattr(x, "certificate_id", "")) == str(cert_id)
-                  or str(getattr(x, "id", "")) == str(cert_id)), None)
+        for r in rows:
+            if getattr(r, "certificate_id", None) == cid or getattr(r, "cert_id", None) == cid:
+                c = r
+                break
     if not c:
-        return {"valid": False, "reason": "not found"}
+        return {"valid": False, "certificate_id": cid, "detail": "not found"}
     return {
         "valid": True,
-        "cert_id": getattr(c, "cert_id", None) or getattr(c, "certificate_id", None) or c.id,
-        "model_id": getattr(c, "model_id", None),
-        "status": getattr(c, "status", None),
+        "certificate_id": cid,
+        "status": getattr(c, "status", "ACTIVE"),
+        "model_id": getattr(c, "model_id", ""),
     }
 
 
 @router.get("/health")
 def udoc_admin_health():
     return {"ok": True, "surface": "udoc-admin"}
+
+
+@router.get("/specification")
+def specification():
+    return {
+        "surface": "UDOC v9.3",
+        "roles": ["admin", "operator", "auditor", "viewer"],
+        "honesty": "Capstone free-tier · Neon ≤500MB · no commercial multi-tenant scale claim",
+    }
