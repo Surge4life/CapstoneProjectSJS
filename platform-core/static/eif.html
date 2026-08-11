@@ -73,6 +73,12 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;b
     <div class="panel" style="margin:0"><h3>Auth</h3><div id="k-auth" style="font-size:1.1rem;font-weight:700">—</div></div>
   </div>
 
+  <div class="grid" style="margin-bottom:12px">
+    <div class="panel" style="margin:0"><h3>MADIBA cycles</h3><div id="k-mad-c" style="font-size:1.4rem;font-weight:700">—</div></div>
+    <div class="panel" style="margin:0"><h3>Recycled</h3><div id="k-mad-r" style="font-size:1.1rem;font-weight:700">—</div></div>
+    <div class="panel" style="margin:0"><h3>Engagements</h3><div id="k-mad-e" style="font-size:1.4rem;font-weight:700">—</div></div>
+  </div>
+
   <div class="panel login">
     <div><label>Email</label><input id="email" value="madiba@gods.local"/></div>
     <div><label>Password</label><input id="pw" type="password" value="staff123"/></div>
@@ -188,6 +194,17 @@ async function load(){
       '<span class="chip'+(i===0?' on':'')+'" onclick="pickDom(\''+d.id+'\',this)">'+esc(d.label)+'</span>'
     ).join('');
     if(domains[0]) document.getElementById('dom').value=domains[0].id;
+    try{
+      const [mm,pipe]=await Promise.all([
+        api('/madiba/metrics').catch(()=>({})),
+        api('/madiba/engage/pipeline').catch(()=>({})),
+      ]);
+      const kc=document.getElementById('k-mad-c'); if(kc) kc.textContent=mm.cycles??'—';
+      const kr=document.getElementById('k-mad-r'); if(kr){
+        const n=Number(mm.cumulative_recycled); kr.textContent=isFinite(n)?('R'+(n>=1e6?(n/1e6).toFixed(2)+'M':(n/1e3).toFixed(1)+'k')):'—';
+      }
+      const ke=document.getElementById('k-mad-e'); if(ke) ke.textContent=pipe.engagements??(pipe.list||[]).length??'—';
+    }catch(_){}
     document.getElementById('tiers').innerHTML='<table><tr><th>Tier</th><th>Recognises</th></tr>'+
       tiers.map(t=>'<tr><td><b>'+esc(t.tier||t.id||t.name||'')+'</b></td><td class="mut">'+esc(t.recognises||t.label||'')+'</td></tr>').join('')+'</table>';
   }catch(e){
