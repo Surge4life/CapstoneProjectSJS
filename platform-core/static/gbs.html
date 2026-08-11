@@ -3,40 +3,32 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>G.O.D.S · GBS Four-Division Freeze · Capstone</title>
+<title>G.O.D.S · GBS Freeze · Four Division</title>
 <style>
-:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--green:#10B981;--seths:#00C2D4;--madiba:#C9A84C;--ts:#10B981;--udoc:#7C5CBF}
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--green:#10B981;--udoc:#7C5CBF}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
-header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
-.tag.ok{border-color:rgba(45,155,90,.5);color:#7fe3ab;background:rgba(45,155,90,.08)}
+.tag.ok{border-color:rgba(201,168,76,.5);color:#f0d78c;background:rgba(201,168,76,.08)}
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
-.wrap{max-width:1140px;margin:0 auto;padding:18px 18px 48px}
-.banner{background:rgba(45,155,90,.12);border:1px solid rgba(45,155,90,.4);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
-.honest{margin:0 0 14px;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:#E8A13A;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0}
-.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
+.banner{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
+.honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:#E8A13A;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
 .card h3{margin:0 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.45rem;font-weight:700}
-.sub{font-size:11px;color:var(--mut);margin-top:4px}
+.metric{font-size:1.35rem;font-weight:700}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
-.panel h3{margin:0 0 10px;color:var(--gold);font-size:14px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
+.chip{display:inline-block;text-decoration:none;border:1px solid var(--line);color:var(--ink);padding:4px 10px;border-radius:14px;font-size:11px;cursor:pointer;background:transparent}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
 .btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:200px;overflow:auto}
-.chip{display:inline-block;margin:3px;padding:4px 10px;border-radius:14px;border:1px solid var(--line);font-size:11px}
-.chip.ok{border-color:var(--ok);color:#7fe3ab}
-.mut{color:var(--mut)}.warn{color:var(--warn)}
-.div-card{border-left:3px solid var(--line)}
-.div-card.seths{border-left-color:var(--seths)}
-.div-card.ts{border-left-color:var(--ts)}
-.div-card.madiba{border-left-color:var(--madiba)}
-.div-card.udoc{border-left-color:var(--udoc)}
-.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
-th{color:var(--mut)}
+.mut{color:var(--mut)}.ok{color:#6ee7b7}.warn{color:var(--warn)}
+.arch{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px}
+.arch .card b{color:var(--cyan)}
 </style>
 </head>
 <body>
@@ -54,122 +46,127 @@ th{color:var(--mut)}
   <a class="nav" href="/eif-ui">EIF</a>
 </header>
 <div class="wrap">
-  <div class="banner"><b>GBS-UDOC v1.0 constitutional freeze.</b> Four divisions under GODS Holdings · pillars + APIs live · franchise nodes empty is honest Capstone state · Sovereign-Verified designed_not_built where noted.</div>
-  <div class="honest">Honesty: capital not_deployed · MADIBA ledger ≠ AUM · zero franchise geographic scale · UDOC governance SaaS operational on free-tier limits (Neon ≤500MB · Render free).</div>
-  <div class="grid" id="kpis">
-    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-ready">—</div><div class="sub">UDOC seed</div></div>
-    <div class="card"><h3>SETHS learners</h3><div class="metric" id="k-seths">—</div><div class="sub" id="k-seths-s">placed —</div></div>
-    <div class="card"><h3>TS projects</h3><div class="metric" id="k-ts">—</div><div class="sub" id="k-ts-s">workers —</div></div>
-    <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mad">—</div><div class="sub" id="k-mad-s">recycled —</div></div>
-    <div class="card"><h3>UDOC models</h3><div class="metric" id="k-models">—</div><div class="sub" id="k-dec">decisions —</div></div>
-    <div class="card"><h3>Open oversight</h3><div class="metric" id="k-ov">—</div><div class="sub">COB cases</div></div>
+  <div class="honest">Capstone honesty: GBS four-division freeze is architectural + live APIs · franchise nodes may be empty · capital not_deployed · Sovereign-Verified designed_not_built where noted · staff seths@/madiba@/ts@ · staff123</div>
+  <div class="banner"><b>GBS-UDOC constitutional freeze.</b> SETHS develops · TS industrialises · MADIBA recognises · UDOC governs. EVA gate + division metrics below are live Core probes.</div>
+
+  <div id="guided-gbs" class="panel">
+    <h3>Guided path · four-division freeze</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">
+      <a class="chip" href="/seths">1 · SETHS develops</a>
+      <a class="chip" href="/ts">2 · TS industrial</a>
+      <a class="chip" href="/madiba">3 · MADIBA recognises</a>
+      <a class="chip" href="/udoc-admin">4 · UDOC governs</a>
+      <a class="chip" href="/admin">GODS Admin cockpit →</a>
+      <a class="chip" href="/divisions">All divisions →</a>
+    </div>
+    <p class="mut" style="font-size:12px;margin:6px 0 0">Operator loop: /seths enrol→PLACED · /ts assign-worker · /madiba allocate (ledger) · or one-click on /admin and /divisions.</p>
   </div>
+
+  <div class="grid">
+    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-ready">—</div></div>
+    <div class="card"><h3>EVA gate</h3><div class="metric" id="k-eva">—</div></div>
+    <div class="card"><h3>SETHS placed</h3><div class="metric" id="k-seths">—</div></div>
+    <div class="card"><h3>TS projects</h3><div class="metric" id="k-ts">—</div></div>
+    <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mad">—</div></div>
+    <div class="card"><h3>Models</h3><div class="metric" id="k-models">—</div></div>
+  </div>
+
+  <div id="gbs-div-metrics" class="panel">
+    <h3>Division live snapshot · Core API</h3>
+    <div id="gbs-div-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">…</div>
+    <p class="mut" style="font-size:11px;margin:8px 0 0">/seths/metrics · /ts/metrics · /madiba/metrics · /admin/status · /udoc/demo/ready</p>
+  </div>
+
+  <div class="panel">
+    <h3>Architecture · GBS-UDOC v1.0</h3>
+    <div class="arch" id="arch">
+      <div class="card"><b>SETHS</b><div class="mut" style="font-size:12px;margin-top:4px">Human capability engine · develops</div></div>
+      <div class="card"><b>TS Industries</b><div class="mut" style="font-size:12px;margin-top:4px">Industrial absorption · SPVs</div></div>
+      <div class="card"><b>MADIBA</b><div class="mut" style="font-size:12px;margin-top:4px">Capital recognition · EIF</div></div>
+      <div class="card"><b>UDOC</b><div class="mut" style="font-size:12px;margin-top:4px">Constitutional governance</div></div>
+    </div>
+    <p class="mut" id="arch-note" style="font-size:12px;margin-top:10px">—</p>
+  </div>
+
   <div class="panel">
     <h3>Command path</h3>
-    <div class="row">
-      <button class="btn" onclick="load()">↻ Refresh GBS + divisions</button>
-      <button class="btn ghost" id="gbs-eva">Run EVA fair/biased gate</button>
-      <a class="btn ghost" href="/admin" style="text-decoration:none;display:inline-block">GODS Admin loop →</a>
-      <a class="btn ghost" href="/divisions" style="text-decoration:none;display:inline-block">All divisions →</a>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button class="btn" onclick="refresh()">↻ Refresh</button>
+      <button class="btn ghost" onclick="runEva()">Run EVA fair/biased</button>
+      <a class="btn ghost" href="/divisions" style="text-decoration:none;display:inline-block">Open divisions</a>
+      <a class="btn ghost" href="/admin" style="text-decoration:none;display:inline-block">GODS Admin</a>
     </div>
-    <div id="gbs-eva-out" class="mut" style="margin-top:8px">EVA gate idle</div>
   </div>
+
   <div class="panel">
-    <h3>Four-division architecture · LIVE</h3>
-    <div class="grid" id="arch">
-      <div class="card div-card seths"><h3>SETHS</h3><div class="metric" style="font-size:1rem">Develops</div><div class="sub">Human capability engine</div><a class="nav" href="/seths" style="margin-top:8px;display:inline-block">Operator →</a></div>
-      <div class="card div-card ts"><h3>TS Industries</h3><div class="metric" style="font-size:1rem">Produces</div><div class="sub">Industrial absorption / SPVs</div><a class="nav" href="/ts" style="margin-top:8px;display:inline-block">Operator →</a></div>
-      <div class="card div-card madiba"><h3>MADIBA</h3><div class="metric" style="font-size:1rem">Recognises</div><div class="sub">Capital interface · EIF</div><a class="nav" href="/madiba" style="margin-top:8px;display:inline-block">Operator →</a></div>
-      <div class="card div-card udoc"><h3>UDOC</h3><div class="metric" style="font-size:1rem">Governs</div><div class="sub">Deterministic EVA + policy</div><a class="nav" href="/Sentinel" style="margin-top:8px;display:inline-block">Sentinel →</a></div>
-    </div>
-    <div id="arch-detail" class="mut" style="margin-top:10px">—</div>
-  </div>
-  <div class="panel">
-    <h3>Constitutional pillars · LIVE</h3>
-    <div id="pillars" class="row mut">—</div>
-  </div>
-  <div class="panel">
-    <h3>GBS layers / doctrine</h3>
-    <div id="layers" class="mut">—</div>
-  </div>
-  <div class="panel">
-    <h3>Ops terminal</h3>
-    <div class="term" id="term">GBS freeze · Core probes</div>
+    <h3>Terminal</h3>
+    <div class="term" id="term">GBS freeze · live probes</div>
   </div>
 </div>
 <script>
 const API=location.origin;
 const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
-const fmt=n=>{n=Number(n);if(!isFinite(n))return '—';if(Math.abs(n)>=1e6)return 'R'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return 'R'+(n/1e3).toFixed(1)+'k';return String(n);};
-async function get(path){
-  const r=await fetch(API+path);
-  if(!r.ok) throw new Error(path+' '+r.status);
-  return r.json();
-}
-async function load(){
+async function refresh(){
   try{
-    const [ov, arch, pill, layers, ready, status, sm, tm, mm]=await Promise.all([
-      get('/gis/gbs/overview').catch(e=>({error:String(e)})),
-      get('/gis/gbs/architecture').catch(e=>({error:String(e)})),
-      get('/gis/gbs/pillars').catch(e=>({error:String(e)})),
-      get('/gis/gbs/layers').catch(()=>({})),
-      get('/udoc/demo/ready').catch(()=>({})),
-      get('/admin/status').catch(()=>({})),
-      get('/seths/metrics').catch(()=>({})),
-      get('/ts/metrics').catch(()=>({})),
-      get('/madiba/metrics').catch(()=>({})),
+    const [ready, sm, tm, mm, st, gbs, arch]=await Promise.all([
+      fetch(API+'/udoc/demo/ready').then(r=>r.json()).catch(()=>({})),
+      fetch(API+'/seths/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/ts/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/madiba/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/admin/status').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/gis/gbs/overview').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/gis/gbs/architecture').then(r=>r.ok?r.json():{}).catch(()=>({})),
     ]);
     document.getElementById('k-ready').textContent=String(ready.ready??'—');
-    document.getElementById('k-ready').style.color=ready.ready?'#7fe3ab':'#E8A13A';
-    document.getElementById('k-seths').textContent=sm.total??'—';
-    document.getElementById('k-seths-s').textContent='placed '+(sm.placed??'—')+' · rate '+(sm.placement_rate!=null?Math.round(sm.placement_rate*100)+'%':'—');
+    document.getElementById('k-seths').textContent=sm.placed??sm.total??'—';
     document.getElementById('k-ts').textContent=tm.projects??'—';
-    document.getElementById('k-ts-s').textContent='workers '+(tm.workers_absorbed??'—')+' · profit '+fmt(tm.monthly_operating_profit);
     document.getElementById('k-mad').textContent=mm.cycles??'—';
-    document.getElementById('k-mad-s').textContent='recycled '+fmt(mm.cumulative_recycled)+' · ratio '+(mm.recycle_ratio??'—');
-    document.getElementById('k-models').textContent=status.models??'—';
-    document.getElementById('k-dec').textContent='decisions '+(status.decisions??'—');
-    document.getElementById('k-ov').textContent=status.open_oversight??'—';
-    document.getElementById('ready').textContent=ready.ready?'DEMO READY · GBS freeze':'CHECK SEED';
-    const honesty=(ov.honesty&&ov.honesty.note)||ov.note||'';
-    const divs=arch.divisions||[];
-    document.getElementById('arch-detail').innerHTML=
-      '<div class="mut" style="margin-bottom:6px">'+esc(arch.doctrine||ov.surface||'GBS-Global')+'</div>'+
-      (divs.length?divs.map(d=>'<span class="chip">'+esc(d.division||d.name||'')+' · '+esc(d.mode||d.role||'')+'</span>').join(' '):'')+
-      (honesty?'<p class="warn" style="margin-top:10px;font-size:12px">'+esc(honesty)+'</p>':'');
-    const plist=pill.constitutional_pillars||pill.pillars||[];
-    document.getElementById('pillars').innerHTML=plist.length
-      ? plist.map(p=>'<span class="chip ok">'+esc(p.numeral||p.id||'')+' · '+esc(p.name||'')+'</span>').join(' ')
-      : '—';
-    const L=layers.layers||layers.items||[];
-    if(Array.isArray(L)&&L.length){
-      document.getElementById('layers').innerHTML='<table><thead><tr><th>Layer</th><th>Role</th></tr></thead><tbody>'+
-        L.map(x=>'<tr><td>'+esc(x.name||x.layer||x.id)+'</td><td>'+esc(x.role||x.description||x.summary||'')+'</td></tr>').join('')+
-        '</tbody></table>';
-    } else {
-      document.getElementById('layers').innerHTML='<span class="mut">'+esc(arch.source||'GBS-UDOC Constitutional Proposition v1.0')+' · layers payload sparse on free tier</span>';
+    document.getElementById('k-models').textContent=st.models??'—';
+    const honesty=(gbs.honesty&&gbs.honesty.note)||gbs.note||'capital not_deployed';
+    document.getElementById('arch-note').textContent=honesty;
+    if(arch.divisions&&arch.divisions.length){
+      document.getElementById('arch').innerHTML=arch.divisions.map(d=>'<div class="card"><b>'+esc(d.division||d.name||'')+'</b><div class="mut" style="font-size:12px;margin-top:4px">'+esc(d.mode||d.role||'')+'</div></div>').join('');
     }
-    log('GBS load ok · pillars '+plist.length+' · SETHS '+(sm.total||0)+' · TS '+(tm.projects||0)+' · MADIBA '+(mm.cycles||0));
-  }catch(e){log('LOAD FAIL '+e.message);}
+    loadDivMetrics(sm,tm,mm,st,ready);
+    log('REFRESH ok · ready='+ready.ready+' seths='+(sm.placed||0)+' ts='+(tm.projects||0));
+  }catch(e){log('REFRESH FAIL '+e.message);}
 }
-document.getElementById('gbs-eva').onclick=async()=>{
-  const out=document.getElementById('gbs-eva-out'); out.textContent='running…';
+function loadDivMetrics(sm,tm,mm,st,ready){
+  const el=document.getElementById('gbs-div-body');
+  if(!el) return;
+  const cell=(l,v)=>'<div style="background:#060E1C;border:1px solid #1c2a45;border-radius:8px;padding:10px"><div style="color:#8fa0bd;font-size:10px;text-transform:uppercase">'+l+'</div><div style="font-size:1.15rem;font-weight:700">'+v+'</div></div>';
+  el.innerHTML=[
+    cell('SETHS learners', (sm&&sm.total)!=null?sm.total:'—'),
+    cell('SETHS placed', (sm&&sm.placed)!=null?sm.placed:'—'),
+    cell('TS projects', (tm&&tm.projects)!=null?tm.projects:'—'),
+    cell('TS workers', (tm&&tm.workers_absorbed)!=null?tm.workers_absorbed:'—'),
+    cell('MADIBA cycles', (mm&&mm.cycles)!=null?mm.cycles:'—'),
+    cell('Demo ready', String(ready&&ready.ready)),
+    cell('Models', (st&&st.models)!=null?st.models:'—'),
+    cell('Open oversight', (st&&st.open_oversight)!=null?st.open_oversight:'—'),
+  ].join('');
+}
+async function runEva(){
   try{
     const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
     const j=await r.json();
-    const items=j.results||j.items||j.decisions||[];
+    const items=j.results||j.items||[];
     const fair=items.find(x=>(x.scenario||x.name)==='fair')||items[0]||{};
     const biased=items.find(x=>(x.scenario||x.name)==='biased')||items[1]||{};
     const fo=fair.outcome||fair.decision||'';
     const bo=biased.outcome||biased.decision||'';
-    const pass=fo!=='BLOCK'&&bo==='BLOCK';
-    out.textContent=(pass?'PASS':'CHECK')+' · fair='+fo+' · biased='+bo;
-    out.style.color=pass?'#7fe3ab':'#E8A13A';
-    log('EVA gate '+(pass?'PASS':'CHECK'));
-  }catch(e){out.textContent=String(e.message||e);out.style.color='#E85D5D';}
-};
-load();
+    const pass=fo!=='BLOCK' && bo==='BLOCK';
+    document.getElementById('k-eva').textContent=pass?'PASS':'CHECK';
+    document.getElementById('k-eva').style.color=pass?'#6ee7b7':'#E8A13A';
+    log('EVA fair='+fo+' biased='+bo+' gate='+(pass?'PASS':'CHECK'));
+  }catch(e){
+    document.getElementById('k-eva').textContent='ERR';
+    log('EVA FAIL '+e.message);
+  }
+}
+refresh(); runEva();
+setInterval(refresh, 20000);
 </script>
 </body>
 </html>
