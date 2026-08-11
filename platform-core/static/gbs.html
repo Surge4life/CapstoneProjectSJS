@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>G.O.D.S · GBS Freeze · Four Division</title>
 <style>
 :root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--green:#10B981;--udoc:#7C5CBF}
@@ -11,30 +11,37 @@ header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-w
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
 .tag.ok{border-color:rgba(201,168,76,.5);color:#f0d78c;background:rgba(201,168,76,.08)}
+.tag.warn{border-color:rgba(232,161,58,.5);color:#f5c97a}
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
 .wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
+.honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
 .banner{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
-.honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:#E8A13A;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
-.card h3{margin:0 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.35rem;font-weight:700}
+.card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.25rem;font-weight:700}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
 .panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
-.chip{display:inline-block;text-decoration:none;border:1px solid var(--line);color:var(--ink);padding:4px 10px;border-radius:14px;font-size:11px;cursor:pointer;background:transparent}
-.chip:hover{border-color:var(--gold);color:var(--gold)}
 .btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:200px;overflow:auto}
-.mut{color:var(--mut)}.ok{color:#6ee7b7}.warn{color:var(--warn)}
-.arch{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px}
-.arch .card b{color:var(--cyan)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:4px 10px;font-size:11px;cursor:pointer;margin:2px;background:transparent;color:var(--ink);text-decoration:none}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.mut{color:var(--mut)}.warn{color:var(--warn)}.ok{color:#7fe3ab}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:220px;overflow:auto}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.pill{border:1px solid var(--line);border-radius:10px;padding:10px;margin:6px 0}
+.pill b{color:var(--cyan)}
 </style>
 </head>
 <body>
 <header>
   <span class="brand">G.O.D.S · <b>GBS Freeze</b></span>
-  <span class="tag ok" id="ready">four-division · Capstone</span>
+  <span class="tag ok" id="ver">v1.0</span>
+  <span class="tag warn" id="sov-tag">Sovereign-Verified</span>
   <span style="flex:1"></span>
   <a class="nav" href="/admin">GODS Admin</a>
   <a class="nav" href="/udoc-admin">UDOC Admin</a>
@@ -42,131 +49,199 @@ a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgb
   <a class="nav" href="/seths">SETHS</a>
   <a class="nav" href="/ts">TS</a>
   <a class="nav" href="/madiba">MADIBA</a>
-  <a class="nav" href="/Sentinel">Sentinel</a>
   <a class="nav" href="/eif-ui">EIF</a>
+  <a class="nav" href="/Sentinel">Sentinel</a>
 </header>
 <div class="wrap">
-  <div class="honest">Capstone honesty: GBS four-division freeze is architectural + live APIs · franchise nodes may be empty · capital not_deployed · Sovereign-Verified designed_not_built where noted · staff seths@/madiba@/ts@ · staff123</div>
-  <div class="banner"><b>GBS-UDOC constitutional freeze.</b> SETHS develops · TS industrialises · MADIBA recognises · UDOC governs. EVA gate + division metrics below are live Core probes.</div>
+  <div class="honest">Capstone honesty: GBS pillars + APIs are live · <b>zero franchise nodes is honest</b> (geographic scale post-seed) · Sovereign-Verified is <b>designed_not_built</b> · capital not_deployed · MADIBA ledger ≠ AUM</div>
+  <div class="banner"><b>GBS-UDOC</b> constitutional freeze · four-division architecture · Layer 1 constitutional standard licensed to SETHS · MADIBA · TS · UDOC under GODS Holdings</div>
 
-  <div id="guided-gbs" class="panel">
-    <h3>Guided path · four-division freeze</h3>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0">
-      <a class="chip" href="/seths">1 · SETHS develops</a>
-      <a class="chip" href="/ts">2 · TS industrial</a>
-      <a class="chip" href="/madiba">3 · MADIBA recognises</a>
-      <a class="chip" href="/udoc-admin">4 · UDOC governs</a>
-      <a class="chip" href="/admin">GODS Admin cockpit →</a>
-      <a class="chip" href="/divisions">All divisions →</a>
+  <div class="panel">
+    <h3>Guided path · GBS operator</h3>
+    <div class="row">
+      <button class="chip" onclick="load()">1 · Load overview</button>
+      <button class="chip" onclick="loadNodes()">2 · List nodes</button>
+      <a class="chip" href="/seths">3 · SETHS →</a>
+      <a class="chip" href="/ts">4 · TS →</a>
+      <a class="chip" href="/madiba">5 · MADIBA →</a>
+      <a class="chip" href="/eif-ui">6 · EIF · Sovereign parallel →</a>
+      <a class="chip" href="/divisions">Full loop →</a>
     </div>
-    <p class="mut" style="font-size:12px;margin:6px 0 0">Operator loop: /seths enrol→PLACED · /ts assign-worker · /madiba allocate (ledger) · or one-click on /admin and /divisions.</p>
   </div>
 
   <div class="grid">
-    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-ready">—</div></div>
-    <div class="card"><h3>EVA gate</h3><div class="metric" id="k-eva">—</div></div>
-    <div class="card"><h3>SETHS placed</h3><div class="metric" id="k-seths">—</div></div>
-    <div class="card"><h3>TS projects</h3><div class="metric" id="k-ts">—</div></div>
-    <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mad">—</div></div>
-    <div class="card"><h3>Models</h3><div class="metric" id="k-models">—</div></div>
-  </div>
-
-  <div id="gbs-div-metrics" class="panel">
-    <h3>Division live snapshot · Core API</h3>
-    <div id="gbs-div-body" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px">…</div>
-    <p class="mut" style="font-size:11px;margin:8px 0 0">/seths/metrics · /ts/metrics · /madiba/metrics · /admin/status · /udoc/demo/ready</p>
-  </div>
-
-  <div class="panel">
-    <h3>Architecture · GBS-UDOC v1.0</h3>
-    <div class="arch" id="arch">
-      <div class="card"><b>SETHS</b><div class="mut" style="font-size:12px;margin-top:4px">Human capability engine · develops</div></div>
-      <div class="card"><b>TS Industries</b><div class="mut" style="font-size:12px;margin-top:4px">Industrial absorption · SPVs</div></div>
-      <div class="card"><b>MADIBA</b><div class="mut" style="font-size:12px;margin-top:4px">Capital recognition · EIF</div></div>
-      <div class="card"><b>UDOC</b><div class="mut" style="font-size:12px;margin-top:4px">Constitutional governance</div></div>
-    </div>
-    <p class="mut" id="arch-note" style="font-size:12px;margin-top:10px">—</p>
+    <div class="card"><h3>GBS version</h3><div class="metric" id="k-ver" style="font-size:1.1rem">—</div></div>
+    <div class="card"><h3>Nodes</h3><div class="metric" id="k-nodes">—</div></div>
+    <div class="card"><h3>Pillars</h3><div class="metric" id="k-pill">—</div></div>
+    <div class="card"><h3>Layers</h3><div class="metric" id="k-lay">—</div></div>
+    <div class="card"><h3>Sovereign</h3><div class="metric" id="k-sov" style="font-size:1rem">—</div></div>
+    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-demo">—</div></div>
+    <div class="card"><h3>SETHS placed</h3><div class="metric" id="k-plc">—</div></div>
+    <div class="card"><h3>TS SPVs</h3><div class="metric" id="k-ts">—</div></div>
   </div>
 
   <div class="panel">
     <h3>Command path</h3>
-    <div style="display:flex;flex-wrap:wrap;gap:8px">
-      <button class="btn" onclick="refresh()">↻ Refresh</button>
-      <button class="btn ghost" onclick="runEva()">Run EVA fair/biased</button>
-      <a class="btn ghost" href="/divisions" style="text-decoration:none;display:inline-block">Open divisions</a>
-      <a class="btn ghost" href="/admin" style="text-decoration:none;display:inline-block">GODS Admin</a>
+    <div class="row">
+      <button class="btn" onclick="load()">↻ Refresh GBS</button>
+      <button class="btn ghost" onclick="loadNodes()">Refresh nodes</button>
+      <button class="btn ghost" onclick="evaSmoke()">UDOC fair/biased smoke</button>
     </div>
   </div>
 
   <div class="panel">
-    <h3>Terminal</h3>
-    <div class="term" id="term">GBS freeze · live probes</div>
+    <h3>Doctrine · architecture</h3>
+    <div id="doctrine" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Layers (1–5)</h3>
+    <div id="layers" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Constitutional + universal pillars</h3>
+    <div id="pillars" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Sovereign-Verified · systems recognition</h3>
+    <div id="sovereign" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Division bindings</h3>
+    <div id="bindings" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>GBS nodes · LIVE</h3>
+    <p class="mut" style="font-size:12px;margin:0 0 8px">Empty list is honest Capstone state · demo nodes may appear from operator tests</p>
+    <div id="nodes">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Honesty register</h3>
+    <div id="honesty" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Ops terminal</h3>
+    <div class="term" id="term">GBS · GIS constitutional freeze · live Core probes</div>
   </div>
 </div>
 <script>
 const API=location.origin;
 const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
-async function refresh(){
+async function j(path){
+  const r=await fetch(API+path);
+  const body=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(body.detail||r.status);
+  return body;
+}
+async function load(){
   try{
-    const [ready, sm, tm, mm, st, gbs, arch]=await Promise.all([
-      fetch(API+'/udoc/demo/ready').then(r=>r.json()).catch(()=>({})),
-      fetch(API+'/seths/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
-      fetch(API+'/ts/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
-      fetch(API+'/madiba/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
-      fetch(API+'/admin/status').then(r=>r.ok?r.json():{}).catch(()=>({})),
-      fetch(API+'/gis/gbs/overview').then(r=>r.ok?r.json():{}).catch(()=>({})),
-      fetch(API+'/gis/gbs/architecture').then(r=>r.ok?r.json():{}).catch(()=>({})),
+    const [ov, arch, layers, pillars, sov, ready]=await Promise.all([
+      j('/gis/gbs/overview'),
+      j('/gis/gbs/architecture'),
+      j('/gis/gbs/layers'),
+      j('/gis/gbs/pillars'),
+      j('/gis/gbs/sovereign-tier'),
+      j('/udoc/demo/ready').catch(()=>({})),
     ]);
-    document.getElementById('k-ready').textContent=String(ready.ready??'—');
-    document.getElementById('k-seths').textContent=sm.placed??sm.total??'—';
-    document.getElementById('k-ts').textContent=tm.projects??'—';
-    document.getElementById('k-mad').textContent=mm.cycles??'—';
-    document.getElementById('k-models').textContent=st.models??'—';
-    const honesty=(gbs.honesty&&gbs.honesty.note)||gbs.note||'capital not_deployed';
-    document.getElementById('arch-note').textContent=honesty;
-    if(arch.divisions&&arch.divisions.length){
-      document.getElementById('arch').innerHTML=arch.divisions.map(d=>'<div class="card"><b>'+esc(d.division||d.name||'')+'</b><div class="mut" style="font-size:12px;margin-top:4px">'+esc(d.mode||d.role||'')+'</div></div>').join('');
-    }
-    loadDivMetrics(sm,tm,mm,st,ready);
-    log('REFRESH ok · ready='+ready.ready+' seths='+(sm.placed||0)+' ts='+(tm.projects||0));
-  }catch(e){log('REFRESH FAIL '+e.message);}
+    document.getElementById('k-ver').textContent=ov.gbs_udoc_version||'1.0';
+    document.getElementById('ver').textContent='v'+(ov.gbs_udoc_version||'1.0');
+    const nodes=ov.nodes||{};
+    const nCount=Array.isArray(nodes)?nodes.length:(nodes.count??nodes.total??(Array.isArray(nodes.list)?nodes.list.length:0));
+    document.getElementById('k-nodes').textContent=nCount;
+    const cp=pillars.constitutional_pillars||[];
+    const up=pillars.gbs_universal_pillars||[];
+    document.getElementById('k-pill').textContent=(Array.isArray(cp)?cp.length:0)+(Array.isArray(up)?up.length:0);
+    const lay=layers.layers||layers||[];
+    document.getElementById('k-lay').textContent=Array.isArray(lay)?lay.length:'—';
+    document.getElementById('k-sov').textContent=sov.status||'designed_not_built';
+    document.getElementById('sov-tag').textContent=(sov.name||'Sovereign-Verified')+' · '+(sov.status||'');
+    document.getElementById('k-demo').textContent=String(ready.ready??'—');
+
+    document.getElementById('doctrine').innerHTML=
+      '<div class="kv"><span>Doctrine</span><span>'+esc(arch.doctrine||'')+'</span></div>'+
+      '<div class="kv"><span>Source</span><span class="mut">'+esc(arch.source||'')+'</span></div>'+
+      '<div class="kv"><span>Symmetry</span><span class="mut">'+esc(typeof arch.symmetry==='string'?arch.symmetry:JSON.stringify(arch.symmetry||''))+'</span></div>'+
+      '<div class="kv"><span>Divisions</span><span>'+esc((arch.divisions||[]).map(d=>typeof d==='string'?d:(d.division||d.name||'')).join(' · '))+'</span></div>';
+
+    document.getElementById('layers').innerHTML=Array.isArray(lay)
+      ? lay.map(L=>'<div class="pill"><b>L'+esc(L.layer||L.id)+'</b> '+esc(L.name||'')+(L.note?' <span class="mut">· '+esc(L.note)+'</span>':'')+'</div>').join('')
+      : esc(JSON.stringify(layers).slice(0,300));
+
+    const pillarHtml=(arr,title)=>{
+      if(!Array.isArray(arr)||!arr.length) return '';
+      return '<p class="mut" style="margin:8px 0 4px">'+esc(title)+'</p>'+arr.map(p=>{
+        if(typeof p==='string') return '<span class="chip">'+esc(p)+'</span>';
+        return '<div class="pill"><b>'+esc(p.name||p.id||p.pillar||'')+'</b> <span class="mut">'+esc(p.description||p.summary||'')+'</span></div>';
+      }).join('');
+    };
+    document.getElementById('pillars').innerHTML=pillarHtml(cp,'Constitutional')+pillarHtml(up,'Universal')||'—';
+
+    document.getElementById('sovereign').innerHTML=
+      '<div class="kv"><span>Name</span><span class="ok">'+esc(sov.name)+'</span></div>'+
+      '<div class="kv"><span>Status</span><span class="warn">'+esc(sov.status)+'</span></div>'+
+      '<div class="kv"><span>Parallel</span><span>'+esc(sov.parallel_to)+'</span></div>'+
+      '<div class="kv"><span>Baseline exceeded</span><span class="mut">'+esc(sov.baseline_exceeded)+'</span></div>'+
+      '<div class="kv"><span>Authority</span><span class="mut">'+esc(sov.verification_authority)+'</span></div>'+
+      (sov.honesty?'<p class="warn" style="font-size:12px;margin-top:8px">'+esc(typeof sov.honesty==='string'?sov.honesty:JSON.stringify(sov.honesty))+'</p>':'');
+
+    const bind=ov.division_bindings||arch.divisions||[];
+    document.getElementById('bindings').innerHTML=Array.isArray(bind)
+      ? bind.map(b=>{
+          if(typeof b==='string') return '<a class="chip" href="/'+b.toLowerCase().replace('.','')+'">'+esc(b)+'</a>';
+          const name=b.division||b.name||'';
+          return '<a class="chip" href="/'+String(name).toLowerCase().replace('.','')+'">'+esc(name)+'</a>';
+        }).join(' ')
+      : esc(JSON.stringify(bind).slice(0,200));
+
+    const hon=ov.honesty||{};
+    document.getElementById('honesty').innerHTML=
+      '<div class="kv"><span>Nodes empty OK</span><span>'+esc(String(hon.nodes_empty_ok))+'</span></div>'+
+      '<div class="kv"><span>Note</span><span class="mut">'+esc(hon.note||'')+'</span></div>';
+
+    try{
+      const [sm,tm]=await Promise.all([
+        fetch(API+'/seths/metrics').then(r=>r.ok?r.json():{}),
+        fetch(API+'/ts/metrics').then(r=>r.ok?r.json():{}),
+      ]);
+      if(sm.placed!=null) document.getElementById('k-plc').textContent=sm.placed;
+      if(tm.projects!=null) document.getElementById('k-ts').textContent=tm.projects;
+    }catch(_){}
+
+    log('GBS overview ok · nodes='+nCount+' sov='+sov.status);
+    await loadNodes();
+  }catch(e){log('LOAD FAIL '+e.message);}
 }
-function loadDivMetrics(sm,tm,mm,st,ready){
-  const el=document.getElementById('gbs-div-body');
-  if(!el) return;
-  const cell=(l,v)=>'<div style="background:#060E1C;border:1px solid #1c2a45;border-radius:8px;padding:10px"><div style="color:#8fa0bd;font-size:10px;text-transform:uppercase">'+l+'</div><div style="font-size:1.15rem;font-weight:700">'+v+'</div></div>';
-  el.innerHTML=[
-    cell('SETHS learners', (sm&&sm.total)!=null?sm.total:'—'),
-    cell('SETHS placed', (sm&&sm.placed)!=null?sm.placed:'—'),
-    cell('TS projects', (tm&&tm.projects)!=null?tm.projects:'—'),
-    cell('TS workers', (tm&&tm.workers_absorbed)!=null?tm.workers_absorbed:'—'),
-    cell('MADIBA cycles', (mm&&mm.cycles)!=null?mm.cycles:'—'),
-    cell('Demo ready', String(ready&&ready.ready)),
-    cell('Models', (st&&st.models)!=null?st.models:'—'),
-    cell('Open oversight', (st&&st.open_oversight)!=null?st.open_oversight:'—'),
-  ].join('');
+async function loadNodes(){
+  try{
+    const nodes=await j('/gis/gbs/nodes');
+    const list=Array.isArray(nodes)?nodes:(nodes.nodes||nodes.items||[]);
+    document.getElementById('k-nodes').textContent=list.length;
+    document.getElementById('nodes').innerHTML=list.length
+      ?('<table><thead><tr><th>Ref</th><th>Layer</th><th>Name</th><th>Territory</th><th>Licence</th></tr></thead><tbody>'+
+        list.slice(0,30).map(n=>'<tr><td>'+esc(n.node_ref)+'</td><td>'+esc(n.layer)+' '+esc(n.layer_name||'')+'</td><td>'+esc(n.name)+'</td><td>'+esc(n.territory)+'</td><td>'+esc(n.licence_status)+'</td></tr>').join('')+
+        '</tbody></table>')
+      :'<span class="mut">No franchise nodes · honest Capstone state</span>';
+    log('NODES '+list.length);
+  }catch(e){log('NODES FAIL '+e.message);}
 }
-async function runEva(){
+async function evaSmoke(){
   try{
     const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
     const j=await r.json();
     const items=j.results||j.items||[];
-    const fair=items.find(x=>(x.scenario||x.name)==='fair')||items[0]||{};
-    const biased=items.find(x=>(x.scenario||x.name)==='biased')||items[1]||{};
-    const fo=fair.outcome||fair.decision||'';
-    const bo=biased.outcome||biased.decision||'';
-    const pass=fo!=='BLOCK' && bo==='BLOCK';
-    document.getElementById('k-eva').textContent=pass?'PASS':'CHECK';
-    document.getElementById('k-eva').style.color=pass?'#6ee7b7':'#E8A13A';
-    log('EVA fair='+fo+' biased='+bo+' gate='+(pass?'PASS':'CHECK'));
-  }catch(e){
-    document.getElementById('k-eva').textContent='ERR';
-    log('EVA FAIL '+e.message);
-  }
+    const map={}; items.forEach(x=>{map[x.scenario||x.name]=x.outcome||x.decision;});
+    const gate=(map.fair&&map.fair!=='BLOCK')&&(map.biased==='BLOCK');
+    log('EVA smoke '+(gate?'PASS':'CHECK')+' '+JSON.stringify(map));
+  }catch(e){log('EVA FAIL '+e.message);}
 }
-refresh(); runEva();
-setInterval(refresh, 20000);
+load();
 </script>
 </body>
 </html>
