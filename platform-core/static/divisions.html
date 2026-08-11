@@ -2,33 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>G.O.D.S · Divisions · Internal Portal Stack</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>G.O.D.S · Divisions · Live Operator</title>
 <style>
 :root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--green:#10B981;--red:#E85D5D}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
-header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
 .tag.ok{border-color:var(--ok);color:#7fe3ab}
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
-.wrap{max-width:1140px;margin:0 auto;padding:16px 18px 40px}
+.wrap{max-width:1140px;margin:0 auto;padding:16px 18px 48px}
 .banner{background:rgba(45,155,90,.1);border:1px solid rgba(45,155,90,.35);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px}
+.honest{margin:0 0 12px;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
 .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 input,select{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px}
 .btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.btn.cyan{background:var(--cyan);color:#041018}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
-.card h3{margin:0 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.35rem;font-weight:700}
+.card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.3rem;font-weight:700}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
 .panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
-.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:220px;overflow:auto}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:240px;overflow:auto}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
 .tabs button{background:transparent;border:1px solid var(--line);color:var(--mut);border-radius:8px;padding:6px 10px;cursor:pointer}
 .tabs button.on{border-color:var(--gold);color:var(--gold)}
-.mut{color:var(--mut)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:14px;padding:3px 9px;font-size:11px;margin:2px;color:var(--ink)}
+.mut{color:var(--mut)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--mut)}
+.bar-track{height:7px;background:#050b16;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--cyan))}
 </style>
 </head>
 <body>
@@ -42,17 +50,22 @@ input,select{background:var(--navy2);border:1px solid var(--line);color:var(--in
   <a class="nav" href="/ts">TS</a>
   <a class="nav" href="/madiba">MADIBA</a>
   <a class="nav" href="/gbs">GBS</a>
+  <a class="nav" href="/eif-ui">EIF</a>
   <a class="nav" href="/Sentinel">Sentinel</a>
 </header>
 <div class="wrap">
-  <div class="banner">Capstone live operator · honest zeros OK · MADIBA ledger ≠ AUM · capital not_deployed · staff: seths@ / madiba@ / ts@ gods.local · staff123</div>
+  <div class="honest">Capstone honesty: division metrics are Neon demo rows · MADIBA ledger ≠ AUM · capital not_deployed · PLACED→TS assign is FK-backed · not franchise scale</div>
+  <div class="banner"><b>Live operator cockpit</b> · SETHS develops → TS absorbs → MADIBA recognises · staff: seths@ / ts@ / madiba@ gods.local · staff123</div>
+
   <div class="bar">
     <input id="email" value="seths@gods.local" style="min-width:180px"/>
     <input id="pw" type="password" value="staff123" style="width:120px"/>
     <button class="btn" id="login">Connect staff</button>
     <button class="btn ghost" id="refresh">↻ Refresh KPIs</button>
+    <button class="btn cyan" id="run-loop">Run full loop</button>
     <span class="mut" id="who">not signed in</span>
   </div>
+
   <div class="grid">
     <div class="card"><h3>Demo ready</h3><div class="metric" id="k-demo">—</div></div>
     <div class="card"><h3>SETHS total</h3><div class="metric" id="k-enr">—</div></div>
@@ -63,61 +76,93 @@ input,select{background:var(--navy2);border:1px solid var(--line);color:var(--in
     <div class="card"><h3>MADIBA recycled</h3><div class="metric" id="k-mr">—</div></div>
     <div class="card"><h3>Engagements</h3><div class="metric" id="k-eng">—</div></div>
   </div>
-  <div class="panel" id="guided-div">
+
+  <div class="panel">
     <h3>Guided path · SETHS → TS → MADIBA</h3>
     <div class="bar">
-      <button class="btn" id="run-loop">Run full loop</button>
-      <a class="btn ghost" href="/seths" style="text-decoration:none;display:inline-block">SETHS operator</a>
-      <a class="btn ghost" href="/ts" style="text-decoration:none;display:inline-block">TS operator</a>
-      <a class="btn ghost" href="/madiba" style="text-decoration:none;display:inline-block">MADIBA operator</a>
-      <a class="btn ghost" href="/admin" style="text-decoration:none;display:inline-block">GODS Admin</a>
+      <button class="btn" id="run-loop-2">1–4 · Run full loop</button>
+      <button class="btn ghost" id="s-enrol">SETHS enrol</button>
+      <button class="btn ghost" id="s-adv">SETHS advance</button>
+      <button class="btn ghost" id="t-deploy">TS deploy SPV</button>
+      <button class="btn ghost" id="t-assign">TS assign PLACED</button>
+      <button class="btn ghost" id="m-all">MADIBA allocate</button>
+      <button class="btn ghost" id="m-eng">MADIBA engage</button>
+      <button class="btn ghost" id="u-batch">EVA fair/biased</button>
     </div>
-    <p class="mut" style="font-size:12px;margin:8px 0 0">Loop: enrol → advance PLACED → deploy SPV → assign-worker → allocate. capital not_deployed.</p>
   </div>
+
+  <div class="panel">
+    <h3>SETHS status · stream · LIVE</h3>
+    <div id="s-status" class="row mut">—</div>
+    <div id="s-stream" class="row mut" style="margin-top:6px">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>TS by subsidiary · LIVE</h3>
+    <div id="t-subs" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>MADIBA series · LIVE</h3>
+    <div id="m-series" class="mut">—</div>
+  </div>
+
   <div class="tabs">
     <button class="on" data-tab="seths">SETHS</button>
     <button data-tab="ts">TS</button>
     <button data-tab="madiba">MADIBA</button>
     <button data-tab="udoc">UDOC EVA</button>
   </div>
-  <div id="tab-seths" class="panel">
+
+  <div class="panel tab" id="tab-seths">
     <h3>SETHS · Enrol → Advance → PLACED</h3>
     <div class="bar">
-      <button class="btn" id="s-enrol">Enrol demo</button>
-      <button class="btn ghost" id="s-adv">Advance first active</button>
+      <button class="btn" id="s-enrol-2">Enrol demo</button>
+      <button class="btn ghost" id="s-adv-2">Advance first active</button>
+      <a class="btn ghost" href="/seths" style="text-decoration:none">Open SETHS surface →</a>
     </div>
-    <div class="term" id="s-list">roster loads after connect</div>
+    <div id="s-list" class="mut" style="margin-top:10px">—</div>
   </div>
-  <div id="tab-ts" class="panel" style="display:none">
+  <div class="panel tab" id="tab-ts" style="display:none">
     <h3>TS · Deploy SPV · Assign PLACED</h3>
     <div class="bar">
-      <button class="btn" id="t-deploy">Deploy demo SPV</button>
-      <button class="btn ghost" id="t-assign">Assign first PLACED</button>
+      <button class="btn" id="t-deploy-2">Deploy ENERGY SPV</button>
+      <button class="btn ghost" id="t-assign-2">Assign first PLACED</button>
+      <a class="btn ghost" href="/ts" style="text-decoration:none">Open TS surface →</a>
     </div>
-    <div class="term" id="t-list">SPVs + PLACED pool</div>
+    <div id="t-list" class="mut" style="margin-top:10px">—</div>
   </div>
-  <div id="tab-madiba" class="panel" style="display:none">
+  <div class="panel tab" id="tab-madiba" style="display:none">
     <h3>MADIBA · Allocate · Engage</h3>
     <div class="bar">
-      <button class="btn" id="m-all">Allocate demo cycle</button>
-      <button class="btn ghost" id="m-eng">New engagement</button>
+      <button class="btn" id="m-all-2">Allocate R50k cycle</button>
+      <button class="btn ghost" id="m-eng-2">New engagement</button>
+      <a class="btn ghost" href="/madiba" style="text-decoration:none">Open MADIBA surface →</a>
+      <a class="btn ghost" href="/eif-ui" style="text-decoration:none">EIF Diamond →</a>
     </div>
-    <div class="term" id="m-list">pipeline</div>
+    <div id="m-pipe" class="mut" style="margin-top:10px">—</div>
   </div>
-  <div id="tab-udoc" class="panel" style="display:none">
+  <div class="panel tab" id="tab-udoc" style="display:none">
     <h3>UDOC EVA · fair / biased gate</h3>
     <div class="bar">
-      <button class="btn" id="u-batch">Run batch fair+biased</button>
+      <button class="btn" id="u-batch-2">Run fair+biased batch</button>
       <button class="btn ghost" id="u-ready">demo/ready</button>
+      <a class="btn ghost" href="/Sentinel" style="text-decoration:none">Sentinel →</a>
     </div>
-    <div class="term" id="u-out">—</div>
+    <pre id="u-out" class="term" style="margin-top:10px">—</pre>
   </div>
-  <div class="panel"><h3>Ops terminal</h3><div class="term" id="log">Divisions stack</div></div>
+
+  <div class="panel">
+    <h3>Ops terminal</h3>
+    <div class="term" id="log">Divisions · live Core probes</div>
+  </div>
 </div>
 <script>
 const $=id=>document.getElementById(id);
 let TOK=localStorage.getItem('gods_div_tok')||'';
 const log=m=>{const el=$('log');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+const fmt=n=>{n=Number(n);if(!isFinite(n))return '—';if(Math.abs(n)>=1e6)return 'R'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return 'R'+(n/1e3).toFixed(1)+'k';return 'R'+n;};
 async function api(path,opts={}){
   const h=Object.assign({'Content-Type':'application/json'},opts.headers||{});
   if(TOK) h.Authorization='Bearer '+TOK;
@@ -129,73 +174,177 @@ async function api(path,opts={}){
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');
-  ['seths','ts','madiba','udoc'].forEach(t=>{const el=$('tab-'+t); if(el) el.style.display=t===b.dataset.tab?'block':'none';});
+  ['seths','ts','madiba','udoc'].forEach(t=>{
+    const el=$('tab-'+t); if(el) el.style.display=(b.dataset.tab===t)?'block':'none';
+  });
 });
-$('login').onclick=async()=>{
-  try{
-    const body=new URLSearchParams({username:$('email').value,password:$('pw').value});
-    const r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
-    const j=await r.json(); if(!r.ok) throw new Error(JSON.stringify(j));
-    TOK=j.access_token; localStorage.setItem('gods_div_tok',TOK);
-    $('who').textContent=$('email').value+' · connected'; log('LOGIN ok'); await refresh();
-  }catch(e){log('LOGIN FAIL '+e.message);}
-};
 async function refresh(){
   try{
-    const ready=await fetch('/udoc/demo/ready').then(r=>r.json()).catch(()=>null);
-    $('k-demo').textContent=ready?String(ready.ready):'—';
-    $('ready').textContent=ready&&ready.ready?'DEMO READY':'CHECK SEED';
-    $('ready').className='tag '+(ready&&ready.ready?'ok':'');
-    if(!TOK){log('KPIs partial · not signed in');return;}
-    const [sk,tm,mm,pipe]=await Promise.all([
-      api('/seths/metrics').catch(()=>null),
-      api('/ts/metrics').catch(()=>null),
-      api('/madiba/metrics').catch(()=>null),
-      api('/madiba/engage/pipeline').catch(()=>null),
+    const [ready, sm, tm, mm, pipe]=await Promise.all([
+      fetch('/udoc/demo/ready').then(r=>r.json()).catch(()=>({})),
+      api('/seths/metrics').catch(()=>({})),
+      api('/ts/metrics').catch(()=>({})),
+      api('/madiba/metrics').catch(()=>({})),
+      api('/madiba/engage/pipeline').catch(()=>({list:[]})),
     ]);
-    $('k-enr').textContent=(sk&&(sk.total??sk.enrolled))??'—';
-    $('k-plc').textContent=sk?.placed??'—';
-    $('k-tsp').textContent=tm?.projects??'—';
-    $('k-tsw').textContent=tm?.workers_absorbed??'—';
-    $('k-mc').textContent=mm?.cycles??'—';
-    $('k-mr').textContent='R'+Number(mm?.cumulative_recycled||0).toLocaleString();
-    $('k-eng').textContent=pipe?.engagements??'—';
-    const learners=await api('/seths/learners?limit=30').catch(()=>({learners:[]}));
-    const L=learners.learners||[];
-    $('s-list').textContent=L.map(l=>l.ref+'  '+l.status+'  R'+Number(l.monthly_value||0).toLocaleString()).join('\n')||'empty roster';
-    const spvs=await api('/ts/projects').catch(()=>[]);
-    const list=Array.isArray(spvs)?spvs:[];
-    const placed=L.filter(l=>/PLACED/i.test(String(l.status||'')));
-    $('t-list').textContent='SPVs:\n'+(list.slice(0,12).map(p=>(p.spv_id||'')+' w:'+(p.workers||0)).join('\n')||'none')+'\n\nPLACED:\n'+(placed.map(l=>l.ref).join('\n')||'none');
-    const pl=pipe?.list||[];
-    $('m-list').textContent=pl.slice(0,12).map(x=>(x.ref||'')+' '+(x.investor||'')+' '+(x.stage||x.state||'')).join('\n')||'no engagements';
-    log('REFRESH ok');
+    $('k-demo').textContent=String(ready.ready??'—');
+    $('ready').textContent=ready.ready?'DEMO READY':'CHECK SEED';
+    $('ready').className='tag '+(ready.ready?'ok':'');
+    $('k-enr').textContent=sm.total??'—';
+    $('k-plc').textContent=sm.placed??'—';
+    $('k-tsp').textContent=tm.projects??'—';
+    $('k-tsw').textContent=tm.workers_absorbed??'—';
+    $('k-mc').textContent=mm.cycles??'—';
+    $('k-mr').textContent=fmt(mm.cumulative_recycled);
+    $('k-eng').textContent=pipe.engagements??(pipe.list||[]).length??'—';
+
+    try{
+      const learners=await api('/seths/learners?limit=40');
+      const list=Array.isArray(learners)?learners:(learners.learners||learners.items||[]);
+      window.__learners=list;
+      const counts={}, streams={};
+      list.forEach(x=>{
+        const s=String(x.status||x.stage||'UNKNOWN'); counts[s]=(counts[s]||0)+1;
+        const st=String(x.stream||x.qualification||'UNKNOWN'); streams[st]=(streams[st]||0)+1;
+      });
+      $('s-status').innerHTML=Object.keys(counts).length?Object.entries(counts).map(([k,v])=>'<span class="chip">'+esc(k)+' · '+v+'</span>').join(' '):'—';
+      $('s-stream').innerHTML=Object.keys(streams).length?Object.entries(streams).map(([k,v])=>'<span class="chip">'+esc(k)+' · '+v+'</span>').join(' '):'—';
+      $('s-list').innerHTML=list.length
+        ?('<table><thead><tr><th>Ref</th><th>Name</th><th>Status</th></tr></thead><tbody>'+
+          list.slice(0,12).map(x=>'<tr><td>'+esc(x.ref||x.learner_ref)+'</td><td>'+esc(x.name||x.full_name||'')+'</td><td>'+esc(x.status||x.stage)+'</td></tr>').join('')+
+          '</tbody></table>')
+        :'<span class="mut">No learners</span>';
+    }catch(e){$('s-status').textContent=e.message;}
+
+    const by=tm.by_subsidiary||{};
+    $('t-subs').innerHTML=Object.keys(by).length
+      ?('<table><thead><tr><th>Subsidiary</th><th>Projects</th><th>Workers</th></tr></thead><tbody>'+
+        Object.entries(by).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td>'+esc(v.projects)+'</td><td>'+esc(v.workers)+'</td></tr>').join('')+
+        '</tbody></table>')
+      :'<span class="mut">No subsidiary breakdown</span>';
+    try{
+      const projects=await api('/ts/projects');
+      const rows=Array.isArray(projects)?projects:[];
+      window.__projects=rows;
+      $('t-list').innerHTML=rows.length
+        ?('<table><thead><tr><th>SPV</th><th>Sector</th><th>Workers</th><th>Equity</th></tr></thead><tbody>'+
+          rows.slice(0,12).map(p=>'<tr><td>'+esc(p.spv_id)+'</td><td>'+esc(p.sector)+'</td><td>'+esc(p.workers)+'</td><td>'+esc(p.equity_pct)+'</td></tr>').join('')+
+          '</tbody></table>')
+        :'<span class="mut">No SPVs</span>';
+    }catch(e){$('t-list').textContent=e.message;}
+
+    const series=mm.series||[];
+    $('m-series').innerHTML=series.length
+      ?('<table><thead><tr><th>Month</th><th>Inflow</th><th>Recycled</th><th></th></tr></thead><tbody>'+
+        series.slice(0,8).map(s=>{
+          const inflow=Number(s.inflow||0), rec=Number(s.recycled||0);
+          const pct=inflow?Math.min(100,Math.round(rec/inflow*100)):0;
+          return '<tr><td>'+esc(s.month)+'</td><td>'+esc(fmt(inflow))+'</td><td>'+esc(fmt(rec))+'</td><td style="min-width:90px"><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div></td></tr>';
+        }).join('')+'</tbody></table>')
+      :'<span class="mut">No series · allocate</span>';
+    const eng=pipe.list||[];
+    $('m-pipe').innerHTML=eng.length
+      ?('<table><thead><tr><th>Ref</th><th>Investor</th><th>Stage</th></tr></thead><tbody>'+
+        eng.slice(0,10).map(x=>'<tr><td>'+esc(x.ref)+'</td><td>'+esc(x.investor)+'</td><td>'+esc(x.stage||x.state)+'</td></tr>').join('')+
+        '</tbody></table>')
+      :'<span class="mut">No engagements</span>';
+
+    log('REFRESH ok · seths='+(sm.total||0)+' ts='+(tm.projects||0)+' madiba='+(mm.cycles||0));
   }catch(e){log('REFRESH FAIL '+e.message);}
 }
-$('refresh').onclick=refresh;
-$('s-enrol').onclick=async()=>{try{const r=await api('/seths/enrol',{method:'POST',body:JSON.stringify({qualification:'Digital Operations & AI Literacy',count:1})});log('ENROL '+JSON.stringify(r).slice(0,120));await refresh();}catch(e){log('ENROL '+e.message);}};
-$('s-adv').onclick=async()=>{try{const L=(await api('/seths/learners?limit=30')).learners||[];const c=L.find(l=>!/PLACED|COMPLETE/i.test(String(l.status||'')))||L[0];if(!c)throw new Error('no learner');await api('/seths/'+encodeURIComponent(c.ref)+'/advance?monthly_value=12000',{method:'POST'});log('ADVANCE '+c.ref);await refresh();}catch(e){log('ADV '+e.message);}};
-$('t-deploy').onclick=async()=>{try{const r=await api('/ts/projects',{method:'POST',body:JSON.stringify({sector:'ENERGY',subsidiary:'ENERGY',name:'Demo SPV',equity_pct:0.3})});log('DEPLOY '+(r.spv_id||''));await refresh();}catch(e){log('DEPLOY '+e.message);}};
-$('t-assign').onclick=async()=>{try{const L=((await api('/seths/learners?limit=30')).learners||[]).filter(l=>/PLACED/i.test(String(l.status||'')));const spvs=await api('/ts/projects');const rows=Array.isArray(spvs)?spvs:[];if(!L.length)throw new Error('no PLACED');if(!rows.length)throw new Error('no SPV');await api('/ts/projects/'+encodeURIComponent(rows[0].spv_id)+'/assign-worker',{method:'POST',body:JSON.stringify({learner_ref:L[0].ref,role:'operator',monthly_wage:12000})});log('ASSIGN '+L[0].ref+' → '+rows[0].spv_id);await refresh();}catch(e){log('ASSIGN '+e.message);}};
-$('m-all').onclick=async()=>{try{const r=await api('/madiba/allocate',{method:'POST',body:JSON.stringify({month:8,total_inflow:50000})});log('ALLOC '+JSON.stringify(r).slice(0,120));await refresh();}catch(e){log('ALLOC '+e.message);}};
-$('m-eng').onclick=async()=>{try{const r=await api('/madiba/engage',{method:'POST',body:JSON.stringify({investor_name:'Divisions Demo Fund',investor_type:'INSTITUTIONAL',instrument:'blended'})});log('ENGAGE '+(r.ref||''));await refresh();}catch(e){log('ENGAGE '+e.message);}};
-$('u-batch').onclick=async()=>{try{const r=await api('/decisions/batch',{method:'POST',body:JSON.stringify({scenarios:['fair','biased']})});$('u-out').textContent=JSON.stringify(r,null,2).slice(0,2500);log('EVA batch ok');}catch(e){log('EVA '+e.message);}};
-$('u-ready').onclick=async()=>{try{const r=await fetch('/udoc/demo/ready').then(x=>x.json());$('u-out').textContent=JSON.stringify(r,null,2);log('demo/ready '+r.ready);}catch(e){log('ready '+e.message);}};
-$('run-loop').onclick=async()=>{
+$('login').onclick=async()=>{
   try{
-    log('LOOP 1/4 enrol…'); await api('/seths/enrol',{method:'POST',body:JSON.stringify({qualification:'Digital Operations & AI Literacy',count:1})});
-    const list=((await api('/seths/learners?limit=30')).learners||[]);
-    const cand=list.find(l=>!/PLACED|COMPLETE/i.test(String(l.status||'')))||list[0];
-    if(cand){log('LOOP 2/4 advance '+cand.ref); await api('/seths/'+encodeURIComponent(cand.ref)+'/advance?monthly_value=12000',{method:'POST'});}
-    let rows=Array.isArray(await api('/ts/projects'))?await api('/ts/projects'):[];
-    if(!rows.length){log('LOOP deploy SPV'); await api('/ts/projects',{method:'POST',body:JSON.stringify({sector:'ENERGY',subsidiary:'ENERGY',name:'Demo SPV',equity_pct:0.3})}); rows=await api('/ts/projects');}
-    const placed=((await api('/seths/learners?limit=30')).learners||[]).filter(l=>/PLACED/i.test(String(l.status||'')));
-    if(placed[0]&&rows[0]){log('LOOP 3/4 assign'); await api('/ts/projects/'+encodeURIComponent(rows[0].spv_id)+'/assign-worker',{method:'POST',body:JSON.stringify({learner_ref:placed[0].ref,role:'operator',monthly_wage:12000})});}
-    log('LOOP 4/4 allocate'); await api('/madiba/allocate',{method:'POST',body:JSON.stringify({month:8,total_inflow:50000})});
+    const f=new URLSearchParams({username:$('email').value.trim().toLowerCase(),password:$('pw').value});
+    const r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.detail||'login failed');
+    TOK=d.access_token||''; localStorage.setItem('gods_div_tok',TOK);
+    $('who').textContent=$('email').value.trim().toLowerCase().split('@')[0]+' · '+(d.role||'');
+    log('LOGIN ok'); await refresh();
+  }catch(e){log('LOGIN FAIL '+e.message); $('who').textContent=e.message;}
+};
+$('refresh').onclick=()=>refresh();
+
+async function enrol(){
+  try{
+    await api('/seths/enrol',{method:'POST',body:JSON.stringify({name:'Divisions Demo Learner '+Date.now().toString(36).slice(-4),qualification:'Digital Operations & AI Literacy'})});
+    log('ENROL ok'); await refresh();
+  }catch(e){
+    try{await api('/seths/enrol',{method:'POST',body:JSON.stringify({qualification:'Digital Operations & AI Literacy',count:1})}); log('ENROL ok'); await refresh();}
+    catch(e2){log('ENROL FAIL '+e2.message);}
+  }
+}
+async function advance(){
+  try{
+    const list=window.__learners||[];
+    const cand=list.find(l=>!/PLACED|COMPLETE/i.test(String(l.status||l.stage||'')))||list[0];
+    if(!cand) throw new Error('no learner');
+    const ref=cand.ref||cand.learner_ref||cand.id;
+    await api('/seths/'+encodeURIComponent(ref)+'/advance?monthly_value=12000',{method:'POST'});
+    log('ADVANCE '+ref); await refresh();
+  }catch(e){log('ADVANCE FAIL '+e.message);}
+}
+async function deploy(){
+  try{
+    const d=await api('/ts/projects',{method:'POST',body:JSON.stringify({sector:'ENERGY',subsidiary:'ENERGY',name:'Divisions Demo SPV',equity_pct:0.3})});
+    log('DEPLOY '+(d.spv_id||'')); await refresh();
+  }catch(e){log('DEPLOY FAIL '+e.message);}
+}
+async function assign(){
+  try{
+    const list=window.__learners||[];
+    const placed=list.filter(l=>/PLACED/i.test(String(l.status||l.stage||'')));
+    let rows=window.__projects||[];
+    if(!rows.length) rows=Array.isArray(await api('/ts/projects'))?await api('/ts/projects'):[];
+    if(!placed.length) throw new Error('no PLACED — advance first');
+    if(!rows.length) throw new Error('no SPV — deploy first');
+    const ref=placed[0].ref||placed[0].learner_ref;
+    await api('/ts/projects/'+encodeURIComponent(rows[0].spv_id)+'/assign-worker',{method:'POST',body:JSON.stringify({learner_ref:ref,role:'operator',monthly_wage:12000})});
+    log('ASSIGN '+ref+' → '+rows[0].spv_id); await refresh();
+  }catch(e){log('ASSIGN FAIL '+e.message);}
+}
+async function allocate(){
+  try{
+    await api('/madiba/allocate',{method:'POST',body:JSON.stringify({month:8,total_inflow:50000})});
+    log('ALLOC ok'); await refresh();
+  }catch(e){log('ALLOC FAIL '+e.message);}
+}
+async function engage(){
+  try{
+    const r=await api('/madiba/engage',{method:'POST',body:JSON.stringify({investor_name:'Divisions Demo Fund',investor_type:'INSTITUTIONAL',instrument:'blended'})});
+    log('ENGAGE '+(r.ref||'')); await refresh();
+  }catch(e){log('ENGAGE FAIL '+e.message);}
+}
+async function batch(){
+  try{
+    const r=await api('/decisions/batch',{method:'POST',body:JSON.stringify({scenarios:['fair','biased']})});
+    $('u-out').textContent=JSON.stringify(r,null,2).slice(0,2500);
+    log('EVA batch ok');
+  }catch(e){log('EVA FAIL '+e.message);}
+}
+async function loop(){
+  try{
+    log('LOOP 1/4 enrol…'); await enrol();
+    log('LOOP 2/4 advance…'); await advance();
+    log('LOOP deploy if needed…'); if(!(window.__projects||[]).length) await deploy();
+    log('LOOP 3/4 assign…'); await assign();
+    log('LOOP 4/4 allocate…'); await allocate();
     log('LOOP complete'); await refresh();
   }catch(e){log('LOOP FAIL '+e.message);}
-};
-(async()=>{if(TOK){$('who').textContent='token restored';try{await refresh();}catch(e){TOK='';localStorage.removeItem('gods_div_tok');$('who').textContent='preload expired';}} else {fetch('/udoc/demo/ready').then(r=>r.json()).then(j=>{$('k-demo').textContent=String(j.ready);$('ready').textContent=j.ready?'DEMO READY':'CHECK SEED';$('ready').className='tag '+(j.ready?'ok':'');}).catch(()=>{});}})();
+}
+['s-enrol','s-enrol-2'].forEach(id=>$(id).onclick=enrol);
+['s-adv','s-adv-2'].forEach(id=>$(id).onclick=advance);
+['t-deploy','t-deploy-2'].forEach(id=>$(id).onclick=deploy);
+['t-assign','t-assign-2'].forEach(id=>$(id).onclick=assign);
+['m-all','m-all-2'].forEach(id=>$(id).onclick=allocate);
+['m-eng','m-eng-2'].forEach(id=>$(id).onclick=engage);
+['u-batch','u-batch-2'].forEach(id=>$(id).onclick=batch);
+$('run-loop').onclick=loop; $('run-loop-2').onclick=loop;
+$('u-ready').onclick=async()=>{try{const r=await fetch('/udoc/demo/ready').then(x=>x.json());$('u-out').textContent=JSON.stringify(r,null,2);log('demo/ready '+r.ready);}catch(e){log('ready '+e.message);}};
+(async()=>{
+  if(TOK){$('who').textContent='token restored'; try{await refresh();}catch(e){TOK='';localStorage.removeItem('gods_div_tok');$('who').textContent='preload expired';}}
+  else {fetch('/udoc/demo/ready').then(r=>r.json()).then(j=>{$('k-demo').textContent=String(j.ready);$('ready').textContent=j.ready?'DEMO READY':'CHECK SEED';$('ready').className='tag '+(j.ready?'ok':'');}).catch(()=>{});}
+})();
 </script>
 </body>
 </html>
