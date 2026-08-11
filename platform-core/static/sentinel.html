@@ -1,6 +1,8 @@
-<!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>UDOC · EVA Command · Sentinel</title>
 <style>
 :root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--warn:#E8A13A}
@@ -10,109 +12,188 @@ header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;flex-w
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
 .tag.ok{border-color:var(--ok);color:#7fe3ab}
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
-.wrap{max-width:1100px;margin:0 auto;padding:16px 18px 48px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:12px 0}
-.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px}
-.card h3{margin:0 0 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.4rem;font-weight:700}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 18px 40px}
+.honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.35rem;font-weight:700}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
-.panel h3{margin:0 0 10px;color:var(--gold)}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
 .btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.btn:disabled{opacity:.45}
-.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:280px;overflow:auto}
-.banner{background:rgba(45,155,90,.1);border:1px solid rgba(45,155,90,.35);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px}
-.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-</style></head><body>
+.btn.cyan{background:var(--cyan);color:#041018}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:4px 10px;font-size:11px;cursor:pointer;margin:2px;background:transparent;color:var(--ink)}
+.chip:hover{border-color:var(--gold);color:var(--gold)}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:260px;overflow:auto}
+.mut{color:var(--mut)}.ok{color:#7fe3ab}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bars{display:grid;gap:6px;margin-top:8px}
+.bar-row{display:grid;grid-template-columns:90px 1fr 40px;gap:8px;align-items:center;font-size:11px}
+.bar-track{height:8px;background:#050b16;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));border-radius:4px}
+</style>
+</head>
+<body>
 <header>
-  <div class="brand">UDOC · <b>Sentinel</b> EVA Command</div>
-  <span class="tag" id="ready">checking…</span>
+  <span class="brand">UDOC · <b>Sentinel</b></span>
+  <span class="tag" id="ready-tag">—</span>
+  <span style="flex:1"></span>
+  <a class="nav" href="/admin">GODS Admin</a>
+  <a class="nav" href="/udoc-admin">UDOC Admin</a>
   <a class="nav" href="/divisions">Divisions</a>
-  <a class="nav" href="/seths">SETHS</a>
-  <a class="nav" href="/ts">TS</a>
-  <a class="nav" href="/madiba">MADIBA</a>
   <a class="nav" href="/gbs">GBS</a>
-  <a class="nav" href="/eif-ui">EIF</a>
   <a class="nav" href="/portals">Portals</a>
-  <a class="nav" href="/udoc-admin">Admin</a>
+  <a class="nav" href="/eif-ui">EIF</a>
 </header>
 <div class="wrap">
-  <div class="banner">Capstone smoke: health · demo/ready · fair ≠ BLOCK · biased = BLOCK · model-001 · POPIA+Fairness pack</div>
-  <div class="panel" id="div-ops" style="margin-top:12px">
-    <h3 style="margin:0 0 8px;color:var(--gold,#C9A84C);font-size:13px">Division operators</h3>
-    <div class="row" style="display:flex;flex-wrap:wrap;gap:8px">
-      <a class="btn" href="/seths" style="text-decoration:none">SETHS · human capability</a>
-      <a class="btn" href="/ts" style="text-decoration:none">TS · SPV absorb</a>
-      <a class="btn" href="/madiba" style="text-decoration:none">MADIBA · EIF ledger</a>
-      <a class="btn" href="/gbs" style="text-decoration:none">GBS freeze</a>
+  <div class="honest">Capstone honesty: Sentinel is the EVA command surface on Core · smoke gate = fair≠BLOCK and biased=BLOCK · model-001 + demo pack auto-heal on /udoc/demo/ready · not commercial SaaS scale</div>
+
+  <div class="panel">
+    <h3>Guided path · assessor smoke</h3>
+    <div class="row">
+      <button class="chip" onclick="refresh()">1 · Demo ready</button>
+      <button class="chip" onclick="evalOne('fair')">2 · Fair</button>
+      <button class="chip" onclick="evalOne('biased')">3 · Biased</button>
+      <button class="chip" onclick="smoke()">4 · Full smoke</button>
+      <button class="chip" onclick="batchAll()">5 · Full EVA matrix</button>
     </div>
+    <p class="mut" style="font-size:12px;margin:8px 0 0">Minimum pass: health + demo/ready + fair≠BLOCK + biased=BLOCK</p>
   </div>
 
   <div class="grid">
     <div class="card"><h3>Demo ready</h3><div class="metric" id="k-ready">—</div></div>
-    <div class="card"><h3>Model-001</h3><div class="metric" id="k-model">—</div></div>
-    <div class="card"><h3>Active rules</h3><div class="metric" id="k-rules">—</div></div>
-    <div class="card"><h3>Last fair</h3><div class="metric" id="k-fair">—</div></div>
-    <div class="card"><h3>Last biased</h3><div class="metric" id="k-bias">—</div></div>
-    <div class="card"><h3>Batch gate</h3><div class="metric" id="k-gate">—</div></div>
+    <div class="card"><h3>Fair</h3><div class="metric" id="k-fair">—</div></div>
+    <div class="card"><h3>Biased</h3><div class="metric" id="k-bias">—</div></div>
+    <div class="card"><h3>High-risk</h3><div class="metric" id="k-high">—</div></div>
+    <div class="card"><h3>Sovereignty</h3><div class="metric" id="k-sov">—</div></div>
+    <div class="card"><h3>Gate</h3><div class="metric" id="k-gate">—</div></div>
+    <div class="card"><h3>Models</h3><div class="metric" id="k-models">—</div></div>
+    <div class="card"><h3>Open cases</h3><div class="metric" id="k-cases">—</div></div>
   </div>
+
   <div class="panel">
-    <h3>Scenario chips · live evaluate</h3>
+    <h3>Command path</h3>
     <div class="row">
-      <button class="btn" data-sc="fair">Fair → expect ≠ BLOCK</button>
-      <button class="btn" data-sc="biased">Biased → expect BLOCK</button>
-      <button class="btn" data-sc="high">High-risk</button>
-      <button class="btn" data-sc="sov">Sovereignty</button>
-      <button class="btn" id="batch">Run Full EVA batch</button>
-      <button class="btn ghost" id="smoke">Smoke suite</button>
-      <button class="btn ghost" id="refresh">↻ Ready</button>
+      <button class="btn" onclick="refresh()">↻ Refresh</button>
+      <button class="btn cyan" onclick="smoke()">Run smoke suite</button>
+      <button class="btn" onclick="batchAll()">Full EVA matrix</button>
+      <button class="btn ghost" onclick="evalOne('fair')">Fair</button>
+      <button class="btn ghost" onclick="evalOne('biased')">Biased</button>
+      <button class="btn ghost" onclick="evalOne('high')">High-risk</button>
+      <button class="btn ghost" onclick="evalOne('sov')">Sovereignty</button>
     </div>
   </div>
+
   <div class="panel">
-    <h3>Terminal</h3>
-    <div class="term" id="log">Sentinel ready · public demo/ready · decisions/batch</div>
+    <h3>Scenario chips · single EVA</h3>
+    <div class="row">
+      <button class="chip" onclick="evalOne('fair')">Fair → expect APPROVE</button>
+      <button class="chip" onclick="evalOne('biased')">Biased → expect BLOCK</button>
+      <button class="chip" onclick="evalOne('high')">High-risk</button>
+      <button class="chip" onclick="evalOne('sov')">Sovereignty</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>6-D EVA bars · last result</h3>
+    <div class="bars" id="bars">
+      <div class="mut">Run an EVA to populate dimensions</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Policy / demo seed</h3>
+    <div id="policy" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Ops terminal</h3>
+    <div class="term" id="term">Sentinel · EVA Command · live Core probes</div>
   </div>
 </div>
 <script>
-const log=(m)=>{const el=document.getElementById('log');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
-async function jget(path){const r=await fetch(path);const t=await r.text();let j;try{j=JSON.parse(t);}catch{j={raw:t};} if(!r.ok) throw new Error((j&&(j.detail||j.message))||t.slice(0,160)||r.status); return j;}
-async function jpost(path,body){const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});const t=await r.text();let j;try{j=JSON.parse(t);}catch{j={raw:t};} if(!r.ok) throw new Error((j&&(j.detail||j.message))||t.slice(0,160)||r.status); return j;}
+const API=location.origin;
+const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+function setGate(){
+  const fair=document.getElementById('k-fair').textContent;
+  const bias=document.getElementById('k-bias').textContent;
+  const ok=(fair&&fair!=='—'&&fair!=='BLOCK')&&(bias==='BLOCK');
+  const g=document.getElementById('k-gate');
+  g.textContent=ok?'PASS':(fair==='—'?'—':'CHECK');
+  g.style.color=ok?'#7fe3ab':(fair==='—'?'': '#E8A13A');
+  return ok;
+}
+function renderBars(dims){
+  const el=document.getElementById('bars');
+  if(!dims||typeof dims!=='object'){el.innerHTML='<div class="mut">No dimension payload</div>';return;}
+  const keys=Object.keys(dims);
+  if(!keys.length){el.innerHTML='<div class="mut">No dimension payload</div>';return;}
+  el.innerHTML=keys.map(k=>{
+    let v=Number(dims[k]);
+    if(!isFinite(v)) v=0;
+    let pct=v;
+    if(v<=1) pct=v*100;
+    else if(v<=10) pct=v*10;
+    pct=Math.max(0,Math.min(100,pct));
+    return '<div class="bar-row"><span>'+esc(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div><span>'+esc(String(dims[k]))+'</span></div>';
+  }).join('');
+}
 async function refresh(){
   try{
-    const d=await jget('/udoc/demo/ready');
-    document.getElementById('k-ready').textContent=String(d.ready);
-    document.getElementById('k-model').textContent=d.model_001?(d.model_001.status||'—'):'missing';
-    document.getElementById('k-rules').textContent=d.active_rules??'—';
-    const el=document.getElementById('ready');
-    el.textContent=d.ready?'DEMO READY':'NOT READY';
-    el.className='tag '+(d.ready?'ok':'');
-    if(d.healed&&d.healed.length) log('HEALED '+d.healed.join('; '));
-    log('READY '+JSON.stringify({ready:d.ready,rules:d.active_rules,missing:d.missing}));
-  }catch(e){log('READY FAIL '+e.message); document.getElementById('ready').textContent='ERROR';}
+    const [ready, status, health]=await Promise.all([
+      fetch(API+'/udoc/demo/ready').then(r=>r.json()),
+      fetch(API+'/admin/status').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/health').then(r=>r.json()).catch(()=>({})),
+    ]);
+    document.getElementById('k-ready').textContent=String(ready.ready);
+    document.getElementById('ready-tag').textContent=ready.ready?'DEMO READY':'CHECK SEED';
+    document.getElementById('ready-tag').className='tag '+(ready.ready?'ok':'');
+    document.getElementById('k-models').textContent=status.models??'—';
+    document.getElementById('k-cases').textContent=status.open_oversight??'—';
+    const rules=(ready.active_rules||ready.rules||[]).length||ready.rule_count||ready.active_rules||'—';
+    document.getElementById('policy').innerHTML=
+      'ready=<b>'+esc(String(ready.ready))+'</b> · model=<b>'+esc(ready.model_id||ready.model||'model-001')+'</b> · pack=<b>'+esc(ready.pack||ready.policy_pack||'demo')+'</b> · rules='+esc(String(rules))+
+      '<br/><span class="mut">health='+esc(health.status||health.service||JSON.stringify(health).slice(0,80))+'</span>';
+    log('READY '+JSON.stringify({ready:ready.ready,model:ready.model_id||ready.model,rules}).slice(0,160));
+  }catch(e){log('READY FAIL '+e.message);}
 }
-async function evalOne(sc){
+async function evalOne(scenario){
   try{
-    const r=await jpost('/decisions/batch',{scenarios:[sc]});
-    const item=(r.results&&r.results[0])||r.items&&r.items[0]||r;
-    const outcome=item.outcome||item.decision||item.result||JSON.stringify(item).slice(0,80);
-    if(sc==='fair') document.getElementById('k-fair').textContent=outcome;
-    if(sc==='biased') document.getElementById('k-bias').textContent=outcome;
-    log('EVA '+sc+' → '+outcome);
-    return outcome;
-  }catch(e){log('EVA '+sc+' FAIL '+e.message); throw e;}
+    log('EVA '+scenario+'…');
+    let r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:[scenario]})});
+    let j=await r.json().catch(()=>({}));
+    if(!r.ok){
+      r=await fetch(API+'/decisions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenario,model_id:'model-001'})});
+      j=await r.json().catch(()=>({}));
+    }
+    const items=j.results||j.items||(Array.isArray(j)?j:[j]);
+    const x=items[0]||j;
+    const outcome=x.outcome||x.decision||x.result||'—';
+    const map={fair:'k-fair',biased:'k-bias',high:'k-high',sov:'k-sov'};
+    if(map[scenario]) document.getElementById(map[scenario]).textContent=outcome;
+    const dims=x.dimensions||x.scores||x.eva||x.metrics||null;
+    if(dims) renderBars(dims);
+    setGate();
+    log('EVA '+scenario+' → '+outcome+' '+JSON.stringify(x).slice(0,140));
+  }catch(e){log('EVA FAIL '+scenario+' '+e.message);}
 }
-async function batch(){
+async function batchAll(){
   try{
-    const r=await jpost('/decisions/batch',{scenarios:['fair','biased','high','sov']});
-    log('BATCH '+JSON.stringify(r).slice(0,1200));
-    const results=r.results||r.items||[];
+    log('BATCH fair|biased|high|sov…');
+    const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased','high','sov']})});
+    const j=await r.json();
+    const items=j.results||j.items||[];
     const map={};
-    results.forEach(x=>{const k=x.scenario||x.name||''; map[k]=(x.outcome||x.decision||'');});
+    items.forEach(x=>{map[x.scenario||x.name]=(x.outcome||x.decision||'');});
     if(map.fair) document.getElementById('k-fair').textContent=map.fair;
     if(map.biased) document.getElementById('k-bias').textContent=map.biased;
-    const gate=(map.fair&&map.fair!=='BLOCK')&&(map.biased==='BLOCK');
-    document.getElementById('k-gate').textContent=gate?'PASS':'CHECK';
-    log('GATE fair≠BLOCK & biased=BLOCK → '+(gate?'PASS':'CHECK'));
+    if(map.high) document.getElementById('k-high').textContent=map.high;
+    if(map.sov) document.getElementById('k-sov').textContent=map.sov;
+    const last=items[items.length-1]||{};
+    if(last.dimensions||last.scores) renderBars(last.dimensions||last.scores);
+    const gate=setGate();
+    log('BATCH gate='+(gate?'PASS':'CHECK')+' '+JSON.stringify(map));
   }catch(e){log('BATCH FAIL '+e.message);}
 }
 async function smoke(){
@@ -120,16 +201,10 @@ async function smoke(){
   await refresh();
   await evalOne('fair');
   await evalOne('biased');
-  const fair=document.getElementById('k-fair').textContent;
-  const bias=document.getElementById('k-bias').textContent;
-  const ok=(fair&&fair!=='BLOCK')&&(bias==='BLOCK');
-  document.getElementById('k-gate').textContent=ok?'PASS':'FAIL';
-  log('SMOKE '+(ok?'PASS':'FAIL')+' fair='+fair+' biased='+bias);
+  const ok=setGate();
+  log('SMOKE '+(ok?'PASS':'FAIL')+' · fair='+document.getElementById('k-fair').textContent+' biased='+document.getElementById('k-bias').textContent);
 }
-document.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>evalOne(b.dataset.sc));
-document.getElementById('batch').onclick=batch;
-document.getElementById('smoke').onclick=smoke;
-document.getElementById('refresh').onclick=refresh;
 refresh();
 </script>
-</body></html>
+</body>
+</html>
