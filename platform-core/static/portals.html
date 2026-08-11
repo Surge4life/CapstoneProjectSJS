@@ -1,24 +1,222 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"/><title>G.O.D.S · Portals</title>
-<style>body{margin:0;background:#060E1C;color:#8fa0bd;font:14px system-ui;padding:24px}</style></head>
-<body><p id="m">Loading portals…</p>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>G.O.D.S · 24 Portals</title>
+<style>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin:12px 0}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer}
+.card:hover{border-color:var(--cyan)}.card h3{margin:0 0 4px;font-size:13px;color:var(--gold)}
+.card p{margin:0;font-size:11px;color:var(--mut)}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.btn{background:var(--gold);color:#0a1220;border:0;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+input,textarea,select{width:100%;background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:8px;margin:4px 0}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:220px;overflow:auto}
+.mut{color:var(--mut)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.login{max-width:360px;margin:20px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:16px}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">G.O.D.S · <b>24 Portals</b></span>
+  <span class="mut" id="who">offline</span>
+  <span style="flex:1"></span>
+  <a class="nav" href="/admin">GODS Admin</a>
+  <a class="nav" href="/udoc-admin">UDOC Admin</a>
+  <a class="nav" href="/divisions">Divisions</a>
+  <a class="nav" href="/Sentinel">Sentinel</a>
+  <a class="nav" href="/gbs">GBS</a>
+</header>
+<div class="wrap">
+  <div class="honest">Capstone honesty: 24 Sovereign-Operator portals on Core · control actions need staff login · CITIZEN is public AI-rights UI · capital not_deployed</div>
+  <div class="login" id="login">
+    <h3 style="margin:0 0 8px;color:var(--gold)">Operator login</h3>
+    <input id="email" value="admin@gods.local"/>
+    <input id="pass" type="password" value="admin123"/>
+    <div class="row"><button class="btn" onclick="doLogin()">Connect</button>
+      <button class="btn ghost" onclick="fill('seths@gods.local')">seths@</button>
+      <button class="btn ghost" onclick="fill('ts@gods.local')">ts@</button>
+    </div>
+    <p class="mut" id="li-err" style="color:#E85D5D"></p>
+  </div>
+  <div id="ops" style="display:none">
+    <div class="row">
+      <input id="q" placeholder="Search portals…" oninput="render()" style="max-width:240px"/>
+      <button class="btn ghost" onclick="refresh()">↻ Refresh</button>
+      <button class="btn ghost" onclick="logout()">Logout</button>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="panel" id="workspace" style="display:none">
+      <h3 id="ws-title">Portal</h3>
+      <p class="mut" id="ws-sub"></p>
+      <div class="row">
+        <select id="ctrl"></select>
+        <input id="target" placeholder="target / case ref" style="max-width:200px"/>
+      </div>
+      <textarea id="note" rows="2" placeholder="note"></textarea>
+      <div class="row">
+        <button class="btn" onclick="runControl()">Run control</button>
+        <button class="btn ghost" onclick="runBatch()">Run 4 controls</button>
+        <button class="btn ghost" onclick="closeWs()">Close</button>
+      </div>
+      <div id="live" class="mut" style="margin-top:8px"></div>
+      <div class="term" id="term">Portals · live</div>
+    </div>
+    <div class="panel" id="citizen-panel">
+      <h3>CITIZEN · AI Rights</h3>
+      <p class="mut">Public challenge path also on Client host /citizen.html · Core POST /citizen/challenge</p>
+      <input id="c-name" placeholder="Your name"/>
+      <input id="c-model" placeholder="Model / system id" value="model-001"/>
+      <textarea id="c-reason" rows="2" placeholder="Why are you challenging this decision?"></textarea>
+      <button class="btn" onclick="citizenChallenge()">Submit challenge</button>
+      <div class="term" id="c-term">Citizen</div>
+    </div>
+  </div>
+</div>
 <script>
-(async function(){
-  const base="https://raw.githubusercontent.com/Surge4life/CapstoneProjectSJS/main/platform-core/static/";
+const API=location.origin;
+let TOK='', PORTALS=[];
+const DEFAULT_CTRL=['HITL_REVIEW','REGULATOR_NOTICE','AUDIT_EXPORT','POLICY_CHECK','ESCALATE_COB'];
+const CATALOG=[
+  ['CITIZEN','AI Rights / public challenge'],
+  ['COB','Conduct of Business'],
+  ['REGULATOR','Regulator case room'],
+  ['SAHRC','SAHRC human rights'],
+  ['INFOREG','Information Regulator'],
+  ['SARS','SARS interface'],
+  ['WELFARE','Welfare oversight'],
+  ['HEALTH','Health sector'],
+  ['JUSTICE','Justice'],
+  ['NPA','NPA'],
+  ['DHA','Home Affairs'],
+  ['BORDER','Border management'],
+  ['SETHS','SETHS division link'],
+  ['TS','TS Industries link'],
+  ['MADIBA','MADIBA capital link'],
+  ['UDOC','UDOC controller'],
+  ['AI_OWNER','AI system owner'],
+  ['AUDITOR','Auditor'],
+  ['CASE_MANAGER','Case manager'],
+  ['PRIVATE_COMPLIANCE','Private compliance'],
+  ['EMPLOYER','Employer portal'],
+  ['EMPLOYEE','Employee portal'],
+  ['STUDENT','Student portal'],
+  ['OPS','Operations']
+];
+const log=(id,m)=>{const el=document.getElementById(id);el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+function fill(e){document.getElementById('email').value=e;}
+async function j(path,opts={}){
+  const h=Object.assign({'Content-Type':'application/json'},opts.headers||{});
+  if(TOK) h.Authorization='Bearer '+TOK;
+  const r=await fetch(API+path,Object.assign({},opts,{headers:h}));
+  const ct=r.headers.get('content-type')||'';
+  const body=ct.includes('json')?await r.json().catch(()=>null):await r.text();
+  if(!r.ok) throw new Error((body&&body.detail)||('HTTP '+r.status));
+  return body;
+}
+async function doLogin(){
+  document.getElementById('li-err').textContent='';
   try{
-    const chunks=[];
-    for(let i=0;i<4;i++){
-      const r=await fetch(base+"portals_payload_"+i+".b64?v=20260807b",{cache:"no-store"});
-      if(!r.ok) throw new Error("part "+i);
-      chunks.push((await r.text()).trim());
+    const f=new URLSearchParams({username:document.getElementById('email').value.trim().toLowerCase(),password:document.getElementById('pass').value});
+    const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f});
+    if(!r.ok) throw new Error('login failed');
+    const d=await r.json(); TOK=d.access_token||'';
+    sessionStorage.setItem('portals_tok',TOK);
+    document.getElementById('login').style.display='none';
+    document.getElementById('ops').style.display='block';
+    document.getElementById('who').textContent=document.getElementById('email').value.split('@')[0]+' · '+(d.role||'');
+    await refresh();
+  }catch(e){document.getElementById('li-err').textContent=e.message;}
+}
+function logout(){TOK='';sessionStorage.removeItem('portals_tok');location.reload();}
+async function refresh(){
+  try{
+    const cat=await j('/portal/catalog').catch(()=>null);
+    if(cat&&(cat.portals||cat.length)){
+      PORTALS=Array.isArray(cat)?cat:(cat.portals||[]);
+    } else {
+      PORTALS=CATALOG.map(([k,d])=>({key:k,description:d}));
     }
-    const b64=chunks.join("");
-    const bin=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
-    const stream=new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"));
-    const html=await new Response(stream).text();
-    document.open();document.write(html);document.close();
-  }catch(e){
-    document.getElementById("m").innerHTML="Portals payload missing · <a style=color:#00C2D4 href=/divisions>Divisions</a> · "+e.message;
+    render();
+    log('term','REFRESH · '+PORTALS.length+' portals');
+  }catch(e){log('term','REFRESH '+e.message); PORTALS=CATALOG.map(([k,d])=>({key:k,description:d})); render();}
+}
+function render(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const list=PORTALS.filter(p=>{
+    const k=(p.key||p.id||'').toLowerCase();
+    const d=(p.description||p.name||'').toLowerCase();
+    return !q||k.includes(q)||d.includes(q);
+  });
+  document.getElementById('grid').innerHTML=list.map(p=>{
+    const k=p.key||p.id;
+    return '<div class="card" onclick="openPortal(\''+esc(k)+'\')"><h3>'+esc(k)+'</h3><p>'+esc(p.description||p.name||'Sovereign-Operator')+'</p></div>';
+  }).join('');
+}
+async function openPortal(key){
+  if(key==='CITIZEN'){
+    document.getElementById('citizen-panel').scrollIntoView({behavior:'smooth'});
+    return;
   }
+  if(key==='SETHS'){location.href='/seths';return;}
+  if(key==='TS'){location.href='/ts';return;}
+  if(key==='MADIBA'){location.href='/madiba';return;}
+  if(key==='UDOC'){location.href='/udoc-admin';return;}
+  document.getElementById('workspace').style.display='block';
+  document.getElementById('ws-title').textContent=key;
+  document.getElementById('ws-sub').textContent='Control workspace · live Core /portal/'+key;
+  const sel=document.getElementById('ctrl');
+  sel.innerHTML=DEFAULT_CTRL.map(c=>'<option>'+c+'</option>').join('');
+  try{
+    const info=await j('/portal/'+encodeURIComponent(key));
+    const live=info.live||info;
+    document.getElementById('live').innerHTML='<pre style="white-space:pre-wrap;font-size:11px">'+esc(JSON.stringify(live,null,2).slice(0,1200))+'</pre>';
+  }catch(e){document.getElementById('live').textContent=e.message;}
+  window.__portal=key;
+}
+function closeWs(){document.getElementById('workspace').style.display='none';}
+async function runControl(){
+  const key=window.__portal; if(!key) return;
+  const control=document.getElementById('ctrl').value;
+  const target=document.getElementById('target').value;
+  const note=document.getElementById('note').value;
+  try{
+    const r=await j('/portal/'+encodeURIComponent(key)+'/control',{method:'POST',body:JSON.stringify({control,target,note})});
+    log('term',key+' · '+control+' · '+JSON.stringify(r).slice(0,160));
+    await openPortal(key);
+  }catch(e){log('term','CTRL FAIL '+e.message);}
+}
+async function runBatch(){
+  const key=window.__portal; if(!key) return;
+  for(const control of DEFAULT_CTRL.slice(0,4)){
+    document.getElementById('ctrl').value=control;
+    await runControl();
+  }
+}
+async function citizenChallenge(){
+  try{
+    const body={name:document.getElementById('c-name').value||'Citizen',model_id:document.getElementById('c-model').value||'model-001',reason:document.getElementById('c-reason').value||'Challenge'};
+    const r=await fetch(API+'/citizen/challenge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.detail||r.status);
+    log('c-term','CHALLENGE '+(j.case_ref||JSON.stringify(j).slice(0,120)));
+  }catch(e){log('c-term','FAIL '+e.message);}
+}
+(function(){
+  const t=sessionStorage.getItem('portals_tok');
+  if(t){TOK=t;document.getElementById('login').style.display='none';document.getElementById('ops').style.display='block';refresh();}
+  else {document.getElementById('ops').style.display='block'; PORTALS=CATALOG.map(([k,d])=>({key:k,description:d})); render();}
 })();
-</script></body></html>
+</script>
+</body>
+</html>
