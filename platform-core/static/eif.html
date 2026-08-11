@@ -48,10 +48,30 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;b
     <a href="/madiba">MADIBA</a>
     <a href="/Sentinel">Sentinel</a>
     <a href="/portals">Portals</a>
+    <a href="/admin">GODS Admin</a>
   </nav>
 </header>
 <main>
   <div class="banner">Recognition plane (MADIBA): EIF Diamond is the individual-side parallel to GBS-UDOC <b>Sovereign-Verified</b> (systems). Nomination logs to sealed audit only — no funding, no Diamond grant on free-tier Capstone. Staff: <code>madiba@gods.local</code> · <code>staff123</code></div>
+
+  <div class="panel">
+    <h3>Guided path · EIF assurance</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">
+      <button type="button" class="chip" onclick="load()">1 · Load framework</button>
+      <button type="button" class="chip" onclick="document.getElementById('nominee').value='Capstone Demo Nominee';document.getElementById('rationale').value='Audit-only Capstone nomination · no capital';">2 · Fill demo</button>
+      <button type="button" class="chip" onclick="nominate()">3 · Nominate (audit)</button>
+      <a class="chip" href="/madiba" style="text-decoration:none">4 · MADIBA →</a>
+      <a class="chip" href="/gbs" style="text-decoration:none">5 · GBS freeze →</a>
+      <a class="chip" href="/Sentinel" style="text-decoration:none">Sentinel EVA →</a>
+    </div>
+    <p class="mut" style="font-size:12px;margin:6px 0 0">Staff: madiba@gods.local / staff123 · nomination seals audit only</p>
+  </div>
+
+  <div class="grid" style="margin-bottom:12px">
+    <div class="panel" style="margin:0"><h3>Domains</h3><div id="k-domains" style="font-size:1.4rem;font-weight:700">—</div></div>
+    <div class="panel" style="margin:0"><h3>Tiers</h3><div id="k-tiers" style="font-size:1.4rem;font-weight:700">—</div></div>
+    <div class="panel" style="margin:0"><h3>Auth</h3><div id="k-auth" style="font-size:1.1rem;font-weight:700">—</div></div>
+  </div>
 
   <div class="panel login">
     <div><label>Email</label><input id="email" value="madiba@gods.local"/></div>
@@ -107,7 +127,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{padding:6px 4px;b
 const API=location.origin;
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
 function tok(){return localStorage.getItem('udoc_eif_tok')||localStorage.getItem('udoc_sent_tok')||'';}
-function setAuth(ok){document.getElementById('authTag').textContent=ok?'auth OK':'auth —';document.getElementById('authTag').className='tag '+(ok?'ok':'');}
+function setAuth(ok){document.getElementById('authTag').textContent=ok?'auth OK':'auth —';document.getElementById('authTag').className='tag '+(ok?'ok':''); const ka=document.getElementById('k-auth'); if(ka) ka.textContent=ok?'OK':'—';}
 async function api(path,opts={}){
   const h=Object.assign({'Content-Type':'application/json'},opts.headers||{});
   const t=tok(); if(t) h.Authorization='Bearer '+t;
@@ -158,6 +178,9 @@ async function load(){
       '<div class="kv"><span>Designed</span><span class="mut">'+esc(hon.designed||'—')+'</span></div>'+
       '<div class="kv"><span>Aspirational</span><span class="warn">'+esc(hon.aspirational||'—')+'</span></div>';
     const domains=fw.domains||[];
+    const kd=document.getElementById('k-domains'); if(kd) kd.textContent=domains.length;
+    const tiers=fw.passport_tiers||fw.tiers||[];
+    const kt=document.getElementById('k-tiers'); if(kt) kt.textContent=tiers.length;
     document.getElementById('domains').innerHTML=domains.map(d=>
       '<div style="margin-bottom:10px"><b>'+esc(d.label)+'</b> <span class="mut">('+esc(d.id)+')</span><div class="mut" style="font-size:12px">'+esc(d.examples||'')+'</div></div>'
     ).join('')||'<span class="bad">'+esc(fw.error||'no domains')+'</span>';
@@ -165,9 +188,8 @@ async function load(){
       '<span class="chip'+(i===0?' on':'')+'" onclick="pickDom(\''+d.id+'\',this)">'+esc(d.label)+'</span>'
     ).join('');
     if(domains[0]) document.getElementById('dom').value=domains[0].id;
-    const tiers=fw.passport_tiers||fw.tiers||[];
     document.getElementById('tiers').innerHTML='<table><tr><th>Tier</th><th>Recognises</th></tr>'+
-      tiers.map(t=>'<tr><td><b>'+esc(t.tier)+'</b></td><td class="mut">'+esc(t.recognises)+'</td></tr>').join('')+'</table>';
+      tiers.map(t=>'<tr><td><b>'+esc(t.tier||t.id||t.name||'')+'</b></td><td class="mut">'+esc(t.recognises||t.label||'')+'</td></tr>').join('')+'</table>';
   }catch(e){
     document.getElementById('term').textContent='Load error: '+e.message;
   }
