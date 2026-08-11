@@ -63,7 +63,7 @@ th{color:var(--mut);font-weight:600}
   </div>
   <div id="ops" style="display:none">
     <div class="honest">Capstone honesty: MADIBA metrics are a <b>demonstration ledger</b> on Neon · not AUM or bank capital · capital not_deployed · recycle ratio is ledger math</div>
-    <div class="banner"><b>MADIBA recognises</b> capital architecture and EIF assurance. Allocate writes CapitalCycle rows only. Parallel: individuals → EIF Diamond · systems → Sovereign-Verified.</div>
+    <div class="banner"><b>Recycle path:</b> allocate cycle → recycle ratio feeds SETHS narrative · engage pipeline is investor process demo · capital not_deployed.<br/><b>MADIBA recognises</b> capital architecture and EIF assurance. Allocate writes CapitalCycle rows only. Parallel: individuals → EIF Diamond · systems → Sovereign-Verified.</div>
 
     <div class="panel">
       <h3>Guided path · MADIBA capital cycle</h3>
@@ -123,6 +123,18 @@ th{color:var(--mut);font-weight:600}
     <div class="panel">
       <h3>Series-A status</h3>
       <div id="seriesa" class="mut">—</div>
+    </div>
+
+    <div class="panel">
+      <h3>Milestones · ledger markers</h3>
+      <p class="mut" style="font-size:12px;margin:0 0 8px">POST /madiba/milestones/{key} — audit markers only · not cash events</p>
+      <div class="row">
+        <input id="ms-key" value="recycle_to_seths" style="flex:1;min-width:140px"/>
+        <button class="btn" onclick="postMilestone()">Record milestone</button>
+        <button class="btn ghost" onclick="postMilestoneKey('series_a_design')">series_a_design</button>
+        <button class="btn ghost" onclick="postMilestoneKey('eif_parallel')">eif_parallel</button>
+      </div>
+      <div id="milestones" class="mut" style="margin-top:8px">—</div>
     </div>
 
     <div class="panel">
@@ -226,6 +238,15 @@ async function advanceFirst(){
   const eng=window.__eng||[];
   if(!eng.length){log('ADVANCE skip · no engagements');return;}
   await advanceOne(eng[0].ref);
+}
+async function postMilestoneKey(k){document.getElementById('ms-key').value=k; await postMilestone();}
+async function postMilestone(){
+  try{
+    const key=document.getElementById('ms-key').value.trim()||'recycle_to_seths';
+    const r=await j('/madiba/milestones/'+encodeURIComponent(key),{method:'POST',body:JSON.stringify({note:'Capstone demo milestone'})});
+    document.getElementById('milestones').textContent=JSON.stringify(r).slice(0,240);
+    log('MILESTONE '+key+' '+JSON.stringify(r).slice(0,120));
+  }catch(e){log('MILESTONE FAIL '+e.message); document.getElementById('milestones').textContent=e.message;}
 }
 (function(){
   const t=localStorage.getItem('madiba_tok');
