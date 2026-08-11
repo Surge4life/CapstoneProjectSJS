@@ -14,23 +14,27 @@ header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;flex-w
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
 .wrap{max-width:1100px;margin:0 auto;padding:16px 18px 40px}
 .honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
 .card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.35rem;font-weight:700}
+.metric{font-size:1.3rem;font-weight:700}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
 .panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
 .btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .btn.cyan{background:var(--cyan);color:#041018}
-.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:4px 10px;font-size:11px;cursor:pointer;margin:2px;background:transparent;color:var(--ink)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:4px 10px;font-size:11px;cursor:pointer;margin:2px;background:transparent;color:var(--ink);text-decoration:none}
 .chip:hover{border-color:var(--gold);color:var(--gold)}
-.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:260px;overflow:auto}
+.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:240px;overflow:auto}
 .mut{color:var(--mut)}.ok{color:#7fe3ab}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .bars{display:grid;gap:6px;margin-top:8px}
 .bar-row{display:grid;grid-template-columns:90px 1fr 40px;gap:8px;align-items:center;font-size:11px}
 .bar-track{height:8px;background:#050b16;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
 .bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));border-radius:4px}
+input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 10px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mut)}
 </style>
 </head>
 <body>
@@ -46,7 +50,7 @@ a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgb
   <a class="nav" href="/eif-ui">EIF</a>
 </header>
 <div class="wrap">
-  <div class="honest">Capstone honesty: Sentinel is the EVA command surface on Core · smoke gate = fair≠BLOCK and biased=BLOCK · model-001 + demo pack auto-heal on /udoc/demo/ready · not commercial SaaS scale</div>
+  <div class="honest">Capstone honesty: Sentinel is the EVA command surface on Core · smoke gate = fair≠BLOCK and biased=BLOCK · model-001 + demo pack auto-heal · not commercial SaaS scale</div>
 
   <div class="panel">
     <h3>Guided path · assessor smoke</h3>
@@ -56,6 +60,7 @@ a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgb
       <button class="chip" onclick="evalOne('biased')">3 · Biased</button>
       <button class="chip" onclick="smoke()">4 · Full smoke</button>
       <button class="chip" onclick="batchAll()">5 · Full EVA matrix</button>
+      <button class="chip" onclick="staffLoad()">6 · Policy + decisions (staff)</button>
     </div>
     <p class="mut" style="font-size:12px;margin:8px 0 0">Minimum pass: health + demo/ready + fair≠BLOCK + biased=BLOCK</p>
   </div>
@@ -67,8 +72,8 @@ a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgb
     <div class="card"><h3>High-risk</h3><div class="metric" id="k-high">—</div></div>
     <div class="card"><h3>Sovereignty</h3><div class="metric" id="k-sov">—</div></div>
     <div class="card"><h3>Gate</h3><div class="metric" id="k-gate">—</div></div>
+    <div class="card"><h3>Decisions</h3><div class="metric" id="k-dec">—</div></div>
     <div class="card"><h3>Models</h3><div class="metric" id="k-models">—</div></div>
-    <div class="card"><h3>Open cases</h3><div class="metric" id="k-cases">—</div></div>
   </div>
 
   <div class="panel">
@@ -96,9 +101,7 @@ a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgb
 
   <div class="panel">
     <h3>6-D EVA bars · last result</h3>
-    <div class="bars" id="bars">
-      <div class="mut">Run an EVA to populate dimensions</div>
-    </div>
+    <div class="bars" id="bars"><div class="mut">Run an EVA to populate dimensions</div></div>
   </div>
 
   <div class="panel">
@@ -107,12 +110,36 @@ a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgb
   </div>
 
   <div class="panel">
+    <h3>Staff connect · policy pack + recent decisions</h3>
+    <div class="row" style="margin-bottom:8px">
+      <input id="email" value="admin@gods.local" style="min-width:180px"/>
+      <input id="pw" type="password" value="admin123" style="width:110px"/>
+      <button class="btn ghost" onclick="staffLogin()">Sign in</button>
+      <button class="btn ghost" onclick="staffLoad()">Load staff panels</button>
+      <span class="mut" id="who">public mode</span>
+    </div>
+    <div id="pack" class="mut">—</div>
+    <div id="recent" style="margin-top:10px">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Division operators</h3>
+    <div class="row">
+      <a class="chip" href="/seths">SETHS</a>
+      <a class="chip" href="/ts">TS</a>
+      <a class="chip" href="/madiba">MADIBA</a>
+      <a class="chip" href="/gbs">GBS freeze</a>
+      <a class="chip" href="/divisions">Full loop</a>
+    </div>
+  </div>
+
+  <div class="panel">
     <h3>Ops terminal</h3>
     <div class="term" id="term">Sentinel · EVA Command · live Core probes</div>
   </div>
 </div>
 <script>
-const API=location.origin;
+const API=location.origin; let TOK=localStorage.getItem('sent_tok')||'';
 const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
 function setGate(){
@@ -121,7 +148,7 @@ function setGate(){
   const ok=(fair&&fair!=='—'&&fair!=='BLOCK')&&(bias==='BLOCK');
   const g=document.getElementById('k-gate');
   g.textContent=ok?'PASS':(fair==='—'?'—':'CHECK');
-  g.style.color=ok?'#7fe3ab':(fair==='—'?'': '#E8A13A');
+  g.style.color=ok?'#7fe3ab':(fair==='—'?'':'#E8A13A');
   return ok;
 }
 function renderBars(dims){
@@ -130,32 +157,27 @@ function renderBars(dims){
   const keys=Object.keys(dims);
   if(!keys.length){el.innerHTML='<div class="mut">No dimension payload</div>';return;}
   el.innerHTML=keys.map(k=>{
-    let v=Number(dims[k]);
-    if(!isFinite(v)) v=0;
-    let pct=v;
-    if(v<=1) pct=v*100;
-    else if(v<=10) pct=v*10;
+    let v=Number(dims[k]); if(!isFinite(v)) v=0;
+    let pct=v; if(v<=1) pct=v*100; else if(v<=10) pct=v*10;
     pct=Math.max(0,Math.min(100,pct));
     return '<div class="bar-row"><span>'+esc(k)+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div><span>'+esc(String(dims[k]))+'</span></div>';
   }).join('');
 }
 async function refresh(){
   try{
-    const [ready, status, health]=await Promise.all([
+    const [ready, health]=await Promise.all([
       fetch(API+'/udoc/demo/ready').then(r=>r.json()),
-      fetch(API+'/admin/status').then(r=>r.ok?r.json():{}).catch(()=>({})),
       fetch(API+'/health').then(r=>r.json()).catch(()=>({})),
     ]);
     document.getElementById('k-ready').textContent=String(ready.ready);
     document.getElementById('ready-tag').textContent=ready.ready?'DEMO READY':'CHECK SEED';
     document.getElementById('ready-tag').className='tag '+(ready.ready?'ok':'');
-    document.getElementById('k-models').textContent=status.models??'—';
-    document.getElementById('k-cases').textContent=status.open_oversight??'—';
-    const rules=(ready.active_rules||ready.rules||[]).length||ready.rule_count||ready.active_rules||'—';
+    const rules=ready.active_rules??ready.rule_count??'—';
     document.getElementById('policy').innerHTML=
-      'ready=<b>'+esc(String(ready.ready))+'</b> · model=<b>'+esc(ready.model_id||ready.model||'model-001')+'</b> · pack=<b>'+esc(ready.pack||ready.policy_pack||'demo')+'</b> · rules='+esc(String(rules))+
+      'ready=<b>'+esc(String(ready.ready))+'</b> · model=<b>'+esc(ready.model_id||(ready.model_001&&ready.model_001.status)||'model-001')+'</b> · pack=<b>'+esc((ready.demo_pack&&ready.demo_pack.name)||ready.pack||'demo')+'</b> · rules='+esc(String(rules))+
       '<br/><span class="mut">health='+esc(health.status||health.service||JSON.stringify(health).slice(0,80))+'</span>';
-    log('READY '+JSON.stringify({ready:ready.ready,model:ready.model_id||ready.model,rules}).slice(0,160));
+    log('READY '+JSON.stringify({ready:ready.ready,rules}).slice(0,160));
+    if(TOK) await staffLoad();
   }catch(e){log('READY FAIL '+e.message);}
 }
 async function evalOne(scenario){
@@ -175,7 +197,7 @@ async function evalOne(scenario){
     const dims=x.dimensions||x.scores||x.eva||x.metrics||null;
     if(dims) renderBars(dims);
     setGate();
-    log('EVA '+scenario+' → '+outcome+' '+JSON.stringify(x).slice(0,140));
+    log('EVA '+scenario+' → '+outcome+' '+JSON.stringify(x).slice(0,120));
   }catch(e){log('EVA FAIL '+scenario+' '+e.message);}
 }
 async function batchAll(){
@@ -204,6 +226,43 @@ async function smoke(){
   const ok=setGate();
   log('SMOKE '+(ok?'PASS':'FAIL')+' · fair='+document.getElementById('k-fair').textContent+' biased='+document.getElementById('k-bias').textContent);
 }
+async function staffLogin(){
+  try{
+    const f=new URLSearchParams({username:document.getElementById('email').value.trim().toLowerCase(),password:document.getElementById('pw').value});
+    const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f});
+    if(!r.ok) throw new Error('login failed');
+    const d=await r.json(); TOK=d.access_token||'';
+    localStorage.setItem('sent_tok',TOK);
+    document.getElementById('who').textContent='staff · '+(d.role||'ok');
+    log('STAFF login ok'); await staffLoad();
+  }catch(e){log('STAFF login FAIL '+e.message);}
+}
+async function staffLoad(){
+  if(!TOK){document.getElementById('who').textContent='public mode · sign in for pack/decisions';return;}
+  try{
+    const h={Authorization:'Bearer '+TOK};
+    const [pol, dec, st]=await Promise.all([
+      fetch(API+'/policy/active',{headers:h}).then(r=>r.ok?r.json():{}),
+      fetch(API+'/decisions?limit=8',{headers:h}).then(r=>r.ok?r.json():[]),
+      fetch(API+'/admin/status',{headers:h}).then(r=>r.ok?r.json():{}),
+    ]);
+    document.getElementById('k-dec').textContent=st.decisions??'—';
+    document.getElementById('k-models').textContent=st.models??'—';
+    const packs=pol.active_packs||pol.packs||[];
+    document.getElementById('pack').innerHTML=packs.length
+      ? packs.map(p=>'<div><b>'+esc(p.name||p.id)+'</b> · '+esc(p.status)+' · '+esc(p.jurisdiction||'')+' · '+esc(p.sector||'')+'</div>').join('')
+      : '<span class="mut">No active packs (or auth required)</span>';
+    const list=Array.isArray(dec)?dec:(dec.items||[]);
+    document.getElementById('recent').innerHTML=list.length
+      ?('<table><thead><tr><th>ID</th><th>Decision</th><th>SVS</th><th>Cert</th><th>When</th></tr></thead><tbody>'+
+        list.map(x=>'<tr><td>'+esc(x.id)+'</td><td>'+esc(x.decision||x.outcome)+'</td><td>'+esc(x.svs)+'</td><td>'+esc(x.certificate_id)+'</td><td>'+esc((x.created_at||'').slice(0,19))+'</td></tr>').join('')+
+        '</tbody></table>')
+      :'<span class="mut">No recent decisions</span>';
+    document.getElementById('who').textContent='staff connected';
+    log('STAFF panels ok · decisions='+(st.decisions||list.length));
+  }catch(e){log('STAFF FAIL '+e.message);}
+}
+if(TOK){document.getElementById('who').textContent='staff token present';}
 refresh();
 </script>
 </body>
