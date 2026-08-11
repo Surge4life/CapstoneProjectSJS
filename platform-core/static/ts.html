@@ -78,6 +78,18 @@ th{color:var(--mut);font-weight:600}
       </div>
     </div>
 
+    <div class="panel" id="handoff-ts" style="display:none;border-color:rgba(45,155,90,.4)">
+      <h3>Handoff · SETHS PLACED → assign workers</h3>
+      <p class="mut" style="font-size:12px;margin:0 0 8px">Placement pool has eligible learners. Assign into an SPV, then continue to MADIBA recognition.</p>
+      <div class="row">
+        <button class="btn" onclick="assignFirst()">Assign first PLACED → SPV</button>
+        <a class="chip" href="/seths" style="text-decoration:none">← Back SETHS</a>
+        <a class="chip" href="/madiba" style="text-decoration:none">Next · MADIBA →</a>
+        <a class="chip" href="/divisions" style="text-decoration:none">Full loop →</a>
+      </div>
+      <div id="handoff-pool" class="mut" style="margin-top:8px">—</div>
+    </div>
+
     <div class="grid">
       <div class="card"><h3>Projects / SPVs</h3><div class="metric" id="k-p">—</div></div>
       <div class="card"><h3>Workers absorbed</h3><div class="metric" id="k-w">—</div></div>
@@ -175,6 +187,8 @@ async function refresh(){
     document.getElementById('k-w').textContent=m.workers_absorbed??'—';
     document.getElementById('k-prof').textContent=fmt(m.monthly_operating_profit);
     document.getElementById('k-placed').textContent=sm.placed??'—';
+    const el=document.getElementById('handoff-ts');
+    if(el){ el.style.display=(Number(sm.placed||0)>0)?'block':'none'; }
     const by=m.by_subsidiary||{};
     document.getElementById('k-sub').textContent=Object.keys(by).length||(Array.isArray(subs)?subs.length:(subs.subsidiaries||[]).length)||'—';
     document.getElementById('subs').innerHTML=Object.keys(by).length
@@ -194,6 +208,8 @@ async function refresh(){
       const list=Array.isArray(learners)?learners:(learners.learners||learners.items||[]);
       const placed=list.filter(x=>/PLACED/i.test(String(x.status||x.stage||'')));
       window.__placed=placed;
+      const hp=document.getElementById('handoff-pool');
+      if(hp) hp.textContent=placed.length?('PLACED pool · '+placed.length+' · '+placed.slice(0,5).map(x=>x.ref||x.learner_ref||x.id).join(', ')):'';
       document.getElementById('placed').innerHTML=placed.length
         ?('<table><thead><tr><th>Ref</th><th>Status</th><th>Stream</th><th></th></tr></thead><tbody>'+
           placed.slice(0,15).map(x=>{
