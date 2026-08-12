@@ -3,69 +3,75 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UDOC · EVA Command · Sentinel</title>
+<title>G.O.D.S · Sentinel · EVA Command</title>
 <style>
-:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--bad:#d4504f;--warn:#E8A13A}
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--bad:#E85D5D;--green:#10B981}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
-header{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
-.tag.ok{border-color:var(--ok);color:#7fe3ab}
-a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
-.wrap{max-width:1100px;margin:0 auto;padding:16px 18px 40px}
-.honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0}
-.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
-.card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.3rem;font-weight:700}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}.tag.warn{border-color:var(--warn);color:var(--warn)}
+nav a{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px;margin-left:4px}
+main{max-width:1140px;margin:0 auto;padding:16px 18px 48px}
+.honest{margin:0 0 12px;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
 .panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
-.btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.btn.cyan{background:var(--cyan);color:#041018}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.2rem;font-weight:700}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:4px 10px;font-size:11px;cursor:pointer;margin:2px;background:transparent;color:var(--ink);text-decoration:none}
 .chip:hover{border-color:var(--gold);color:var(--gold)}
-.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:240px;overflow:auto}
-.mut{color:var(--mut)}.ok{color:#7fe3ab}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.bars{display:grid;gap:6px;margin-top:8px}
-.bar-row{display:grid;grid-template-columns:90px 1fr 40px;gap:8px;align-items:center;font-size:11px}
-.bar-track{height:8px;background:#050b16;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
-.bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold));border-radius:4px}
-input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 10px;font-size:13px}
+.btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px}
+.btn.cyan{background:var(--cyan);color:#041018}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.green{background:var(--green);color:#041018}
+input{background:var(--navy);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
-th{color:var(--mut)}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-size:10px;text-transform:uppercase}
+.term{background:#040a14;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;white-space:pre-wrap;max-height:260px;overflow:auto;color:#b8c7e0}
+.mut{color:var(--mut)}.bar-row{display:grid;grid-template-columns:110px 1fr 48px;gap:8px;align-items:center;margin:4px 0;font-size:12px}
+.bar-track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--gold))}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:800px){.two{grid-template-columns:1fr}}
+.pill{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700}
+.APPROVE{background:#163a2a;color:#7fe3ab}.BLOCK{background:#3a1717;color:#f0a0a0}.ESCALATE{background:#33203a;color:#d6a8ef}
 </style>
 </head>
 <body>
 <header>
-  <span class="brand">UDOC · <b>Sentinel</b></span>
+  <span class="brand">G.O.D.S · <b>Sentinel</b></span>
   <span class="tag" id="ready-tag">—</span>
+  <span class="tag" id="gate-tag">gate —</span>
   <span style="flex:1"></span>
-  <a class="nav" href="/admin">GODS Admin</a>
-  <a class="nav" href="/udoc-admin">UDOC Admin</a>
-  <a class="nav" href="/divisions">Divisions</a>
-  <a class="nav" href="/gbs">GBS</a>
-  <a class="nav" href="/portals">Portals</a>
-  <a class="nav" href="/eif-ui">EIF</a>
+  <nav>
+    <a href="/udoc-admin">UDOC Admin</a>
+    <a href="/eif-ui">EIF</a>
+    <a href="/gbs">GBS</a>
+    <a href="/divisions">Divisions</a>
+    <a href="/portals">Portals</a>
+    <a href="/admin">GODS Admin</a>
+  </nav>
 </header>
-<div class="wrap">
+<main>
   <div class="honest">Capstone honesty: Sentinel is the EVA command surface on Core · smoke gate = fair≠BLOCK and biased=BLOCK · model-001 + demo pack auto-heal · not commercial SaaS scale</div>
 
   <div class="panel">
     <h3>Guided path · assessor smoke</h3>
-    <div class="row">
-      <button class="chip" onclick="refresh()">1 · Demo ready</button>
-      <button class="chip" onclick="evalOne('fair')">2 · Fair</button>
-      <button class="chip" onclick="evalOne('biased')">3 · Biased</button>
-      <button class="chip" onclick="smoke()">4 · Full smoke</button>
-      <button class="chip" onclick="batchAll()">5 · Full EVA matrix</button>
-      <button class="chip" onclick="staffLoad()">6 · Policy + decisions (staff)</button>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="chip" type="button" onclick="refresh()">1 · Demo ready</button>
+      <button class="chip" type="button" onclick="evalOne('fair')">2 · Fair</button>
+      <button class="chip" type="button" onclick="evalOne('biased')">3 · Biased</button>
+      <button class="chip" type="button" onclick="smoke()">4 · Full smoke</button>
+      <button class="chip" type="button" onclick="batchAll()">5 · Full EVA matrix</button>
+      <button class="chip" type="button" onclick="staffLoad()">6 · Policy + decisions</button>
+      <button class="chip" type="button" onclick="divStrip()">7 · Division KPIs</button>
     </div>
-    <p class="mut" style="font-size:12px;margin:8px 0 0">Minimum pass: health + demo/ready + fair≠BLOCK + biased=BLOCK</p>
   </div>
 
-  <div class="grid">
+  <div class="grid" style="margin-top:12px">
     <div class="card"><h3>Demo ready</h3><div class="metric" id="k-ready">—</div></div>
     <div class="card"><h3>Fair</h3><div class="metric" id="k-fair">—</div></div>
     <div class="card"><h3>Biased</h3><div class="metric" id="k-bias">—</div></div>
@@ -74,74 +80,80 @@ th{color:var(--mut)}
     <div class="card"><h3>Gate</h3><div class="metric" id="k-gate">—</div></div>
     <div class="card"><h3>Decisions</h3><div class="metric" id="k-dec">—</div></div>
     <div class="card"><h3>Models</h3><div class="metric" id="k-models">—</div></div>
+    <div class="card"><h3>Incidents</h3><div class="metric" id="k-inc">—</div></div>
+    <div class="card"><h3>APPROVE</h3><div class="metric" id="k-appr" style="color:#7fe3ab">—</div></div>
+    <div class="card"><h3>BLOCK</h3><div class="metric" id="k-blk" style="color:#f0a0a0">—</div></div>
   </div>
 
   <div class="panel">
-    <h3>Command path</h3>
-    <div class="row">
-      <button class="btn" onclick="refresh()">↻ Refresh</button>
-      <button class="btn cyan" onclick="smoke()">Run smoke suite</button>
-      <button class="btn" onclick="batchAll()">Full EVA matrix</button>
-      <button class="btn ghost" onclick="evalOne('fair')">Fair</button>
-      <button class="btn ghost" onclick="evalOne('biased')">Biased</button>
-      <button class="btn ghost" onclick="evalOne('high')">High-risk</button>
-      <button class="btn ghost" onclick="evalOne('sov')">Sovereignty</button>
+    <h3>Command · smoke + matrix</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <button class="btn cyan" type="button" onclick="smoke()">Run smoke suite</button>
+      <button class="btn" type="button" onclick="batchAll()">Full EVA matrix</button>
+      <button class="btn ghost" type="button" onclick="refresh()">Refresh ready</button>
+      <button class="btn green" type="button" onclick="autoAssessor()">Assessor one-click</button>
     </div>
+    <div class="mut" id="policy">—</div>
   </div>
 
   <div class="panel">
     <h3>Scenario chips · single EVA</h3>
-    <div class="row">
-      <button class="chip" onclick="evalOne('fair')">Fair → expect APPROVE</button>
-      <button class="chip" onclick="evalOne('biased')">Biased → expect BLOCK</button>
-      <button class="chip" onclick="evalOne('high')">High-risk</button>
-      <button class="chip" onclick="evalOne('sov')">Sovereignty</button>
+    <div>
+      <button class="chip" type="button" onclick="evalOne('fair')">Fair → expect APPROVE</button>
+      <button class="chip" type="button" onclick="evalOne('biased')">Biased → expect BLOCK</button>
+      <button class="chip" type="button" onclick="evalOne('high')">High-risk</button>
+      <button class="chip" type="button" onclick="evalOne('sov')">Sovereignty</button>
+    </div>
+    <div id="bars" style="margin-top:12px"><div class="mut">Run an EVA to populate dimensions</div></div>
+  </div>
+
+  <div class="two">
+    <div class="panel">
+      <h3>Matrix results</h3>
+      <div id="matrix">—</div>
+    </div>
+    <div class="panel">
+      <h3>Division strip</h3>
+      <div id="divstrip" class="mut">—</div>
     </div>
   </div>
 
   <div class="panel">
-    <h3>6-D EVA bars · last result</h3>
-    <div class="bars" id="bars"><div class="mut">Run an EVA to populate dimensions</div></div>
-  </div>
-
-  <div class="panel">
-    <h3>Policy / demo seed</h3>
-    <div id="policy" class="mut">—</div>
-  </div>
-
-  <div class="panel">
-    <h3>Staff connect · policy pack + recent decisions</h3>
-    <div class="row" style="margin-bottom:8px">
+    <h3>Staff connect · policy pack + recent decisions + certs</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px">
       <input id="email" value="admin@gods.local" style="min-width:180px"/>
       <input id="pw" type="password" value="admin123" style="width:110px"/>
-      <button class="btn ghost" onclick="staffLogin()">Sign in</button>
-      <button class="btn ghost" onclick="staffLoad()">Load staff panels</button>
+      <button class="btn green" type="button" onclick="staffLogin()">Sign in</button>
+      <button class="btn ghost" type="button" onclick="staffLoad()">Load panels</button>
       <span class="mut" id="who">public mode</span>
     </div>
     <div id="pack" class="mut">—</div>
     <div id="recent" style="margin-top:10px">—</div>
+    <div id="certs" style="margin-top:10px">—</div>
   </div>
 
   <div class="panel">
-    <h3>Division operators</h3>
-    <div class="row">
-      <a class="chip" href="/seths">SETHS</a>
-      <a class="chip" href="/ts">TS</a>
-      <a class="chip" href="/madiba">MADIBA</a>
-      <a class="chip" href="/gbs">GBS freeze</a>
-      <a class="chip" href="/divisions">Full loop</a>
-    </div>
+    <h3>Operator loop · divisions</h3>
+    <a class="chip" href="/seths">SETHS</a>
+    <a class="chip" href="/ts">TS</a>
+    <a class="chip" href="/madiba">MADIBA</a>
+    <a class="chip" href="/eif-ui">EIF</a>
+    <a class="chip" href="/gbs">GBS freeze</a>
+    <a class="chip" href="/divisions">Full loop</a>
+    <a class="chip" href="/udoc-admin">UDOC Admin Layers</a>
   </div>
 
   <div class="panel">
-    <h3>Ops terminal</h3>
+    <h3>Terminal</h3>
     <div class="term" id="term">Sentinel · EVA Command · live Core probes</div>
   </div>
-</div>
+</main>
 <script>
 const API=location.origin; let TOK=localStorage.getItem('sent_tok')||'';
 const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+const pill=s=>'<span class="pill '+(s||'')+'">'+esc(s||'')+'</span>';
+
 function setGate(){
   const fair=document.getElementById('k-fair').textContent;
   const bias=document.getElementById('k-bias').textContent;
@@ -149,6 +161,9 @@ function setGate(){
   const g=document.getElementById('k-gate');
   g.textContent=ok?'PASS':(fair==='—'?'—':'CHECK');
   g.style.color=ok?'#7fe3ab':(fair==='—'?'':'#E8A13A');
+  const gt=document.getElementById('gate-tag');
+  gt.textContent=ok?'gate PASS':(fair==='—'?'gate —':'gate CHECK');
+  gt.className='tag '+(ok?'ok':(fair==='—'?'':'warn'));
   return ok;
 }
 function renderBars(dims){
@@ -171,12 +186,13 @@ async function refresh(){
     ]);
     document.getElementById('k-ready').textContent=String(ready.ready);
     document.getElementById('ready-tag').textContent=ready.ready?'DEMO READY':'CHECK SEED';
-    document.getElementById('ready-tag').className='tag '+(ready.ready?'ok':'');
-    const rules=ready.active_rules??ready.rule_count??'—';
+    document.getElementById('ready-tag').className='tag '+(ready.ready?'ok':'warn');
+    const rules=ready.active_rules??'—';
+    const mstat=(ready.model_001&&ready.model_001.status)||'—';
     document.getElementById('policy').innerHTML=
-      'ready=<b>'+esc(String(ready.ready))+'</b> · model=<b>'+esc(ready.model_id||(ready.model_001&&ready.model_001.status)||'model-001')+'</b> · pack=<b>'+esc((ready.demo_pack&&ready.demo_pack.name)||ready.pack||'demo')+'</b> · rules='+esc(String(rules))+
-      '<br/><span class="mut">health='+esc(health.status||health.service||JSON.stringify(health).slice(0,80))+'</span>';
-    log('READY '+JSON.stringify({ready:ready.ready,rules}).slice(0,160));
+      'ready=<b>'+esc(String(ready.ready))+'</b> · model-001=<b>'+esc(mstat)+'</b> · pack=<b>'+esc((ready.demo_pack&&ready.demo_pack.name)||'demo')+'</b> · rules='+esc(String(rules))+
+      '<br/><span class="mut">health='+esc(health.status||health.service||'—')+'</span>';
+    log('READY '+JSON.stringify({ready:ready.ready,rules,mstat}).slice(0,180));
     if(TOK) await staffLoad();
   }catch(e){log('READY FAIL '+e.message);}
 }
@@ -185,46 +201,56 @@ async function evalOne(scenario){
     log('EVA '+scenario+'…');
     let r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:[scenario]})});
     let j=await r.json().catch(()=>({}));
-    if(!r.ok){
+    let x=(j.results&&j.results[0])||j;
+    if(!r.ok || x.ok===false){
       r=await fetch(API+'/decisions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenario,model_id:'model-001'})});
-      j=await r.json().catch(()=>({}));
+      x=await r.json();
     }
-    const items=j.results||j.items||(Array.isArray(j)?j:[j]);
-    const x=items[0]||j;
-    const outcome=x.outcome||x.decision||x.result||'—';
+    const outcome=x.outcome||x.decision||'—';
     const map={fair:'k-fair',biased:'k-bias',high:'k-high',sov:'k-sov'};
     if(map[scenario]) document.getElementById(map[scenario]).textContent=outcome;
-    const dims=x.dimensions||x.scores||x.eva||x.metrics||null;
-    if(dims) renderBars(dims);
+    if(x.dimensions) renderBars(x.dimensions);
     setGate();
-    log('EVA '+scenario+' → '+outcome+' '+JSON.stringify(x).slice(0,120));
+    log('EVA '+scenario+' → '+outcome+(x.certificate_id?(' · '+x.certificate_id):''));
   }catch(e){log('EVA FAIL '+scenario+' '+e.message);}
 }
 async function batchAll(){
   try{
-    log('BATCH fair|biased|high|sov…');
+    log('Full EVA matrix…');
     const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased','high','sov']})});
     const j=await r.json();
-    const items=j.results||j.items||[];
+    const items=j.results||[];
     const map={};
-    items.forEach(x=>{map[x.scenario||x.name]=(x.outcome||x.decision||'');});
+    items.forEach(x=>{map[x.scenario||x.option||x.name]=(x.outcome||x.decision||''); if(x.dimensions&&(x.scenario==='fair'||x.option==='fair')) renderBars(x.dimensions);});
     if(map.fair) document.getElementById('k-fair').textContent=map.fair;
     if(map.biased) document.getElementById('k-bias').textContent=map.biased;
     if(map.high) document.getElementById('k-high').textContent=map.high;
     if(map.sov) document.getElementById('k-sov').textContent=map.sov;
-    const last=items[items.length-1]||{};
-    if(last.dimensions||last.scores) renderBars(last.dimensions||last.scores);
-    const gate=setGate();
-    log('BATCH gate='+(gate?'PASS':'CHECK')+' '+JSON.stringify(map));
-  }catch(e){log('BATCH FAIL '+e.message);}
+    const oc=j.outcomes||{};
+    if(oc.APPROVE!=null) document.getElementById('k-appr').textContent=oc.APPROVE;
+    if(oc.BLOCK!=null) document.getElementById('k-blk').textContent=oc.BLOCK;
+    document.getElementById('matrix').innerHTML=items.length
+      ? '<table><thead><tr><th>Scenario</th><th>Outcome</th><th>EVA</th><th>Cert</th></tr></thead><tbody>'+
+        items.map(x=>'<tr><td>'+esc(x.scenario||x.option)+'</td><td>'+pill(x.outcome||x.decision)+'</td><td>'+esc(x.composite_eva??'')+'</td><td class="mut">'+esc(x.certificate_id||'')+'</td></tr>').join('')+
+        '</tbody></table>'
+      : '<span class="mut">No matrix rows</span>';
+    setGate();
+    log('MATRIX '+JSON.stringify(j.outcomes||map).slice(0,200));
+  }catch(e){log('MATRIX FAIL '+e.message);}
 }
 async function smoke(){
-  log('SMOKE start');
   await refresh();
   await evalOne('fair');
   await evalOne('biased');
   const ok=setGate();
   log('SMOKE '+(ok?'PASS':'FAIL')+' · fair='+document.getElementById('k-fair').textContent+' biased='+document.getElementById('k-bias').textContent);
+}
+async function autoAssessor(){
+  await smoke();
+  await batchAll();
+  if(TOK) await staffLoad();
+  await divStrip();
+  log('ASSESSOR one-click complete · gate='+document.getElementById('k-gate').textContent);
 }
 async function staffLogin(){
   try{
@@ -241,26 +267,51 @@ async function staffLoad(){
   if(!TOK){document.getElementById('who').textContent='public mode · sign in for pack/decisions';return;}
   try{
     const h={Authorization:'Bearer '+TOK};
-    const [pol, dec, st]=await Promise.all([
+    const [pol, dec, st, inc, certs]=await Promise.all([
       fetch(API+'/policy/active',{headers:h}).then(r=>r.ok?r.json():{}),
       fetch(API+'/decisions?limit=8',{headers:h}).then(r=>r.ok?r.json():[]),
       fetch(API+'/admin/status',{headers:h}).then(r=>r.ok?r.json():{}),
+      fetch(API+'/udoc/incidents',{headers:h}).then(r=>r.ok?r.json():{}),
+      fetch(API+'/udoc/certs',{headers:h}).then(r=>r.ok?r.json():{}),
     ]);
     document.getElementById('k-dec').textContent=st.decisions??'—';
     document.getElementById('k-models').textContent=st.models??'—';
-    const packs=pol.active_packs||pol.packs||[];
+    document.getElementById('k-inc').textContent=inc.count??'—';
+    const packs=pol.active_packs||[];
     document.getElementById('pack').innerHTML=packs.length
-      ? packs.map(p=>'<div><b>'+esc(p.name||p.id)+'</b> · '+esc(p.status)+' · '+esc(p.jurisdiction||'')+' · '+esc(p.sector||'')+'</div>').join('')
+      ? packs.map(p=>'<div><b>'+esc(p.name||p.id)+'</b> · '+esc(p.status)+' · '+esc(p.jurisdiction||'')+' · rules '+(p.rule_count??'?')+'</div>').join('')
       : '<span class="mut">No active packs (or auth required)</span>';
     const list=Array.isArray(dec)?dec:(dec.items||[]);
+    let ap=0,bl=0;
+    list.forEach(x=>{const d=x.decision||x.outcome; if(d==='APPROVE')ap++; if(d==='BLOCK')bl++;});
+    if(list.length){ document.getElementById('k-appr').textContent=ap; document.getElementById('k-blk').textContent=bl; }
     document.getElementById('recent').innerHTML=list.length
       ?('<table><thead><tr><th>ID</th><th>Decision</th><th>SVS</th><th>Cert</th><th>When</th></tr></thead><tbody>'+
-        list.map(x=>'<tr><td>'+esc(x.id)+'</td><td>'+esc(x.decision||x.outcome)+'</td><td>'+esc(x.svs)+'</td><td>'+esc(x.certificate_id)+'</td><td>'+esc((x.created_at||'').slice(0,19))+'</td></tr>').join('')+
+        list.map(x=>'<tr><td>'+esc(x.id)+'</td><td>'+pill(x.decision||x.outcome)+'</td><td>'+esc(x.svs)+'</td><td class="mut">'+esc(x.certificate_id)+'</td><td>'+esc((x.created_at||'').slice(0,19))+'</td></tr>').join('')+
         '</tbody></table>')
       :'<span class="mut">No recent decisions</span>';
+    const cl=certs.certs||[];
+    document.getElementById('certs').innerHTML=cl.length
+      ? '<div class="mut" style="margin-bottom:6px">Recent certificates ('+(certs.count||cl.length)+')</div><table><thead><tr><th>Cert</th><th>Model</th></tr></thead><tbody>'+
+        cl.slice(0,6).map(c=>'<tr><td class="mut">'+esc(c.certificate_id)+'</td><td>'+esc(c.model_id)+'</td></tr>').join('')+'</tbody></table>'
+      : '<span class="mut">No certs listed</span>';
     document.getElementById('who').textContent='staff connected';
-    log('STAFF panels ok · decisions='+(st.decisions||list.length));
+    log('STAFF panels ok · decisions='+(st.decisions||list.length)+' · incidents='+(inc.count??'?'));
   }catch(e){log('STAFF FAIL '+e.message);}
+}
+async function divStrip(){
+  try{
+    const [s,t,m]=await Promise.all([
+      fetch(API+'/seths/metrics').then(r=>r.ok?r.json():{}),
+      fetch(API+'/ts/metrics').then(r=>r.ok?r.json():{}),
+      fetch(API+'/madiba/metrics').then(r=>r.ok?r.json():{}),
+    ]);
+    document.getElementById('divstrip').innerHTML=
+      '<div><b>SETHS</b> placed '+(s.placed??'—')+' / '+(s.total??'—')+' · rate '+(s.placement_rate!=null?(s.placement_rate*100).toFixed(0)+'%':'—')+'</div>'+
+      '<div><b>TS</b> projects '+(t.projects??'—')+' · workers '+(t.workers_absorbed??'—')+'</div>'+
+      '<div><b>MADIBA</b> cycles '+(m.cycles??'—')+' · recycled '+(m.cumulative_recycled??'—')+'</div>';
+    log('DIV strip ok');
+  }catch(e){document.getElementById('divstrip').innerHTML='<span class="mut">'+esc(e.message)+'</span>';}
 }
 if(TOK){document.getElementById('who').textContent='staff token present';}
 refresh();
