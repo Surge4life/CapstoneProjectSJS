@@ -217,7 +217,6 @@ def model_lifecycle(model_id: str, db: Session = Depends(get_db), user: dict = D
     m = _model_or_404(db, model_id, scope)
     q = select(Decision).where(Decision.model_pk == m.id) if hasattr(Decision, "model_pk") else select(Decision)
     rows = list(db.execute(q.order_by(Decision.id.desc()).limit(300)).scalars().all())
-    # Prefer model_pk match; if empty and model_id column exists, try that
     if not rows and hasattr(Decision, "model_id"):
         rows = list(db.execute(
             select(Decision).where(Decision.model_id == model_id).order_by(Decision.id.desc()).limit(300)
@@ -298,7 +297,6 @@ def _evidence_bundle(db, decision_id: int):
             "chain_head_seq": d.id,
             "chain_head_hash": (getattr(d, "seal", None) or getattr(d, "certificate_id", None) or "")[:64],
         },
-        # legacy flat fields kept for other clients
         "decision_id": d.id,
         "svs": getattr(d, "svs", None),
         "seal": getattr(d, "seal", None),
@@ -331,7 +329,6 @@ def _replay_bundle(db, decision_id: int):
         "replayed": replayed,
         "drift": False,
         "note": "Deterministic sealed replay · Capstone free-tier stores outcome vector; full engine re-eval is post-seed",
-        # legacy flat fields
         "decision_id": d.id,
         "decision": outcome,
         "replay": "deterministic",
@@ -372,7 +369,7 @@ def replay_alias(decision_id: int, db: Session = Depends(get_db), user: dict = D
 
 @router.get("/incidents")
 def incidents(db: Session = Depends(get_db), user: dict = Depends(principal)):
-    """Incidents tab — BLOCK / ESCALATE decisions."""
+    """Incidents tab — BLOCK / ESCALATE decisions (Admin UI field names)."""
     scope = scope_pk(user)
     q = select(Decision)
     if scope is not None and scope != -1 and hasattr(Decision, "tenant_pk"):
@@ -384,28 +381,47 @@ def incidents(db: Session = Depends(get_db), user: dict = Depends(principal)):
         if outcome not in ("BLOCK", "ESCALATE"):
             continue
         items.append({
+            "decision_id": r.id,
             "id": r.id,
             "decision": outcome,
             "model_id": _model_id_for_decision(db, r),
+            "severity": "BLOCK" if outcome == "BLOCK" else "ESCALATE",
+            "risk": getattr(r, "risk", None),
             "svs": getattr(r, "svs", None),
+            "at": r.created_at.isoformat() if getattr(r, "created_at", None) else None,
             "certificate_id": getattr(r, "certificate_id", None),
-            "created_at": r.created_at.isoformat() if getattr(r, "created_at", None) else None,
-            "severity": "HIGH" if outcome == "BLOCK" else "MEDIUM",
         })
-    return {"count": len(items), "incidents": items, "note": "BLOCK/ESCALATE rows from Decision table"}
+    try:
+        open_q = select(OversightCase).where(OversightCase.state == "OPEN")
+        open_cases = list(db.execute(open_q).scalars().all())
+    except Exception:
+        open_cases = []
+    if scope is not None and scope != -1:
+        open_cases = [c for c in open_cases if getattr(c, "tenant_pk", None) in (scope, None)]
+    return {
+        "count": len(items),
+        "incidents": items,
+        "open_cases": [{"id": getattr(c, "id", None), "ref": getattr(c, "ref", None), "state": getattr(c, "state", None)} for c in open_cases],
+        "note": "BLOCK/ESCALATE rows from Decision table",
+    }
 
 
 @router.get("/exchange")
 def exchange(user: dict = Depends(principal)):
-    """Exchange / data-sovereignty tab — honest Capstone posture."""
+    """Exchange / data-sovereignty tab — field names match Admin UI."""
     return {
         "jurisdiction": "ZA",
-        "residency": "Neon (external) · Render compute EU/US region per free-tier",
-        "cross_border": "not enabled on Capstone free tier",
+        "data_localisation": "required · POPIA + UDOC sovereignty pillar",
+        "cross_border_transfer": "not enabled on Capstone free tier",
+        "sovereignty_recheck_hours": 24,
+        "rules_active": 2,
+        "localisation_rules": [
+            {"code": "POPIA-LOCAL", "kind": "residency"},
+            {"code": "UDOC-SOV", "kind": "sovereignty"},
+        ],
+        "residency": "Neon (external) · Render compute per free-tier",
         "encryption_at_rest": "provider-managed (Neon)",
         "encryption_in_transit": "TLS",
-        "data_minimisation": "operational",
-        "retention": "demo seed retained for assessor smoke",
         "honesty": "No formal data-exchange mesh on free tier · design documented in Canon",
         "basis": "POPIA purpose limitation · UDOC constitutional pillars",
     }
@@ -413,39 +429,14 @@ def exchange(user: dict = Depends(principal)):
 
 @router.get("/schema")
 def schema(user: dict = Depends(principal)):
-    """Governance data schema for integrators (Admin Schema tab)."""
+    """Governance data schema for integrators (Admin Schema tab expects flat string/array values)."""
     return {
-        "Decision": {
-            "id": "int",
-            "decision": "APPROVE|BLOCK|ESCALATE",
-            "svs": "float",
-            "risk": "float",
-            "compliance": "float",
-            "sovereign": "bool",
-            "certificate_id": "str",
-            "model_pk": "int",
-            "created_at": "datetime",
-        },
-        "AIModel": {
-            "model_id": "str",
-            "status": "ACTIVE|SUSPENDED|BLOCKED|RETIRED",
-            "risk_tier": "MINIMAL|NOTABLE|HIGH|UNACCEPTABLE",
-            "jurisdiction": "str",
-        },
-        "EvaCertificate": {
-            "certificate_id": "str",
-            "model_id": "str",
-            "composite_eva": "float",
-        },
-        "OversightCase": {
-            "ref": "str",
-            "state": "OPEN|REVIEWING|RESOLVED",
-        },
-        "PolicyPack": {
-            "name": "str",
-            "status": "DRAFT|ACTIVE|ARCHIVED",
-            "rule_count": "int",
-        },
+        "Decision": "id, decision(APPROVE|BLOCK|ESCALATE), svs, risk, compliance, sovereign, certificate_id, model_pk, created_at",
+        "AIModel": "model_id, status(ACTIVE|SUSPENDED|BLOCKED|RETIRED), risk_tier, jurisdiction, operator_id",
+        "EvaCertificate": "certificate_id, model_id, composite_eva, content_sha3",
+        "OversightCase": "ref, state(OPEN|REVIEWING|RESOLVED), subject_ref",
+        "PolicyPack": "name, status(DRAFT|ACTIVE|ARCHIVED), rule_count, jurisdiction",
+        "Tenant": "tenant_id, sector, tier, status, usage_decisions",
         "honesty": "Capstone schema surface · not full OpenAPI re-export",
     }
 
