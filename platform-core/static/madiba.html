@@ -58,7 +58,13 @@ th{color:var(--mut);font-weight:600}
       <input id="email" value="madiba@gods.local" style="flex:1"/>
       <input id="pass" type="password" value="staff123" style="width:110px"/>
     </div>
-    <div class="row"><button class="btn" onclick="doLogin()">Sign in</button></div>
+    <div class="row">
+      <button class="btn" onclick="doLogin()">Sign in</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('madiba@gods.local','staff123')">madiba@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('seths@gods.local','staff123')">seths@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('ts@gods.local','staff123')">ts@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('admin@gods.local','admin123')">admin@</button>
+    </div>
     <p id="li-err" style="color:var(--red);margin-top:8px;font-size:12px"></p>
   </div>
   <div id="ops" style="display:none">
@@ -148,6 +154,7 @@ const API=location.origin; let TOK='';
 const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
 const fmt=n=>{n=Number(n);if(!isFinite(n))return '—';if(Math.abs(n)>=1e6)return 'R'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return 'R'+(n/1e3).toFixed(1)+'k';return 'R'+n;};
+function fillLogin(e,p){document.getElementById('email').value=e;document.getElementById('pass').value=p;}
 async function j(path,opts={}){
   const h=Object.assign({},opts.headers||{});
   if(TOK) h.Authorization='Bearer '+TOK;
