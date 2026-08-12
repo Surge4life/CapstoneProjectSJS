@@ -1,28 +1,29 @@
 # Division surface density plan
 
-**Updated:** 2026-08-12  
+**Updated:** 2026-08-12 20:30 SAST  
 **Mode:** densify **existing** Core surfaces only — no new Render services.
 
 ---
 
-## CLOSED — Login density parity (12 Aug 2026)
+## CLOSED — Login density parity (operator surfaces)
 
 Every operator surface has consistent staff role chips + `fillLogin`:
 
-| Surface | Commit | Chips |
-|---------|--------|-------|
-| `/seths` | `ad0cfbb` | seths@ · madiba@ · ts@ · admin@ |
-| `/ts` | `858be78` | same |
-| `/madiba` | `88475ea` | same |
-| `/divisions` | `ed30740` | same |
-| `/eif-ui` | `0215f77b` | same |
-| `/portals` | `7e6167c` + `fc64e15` | same + CITIZEN control workspace |
-| `/gbs` | `4d8f4ed` | same + nodes/symmetry/EVA gate |
-| `/Sentinel` | `a38cbeb` | same |
-| Gateway | `f29fbf4` | individual SETHS/TS/MADIBA cards |
+| Surface | Chips |
+|---------|-------|
+| `/seths` `/ts` `/madiba` `/divisions` `/eif-ui` `/portals` `/gbs` `/Sentinel` | admin@ · seths@ · madiba@ · ts@ |
 
-**Staff credentials (all surfaces):**  
-`admin@gods.local` / `admin123` · `seths@` / `madiba@` / `ts@` `gods.local` / `staff123`
+**Staff credentials:** `admin@gods.local` / `admin123` · `seths@` / `madiba@` / `ts@` `gods.local` / `staff123`
+
+---
+
+## THIS SESSION — residual static logins
+
+| Surface | Change | Commit |
+|---------|--------|--------|
+| `/udoc-admin` (`udoc_admin_v93.html`) | 4 role chips + `fillLogin` on Connect bar | `12dd5412` |
+
+Website / Netlify paste remains **last**.
 
 ---
 
@@ -45,16 +46,10 @@ Zeros OK · MADIBA ≠ AUM · capital not_deployed · Sovereign-Verified = **des
 
 ---
 
-## SWITCH — Capstone assessor / timeline track
+## Next residual (optional)
 
-Density residual = optional pixel polish only.
+1. GODS Admin connect bar — confirm/expand static role chips if still text-only
+2. Re-verify live smoke after Render picks up UDOC Admin change
+3. Capstone assessor pack + Netlify §7 (human) still the priority track after residual density
 
-**Primary path now:**
-
-1. `CAPSTONE_ASSESSOR_PACK.md` — stranger 20-minute live path  
-2. `SUBMISSION_TIMELINE.md` — runway to **30 October 2026** (~11 weeks)  
-3. Netlify Holdings paste — human action on `LIVE_SITE_CORRECTION_PACK` §7  
-4. Smoke evidence screenshot set once  
-5. No new Render services · no fabricated scale
-
-**Founder open:** 6-month EVA baseline confirm before any external Sovereign-Verified "issued" language · optional SETHS acronym sentence · Netlify §7 paste.
+**Founder open:** 6-month EVA baseline confirm · optional SETHS acronym sentence · Netlify §7 paste.
