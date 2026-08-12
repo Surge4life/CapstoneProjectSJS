@@ -3,23 +3,18 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>G.O.D.S · Portals</title>
+<title>G.O.D.S · Portals · 24 Control Workspaces</title>
 <style>
-:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A}
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--red:#E85D5D}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
 header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
 .tag.ok{border-color:var(--ok);color:#7fe3ab}
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
-.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
-.honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:12px 0}
-.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}
-.card:hover,.card.on{border-color:var(--gold)}
-.card h4{margin:0 0 4px;font-size:13px;color:var(--gold)}
-.card p{margin:0;font-size:11px;color:var(--mut)}
-.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 18px 48px}
+.honest{margin:0 0 12px;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
 .panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
 .btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
@@ -35,6 +30,7 @@ input,select,textarea{background:#050b16;border:1px solid var(--line);color:var(
 .login-box{max-width:380px;margin:30px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
 table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}th{color:var(--mut)}
 .hide{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:12px 0}
 </style>
 </head>
 <body>
@@ -52,12 +48,18 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
 
   <div class="login-box" id="login">
     <h2 style="margin:0 0 8px;color:var(--gold)">Staff login</h2>
-    <p class="mut" style="font-size:12px;margin:0 0 12px">admin@gods.local · admin123</p>
+    <p class="mut" style="font-size:12px;margin:0 0 12px">admin@/admin123 · seths@ madiba@ ts@ / staff123</p>
     <div class="row" style="margin-bottom:8px">
       <input id="email" value="admin@gods.local" style="flex:1"/>
       <input id="pass" type="password" value="admin123" style="width:110px"/>
     </div>
-    <div class="row"><button class="btn" onclick="doLogin()">Sign in</button></div>
+    <div class="row">
+      <button class="btn" onclick="doLogin()">Sign in</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('admin@gods.local','admin123')">admin@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('seths@gods.local','staff123')">seths@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('madiba@gods.local','staff123')">madiba@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('ts@gods.local','staff123')">ts@</button>
+    </div>
     <p id="li-err" style="color:#E85D5D;margin-top:8px;font-size:12px"></p>
   </div>
 
@@ -69,8 +71,13 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
         <button class="chip" onclick="openPortal('REGULATOR')">2 · Regulator</button>
         <button class="chip" onclick="openPortal('SAHRC')">3 · SAHRC</button>
         <button class="chip" onclick="openPortal('SETHS')">4 · SETHS portal</button>
+        <button class="chip" onclick="openPortal('COB')">5 · COB</button>
+        <button class="chip" onclick="openPortal('HITL_REVIEW')">6 · HITL</button>
+        <button class="chip" onclick="openPortal('AI_OWNER')">7 · AI Owner</button>
         <a class="chip" href="/seths" style="text-decoration:none">SETHS operator →</a>
         <a class="chip" href="/Sentinel" style="text-decoration:none">Sentinel →</a>
+        <a class="chip" href="/eif-ui" style="text-decoration:none">EIF →</a>
+        <a class="chip" href="/gbs" style="text-decoration:none">GBS →</a>
       </div>
     </div>
 
@@ -98,206 +105,90 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
 
     <div class="panel">
       <h3>Workspace · <span id="ws-title">select a portal</span></h3>
-      <div id="citizen-ui" class="hide">
-        <p class="mut" style="font-size:12px;margin:0 0 8px">POST /citizen/challenge · fields: service + description</p>
-        <input id="c-service" value="model-001 automated decision" style="width:100%;margin-bottom:6px"/>
-        <textarea id="c-desc" rows="2" style="width:100%">Request explanation of automated decision under AI Rights</textarea>
-        <input id="c-email" placeholder="email (optional)" style="width:100%;margin-top:6px"/>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" onclick="citizenChallenge()">Submit challenge</button>
-          <button class="btn ghost" onclick="citizenStatus()">Lookup status</button>
-          <input id="c-ref" placeholder="case ref" style="width:160px"/>
-        </div>
-      </div>
-      <div id="control-ui" class="hide">
-        <p class="mut" id="ws-desc" style="font-size:12px;margin:0 0 8px"></p>
-        <div class="row" style="margin-bottom:8px">
-          <select id="ctrl" style="min-width:200px"></select>
-          <input id="target" placeholder="target (optional)" style="flex:1;min-width:120px"/>
-        </div>
-        <textarea id="note" rows="2" style="width:100%">Capstone portal control</textarea>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" onclick="runControl()">Run control</button>
-          <button class="btn ghost" onclick="runBatch()">Run all controls</button>
-          <button class="btn ghost" onclick="refreshLive()">↻ Live</button>
-        </div>
-      </div>
-      <div id="live" class="mut" style="margin-top:12px">—</div>
-    </div>
-
-    <div class="panel">
-      <h3>Ops terminal</h3>
-      <div class="term" id="term">Portals · live dual-path</div>
+      <div id="ws-body" class="mut">Select a portal card or guided chip.</div>
+      <div class="term" id="term" style="margin-top:10px"></div>
     </div>
   </div>
 </div>
 <script>
-const API=location.origin; let TOK=''; let GROUP='all';
-const FALLBACK=[
-  ['REGULATOR','Regulator','GOVERNANCE'],
-  ['SAHRC','Human Rights Commission','PEOPLE'],
-  ['CITIZEN','Citizen AI Rights','PEOPLE'],
-  ['SARS','Revenue Service','OPERATIONS'],
-  ['WELFARE','Welfare','PEOPLE'],
-  ['HEALTH','Health','OPERATIONS'],
-  ['JUSTICE','Justice','OPERATIONS'],
-  ['NPA','NPA','OPERATIONS'],
-  ['DHA','Home Affairs','OPERATIONS'],
-  ['BORDER','Border Control','OPERATIONS'],
-  ['SETHS','S.E.T.H.S Skills','PEOPLE'],
-  ['MADIBA','MADIBA Capital','PEOPLE'],
-  ['AI_OWNER','AI System Owner','BUSINESS'],
-  ['CASE_MANAGER','Case Manager','PEOPLE'],
-  ['PRIVATE_COMPLIANCE','Private Compliance','BUSINESS'],
-  ['EMPLOYER','Employer','PEOPLE']
-];
-let CATALOG=FALLBACK.map(([k,t,g])=>({key:k,title:t,group:g,controls:[]}));
-const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
-const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
-function setGroup(el,g){GROUP=g;document.querySelectorAll('[data-g]').forEach(x=>x.classList.toggle('on',x.dataset.g===g));renderCatalog();}
-async function j(path,opts={}){
-  const h=Object.assign({'Content-Type':'application/json'},opts.headers||{});
-  if(TOK) h.Authorization='Bearer '+TOK;
-  const r=await fetch(API+path,Object.assign({},opts,{headers:h}));
-  const body=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(typeof body.detail==='string'?body.detail:JSON.stringify(body.detail||r.status));
-  return body;
-}
+const API='';
+let TOK='', GROUP='all', CATALOG=[], ACTIVE=null;
+function log(m){const el=document.getElementById('term'); if(el) el.textContent=(new Date().toISOString().slice(11,19))+' '+m+'\n'+(el.textContent||'').slice(0,4000);}
+function fillLogin(e,p){document.getElementById('email').value=e;document.getElementById('pass').value=p;}
 async function doLogin(){
-  document.getElementById('li-err').textContent='';
   try{
     const f=new URLSearchParams({username:document.getElementById('email').value.trim().toLowerCase(),password:document.getElementById('pass').value});
     const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f});
-    const d=await r.json();
+    const d=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(d.detail||'login failed');
-    TOK=d.access_token||'';
-    localStorage.setItem('portal_tok',TOK);
-    localStorage.setItem('portal_who',document.getElementById('email').value.trim().toLowerCase());
+    TOK=d.access_token; localStorage.setItem('portals_tok',TOK);
     document.getElementById('login').classList.add('hide');
     document.getElementById('ops').classList.remove('hide');
-    document.getElementById('k-who').textContent=(localStorage.getItem('portal_who')||'').split('@')[0];
-    log('LOGIN ok · '+(d.role||'')); await boot();
-  }catch(e){document.getElementById('li-err').textContent=e.message;}
+    document.getElementById('k-who').textContent=document.getElementById('email').value.split('@')[0]+' · '+(d.role||'');
+    log('LOGIN ok · role='+(d.role||''));
+    await boot();
+  }catch(e){ document.getElementById('li-err').textContent=String(e.message||e); }
 }
-function logout(){TOK='';localStorage.removeItem('portal_tok');location.reload();}
-function renderCatalog(){
-  const q=(document.getElementById('q').value||'').toLowerCase();
-  const rows=CATALOG.filter(p=>{
-    if(GROUP!=='all'&&p.group!==GROUP) return false;
-    if(!q) return true;
-    return (p.key+p.title).toLowerCase().includes(q);
-  });
-  document.getElementById('catalog').innerHTML=rows.map(p=>
-    '<div class="card" id="card-'+p.key+'" onclick="openPortal(\''+p.key+'\')"><h4>'+esc(p.key)+'</h4><p>'+esc(p.title)+' · '+esc(p.group)+'</p></div>'
-  ).join('');
-  document.getElementById('k-n').textContent=CATALOG.length;
+function logout(){TOK='';localStorage.removeItem('portals_tok');document.getElementById('ops').classList.add('hide');document.getElementById('login').classList.remove('hide');}
+async function j(path,opts){
+  const h=Object.assign({'Content-Type':'application/json'}, (opts&&opts.headers)||{});
+  if(TOK) h.Authorization='Bearer '+TOK;
+  const r=await fetch(API+path,Object.assign({},opts,{headers:h}));
+  const t=await r.text(); let d; try{d=JSON.parse(t)}catch(_){d={raw:t}};
+  if(!r.ok) throw new Error((d&&d.detail)||t||r.status);
+  return d;
 }
 async function boot(){
-  renderCatalog();
-  const next=[];
-  for(const p of FALLBACK){
-    const [k,title,group]=p;
-    try{
-      const d=await j('/portal/'+k);
-      const portal=d.portal||{};
-      next.push({key:k,title:portal.title||title,group:portal.group||group,controls:(portal.controls||[]).map(c=>c.name||c),desc:portal.desc||''});
-    }catch(e){
-      next.push({key:k,title,group,controls:[],desc:''});
-    }
-  }
-  CATALOG=next;
-  renderCatalog();
   try{
-    const ready=await fetch(API+'/udoc/demo/ready').then(r=>r.json());
-    document.getElementById('k-ready').textContent=String(ready.ready);
-    document.getElementById('ready-tag').textContent=ready.ready?'DEMO READY':'CHECK';
+    const ready=await j('/udoc/demo/ready');
+    document.getElementById('k-ready').textContent=ready.ready?'YES':'NO';
+    document.getElementById('ready-tag').textContent=ready.ready?'DEMO READY':'NOT READY';
     document.getElementById('ready-tag').className='tag '+(ready.ready?'ok':'');
-  }catch(_){}
+  }catch(e){ document.getElementById('k-ready').textContent='err'; }
   try{
-    const st=await j('/admin/status');
-    document.getElementById('k-cases').textContent=st.open_oversight??'—';
-  }catch(_){}
-  log('BOOT · '+CATALOG.length+' live portal keys');
+    const cat=await j('/portals');
+    CATALOG=Array.isArray(cat)?cat:(cat.portals||cat.keys||[]);
+    if(CATALOG.length && typeof CATALOG[0]==='string') CATALOG=CATALOG.map(k=>({key:k,group:'GOVERNANCE',label:k}));
+    document.getElementById('k-n').textContent=String(CATALOG.length||0);
+    renderCatalog();
+  }catch(e){ log('catalog '+e.message); }
+}
+function setGroup(el,g){ GROUP=g; document.querySelectorAll('[data-g]').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderCatalog(); }
+function renderCatalog(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const el=document.getElementById('catalog');
+  const rows=(CATALOG||[]).filter(p=>{
+    const key=(p.key||p.id||p).toString();
+    const group=(p.group||'GOVERNANCE').toString();
+    if(GROUP!=='all' && group!==GROUP) return false;
+    if(q && !key.toLowerCase().includes(q) && !(p.label||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  el.innerHTML=rows.map(p=>{
+    const key=(p.key||p.id||p).toString();
+    const label=p.label||key;
+    return '<button class="chip" style="text-align:left;width:100%" onclick="openPortal(\''+key.replace(/'/g,"\\'")+'\')"><b>'+label+'</b><br/><span class="mut">'+(p.group||'')+'</span></button>';
+  }).join('') || '<span class="mut">No portals match</span>';
 }
 async function openPortal(key){
-  window.__portal=key;
-  document.getElementById('k-act').textContent=key;
+  ACTIVE=key;
   document.getElementById('ws-title').textContent=key;
-  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on',c.id==='card-'+key));
-  const isCit=key==='CITIZEN';
-  document.getElementById('citizen-ui').classList.toggle('hide',!isCit);
-  document.getElementById('control-ui').classList.toggle('hide',isCit);
-  if(isCit){ log('OPEN CITIZEN'); return; }
+  document.getElementById('k-act').textContent=key;
   try{
     const d=await j('/portal/'+encodeURIComponent(key));
-    const portal=d.portal||{};
-    const ctrls=(portal.controls||[]).map(c=>c.name||c);
-    document.getElementById('ws-desc').textContent=portal.desc||'';
-    document.getElementById('ctrl').innerHTML=ctrls.length
-      ? ctrls.map(c=>'<option>'+esc(c)+'</option>').join('')
-      : '<option value="">(no controls)</option>';
-    window.__controls=ctrls;
-    const cases=(d.live&&d.live.oversight_cases)||[];
-    document.getElementById('live').innerHTML=cases.length
-      ?('<table><thead><tr><th>Ref</th><th>State</th><th>Reason</th></tr></thead><tbody>'+
-        cases.slice(0,12).map(c=>'<tr><td>'+esc(c.case_ref||c.ref)+'</td><td>'+esc(c.state)+'</td><td>'+esc((c.reason||'').slice(0,80))+'</td></tr>').join('')+
-        '</tbody></table>')
-      :'<span class="mut">No live oversight cases · run a control</span>';
-    log('OPEN '+key+' · controls='+ctrls.length+' cases='+cases.length);
+    const live=d.live||d;
+    const cases=(live.oversight_cases||live.cases||[]).length;
+    document.getElementById('k-cases').textContent=String(cases);
+    document.getElementById('ws-body').innerHTML='<pre style="white-space:pre-wrap;font-size:12px">'+JSON.stringify(d,null,2).slice(0,2500)+'</pre>';
+    log('OPEN '+key+' · cases='+cases);
   }catch(e){
-    document.getElementById('live').textContent=e.message;
-    log('OPEN FAIL '+e.message);
+    document.getElementById('ws-body').textContent='Error: '+e.message;
+    log('OPEN FAIL '+key+' '+e.message);
   }
 }
-async function refreshLive(){ if(window.__portal) await openPortal(window.__portal); }
-async function runControl(){
-  const key=window.__portal; if(!key) return;
-  const control=document.getElementById('ctrl').value;
-  if(!control){log('no control selected');return;}
-  const body={control, target:document.getElementById('target').value||undefined, note:document.getElementById('note').value||undefined};
-  try{
-    const r=await j('/portal/'+encodeURIComponent(key)+'/control',{method:'POST',body:JSON.stringify(body)});
-    log(key+' · '+control+' · '+JSON.stringify(r).slice(0,180));
-    await openPortal(key);
-  }catch(e){log('CTRL FAIL '+e.message);}
-}
-async function runBatch(){
-  const ctrls=window.__controls||[];
-  for(const c of ctrls){
-    document.getElementById('ctrl').value=c;
-    await runControl();
-  }
-}
-async function citizenChallenge(){
-  try{
-    const body={
-      service:document.getElementById('c-service').value||'model-001 decision',
-      description:document.getElementById('c-desc').value||'Challenge automated decision',
-      email:document.getElementById('c-email').value||''
-    };
-    const r=await fetch(API+'/citizen/challenge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const j=await r.json();
-    if(!r.ok) throw new Error(typeof j.detail==='string'?j.detail:JSON.stringify(j.detail||r.status));
-    const ref=j.case_ref||j.ref||j.id||'';
-    document.getElementById('c-ref').value=ref;
-    log('CHALLENGE '+JSON.stringify(j).slice(0,200));
-  }catch(e){log('CHALLENGE FAIL '+e.message);}
-}
-async function citizenStatus(){
-  try{
-    const ref=document.getElementById('c-ref').value.trim();
-    if(!ref) throw new Error('enter case ref');
-    const r=await fetch(API+'/citizen/cases/'+encodeURIComponent(ref));
-    const j=await r.json();
-    if(!r.ok) throw new Error(j.detail||r.status);
-    log('STATUS '+JSON.stringify(j).slice(0,220));
-  }catch(e){log('STATUS FAIL '+e.message);}
-}
-(function(){
-  const t=localStorage.getItem('portal_tok');
-  if(t){TOK=t;document.getElementById('login').classList.add('hide');document.getElementById('ops').classList.remove('hide');
-    document.getElementById('k-who').textContent=(localStorage.getItem('portal_who')||'').split('@')[0]; boot();}
-  else renderCatalog();
+(async()=>{
+  const t=localStorage.getItem('portals_tok');
+  if(t){TOK=t;document.getElementById('login').classList.add('hide');document.getElementById('ops').classList.remove('hide'); await boot();}
 })();
 </script>
 </body>
