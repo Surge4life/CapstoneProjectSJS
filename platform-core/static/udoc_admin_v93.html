@@ -61,6 +61,10 @@
     <input id="pass" type="password" placeholder="password" value="admin123" style="width:120px">
     <button type="button" onclick="login()">Connect</button>
     <button type="button" class="ghost" onclick="probeLayers()">Probe layers</button>
+    <button type="button" class="ghost" onclick="fillLogin('admin@gods.local','admin123')">admin@</button>
+    <button type="button" class="ghost" onclick="fillLogin('seths@gods.local','staff123')">seths@</button>
+    <button type="button" class="ghost" onclick="fillLogin('madiba@gods.local','staff123')">madiba@</button>
+    <button type="button" class="ghost" onclick="fillLogin('ts@gods.local','staff123')">ts@</button>
     <span id="who" style="color:var(--mut)"></span>
   </div>
   <div class="tabs" id="tabs"></div>
@@ -88,6 +92,7 @@ async function api(path,opts={}){
   }
   return j;
 }
+function fillLogin(e,p){document.getElementById("email").value=e;document.getElementById("pass").value=p;}
 async function login(){
   API=($("api").value||"").trim().replace(/\/$/,"");
   if(!API) API=location.origin;
