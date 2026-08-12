@@ -60,9 +60,10 @@ th{color:var(--mut);font-weight:600}
     </div>
     <div class="row">
       <button class="btn" onclick="doLogin()">Sign in</button>
-      <span class="chip" onclick="fill('seths@gods.local')">seths@</span>
-      <span class="chip" onclick="fill('ts@gods.local')">ts@</span>
-      <span class="chip" onclick="fill('madiba@gods.local')">madiba@</span>
+      <button class="btn ghost" type="button" onclick="fill('seths@gods.local','staff123')">seths@</button>
+      <button class="btn ghost" type="button" onclick="fill('ts@gods.local','staff123')">ts@</button>
+      <button class="btn ghost" type="button" onclick="fill('madiba@gods.local','staff123')">madiba@</button>
+      <button class="btn ghost" type="button" onclick="fill('admin@gods.local','admin123')">admin@</button>
     </div>
     <p id="li-err" style="color:var(--red);margin-top:8px;font-size:12px"></p>
   </div>
@@ -136,7 +137,7 @@ th{color:var(--mut);font-weight:600}
 const API=location.origin; let TOK="";
 const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
-function fill(e){document.getElementById('email').value=e;}
+function fill(e,p){document.getElementById('email').value=e;if(p)document.getElementById('pass').value=p;}
 async function j(path,opts={}){
   const h=Object.assign({},opts.headers||{});
   if(TOK) h.Authorization='Bearer '+TOK;
