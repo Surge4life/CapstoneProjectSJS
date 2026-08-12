@@ -15,7 +15,7 @@
   header a{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
   .wrap{max-width:1040px;margin:0 auto;padding:18px 22px}
   .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-  input{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px}
+  input,select{background:var(--navy2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:13px}
   button{background:var(--gold);color:#1a1505;border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
   button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
   .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:16px}
@@ -32,11 +32,15 @@
   .ENFORCED{background:#163a2a;color:#7fe3ab}.DECLARED{background:#1b2740;color:#9fb4dd}
   .PARTIAL{background:#3a2f16;color:#f0c674}.APPROVE{background:#163a2a;color:#7fe3ab}
   .BLOCK{background:#3a1717;color:#f0a0a0}.REVIEW{background:#3a2f16;color:#f0c674}.ESCALATE{background:#33203a;color:#d6a8ef}
+  .operational{background:#163a2a;color:#7fe3ab}
   .kv{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line)}
   .kv span:first-child{color:var(--mut)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--cyan)}
   .note{color:var(--mut);font-size:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
-  .err{color:var(--bad)}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--bad)}
+  .err{color:var(--bad)}.ok{color:var(--ok)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;background:var(--bad)}
   .dot.live{background:var(--ok)}
+  .layer{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12px}
+  .layer .st{font-weight:700}
 </style></head>
 <body>
 <header>
@@ -47,33 +51,55 @@
   <span style="flex:1"></span>
   <a href="/admin">GODS Admin</a>
   <a href="/portals">24 Portals</a>
+  <a href="/Sentinel">Sentinel</a>
+  <a href="/divisions">Divisions</a>
 </header>
 <div class="wrap">
   <div class="bar">
-    <input id="api" placeholder="API base (blank = same origin)" style="width:240px">
-    <input id="email" placeholder="email" value="seths@gods.local" style="width:180px">
-    <input id="pass" type="password" placeholder="password" value="staff123" style="width:140px">
+    <input id="api" placeholder="API base (blank = same origin)" style="width:220px">
+    <input id="email" placeholder="email" value="admin@gods.local" style="width:170px">
+    <input id="pass" type="password" placeholder="password" value="admin123" style="width:120px">
     <button type="button" onclick="login()">Connect</button>
+    <button type="button" class="ghost" onclick="probeLayers()">Probe layers</button>
     <span id="who" style="color:var(--mut)"></span>
   </div>
   <div class="tabs" id="tabs"></div>
   <div id="view"></div>
   <div class="note">
-    Staff login: <code>seths@gods.local</code> / <code>staff123</code> (or madiba@ / ts@). Internal UDOC controller on platform-core. <b>/admin</b> = GODS constitutional governance.
-    <b>/portals</b> = 24 Sovereign-Operator select + control. GG54477 withdrawn 2026-04-26; POPIA s71 + Constitution ss 9/16/33.
+    Logins: <code>admin@gods.local</code>/<code>admin123</code> (admin) · <code>seths@</code>/<code>madiba@</code>/<code>ts@gods.local</code>/<code>staff123</code> (operator).
+    <b>/admin</b> = GODS constitutional · <b>/udoc-admin</b> = UDOC controller · GG54477 withdrawn · POPIA s71.
   </div>
 </div>
 <script>
-let API="", TOK="", lastMid="model-001", lastDid="130", active="regulator";
+let API="", TOK="", lastMid="model-001", lastDid="130", active="layers";
 const $=id=>document.getElementById(id);
-const TABS=[["regulator","Regulator"],["pillars","Constitutional"],["control","Control"],["incidents","Incidents"],["lifecycle","Lifecycle"],["evidence","Evidence"],["replay","Replay"],["exchange","Exchange"],["schema","Schema"],["submit","Submit"],["tenancy","Tenancy"]];
+const TABS=[
+  ["layers","Layers"],
+  ["regulator","Regulator"],
+  ["pillars","Constitutional"],
+  ["control","Control"],
+  ["incidents","Incidents"],
+  ["lifecycle","Lifecycle"],
+  ["evidence","Evidence"],
+  ["replay","Replay"],
+  ["exchange","Exchange"],
+  ["schema","Schema"],
+  ["submit","Submit"],
+  ["tenancy","Tenancy"]
+];
 function drawTabs(){$("tabs").innerHTML=TABS.map(([k,l])=>`<button class="${k===active?'on':''}" onclick="go('${k}')">${l}</button>`).join("");}
 function go(k){active=k;drawTabs();render();}
 async function api(path,opts={}){
-  const h=opts.headers||{}; if(TOK)h.Authorization="Bearer "+TOK;
+  const h=Object.assign({}, opts.headers||{}); if(TOK) h.Authorization="Bearer "+TOK;
+  if(opts.body && !h["Content-Type"] && !(opts.body instanceof URLSearchParams)) h["Content-Type"]="application/json";
   const r=await fetch(API+path,{...opts,headers:h});
-  if(!r.ok) throw new Error("HTTP "+r.status+" on "+path);
-  return r.json();
+  const text=await r.text();
+  let j; try{j=JSON.parse(text);}catch{j={raw:text};}
+  if(!r.ok){
+    const det=(j&&(j.detail||j.message))||text.slice(0,160)||r.status;
+    throw new Error("HTTP "+r.status+" on "+path+" · "+(typeof det==="string"?det:JSON.stringify(det).slice(0,160)));
+  }
+  return j;
 }
 async function login(){
   API=($("api").value||"").trim().replace(/\/$/,"");
@@ -92,55 +118,129 @@ async function login(){
   }catch(e){$("who").innerHTML='<span class="err">'+String(e.message||e)+'</span>';}
 }
 const esc=s=>{const d=document.createElement("div");d.textContent=String(s==null?"":s);return d.innerHTML;};
-function pill(s){return `<span class="pill ${esc(s)}">${esc(s)}</span>`;}
-function kv(o){return Object.entries(o).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${typeof v==="object"?esc(JSON.stringify(v)):esc(v)}</span></div>`).join("");}
+function pill(s){const t=String(s||"");return `<span class="pill ${esc(t)}">${esc(t)}</span>`;}
+function kv(o){
+  if(!o||typeof o!=="object") return `<div class="note" style="border:0;padding:0">—</div>`;
+  return Object.entries(o).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${typeof v==="object"?esc(JSON.stringify(v)):esc(v)}</span></div>`).join("");
+}
+function num(v,d=0){const n=Number(v);return isFinite(n)?n:d;}
+
+async function probeLayers(){
+  if(!TOK){alert("Connect first");return;}
+  active="layers"; drawTabs(); await render();
+}
+
+async function loadLayers(){
+  const o=$("view");
+  o.innerHTML=`<div class="card"><h4>Layer probe</h4><div id="layer-body">Probing…</div></div>`;
+  const checks=[
+    ["Auth token", async()=>({ok:!!TOK, detail:TOK?"present":"missing"})],
+    ["demo/ready", async()=>{const d=await api("/udoc/demo/ready"); return {ok:!!d.ready, detail:JSON.stringify({ready:d.ready,rules:d.active_rules,model:d.model_001&&d.model_001.status})}}],
+    ["Regulator summary", async()=>{const d=await api("/udoc/regulator/summary"); return {ok:!!(d.systems&&d.decisions), detail:`systems ${d.systems&&d.systems.total} · decisions ${d.decisions&&d.decisions.total}`}}],
+    ["Constitutional pillars", async()=>{const d=await api("/udoc/constitutional/pillars"); return {ok:(d.count||0)>=12, detail:`count ${d.count}`}}],
+    ["Registry models", async()=>{const d=await api("/registry/models"); return {ok:Array.isArray(d), detail:`${(d||[]).length} models`}}],
+    ["Incidents", async()=>{const d=await api("/udoc/incidents"); return {ok:typeof d.count==="number", detail:`${d.count} · open ${(d.open_cases||[]).length}`}}],
+    ["Lifecycle model-001", async()=>{const d=await api("/udoc/models/model-001/lifecycle"); return {ok:!!d.model_id, detail:`${d.status} · decisions ${d.decisions&&d.decisions.total}`}}],
+    ["Evidence latest", async()=>{
+      const list=await api("/decisions");
+      const id=(Array.isArray(list)&&list[0]&&list[0].id)||lastDid;
+      lastDid=String(id);
+      const d=await api("/udoc/decisions/"+encodeURIComponent(id)+"/evidence");
+      return {ok:!!(d.decision&&d.decision.id), detail:`#${d.decision.id} ${d.decision.outcome}`};
+    }],
+    ["Replay latest", async()=>{
+      const d=await api("/udoc/decisions/"+encodeURIComponent(lastDid)+"/replay");
+      return {ok:d.drift===false||d.drift===true, detail:`drift=${d.drift}`};
+    }],
+    ["Exchange", async()=>{const d=await api("/udoc/exchange"); return {ok:!!d.jurisdiction, detail:d.jurisdiction}}],
+    ["Schema", async()=>{const d=await api("/udoc/schema"); return {ok:!!d.Decision, detail:Object.keys(d).length+" keys"}}],
+    ["Tenants", async()=>{const d=await api("/tenants"); return {ok:Array.isArray(d), detail:`${d.length} tenants`}}],
+    ["Tenants/me", async()=>{const d=await api("/tenants/me"); return {ok:true, detail:d.tenant_id||d.role||d.note||"ok"}}],
+    ["Policy active", async()=>{const d=await api("/policy/active"); return {ok:!!(d.active_packs||d.rules), detail:`packs ${(d.active_packs||[]).length||d.active_packs} rules ${(d.rules||[]).length}`}}],
+    ["EVA fair decision", async()=>{
+      const d=await api("/decisions",{method:"POST",body:JSON.stringify({model_id:"model-001",raw_confidence:0.92,compliance:1.0})});
+      return {ok:d.decision==="APPROVE"||d.decision==="BLOCK"||d.decision==="ESCALATE", detail:d.decision+" #"+d.id};
+    }],
+  ];
+  const lines=[];
+  for(const [name,fn] of checks){
+    try{
+      const r=await fn();
+      lines.push(`<div class="layer"><span>${esc(name)}</span><span class="st ${r.ok?'ok':'err'}">${r.ok?'PASS':'CHECK'} · ${esc(r.detail)}</span></div>`);
+    }catch(e){
+      lines.push(`<div class="layer"><span>${esc(name)}</span><span class="st err">FAIL · ${esc(e.message)}</span></div>`);
+    }
+  }
+  $("layer-body").innerHTML=lines.join("")||"—";
+}
 
 async function loadLifecycle(){
   const mid=($("mid").value||"model-001"); lastMid=mid; const o=$("lc"); o.innerHTML="Loading…";
   try{const d=await api("/udoc/models/"+encodeURIComponent(mid)+"/lifecycle");
+    const dec=d.decisions||{};
     o.innerHTML=`<div class="grid">
       <div class="card"><h4>${esc(d.model_id)} · ${esc(d.name)}</h4>${kv({operator:d.operator_id,risk_tier:d.risk_tier,jurisdiction:d.jurisdiction,status:d.status,stage:d.stage})}</div>
-      <div class="card"><h4>Decisions</h4><div class="big gold">${d.decisions.total}</div>
-        <div style="margin-top:8px">${Object.entries(d.decisions.by_outcome||{}).map(([k,n])=>pill(k)+" "+n).join("&nbsp; ")}</div>
-        <div class="note" style="border:0;padding:0;margin-top:8px">last: ${esc(d.decisions.last_outcome)} @ ${esc(d.decisions.last_decision)}</div></div></div>`;
+      <div class="card"><h4>Decisions</h4><div class="big gold">${num(dec.total)}</div>
+        <div style="margin-top:8px">${Object.entries(dec.by_outcome||{}).map(([k,n])=>pill(k)+" "+n).join("&nbsp; ")}</div>
+        <div class="note" style="border:0;padding:0;margin-top:8px">last: ${esc(dec.last_outcome)} @ ${esc(dec.last_decision)}</div></div></div>`;
   }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
 async function loadEvidence(){
-  const did=($("did").value||"130"); lastDid=did; const o=$("out"); o.innerHTML="Loading…";
-  try{const d=await api("/udoc/decisions/"+encodeURIComponent(did)+"/evidence"); const c=d.certificate;
+  let did=($("did")&&$("did").value)||lastDid||"130";
+  lastDid=did; const o=$("out"); o.innerHTML="Loading…";
+  try{
+    if(!did || did==="1"){
+      try{const list=await api("/decisions"); if(Array.isArray(list)&&list[0]){did=String(list[0].id); lastDid=did; if($("did"))$("did").value=did;}}catch(_){}}
+    const d=await api("/udoc/decisions/"+encodeURIComponent(did)+"/evidence");
+    const c=d.certificate||null;
+    const dec=d.decision||{};
+    const audit=d.audit_context||{};
     o.innerHTML=`<div class="grid">
-      <div class="card"><h4>Decision #${esc(d.decision.id)}</h4>${kv({model:d.decision.model_id,outcome:d.decision.outcome,risk:d.decision.risk,compliance:d.decision.compliance,sealed:d.decision.sealed,at:d.decision.at})}
-        <div class="note" style="border:0;padding:0;margin-top:6px">${esc(d.decision.reasons)}</div></div>
+      <div class="card"><h4>Decision #${esc(dec.id)}</h4>${kv({model:dec.model_id,outcome:dec.outcome,risk:dec.risk,compliance:dec.compliance,sealed:dec.sealed,at:dec.at})}
+        <div class="note" style="border:0;padding:0;margin-top:6px">${esc(dec.reasons||"")}</div></div>
       <div class="card"><h4>EVA certificate</h4>${c?kv({id:c.certificate_id,composite_eva:c.composite_eva,policy_version:c.policy_version,signature:c.signature_alg}):"none"}
         ${c?`<div class="kv"><span>content_sha3</span><span class="mono">${esc(c.content_sha3)}</span></div><div class="kv"><span>merkle_leaf</span><span class="mono">${esc(c.merkle_leaf)}</span></div>`:""}</div>
-      <div class="card"><h4>Audit anchor</h4>${kv({chain_head_seq:d.audit_context.chain_head_seq})}<div class="kv"><span>chain_head_hash</span><span class="mono">${esc((d.audit_context.chain_head_hash||"").slice(0,24))}…</span></div></div>
-      <div class="card"><h4>Dimensions</h4>${c?kv(c.dimensions):"—"}</div></div>`;
+      <div class="card"><h4>Audit anchor</h4>${kv({chain_head_seq:audit.chain_head_seq})}<div class="kv"><span>chain_head_hash</span><span class="mono">${esc(String(audit.chain_head_hash||"").slice(0,24))}…</span></div></div>
+      <div class="card"><h4>Dimensions</h4>${c?kv(c.dimensions||{}):"—"}</div></div>`;
   }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
 async function loadReplay(){
-  const did=($("did").value||"130"); lastDid=did; const o=$("out"); o.innerHTML="Loading…";
-  try{const d=await api("/udoc/decisions/"+encodeURIComponent(did)+"/replay");
+  let did=($("did")&&$("did").value)||lastDid||"130";
+  lastDid=did; const o=$("out"); o.innerHTML="Loading…";
+  try{
+    if(!did || did==="1"){
+      try{const list=await api("/decisions"); if(Array.isArray(list)&&list[0]){did=String(list[0].id); lastDid=did; if($("did"))$("did").value=did;}}catch(_){}}
+    const d=await api("/udoc/decisions/"+encodeURIComponent(did)+"/replay");
     o.innerHTML=`<div class="grid">
-      <div class="card"><h4>Original (sealed)</h4>${kv(d.original)}</div>
-      <div class="card"><h4>Replayed (current engine)</h4>${kv({outcome:d.replayed.outcome,svs:d.replayed.svs,risk:d.replayed.risk,composite_eva:d.replayed.composite_eva})}</div>
+      <div class="card"><h4>Original (sealed)</h4>${kv(d.original||{})}</div>
+      <div class="card"><h4>Replayed (current engine)</h4>${kv({outcome:(d.replayed||{}).outcome,svs:(d.replayed||{}).svs,risk:(d.replayed||{}).risk,composite_eva:(d.replayed||{}).composite_eva})}</div>
       <div class="card"><h4>Drift</h4><div class="big" style="color:${d.drift?'var(--bad)':'var(--ok)'}">${d.drift?"DRIFT":"REPRODUCIBLE"}</div>
-        <div class="note" style="border:0;padding:0;margin-top:8px">${esc(d.note)}</div></div></div>`;
+        <div class="note" style="border:0;padding:0;margin-top:8px">${esc(d.note||"")}</div></div></div>`;
   }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
 
 async function loadControl(){
   const o=$("ctl"); o.innerHTML="Loading…";
-  try{const ms=await api("/registry/models");
+  try{
+    let ms=await api("/registry/models");
+    if(!Array.isArray(ms)) ms=(ms&&ms.models)||[];
     o.innerHTML=`<table><tr><th>Model</th><th>Risk</th><th>Status</th><th>Kill-switch</th></tr>`+
-      ms.map(m=>`<tr><td><b>${esc(m.model_id)}</b><div class="note" style="border:0;padding:0;margin:0">${esc(m.name)}</div></td>
-        <td>${esc(m.risk_tier)}</td><td>${pill(m.status==='ACTIVE'?'APPROVE':(m.status==='BLOCKED'?'BLOCK':'REVIEW'))} ${esc(m.status)}</td>
+      ms.map(m=>`<tr><td><b>${esc(m.model_id)}</b><div class="note" style="border:0;padding:0;margin:0">${esc(m.name||"")}</div></td>
+        <td>${esc(m.risk_tier)}</td><td>${pill(m.status==='ACTIVE'?'APPROVE':(m.status==='BLOCKED'||m.status==='SUSPENDED'?'BLOCK':'REVIEW'))} ${esc(m.status)}</td>
         <td><select id="st_${esc(m.model_id)}"><option>ACTIVE</option><option>SUSPENDED</option><option>RETIRED</option></select>
         <button class="ghost" onclick="setModelStatus('${esc(m.model_id)}')">Apply</button></td></tr>`).join("")+`</table>`;
   }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
 async function setModelStatus(mid){
-  try{await api("/registry/models/"+encodeURIComponent(mid)+"/status?new_status="+$("st_"+mid).value,{method:"POST"}); loadControl();}
-  catch(e){alert(e.message);}
+  try{
+    const st=$("st_"+mid).value;
+    try{
+      await api("/registry/models/"+encodeURIComponent(mid)+"/status?new_status="+encodeURIComponent(st),{method:"POST"});
+    }catch(_){
+      await api("/udoc/models/"+encodeURIComponent(mid)+"/status",{method:"POST",body:JSON.stringify({status:st})});
+    }
+    loadControl();
+  }catch(e){alert(e.message);}
 }
 async function downloadExport(){
   try{const d=await api("/udoc/regulator/export");
@@ -150,6 +250,7 @@ async function downloadExport(){
 }
 
 function usageBar(u,q){
+  u=num(u); q=num(q,-1);
   if(q<0) return `<div class="note" style="border:0;padding:0;margin-top:6px">${u} decisions · unlimited</div>`;
   const pct=Math.min(100,Math.round(u/Math.max(1,q)*100));
   return `<div style="background:var(--line);border-radius:6px;height:8px;overflow:hidden;margin-top:8px"><div style="width:${pct}%;height:8px;background:${pct>90?'var(--bad)':'var(--gold)'}"></div></div><div class="note" style="border:0;padding:0;margin-top:4px">${u}/${q} (${pct}%)</div>`;
@@ -158,37 +259,43 @@ async function loadTenancy(){
   const o=$("ten"); o.innerHTML="Loading…";
   try{
     const me=await api("/tenants/me");
-    if(me && me.tenant_id){
+    const tenantId=me.tenant_id || (me.tenant && (me.tenant.tenant_id||me.tenant.id));
+    if(tenantId){
+      const t=me.tenant||me;
       o.innerHTML=`<div class="grid">
-        <div class="card"><h4>Plan · ${esc(me.tier_name)}</h4>${kv({tenant:me.tenant_id,sector:me.sector,status:me.status})}${usageBar(me.usage_decisions,me.decision_quota)}</div>
-        <div class="card"><h4>Entitlements</h4>${kv({max_models:me.entitlements.max_models,api_keys:me.entitlements.api_keys,certificates:me.entitlements.certificates,async_tiers:me.entitlements.async_tiers,cob:me.entitlements.cob})}</div>
+        <div class="card"><h4>Plan · ${esc(t.tier_name||t.tier||me.tier_name)}</h4>${kv({tenant:tenantId,sector:t.sector||me.sector,status:t.status||me.status})}${usageBar(t.usage_decisions||me.usage_decisions,t.decision_quota||me.decision_quota)}</div>
+        <div class="card"><h4>Entitlements</h4>${kv((t.entitlements||me.entitlements)||{})}</div>
         <div class="card"><h4>API keys <button class="ghost" style="float:right;padding:3px 8px" onclick="tnIssueMyKey()">+ Issue</button></h4><div id="keys">…</div></div></div>`;
-      const ks=await api("/tenants/me/apikeys");
-      $("keys").innerHTML=ks.map(k=>`<div class="kv"><span class="mono">${esc(k.prefix)}…</span><span>${esc(k.name)}${k.active?'':' (revoked)'}</span></div>`).join("")||"<div class='note' style='border:0;padding:0'>none yet</div>";
+      try{
+        const ks=await api("/tenants/me/apikeys");
+        $("keys").innerHTML=(ks||[]).map(k=>`<div class="kv"><span class="mono">${esc(k.prefix)}…</span><span>${esc(k.name)}${k.active?'':' (revoked)'}</span></div>`).join("")||"<div class='note' style='border:0;padding:0'>none yet</div>";
+      }catch(e){$("keys").innerHTML=`<span class="err">${esc(e.message)}</span>`;}
     } else {
       const ts=await api("/tenants"), tiers=await api("/tenants/tiers");
-      const TI=["SANDBOX","STARTER","GROWTH","ENTERPRISE","INSTITUTIONAL","SOVEREIGN"];
-      o.innerHTML=`<div class="card"><h4>Tenants (${ts.length})</h4><table><tr><th>Tenant</th><th>Tier / status</th><th>Usage</th><th>Controls</th></tr>
-        ${ts.map(t=>`<tr><td><b>${esc(t.tenant_id)}</b><div class="note" style="border:0;padding:0">${esc(t.name)}</div></td>
+      const TI=(tiers.order)||["SANDBOX","STARTER","GROWTH","ENTERPRISE","INSTITUTIONAL","SOVEREIGN"];
+      o.innerHTML=`<div class="card"><h4>Staff view · Tenants (${(ts||[]).length})</h4>
+        <div class="note" style="border:0;padding:0 0 8px">${esc(me.note||"platform staff — not tenant-scoped")} · role ${esc(me.role||"")}</div>
+        <table><tr><th>Tenant</th><th>Tier / status</th><th>Usage</th><th>Controls</th></tr>
+        ${(ts||[]).map(t=>`<tr><td><b>${esc(t.tenant_id)}</b><div class="note" style="border:0;padding:0">${esc(t.name)}</div></td>
           <td>${esc(t.tier_name)} <span class="pill ${t.status==='ACTIVE'?'APPROVE':(t.status==='SUSPENDED'?'BLOCK':'REVIEW')}">${esc(t.status)}</span></td>
           <td style="min-width:150px">${usageBar(t.usage_decisions,t.decision_quota)}</td>
           <td><select id="tier_${t.id}">${TI.map(x=>`<option ${x===t.tier?'selected':''}>${x}</option>`).join("")}</select><button class="ghost" onclick="tnSetTier(${t.id})">Tier</button>
             <select id="stat_${t.id}">${["TRIAL","ACTIVE","SUSPENDED"].map(x=>`<option ${x===t.status?'selected':''}>${x}</option>`).join("")}</select><button class="ghost" onclick="tnSetStatus(${t.id})">Status</button>
             <button class="ghost" onclick="tnIssueKey(${t.id})">+Key</button></td></tr>`).join("")}</table></div>
         <div class="card"><h4>Six-tier commercial architecture</h4><table><tr><th>Tier</th><th>Decisions/period</th><th>Models</th><th>API keys</th><th>COB</th></tr>
-        ${tiers.order.map(k=>{const t=tiers.tiers[k];return `<tr><td>${esc(t.name)}</td><td>${t.decision_quota<0?'unlimited':t.decision_quota}</td><td>${t.max_models<0?'∞':t.max_models}</td><td>${t.api_keys}</td><td>${t.cob?'yes':'—'}</td></tr>`;}).join("")}</table></div>`;
+        ${TI.map(k=>{const t=(tiers.tiers||{})[k]||{};return `<tr><td>${esc(t.name||k)}</td><td>${t.decision_quota<0?'unlimited':(t.decision_quota??'—')}</td><td>${t.max_models<0?'∞':(t.max_models??'—')}</td><td>${t.api_keys??'—'}</td><td>${t.cob?'yes':'—'}</td></tr>`;}).join("")}</table></div>`;
     }
   }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
 async function tnSetTier(id){try{await api("/tenants/"+id+"/tier?tier="+$("tier_"+id).value,{method:"POST"});loadTenancy();}catch(e){alert(e.message);}}
 async function tnSetStatus(id){try{await api("/tenants/"+id+"/status?status_value="+$("stat_"+id).value,{method:"POST"});loadTenancy();}catch(e){alert(e.message);}}
-async function tnIssueKey(id){try{const r=await api("/tenants/"+id+"/apikeys",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"console"})});alert("API key (copy now — shown once):\n"+r.api_key);loadTenancy();}catch(e){alert(e.message);}}
-async function tnIssueMyKey(){try{const r=await api("/tenants/me/apikeys",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:"console"})});alert("API key (copy now — shown once):\n"+r.api_key);loadTenancy();}catch(e){alert(e.message);}}
+async function tnIssueKey(id){try{const r=await api("/tenants/"+id+"/apikeys",{method:"POST",body:JSON.stringify({name:"console"})});alert("API key (copy now — shown once):\n"+r.api_key);loadTenancy();}catch(e){alert(e.message);}}
+async function tnIssueMyKey(){try{const r=await api("/tenants/me/apikeys",{method:"POST",body:JSON.stringify({name:"console"})});alert("API key (copy now — shown once):\n"+r.api_key);loadTenancy();}catch(e){alert(e.message);}}
 
 async function doRegister(){
   const o=$("regout");
   try{const id=$("r_id").value.trim(); if(!id){o.innerHTML="<span class=err>model_id required</span>";return;}
-    const r=await api("/registry/models",{method:"POST",headers:{"Content-Type":"application/json"},
+    const r=await api("/registry/models",{method:"POST",
       body:JSON.stringify({model_id:id,name:$("r_name").value||id,operator_id:"self",risk_tier:$("r_tier").value,use_case:$("r_use").value})});
     o.innerHTML=`Registered <b>${esc(r.model_id)}</b> · status ${esc(r.status)}`; if($("e_id"))$("e_id").value=r.model_id;
   }catch(e){o.innerHTML=`<span class="err">${esc(e.message)}</span>`;}
@@ -197,28 +304,33 @@ async function doEvaluate(){
   const o=$("evout"); o.innerHTML="<div class='card'>Evaluating…</div>";
   const body={model_id:$("e_id").value,raw_confidence:parseFloat($("e_conf").value)||0.9,compliance:parseFloat($("e_comp").value)||1.0};
   if($("e_fair").value==="biased"){body.priv_favorable=900;body.priv_total=1000;body.unpriv_favorable=120;body.unpriv_total=1000;}
-  try{const d=await api("/decisions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  try{const d=await api("/decisions",{method:"POST",body:JSON.stringify(body)});
+    if(d.id) lastDid=String(d.id);
     const reasons=Array.isArray(d.block_reasons)?d.block_reasons.join(" · "):(d.block_reasons||"");
     o.innerHTML=`<div class="grid">
       <div class="card"><h4>Outcome</h4><div class="big">${pill(d.decision)}</div>
-        <div class="note" style="border:0;padding:0;margin-top:8px">composite EVA ${d.composite_eva}</div>
+        <div class="note" style="border:0;padding:0;margin-top:8px">composite EVA ${d.composite_eva} · id ${d.id}</div>
         ${reasons?`<div class="note">${esc(reasons)}</div>`:""}</div>
       <div class="card"><h4>EVA dimensions</h4>${kv(d.dimensions||{})}</div>
       <div class="card"><h4>Certificate</h4>${kv({id:d.certificate_id,policy_version:d.policy_version})}
-        <div class="kv"><span>content_sha3</span><span class="mono">${esc((d.content_sha3||'').slice(0,20))}…</span></div>
+        <div class="kv"><span>content_sha3</span><span class="mono">${esc(String(d.content_sha3||'').slice(0,20))}…</span></div>
         <button class="ghost" onclick="verifyCert('${esc(d.certificate_id)}')">Verify certificate</button>
         <div id="vout" class="note" style="border:0;padding:0;margin-top:6px"></div></div></div>`;
   }catch(e){o.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
 async function verifyCert(cid){
-  try{const v=await api("/decisions/certificates/"+encodeURIComponent(cid)+"/verify");
-    $("vout").innerHTML=`<b style="color:${v.valid?'var(--ok)':'var(--bad)'}">${v.valid?'VALID':'INVALID'}</b> · ${esc(v.signature_alg)}`;
+  try{
+    let v;
+    try{v=await api("/decisions/certificates/"+encodeURIComponent(cid)+"/verify");}
+    catch(_){v=await api("/udoc/certs/verify",{method:"POST",body:JSON.stringify({certificate_id:cid})});}
+    $("vout").innerHTML=`<b style="color:${v.valid?'var(--ok)':'var(--bad)'}">${v.valid?'VALID':'INVALID'}</b> · ${esc(v.signature_alg||v.status||'')}`;
   }catch(e){$("vout").innerHTML=`<span class="err">${esc(e.message)}</span>`;}
 }
 
 async function render(){
   if(!TOK){$("view").innerHTML=`<div class="card">Connect to the governance core to load admin data.</div>`;return;}
   const v=$("view");
+  if(active==="layers"){ await loadLayers(); return; }
   if(active==="lifecycle"){
     v.innerHTML=`<div class="bar"><input id="mid" placeholder="model_id" value="${esc(lastMid)}" style="width:220px"><button class="ghost" onclick="loadLifecycle()">Load</button></div><div id="lc"></div>`;
     loadLifecycle(); return;
@@ -258,29 +370,30 @@ async function render(){
   v.innerHTML=`<div class="card">Loading…</div>`;
   try{
     if(active==="regulator"){
-      const d=await api("/udoc/regulator/summary"); const oc=(d.decisions&&d.decisions.by_outcome)||d.by_outcome||{};
+      const d=await api("/udoc/regulator/summary");
       const systems=d.systems||{total:0,by_status:{}};
-      const decisions=d.decisions||{total:d.decisions||0,by_outcome:oc,blocked:oc.BLOCK||0,escalated:oc.ESCALATE||0};
-      const oversight=d.oversight||{open:d.open_oversight||0,total:d.open_oversight||0};
+      const decisions=typeof d.decisions==="object"&&d.decisions?d.decisions:{total:num(d.decisions),by_outcome:d.by_outcome||{},blocked:0,escalated:0};
+      const oc=decisions.by_outcome||d.by_outcome||{};
+      const oversight=d.oversight||{open:num(d.open_oversight),total:num(d.open_oversight)};
       const policy=d.policy||{active_packs:0,active_rules:0,hot_reload:{last_reload_ms:0}};
-      const crypto=d.crypto||{label:'HMAC demo',custody:'Capstone'};
+      const crypto=d.crypto||{label:"HMAC demo",custody:"Capstone"};
       v.innerHTML=`<div class="grid">
-        <div class="card"><h4>Registered systems (${esc(d.scope||'platform')})</h4><div class="big gold">${systems.total||0}</div>
+        <div class="card"><h4>Registered systems (${esc(d.scope||"platform")})</h4><div class="big gold">${num(systems.total)}</div>
           <div class="note" style="border:0;padding:0;margin-top:8px">${kv(systems.by_status||{})}</div></div>
-        <div class="card"><h4>Governed decisions</h4><div class="big">${decisions.total||0}</div>
+        <div class="card"><h4>Governed decisions</h4><div class="big">${num(decisions.total)}</div>
           <div style="margin-top:8px">${Object.entries(oc).map(([k,n])=>pill(k)+" "+n).join("&nbsp; ")}</div></div>
-        <div class="card"><h4>Blocked / Escalated</h4><div class="big" style="color:var(--bad)">${decisions.blocked||0}</div>
-          <div class="note" style="border:0;padding:0">escalated ${decisions.escalated||0}</div></div>
-        <div class="card"><h4>Oversight (COB)</h4><div class="big">${oversight.open||0}<span style="font-size:14px;color:var(--mut)"> open / ${oversight.total||0}</span></div></div>
-        <div class="card"><h4>Active policy</h4><div class="big">${policy.active_packs||0}<span style="font-size:14px;color:var(--mut)"> packs · ${policy.active_rules||0} rules</span></div>
-          <div class="note" style="border:0;padding:0">hot-reload ${(policy.hot_reload&&policy.hot_reload.last_reload_ms)||0} ms</div></div>
+        <div class="card"><h4>Blocked / Escalated</h4><div class="big" style="color:var(--bad)">${num(decisions.blocked)}</div>
+          <div class="note" style="border:0;padding:0">escalated ${num(decisions.escalated)}</div></div>
+        <div class="card"><h4>Oversight (COB)</h4><div class="big">${num(oversight.open)}<span style="font-size:14px;color:var(--mut)"> open / ${num(oversight.total)}</span></div></div>
+        <div class="card"><h4>Active policy</h4><div class="big">${num(policy.active_packs)}<span style="font-size:14px;color:var(--mut)"> packs · ${num(policy.active_rules)} rules</span></div>
+          <div class="note" style="border:0;padding:0">hot-reload ${num(policy.hot_reload&&policy.hot_reload.last_reload_ms)} ms</div></div>
         <div class="card"><h4>Crypto provider</h4><div>${esc(crypto.label)}</div><div class="note" style="border:0;padding:0">custody: ${esc(crypto.custody)}</div></div>
         <div class="card"><h4>Regulator export</h4><button class="ghost" onclick="downloadExport()">Download signed evidence (JSON)</button></div>
-      </div><div class="note">${esc(d.compliance_basis||'')}</div>`;
+      </div><div class="note">${esc(d.compliance_basis||d.note||"")}</div>`;
     }
     else if(active==="incidents"){
       const d=await api("/udoc/incidents");
-      v.innerHTML=`<div class="card"><h4>Incidents — BLOCK / ESCALATE (${d.count})</h4>
+      v.innerHTML=`<div class="card"><h4>Incidents — BLOCK / ESCALATE (${num(d.count)})</h4>
         <table><tr><th>#</th><th>Model</th><th>Severity</th><th>Risk</th><th>When</th></tr>
         ${(d.incidents||[]).map(i=>`<tr><td>${i.decision_id}</td><td>${esc(i.model_id)}</td><td>${pill(i.severity)}</td><td>${i.risk}</td><td>${esc(i.at)}</td></tr>`).join("")||"<tr><td colspan=5 style='color:var(--mut)'>No incidents recorded.</td></tr>"}</table>
         <div class="note">Open oversight cases: ${(d.open_cases||[]).length}</div></div>`;
@@ -289,8 +402,8 @@ async function render(){
       const d=await api("/udoc/exchange");
       v.innerHTML=`<div class="grid">
         <div class="card"><h4>Data sovereignty</h4>${kv({jurisdiction:d.jurisdiction,data_localisation:d.data_localisation,cross_border:d.cross_border_transfer,recheck_hours:d.sovereignty_recheck_hours})}</div>
-        <div class="card"><h4>Localisation rules (${d.rules_active})</h4>${(d.localisation_rules||[]).map(r=>`<div class="kv"><span>${esc(r.code)}</span><span>${esc(r.kind)}</span></div>`).join("")||"<div class='note' style='border:0;padding:0'>none active</div>"}</div>
-        </div><div class="note">${esc(d.basis)}</div>`;
+        <div class="card"><h4>Localisation rules (${num(d.rules_active)})</h4>${(d.localisation_rules||[]).map(r=>`<div class="kv"><span>${esc(r.code)}</span><span>${esc(r.kind)}</span></div>`).join("")||"<div class='note' style='border:0;padding:0'>none active</div>"}</div>
+        </div><div class="note">${esc(d.basis||d.honesty||"")}</div>`;
     }
     else if(active==="schema"){
       const d=await api("/udoc/schema");
@@ -300,10 +413,10 @@ async function render(){
     else if(active==="pillars"){
       const d=await api("/udoc/constitutional/pillars");
       const summary=d.status_summary||{};
-      v.innerHTML=`<div class="card"><h4>G.O.D.S Constitutional Pillars — ${d.count|| (d.pillars||[]).length} · ${Object.entries(summary).map(([k,n])=>esc(k)+" "+n).join(" · ")}</h4>
+      v.innerHTML=`<div class="card"><h4>G.O.D.S Constitutional Pillars — ${d.count||(d.pillars||[]).length} · ${Object.entries(summary).map(([k,n])=>esc(k)+" "+n).join(" · ")}</h4>
         <table><tr><th>#</th><th>Pillar</th><th>Enforcement</th><th>Status</th></tr>
-        ${(d.pillars||[]).map(p=>`<tr><td>${p.n||p.id}</td><td><b>${esc(p.name)}</b><div class="note" style="border:0;padding:0;margin:2px 0 0">${esc(p.principle||'')}</div></td>
-          <td>${esc(p.enforcement||'')}</td><td>${pill(p.status)}</td></tr>`).join("")}</table></div>`;
+        ${(d.pillars||[]).map(p=>`<tr><td>${p.n||p.id}</td><td><b>${esc(p.name)}</b><div class="note" style="border:0;padding:0;margin:2px 0 0">${esc(p.principle||"")}</div></td>
+          <td>${esc(p.enforcement||"")}</td><td>${pill(p.status)}</td></tr>`).join("")}</table></div>`;
     }
   }catch(e){v.innerHTML=`<div class="card err">${esc(e.message)}</div>`;}
 }
