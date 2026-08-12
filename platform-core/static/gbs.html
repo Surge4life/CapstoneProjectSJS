@@ -1,1 +1,205 @@
-PLACEHOLDER_WILL_FAIL
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>G.O.D.S · GBS Constitutional Freeze</title>
+<style>
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--green:#10B981;--bad:#E85D5D}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.brand{font-weight:700}.brand b{color:var(--gold)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}.tag.warn{border-color:var(--warn);color:var(--warn)}
+nav a{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px;margin-left:4px}
+main{max-width:1100px;margin:0 auto;padding:16px 18px 48px}
+.honest{margin:0 0 12px;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.metric{font-size:1.3rem;font-weight:700}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:14px;padding:4px 10px;font-size:11px;margin:2px;cursor:pointer;background:transparent;color:var(--ink);text-decoration:none}
+.btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:3px;font-size:12px}
+.mut{color:var(--mut)}.term{background:#040a14;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;white-space:pre-wrap;max-height:220px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}th{color:var(--mut)}
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">G.O.D.S · <b>GBS</b></span>
+  <span class="tag ok" id="ver">v1.0</span>
+  <span class="tag warn" id="sov-tag">Sovereign-Verified</span>
+  <span style="flex:1"></span>
+  <nav>
+    <a href="/divisions">Divisions</a>
+    <a href="/seths">SETHS</a>
+    <a href="/ts">TS</a>
+    <a href="/madiba">MADIBA</a>
+    <a href="/eif-ui">EIF</a>
+    <a href="/Sentinel">Sentinel</a>
+    <a href="/portals">Portals</a>
+    <a href="/admin">GODS Admin</a>
+  </nav>
+</header>
+<main>
+
+  <div class="panel" id="auth-panel">
+    <h3>Staff connect</h3>
+    <p class="mut" style="font-size:12px;margin:0 0 10px">admin@gods.local / admin123 · seths@ / madiba@ / ts@ gods.local / staff123</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+      <input id="email" value="admin@gods.local" style="min-width:180px;background:var(--navy);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px"/>
+      <input id="pass" type="password" value="admin123" style="width:110px;background:var(--navy);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px"/>
+      <button class="btn" type="button" onclick="doLogin()">Sign in</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('seths@gods.local','staff123')">seths@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('madiba@gods.local','staff123')">madiba@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('ts@gods.local','staff123')">ts@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('admin@gods.local','admin123')">admin@</button>
+      <span class="mut" id="who">public · read metrics open</span>
+    </div>
+  </div>
+
+  <div class="honest">Capstone honesty: GBS pillars + APIs live under <code>/gis/gbs/*</code> · zero franchise geographic scale is honest · Sovereign-Verified = <b>designed_not_built</b> · capital not_deployed · MADIBA ledger ≠ AUM</div>
+
+  <div class="panel">
+    <h3>Guided path · GBS freeze</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button class="chip" onclick="load()">1 · Load overview</button>
+      <button class="chip" onclick="loadNodes()">2 · List nodes</button>
+      <button class="chip" onclick="divMetrics()">3 · Division metrics</button>
+      <button class="chip" onclick="evaSmoke()">4 · EVA fair/biased</button>
+      <a class="chip" href="/divisions">5 · Operator loop →</a>
+      <a class="chip" href="/Sentinel">Sentinel →</a>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:12px">
+    <div class="card"><h3>GBS version</h3><div class="metric" id="k-ver" style="font-size:1.05rem">—</div></div>
+    <div class="card"><h3>Nodes</h3><div class="metric" id="k-nodes">—</div></div>
+    <div class="card"><h3>Pillars</h3><div class="metric" id="k-pill">—</div></div>
+    <div class="card"><h3>Layers</h3><div class="metric" id="k-lay">—</div></div>
+    <div class="card"><h3>Sovereign</h3><div class="metric" id="k-sov" style="font-size:0.95rem">—</div></div>
+    <div class="card"><h3>Demo ready</h3><div class="metric" id="k-demo">—</div></div>
+    <div class="card"><h3>SETHS placed</h3><div class="metric" id="k-plc">—</div></div>
+    <div class="card"><h3>TS SPVs</h3><div class="metric" id="k-ts">—</div></div>
+    <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mc">—</div></div>
+  </div>
+
+  <div class="panel">
+    <h3>Command</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <button class="btn" onclick="load()">↻ Refresh GBS</button>
+      <button class="btn ghost" onclick="loadNodes()">Refresh nodes</button>
+      <button class="btn ghost" onclick="divMetrics()">Division KPIs</button>
+      <button class="btn ghost" onclick="evaSmoke()">EVA smoke</button>
+    </div>
+  </div>
+
+  <div class="panel"><h3>Doctrine</h3><div id="doctrine" class="mut">—</div></div>
+  <div class="panel"><h3>Division bindings</h3><div id="bindings" class="mut">—</div></div>
+  <div class="panel"><h3>Layers</h3><div id="layers" class="mut">—</div></div>
+  <div class="panel"><h3>Constitutional + universal pillars</h3><div id="pillars" class="mut">—</div></div>
+  <div class="panel"><h3>Sovereign-Verified</h3><div id="sovereign" class="mut">—</div></div>
+  <div class="panel"><h3>GBS nodes · LIVE</h3><p class="mut" style="font-size:12px;margin:0 0 8px">Demo delivery nodes may exist · geographic franchise scale remains post-seed</p><div id="nodes">—</div></div>
+  <div class="panel"><h3>Honesty</h3><div id="honesty" class="mut">—</div></div>
+  <div class="panel"><h3>Terminal</h3><div class="term" id="term">GBS · /gis/gbs/* constitutional freeze</div></div>
+</main>
+<script>
+const API=location.origin;
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
+const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+let TOK=localStorage.getItem('gbs_tok')||'';
+function fillLogin(e,p){document.getElementById('email').value=e;document.getElementById('pass').value=p;}
+async function doLogin(){
+  try{
+    const f=new URLSearchParams({username:document.getElementById('email').value.trim().toLowerCase(),password:document.getElementById('pass').value});
+    const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f});
+    const d=await r.json();
+    if(!r.ok||!d.access_token) throw new Error(d.detail||('login '+r.status));
+    TOK=d.access_token; localStorage.setItem('gbs_tok',TOK);
+    document.getElementById('who').textContent=document.getElementById('email').value+' · '+(d.role||'ok');
+    log('STAFF login ok · '+ (d.role||''));
+    await load(); await loadNodes(); await divMetrics();
+  }catch(e){ document.getElementById('who').textContent='login fail'; log('LOGIN FAIL '+e.message); }
+}
+async function j(path){
+  const h={}; if(TOK) h.Authorization='Bearer '+TOK;
+  const r=await fetch(API+path,{headers:h});
+  if(!r.ok) throw new Error(path+' '+r.status);
+  return r.json();
+}
+async function load(){
+  try{
+    const [ov, arch, layers, pillars, sov, ready]=await Promise.all([
+      j('/gis/gbs/overview'),
+      j('/gis/gbs/architecture'),
+      j('/gis/gbs/layers'),
+      j('/gis/gbs/pillars'),
+      j('/gis/gbs/sovereign-tier').catch(()=>({})),
+      fetch(API+'/udoc/demo/ready').then(r=>r.json()).catch(()=>({})),
+    ]);
+    document.getElementById('k-ver').textContent=ov.gbs_udoc_version||arch.version||'1.0';
+    document.getElementById('ver').textContent='v'+(ov.gbs_udoc_version||'1.0');
+    const cp=pillars.constitutional_pillars||[];
+    const up=pillars.gbs_universal_pillars||[];
+    document.getElementById('k-pill').textContent=(Array.isArray(cp)?cp.length:0)+(Array.isArray(up)?up.length:0);
+    const lay=layers.layers||[];
+    document.getElementById('k-lay').textContent=Array.isArray(lay)?lay.length:'—';
+    document.getElementById('k-sov').textContent=sov.status||(ov.honesty&&ov.honesty.sovereign_verified)||'designed_not_built';
+    document.getElementById('k-demo').textContent=String(!!ready.ready);
+    document.getElementById('doctrine').innerHTML='<div><b>'+esc(arch.doctrine||(arch.architecture&&arch.architecture.doctrine)||'')+'</b></div><div class="mut">'+esc(arch.source||'')+'</div>';
+    const divs=(arch.architecture&&arch.architecture.divisions)||(ov.architecture&&ov.architecture.divisions)||[];
+    document.getElementById('bindings').innerHTML=Array.isArray(divs)&&divs.length
+      ? '<table><thead><tr><th>Division</th><th>Proposition</th><th>Assures</th><th>Mode</th></tr></thead><tbody>'+
+        divs.map(d=>'<tr><td><b>'+esc(d.division)+'</b></td><td>'+esc(d.proposition)+'</td><td>'+esc(d.assures)+'</td><td>'+esc(d.mode)+'</td></tr>').join('')+'</tbody></table>'
+      : '—';
+    document.getElementById('layers').innerHTML=Array.isArray(lay)
+      ? lay.map(L=>'<div class="pill"><b>L'+esc(L.layer||L.id)+'</b> '+esc(L.name||'')+'</div>').join('') : '—';
+    const allP=[].concat(cp||[], up||[]);
+    document.getElementById('pillars').innerHTML=allP.length
+      ? allP.map(p=>'<div class="pill"><b>'+esc(p.numeral||p.id||'')+'</b> '+esc(p.name||p.pillar||'')+'</div>').join('') : '—';
+    document.getElementById('sovereign').innerHTML=esc(JSON.stringify(sov||ov.honesty||{},null,2)).replace(/\n/g,'<br/>');
+    const h=ov.honesty||{};
+    document.getElementById('honesty').innerHTML=Object.entries(h).map(([k,v])=>'<div><b>'+esc(k)+'</b>: '+esc(typeof v==='object'?JSON.stringify(v):v)+'</div>').join('')||'—';
+    await loadNodes(); await divMetrics();
+    log('GBS overview ok · pillars='+allP.length);
+  }catch(e){log('LOAD FAIL '+e.message);}
+}
+async function loadNodes(){
+  try{
+    const nodes=await j('/gis/gbs/nodes');
+    const list=Array.isArray(nodes)?nodes:(nodes.list||nodes.nodes||[]);
+    document.getElementById('k-nodes').textContent=list.length;
+    document.getElementById('nodes').innerHTML=list.length
+      ?('<table><thead><tr><th>Ref</th><th>Layer</th><th>Name</th><th>Territory</th><th>Licence</th></tr></thead><tbody>'+
+        list.map(n=>'<tr><td>'+esc(n.node_ref)+'</td><td>L'+esc(n.layer)+' '+esc(n.layer_name||'')+'</td><td>'+esc(n.name)+'</td><td>'+esc(n.territory)+'</td><td>'+esc(n.licence_status)+'</td></tr>').join('')+'</tbody></table>')
+      :'<span class="mut">Zero nodes — honest Capstone state</span>';
+  }catch(e){document.getElementById('nodes').textContent=e.message;}
+}
+async function divMetrics(){
+  try{
+    const [s,t,m]=await Promise.all([
+      fetch(API+'/seths/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/ts/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch(API+'/madiba/metrics').then(r=>r.ok?r.json():{}).catch(()=>({})),
+    ]);
+    document.getElementById('k-plc').textContent=s.placed??'—';
+    document.getElementById('k-ts').textContent=t.projects??'—';
+    document.getElementById('k-mc').textContent=m.cycles??'—';
+  }catch(e){log('DIV metrics '+e.message);}
+}
+async function evaSmoke(){
+  try{
+    const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
+    const j=await r.json();
+    log('EVA smoke '+JSON.stringify(j.outcomes||j).slice(0,200));
+  }catch(e){log('EVA FAIL '+e.message);}
+}
+if(TOK){document.getElementById('who').textContent='token present';}
+load();
+</script>
+</body>
+</html>
