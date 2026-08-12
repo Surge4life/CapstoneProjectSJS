@@ -10,7 +10,7 @@
 header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .brand{font-weight:700}.brand b{color:var(--gold)}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
-.tag.ok{border-color:var(--ok);color:#7fe3ab}.tag.warn{border-color:var(--warn);color:var(--warn)}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}.tag.warn{border-color:var(--warn);color:var(--warn)}.tag.fail{border-color:#E85D5D;color:#fca5a5}
 nav a{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px;margin-left:4px}
 main{max-width:1100px;margin:0 auto;padding:16px 18px 48px}
 .honest{margin:0 0 12px;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
@@ -33,6 +33,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
   <span class="brand">G.O.D.S · <b>GBS</b></span>
   <span class="tag ok" id="ver">v1.0</span>
   <span class="tag warn" id="sov-tag">Sovereign-Verified</span>
+  <span class="tag" id="eva-tag">EVA —</span>
   <span style="flex:1"></span>
   <nav>
     <a href="/divisions">Divisions</a>
@@ -72,6 +73,11 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
       <button class="chip" onclick="divMetrics()">3 · Division metrics</button>
       <button class="chip" onclick="evaSmoke()">4 · EVA fair/biased</button>
       <a class="chip" href="/divisions">5 · Operator loop →</a>
+      <a class="chip" href="/seths">SETHS →</a>
+      <a class="chip" href="/ts">TS →</a>
+      <a class="chip" href="/madiba">MADIBA →</a>
+      <a class="chip" href="/eif-ui">EIF →</a>
+      <a class="chip" href="/portals">Portals →</a>
       <a class="chip" href="/Sentinel">Sentinel →</a>
     </div>
   </div>
@@ -98,6 +104,8 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
     </div>
   </div>
 
+  <div class="panel"><h3>Four-division symmetry</h3><div id="symmetry" class="mut">—</div></div>
+  <div class="panel"><h3>Division KPIs · LIVE</h3><div id="div-detail" class="mut">—</div></div>
   <div class="panel"><h3>Doctrine</h3><div id="doctrine" class="mut">—</div></div>
   <div class="panel"><h3>Division bindings</h3><div id="bindings" class="mut">—</div></div>
   <div class="panel"><h3>Layers</h3><div id="layers" class="mut">—</div></div>
@@ -148,7 +156,18 @@ async function load(){
     document.getElementById('k-pill').textContent=(Array.isArray(cp)?cp.length:0)+(Array.isArray(up)?up.length:0);
     const lay=layers.layers||[];
     document.getElementById('k-lay').textContent=Array.isArray(lay)?lay.length:'—';
-    document.getElementById('k-sov').textContent=sov.status||(ov.honesty&&ov.honesty.sovereign_verified)||'designed_not_built';
+    const sovStatus=sov.status||(ov.honesty&&ov.honesty.sovereign_verified)||'designed_not_built';
+    document.getElementById('k-sov').textContent=sovStatus;
+    const st=document.getElementById('sov-tag'); if(st) st.textContent='Sovereign · '+sovStatus;
+    const sym=(ov.architecture&&ov.architecture.symmetry)||(arch.architecture&&arch.architecture.symmetry)||arch.symmetry||{};
+    const develops=sym.develops||['SETHS','TS'];
+    const recognises=sym.recognises||['MADIBA_EIF','UDOC'];
+    const symEl=document.getElementById('symmetry');
+    if(symEl){
+      symEl.innerHTML='<div style="margin-bottom:8px"><span class="pill"><b>Develops</b> '+esc(develops.join(' · '))+'</span> <span class="pill"><b>Recognises</b> '+esc(recognises.join(' · '))+'</span></div>'+
+        '<div class="mut">'+esc(sym.note||'SETHS develops human capability; TS develops trusted systems; MADIBA/EIF recognises exceptional individuals; UDOC recognises systems under GBS-UDOC.')+'</div>'+
+        '<div class="mut" style="margin-top:6px">Four-division set: '+esc((ov.honesty&&ov.honesty.four_division_set)||'GBS-SETHS · GBS-T.S. · GBS-M.A.D.I.B.A./EIF · GBS-UDOC')+'</div>';
+    }
     document.getElementById('k-demo').textContent=String(!!ready.ready);
     document.getElementById('doctrine').innerHTML='<div><b>'+esc(arch.doctrine||(arch.architecture&&arch.architecture.doctrine)||'')+'</b></div><div class="mut">'+esc(arch.source||'')+'</div>';
     const divs=(arch.architecture&&arch.architecture.divisions)||(ov.architecture&&ov.architecture.divisions)||[];
@@ -174,9 +193,13 @@ async function loadNodes(){
     const list=Array.isArray(nodes)?nodes:(nodes.list||nodes.nodes||[]);
     document.getElementById('k-nodes').textContent=list.length;
     document.getElementById('nodes').innerHTML=list.length
-      ?('<table><thead><tr><th>Ref</th><th>Layer</th><th>Name</th><th>Territory</th><th>Licence</th></tr></thead><tbody>'+
-        list.map(n=>'<tr><td>'+esc(n.node_ref)+'</td><td>L'+esc(n.layer)+' '+esc(n.layer_name||'')+'</td><td>'+esc(n.name)+'</td><td>'+esc(n.territory)+'</td><td>'+esc(n.licence_status)+'</td></tr>').join('')+'</tbody></table>')
-      :'<span class="mut">Zero nodes — honest Capstone state</span>';
+      ?('<table><thead><tr><th>Ref</th><th>Layer</th><th>Name</th><th>Territory</th><th>Licence</th><th>Compliance</th><th>Fidelity</th></tr></thead><tbody>'+
+        list.map(n=>{
+          const cs=n.compliance_score!=null?Number(n.compliance_score).toFixed(2):'—';
+          const cf=n.curriculum_fidelity_pct!=null?(Math.round(Number(n.curriculum_fidelity_pct)*100)+'%'):'—';
+          return '<tr><td class="mut">'+esc(n.node_ref)+'</td><td>L'+esc(n.layer)+' '+esc(n.layer_name||'')+'</td><td>'+esc(n.name)+'</td><td>'+esc(n.territory)+'</td><td>'+esc(n.licence_status)+'</td><td>'+esc(cs)+'</td><td>'+esc(cf)+'</td></tr>';
+        }).join('')+'</tbody></table>')
+      :'<span class="mut">Zero nodes — honest Capstone state · franchise scale post-seed</span>';
   }catch(e){document.getElementById('nodes').textContent=e.message;}
 }
 async function divMetrics(){
@@ -189,14 +212,33 @@ async function divMetrics(){
     document.getElementById('k-plc').textContent=s.placed??'—';
     document.getElementById('k-ts').textContent=t.projects??'—';
     document.getElementById('k-mc').textContent=m.cycles??'—';
+    const det=document.getElementById('div-detail');
+    if(det){
+      det.innerHTML='<table><thead><tr><th>Division</th><th>KPI</th><th>Value</th><th>Honesty</th></tr></thead><tbody>'+
+        '<tr><td><b>SETHS</b></td><td>total / placed / rate</td><td>'+esc(s.total??'—')+' / '+esc(s.placed??'—')+' / '+esc(s.placement_rate!=null?Math.round(s.placement_rate*100)+'%':'—')+'</td><td class="mut">demo learners · not funded programme</td></tr>'+
+        '<tr><td><b>TS</b></td><td>projects / workers</td><td>'+esc(t.projects??'—')+' / '+esc(t.workers_absorbed??'—')+'</td><td class="mut">SPV rows · capital not_deployed</td></tr>'+
+        '<tr><td><b>MADIBA</b></td><td>cycles / recycled</td><td>'+esc(m.cycles??'—')+' / '+esc(m.cumulative_recycled??'—')+'</td><td class="mut">ledger ≠ AUM</td></tr>'+
+        '</tbody></table>';
+    }
+    log('DIV KPIs seths.placed='+(s.placed??0)+' ts.projects='+(t.projects??0)+' madiba.cycles='+(m.cycles??0));
   }catch(e){log('DIV metrics '+e.message);}
 }
 async function evaSmoke(){
   try{
     const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
     const j=await r.json();
-    log('EVA smoke '+JSON.stringify(j.outcomes||j).slice(0,200));
-  }catch(e){log('EVA FAIL '+e.message);}
+    const out=j.outcomes||{};
+    const fairOk=(out.APPROVE||0)>=1 || (j.results||[]).some(x=>x.scenario==='fair'&&String(x.decision||x.outcome).toUpperCase()!=='BLOCK');
+    const biasedOk=(out.BLOCK||0)>=1 || (j.results||[]).some(x=>x.scenario==='biased'&&String(x.decision||x.outcome).toUpperCase()==='BLOCK');
+    const pass=fairOk&&biasedOk;
+    const tag=document.getElementById('eva-tag');
+    if(tag){ tag.textContent=pass?'EVA PASS':'EVA FAIL'; tag.className='tag '+(pass?'ok':'fail'); }
+    log('EVA smoke '+(pass?'PASS':'FAIL')+' · '+JSON.stringify(out).slice(0,160));
+  }catch(e){
+    const tag=document.getElementById('eva-tag');
+    if(tag){ tag.textContent='EVA ERR'; tag.className='tag fail'; }
+    log('EVA FAIL '+e.message);
+  }
 }
 if(TOK){document.getElementById('who').textContent='token present';}
 load();
