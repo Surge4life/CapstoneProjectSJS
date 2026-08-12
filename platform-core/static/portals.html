@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>G.O.D.S · Portals · 24 Control Workspaces</title>
+<title>G.O.D.S · Portals</title>
 <style>
 :root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A;--warn:#E8A13A;--red:#E85D5D}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.45 system-ui,sans-serif}
@@ -105,14 +105,45 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
 
     <div class="panel">
       <h3>Workspace · <span id="ws-title">select a portal</span></h3>
-      <div id="ws-body" class="mut">Select a portal card or guided chip.</div>
+      <div id="citizen-ui" class="hide">
+        <p class="mut" style="font-size:12px;margin:0 0 8px">POST /citizen/challenge · fields: service + description</p>
+        <div class="row" style="margin-bottom:8px">
+          <input id="cit-service" placeholder="Service / system" value="Capstone demo service" style="flex:1"/>
+        </div>
+        <textarea id="cit-desc" rows="3" style="width:100%;margin-bottom:8px">I challenge an automated decision that may affect my rights.</textarea>
+        <div class="row">
+          <button class="btn" onclick="citizenChallenge()">Submit challenge</button>
+        </div>
+      </div>
+      <div id="control-ui" class="hide">
+        <p class="mut" id="ws-desc" style="font-size:12px;margin:0 0 8px"></p>
+        <div class="row" style="margin-bottom:8px">
+          <select id="ctrl" style="min-width:180px"></select>
+          <input id="target" placeholder="target ref (optional)" style="flex:1"/>
+        </div>
+        <textarea id="note" rows="2" style="width:100%;margin-bottom:8px">Capstone portal control</textarea>
+        <div class="row">
+          <button class="btn" onclick="runControl()">Run control</button>
+          <button class="btn ghost" onclick="runBatch()">Run all controls</button>
+        </div>
+        <div id="cases" class="mut" style="margin-top:10px"></div>
+      </div>
       <div class="term" id="term" style="margin-top:10px"></div>
     </div>
   </div>
 </div>
 <script>
 const API='';
-let TOK='', GROUP='all', CATALOG=[], ACTIVE=null;
+let TOK='', GROUP='all', CATALOG=[], ACTIVE=null, CONTROLS=[];
+const FALLBACK=[
+  ['CITIZEN','Citizen AI Rights','PEOPLE'],
+  ['REGULATOR','Regulator','GOVERNANCE'],
+  ['SAHRC','SAHRC','GOVERNANCE'],
+  ['SETHS','SETHS portal','OPERATIONS'],
+  ['COB','Conduct of Business','BUSINESS'],
+  ['HITL_REVIEW','HITL Review','GOVERNANCE'],
+  ['AI_OWNER','AI Owner','BUSINESS'],
+];
 function log(m){const el=document.getElementById('term'); if(el) el.textContent=(new Date().toISOString().slice(11,19))+' '+m+'\n'+(el.textContent||'').slice(0,4000);}
 function fillLogin(e,p){document.getElementById('email').value=e;document.getElementById('pass').value=p;}
 async function doLogin(){
@@ -147,11 +178,18 @@ async function boot(){
   }catch(e){ document.getElementById('k-ready').textContent='err'; }
   try{
     const cat=await j('/portals');
-    CATALOG=Array.isArray(cat)?cat:(cat.portals||cat.keys||[]);
-    if(CATALOG.length && typeof CATALOG[0]==='string') CATALOG=CATALOG.map(k=>({key:k,group:'GOVERNANCE',label:k}));
+    let list=Array.isArray(cat)?cat:(cat.portals||cat.keys||[]);
+    if(list.length && typeof list[0]==='string') list=list.map(k=>({key:k,group:'GOVERNANCE',label:k}));
+    if(!list.length) list=FALLBACK.map(([k,l,g])=>({key:k,label:l,group:g,controls:[]}));
+    CATALOG=list;
     document.getElementById('k-n').textContent=String(CATALOG.length||0);
     renderCatalog();
-  }catch(e){ log('catalog '+e.message); }
+  }catch(e){
+    log('catalog '+e.message);
+    CATALOG=FALLBACK.map(([k,l,g])=>({key:k,label:l,group:g,controls:[]}));
+    document.getElementById('k-n').textContent=String(CATALOG.length);
+    renderCatalog();
+  }
 }
 function setGroup(el,g){ GROUP=g; document.querySelectorAll('[data-g]').forEach(c=>c.classList.remove('on')); el.classList.add('on'); renderCatalog(); }
 function renderCatalog(){
@@ -174,17 +212,56 @@ async function openPortal(key){
   ACTIVE=key;
   document.getElementById('ws-title').textContent=key;
   document.getElementById('k-act').textContent=key;
+  const isCit=key==='CITIZEN';
+  document.getElementById('citizen-ui').classList.toggle('hide',!isCit);
+  document.getElementById('control-ui').classList.toggle('hide',isCit);
+  if(isCit){ log('OPEN CITIZEN'); return; }
   try{
     const d=await j('/portal/'+encodeURIComponent(key));
-    const live=d.live||d;
-    const cases=(live.oversight_cases||live.cases||[]).length;
-    document.getElementById('k-cases').textContent=String(cases);
-    document.getElementById('ws-body').innerHTML='<pre style="white-space:pre-wrap;font-size:12px">'+JSON.stringify(d,null,2).slice(0,2500)+'</pre>';
-    log('OPEN '+key+' · cases='+cases);
+    const portal=d.portal||d;
+    const live=d.live||{};
+    const ctrls=(portal.controls||d.controls||[]).map(c=>c.name||c.key||c);
+    CONTROLS=ctrls;
+    const sel=document.getElementById('ctrl');
+    sel.innerHTML=ctrls.length?ctrls.map(c=>'<option value="'+c+'">'+c+'</option>').join(''):'<option value="">(no controls)</option>';
+    document.getElementById('ws-desc').textContent=portal.desc||portal.description||(ctrls.length+' controls');
+    const cases=(live.oversight_cases||live.cases||[]);
+    document.getElementById('k-cases').textContent=String(cases.length);
+    document.getElementById('cases').innerHTML=cases.length
+      ? '<table><thead><tr><th>Ref</th><th>State</th></tr></thead><tbody>'+cases.slice(0,8).map(c=>'<tr><td>'+(c.ref||c.id||'')+'</td><td>'+(c.state||c.status||'')+'</td></tr>').join('')+'</tbody></table>'
+      : '<span class="mut">No live oversight cases · run a control</span>';
+    log('OPEN '+key+' · controls='+ctrls.length+' cases='+cases.length);
   }catch(e){
-    document.getElementById('ws-body').textContent='Error: '+e.message;
+    document.getElementById('ws-desc').textContent='Error: '+e.message;
     log('OPEN FAIL '+key+' '+e.message);
   }
+}
+async function runControl(){
+  if(!ACTIVE||ACTIVE==='CITIZEN') return;
+  const control=document.getElementById('ctrl').value;
+  if(!control){ log('No control selected'); return; }
+  const body={control:control,target:document.getElementById('target').value||undefined,note:document.getElementById('note').value||'Capstone portal control'};
+  try{
+    const d=await j('/portal/'+encodeURIComponent(ACTIVE)+'/control',{method:'POST',body:JSON.stringify(body)});
+    log('CONTROL '+control+' → '+JSON.stringify(d).slice(0,200));
+    await openPortal(ACTIVE);
+  }catch(e){ log('CONTROL FAIL '+e.message); }
+}
+async function runBatch(){
+  if(!CONTROLS.length){ log('No controls to batch'); return; }
+  for(const c of CONTROLS.slice(0,4)){
+    document.getElementById('ctrl').value=c;
+    await runControl();
+  }
+}
+async function citizenChallenge(){
+  try{
+    const body={service:document.getElementById('cit-service').value||'demo',description:document.getElementById('cit-desc').value||'challenge'};
+    const r=await fetch(API+'/citizen/challenge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.detail||r.status);
+    log('CITIZEN challenge OK '+JSON.stringify(d).slice(0,200));
+  }catch(e){ log('CITIZEN FAIL '+e.message); }
 }
 (async()=>{
   const t=localStorage.getItem('portals_tok');
