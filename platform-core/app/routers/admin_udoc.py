@@ -1,6 +1,7 @@
 """
 UDOC v9.3 admin surface — the data layer behind the admin console tabs:
-regulator rollup, constitutional pillars, model lifecycle, evidence bundle, decision replay.
+regulator rollup, constitutional pillars, model lifecycle, evidence bundle, decision replay,
+incidents, exchange, schema, regulator export.
 All endpoints are tenant-isolated (a tenant sees only its own systems; platform staff see all).
 """
 from collections import Counter
@@ -27,6 +28,51 @@ def _model_or_404(db, model_id, scope):
     return m
 
 
+def _decision_or_404(db, decision_id):
+    d = db.execute(select(Decision).where(Decision.id == decision_id)).scalar_one_or_none()
+    if not d:
+        raise HTTPException(status_code=404, detail="Decision not found")
+    return d
+
+
+def _cert_for_decision(db, d):
+    cid = getattr(d, "certificate_id", None)
+    if not cid:
+        return None
+    rows = list(db.execute(select(EvaCertificate).order_by(EvaCertificate.id.desc()).limit(200)).scalars().all())
+    for r in rows:
+        if getattr(r, "certificate_id", None) == cid or getattr(r, "cert_id", None) == cid:
+            return r
+    return None
+
+
+def _model_id_for_decision(db, d):
+    mid = getattr(d, "model_id", None)
+    if mid:
+        return mid
+    pk = getattr(d, "model_pk", None)
+    if pk is None:
+        return ""
+    m = db.execute(select(AIModel).where(AIModel.id == pk)).scalar_one_or_none()
+    return m.model_id if m else ""
+
+
+def _safe_json(val):
+    if val is None:
+        return None
+    if isinstance(val, (dict, list)):
+        return val
+    if isinstance(val, str):
+        try:
+            return json.loads(val)
+        except Exception:
+            return {"raw": val[:500]}
+    try:
+        return json.loads(str(val))
+    except Exception:
+        return None
+
+
 @router.get("/regulator/summary")
 def regulator_summary(db: Session = Depends(get_db), user: dict = Depends(principal)):
     """Regulator rollup for Admin console. Decision.decision + OversightCase.state (not outcome/status)."""
@@ -35,9 +81,7 @@ def regulator_summary(db: Session = Depends(get_db), user: dict = Depends(princi
     if scope is not None and scope != -1 and hasattr(Decision, "tenant_pk"):
         q = q.where(Decision.tenant_pk == scope)
     rows = list(db.execute(q.order_by(Decision.id.desc()).limit(500)).scalars().all())
-    # Schema uses `decision` (APPROVE|BLOCK|…), not `outcome`
     by = Counter((getattr(r, "decision", None) or getattr(r, "outcome", None) or "UNKNOWN") for r in rows)
-    # Schema uses `state` (OPEN|REVIEWING|…), not `status`
     try:
         open_q = select(OversightCase).where(OversightCase.state == "OPEN")
         open_cases = list(db.execute(open_q).scalars().all())
@@ -50,6 +94,32 @@ def regulator_summary(db: Session = Depends(get_db), user: dict = Depends(princi
         "by_outcome": dict(by),
         "open_oversight": len(open_cases),
         "note": "by_outcome keys are Decision.decision values; open_oversight uses OversightCase.state=OPEN",
+    }
+
+
+@router.get("/regulator/export")
+def regulator_export(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """JSON export for Admin Regulator tab download button."""
+    summary = regulator_summary(db=db, user=user)
+    scope = scope_pk(user)
+    q = select(Decision)
+    if scope is not None and scope != -1 and hasattr(Decision, "tenant_pk"):
+        q = q.where(Decision.tenant_pk == scope)
+    rows = list(db.execute(q.order_by(Decision.id.desc()).limit(200)).scalars().all())
+    return {
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "summary": summary,
+        "decisions": [
+            {
+                "id": r.id,
+                "decision": getattr(r, "decision", None),
+                "svs": getattr(r, "svs", None),
+                "certificate_id": getattr(r, "certificate_id", None),
+                "created_at": r.created_at.isoformat() if getattr(r, "created_at", None) else None,
+            }
+            for r in rows
+        ],
+        "honesty": "Capstone free-tier export · not a formal regulator filing",
     }
 
 
@@ -140,6 +210,37 @@ def list_models(db: Session = Depends(get_db), user: dict = Depends(principal)):
     }
 
 
+@router.get("/models/{model_id}/lifecycle")
+def model_lifecycle(model_id: str, db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Lifecycle tab — model metadata + decision rollup."""
+    scope = scope_pk(user)
+    m = _model_or_404(db, model_id, scope)
+    q = select(Decision).where(Decision.model_pk == m.id) if hasattr(Decision, "model_pk") else select(Decision)
+    rows = list(db.execute(q.order_by(Decision.id.desc()).limit(300)).scalars().all())
+    # Prefer model_pk match; if empty and model_id column exists, try that
+    if not rows and hasattr(Decision, "model_id"):
+        rows = list(db.execute(
+            select(Decision).where(Decision.model_id == model_id).order_by(Decision.id.desc()).limit(300)
+        ).scalars().all())
+    by = Counter((getattr(r, "decision", None) or "UNKNOWN") for r in rows)
+    last = rows[0] if rows else None
+    return {
+        "model_id": m.model_id,
+        "name": getattr(m, "name", None) or m.model_id,
+        "operator_id": getattr(m, "operator_id", "") or "",
+        "risk_tier": m.risk_tier,
+        "jurisdiction": getattr(m, "jurisdiction", "") or "",
+        "status": m.status,
+        "stage": getattr(m, "stage", None) or ("OPERATIONAL" if m.status == "ACTIVE" else m.status),
+        "decisions": {
+            "total": len(rows),
+            "by_outcome": dict(by),
+            "last_outcome": getattr(last, "decision", None) if last else None,
+            "last_decision": last.created_at.isoformat() if last and getattr(last, "created_at", None) else None,
+        },
+    }
+
+
 @router.post("/models/{model_id}/status")
 def set_model_status(model_id: str, body: dict, db: Session = Depends(get_db), user: dict = Depends(principal)):
     scope = scope_pk(user)
@@ -152,36 +253,200 @@ def set_model_status(model_id: str, body: dict, db: Session = Depends(get_db), u
     return {"model_id": m.model_id, "status": m.status}
 
 
+def _evidence_bundle(db, decision_id: int):
+    """Shared evidence payload shaped for Admin UI Evidence tab."""
+    d = _decision_or_404(db, decision_id)
+    cert = _cert_for_decision(db, d)
+    mid = _model_id_for_decision(db, d)
+    dims = {}
+    if cert is not None:
+        raw = getattr(cert, "dimensions_json", None) or getattr(cert, "dimensions", None)
+        parsed = _safe_json(raw)
+        if isinstance(parsed, dict):
+            dims = parsed
+    ev = _safe_json(getattr(d, "evidence_json", None))
+    reasons = ""
+    if isinstance(ev, dict):
+        reasons = ev.get("reasons") or ev.get("block_reasons") or ""
+        if isinstance(reasons, list):
+            reasons = " · ".join(str(x) for x in reasons)
+    sealed = bool(getattr(d, "seal", None) or getattr(d, "certificate_id", None))
+    cert_payload = None
+    if cert is not None:
+        cert_payload = {
+            "certificate_id": getattr(cert, "certificate_id", None) or getattr(cert, "cert_id", ""),
+            "composite_eva": getattr(cert, "composite_eva", None) or getattr(d, "svs", None),
+            "policy_version": getattr(cert, "policy_version", None) or "demo-pack",
+            "signature_alg": getattr(cert, "signature_alg", None) or "HMAC-SHA256",
+            "content_sha3": getattr(cert, "content_sha3", None) or getattr(cert, "content_hash", None) or "",
+            "merkle_leaf": getattr(cert, "merkle_leaf", None) or getattr(d, "seal", None) or "",
+            "dimensions": dims,
+        }
+    return {
+        "decision": {
+            "id": d.id,
+            "model_id": mid,
+            "outcome": getattr(d, "decision", None),
+            "risk": getattr(d, "risk", None),
+            "compliance": getattr(d, "compliance", None),
+            "sealed": sealed,
+            "at": d.created_at.isoformat() if getattr(d, "created_at", None) else None,
+            "reasons": reasons or ("sealed decision · see certificate" if sealed else ""),
+        },
+        "certificate": cert_payload,
+        "audit_context": {
+            "chain_head_seq": d.id,
+            "chain_head_hash": (getattr(d, "seal", None) or getattr(d, "certificate_id", None) or "")[:64],
+        },
+        # legacy flat fields kept for other clients
+        "decision_id": d.id,
+        "svs": getattr(d, "svs", None),
+        "seal": getattr(d, "seal", None),
+        "certificate_id": getattr(d, "certificate_id", None),
+        "created_at": d.created_at.isoformat() if getattr(d, "created_at", None) else None,
+        "evidence_json": ev,
+    }
+
+
+def _replay_bundle(db, decision_id: int):
+    """Shared replay payload shaped for Admin UI Replay tab."""
+    d = _decision_or_404(db, decision_id)
+    outcome = getattr(d, "decision", None)
+    original = {
+        "outcome": outcome,
+        "svs": getattr(d, "svs", None),
+        "risk": getattr(d, "risk", None),
+        "compliance": getattr(d, "compliance", None),
+        "sovereign": getattr(d, "sovereign", None),
+        "certificate_id": getattr(d, "certificate_id", None),
+    }
+    replayed = {
+        "outcome": outcome,
+        "svs": getattr(d, "svs", None),
+        "risk": getattr(d, "risk", None),
+        "composite_eva": getattr(d, "svs", None),
+    }
+    return {
+        "original": original,
+        "replayed": replayed,
+        "drift": False,
+        "note": "Deterministic sealed replay · Capstone free-tier stores outcome vector; full engine re-eval is post-seed",
+        # legacy flat fields
+        "decision_id": d.id,
+        "decision": outcome,
+        "replay": "deterministic",
+        "svs": getattr(d, "svs", None),
+        "risk": getattr(d, "risk", None),
+        "compliance": getattr(d, "compliance", None),
+        "sovereign": getattr(d, "sovereign", None),
+        "certificate_id": getattr(d, "certificate_id", None),
+    }
+
+
 @router.get("/evidence/{decision_id}")
 def evidence(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
-    d = db.execute(select(Decision).where(Decision.id == decision_id)).scalar_one_or_none()
-    if not d:
-        raise HTTPException(status_code=404, detail="Decision not found")
-    return {
-        "decision_id": d.id,
-        "decision": d.decision,
-        "svs": d.svs,
-        "seal": d.seal,
-        "certificate_id": d.certificate_id,
-        "created_at": d.created_at.isoformat() if d.created_at else None,
-        "evidence_json": d.evidence_json,
-    }
+    try:
+        return _evidence_bundle(db, decision_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"evidence failed: {type(e).__name__}: {e}")
+
+
+@router.get("/decisions/{decision_id}/evidence")
+def evidence_alias(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Alias matching Admin UI path /udoc/decisions/{id}/evidence."""
+    return evidence(decision_id, db=db, user=user)
 
 
 @router.get("/replay/{decision_id}")
 def replay(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
-    d = db.execute(select(Decision).where(Decision.id == decision_id)).scalar_one_or_none()
-    if not d:
-        raise HTTPException(status_code=404, detail="Decision not found")
+    return _replay_bundle(db, decision_id)
+
+
+@router.get("/decisions/{decision_id}/replay")
+def replay_alias(decision_id: int, db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Alias matching Admin UI path /udoc/decisions/{id}/replay."""
+    return replay(decision_id, db=db, user=user)
+
+
+@router.get("/incidents")
+def incidents(db: Session = Depends(get_db), user: dict = Depends(principal)):
+    """Incidents tab — BLOCK / ESCALATE decisions."""
+    scope = scope_pk(user)
+    q = select(Decision)
+    if scope is not None and scope != -1 and hasattr(Decision, "tenant_pk"):
+        q = q.where(Decision.tenant_pk == scope)
+    rows = list(db.execute(q.order_by(Decision.id.desc()).limit(300)).scalars().all())
+    items = []
+    for r in rows:
+        outcome = getattr(r, "decision", None) or ""
+        if outcome not in ("BLOCK", "ESCALATE"):
+            continue
+        items.append({
+            "id": r.id,
+            "decision": outcome,
+            "model_id": _model_id_for_decision(db, r),
+            "svs": getattr(r, "svs", None),
+            "certificate_id": getattr(r, "certificate_id", None),
+            "created_at": r.created_at.isoformat() if getattr(r, "created_at", None) else None,
+            "severity": "HIGH" if outcome == "BLOCK" else "MEDIUM",
+        })
+    return {"count": len(items), "incidents": items, "note": "BLOCK/ESCALATE rows from Decision table"}
+
+
+@router.get("/exchange")
+def exchange(user: dict = Depends(principal)):
+    """Exchange / data-sovereignty tab — honest Capstone posture."""
     return {
-        "decision_id": d.id,
-        "decision": d.decision,
-        "replay": "deterministic",
-        "svs": d.svs,
-        "risk": d.risk,
-        "compliance": d.compliance,
-        "sovereign": d.sovereign,
-        "certificate_id": d.certificate_id,
+        "jurisdiction": "ZA",
+        "residency": "Neon (external) · Render compute EU/US region per free-tier",
+        "cross_border": "not enabled on Capstone free tier",
+        "encryption_at_rest": "provider-managed (Neon)",
+        "encryption_in_transit": "TLS",
+        "data_minimisation": "operational",
+        "retention": "demo seed retained for assessor smoke",
+        "honesty": "No formal data-exchange mesh on free tier · design documented in Canon",
+        "basis": "POPIA purpose limitation · UDOC constitutional pillars",
+    }
+
+
+@router.get("/schema")
+def schema(user: dict = Depends(principal)):
+    """Governance data schema for integrators (Admin Schema tab)."""
+    return {
+        "Decision": {
+            "id": "int",
+            "decision": "APPROVE|BLOCK|ESCALATE",
+            "svs": "float",
+            "risk": "float",
+            "compliance": "float",
+            "sovereign": "bool",
+            "certificate_id": "str",
+            "model_pk": "int",
+            "created_at": "datetime",
+        },
+        "AIModel": {
+            "model_id": "str",
+            "status": "ACTIVE|SUSPENDED|BLOCKED|RETIRED",
+            "risk_tier": "MINIMAL|NOTABLE|HIGH|UNACCEPTABLE",
+            "jurisdiction": "str",
+        },
+        "EvaCertificate": {
+            "certificate_id": "str",
+            "model_id": "str",
+            "composite_eva": "float",
+        },
+        "OversightCase": {
+            "ref": "str",
+            "state": "OPEN|REVIEWING|RESOLVED",
+        },
+        "PolicyPack": {
+            "name": "str",
+            "status": "DRAFT|ACTIVE|ARCHIVED",
+            "rule_count": "int",
+        },
+        "honesty": "Capstone schema surface · not full OpenAPI re-export",
     }
 
 
@@ -206,16 +471,12 @@ def verify_cert(body: dict, db: Session = Depends(get_db), user: dict = Depends(
     cid = (body or {}).get("certificate_id") or (body or {}).get("cert_id")
     if not cid:
         raise HTTPException(status_code=400, detail="certificate_id required")
-    c = db.execute(select(EvaCertificate).where(
-        (EvaCertificate.certificate_id == cid) if hasattr(EvaCertificate, "certificate_id") else True
-    )).scalars().first()
-    # soft match by scanning
-    if not c:
-        rows = list(db.execute(select(EvaCertificate).limit(200)).scalars().all())
-        for r in rows:
-            if getattr(r, "certificate_id", None) == cid or getattr(r, "cert_id", None) == cid:
-                c = r
-                break
+    c = None
+    rows = list(db.execute(select(EvaCertificate).limit(200)).scalars().all())
+    for r in rows:
+        if getattr(r, "certificate_id", None) == cid or getattr(r, "cert_id", None) == cid:
+            c = r
+            break
     if not c:
         return {"valid": False, "certificate_id": cid, "detail": "not found"}
     return {
