@@ -110,20 +110,23 @@ th{color:var(--mut);font-size:10px;text-transform:uppercase}
   <div class="two">
     <div class="panel">
       <h3>Matrix results</h3>
-      <div id="matrix">—</div>
-    </div>
+      <div id="matrix">—</div></div>
     <div class="panel">
       <h3>Division strip</h3>
-      <div id="divstrip" class="mut">—</div>
-    </div>
+      <div id="divstrip" class="mut">—</div></div>
   </div>
 
   <div class="panel">
     <h3>Staff connect · policy pack + recent decisions + certs</h3>
+    <p class="mut" style="font-size:12px;margin:0 0 8px">admin@gods.local / admin123 · seths@ / madiba@ / ts@ gods.local / staff123</p>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px">
       <input id="email" value="admin@gods.local" style="min-width:180px"/>
       <input id="pw" type="password" value="admin123" style="width:110px"/>
       <button class="btn green" type="button" onclick="staffLogin()">Sign in</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('seths@gods.local','staff123')">seths@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('madiba@gods.local','staff123')">madiba@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('ts@gods.local','staff123')">ts@</button>
+      <button class="btn ghost" type="button" onclick="fillLogin('admin@gods.local','admin123')">admin@</button>
       <button class="btn ghost" type="button" onclick="staffLoad()">Load panels</button>
       <span class="mut" id="who">public mode</span>
     </div>
@@ -252,6 +255,7 @@ async function autoAssessor(){
   await divStrip();
   log('ASSESSOR one-click complete · gate='+document.getElementById('k-gate').textContent);
 }
+function fillLogin(e,p){document.getElementById('email').value=e;document.getElementById('pw').value=p;}
 async function staffLogin(){
   try{
     const f=new URLSearchParams({username:document.getElementById('email').value.trim().toLowerCase(),password:document.getElementById('pw').value});
