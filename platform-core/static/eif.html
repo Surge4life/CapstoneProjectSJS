@@ -63,6 +63,10 @@ th{color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.04em
     <input id="email" value="madiba@gods.local" style="max-width:220px" placeholder="email">
     <input id="pass" type="password" value="staff123" style="max-width:140px" placeholder="password">
     <button class="btn" type="button" onclick="login()">Connect</button>
+    <button class="btn ghost" type="button" onclick="fillLogin('madiba@gods.local','staff123')">madiba@</button>
+    <button class="btn ghost" type="button" onclick="fillLogin('seths@gods.local','staff123')">seths@</button>
+    <button class="btn ghost" type="button" onclick="fillLogin('ts@gods.local','staff123')">ts@</button>
+    <button class="btn ghost" type="button" onclick="fillLogin('admin@gods.local','admin123')">admin@</button>
     <button class="btn ghost" type="button" onclick="load()">Refresh framework</button>
     <span class="mut" id="who">not connected</span>
   </div>
@@ -171,6 +175,7 @@ async function api(path,opts={}){
   return j;
 }
 
+function fillLogin(e,p){document.getElementById("email").value=e;document.getElementById("pass").value=p;}
 async function login(){
   try{
     const body=new URLSearchParams({username:$('email').value.trim(),password:$('pass').value});
