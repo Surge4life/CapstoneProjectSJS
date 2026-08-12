@@ -12,7 +12,7 @@ header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-w
 .tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
 .tag.ok{border-color:var(--ok);color:#7fe3ab}.tag.warn{border-color:var(--warn);color:var(--warn)}
 nav a{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px;margin-left:4px}
-main{max-width:1100px;margin:0 auto;padding:16px 18px 48px}
+main{max-width:1120px;margin:0 auto;padding:16px 18px 48px}
 .banner{background:rgba(124,92,191,.12);border:1px solid rgba(124,92,191,.35);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px}
 .honest{margin:0 0 12px;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:var(--warn);font-size:12px}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
@@ -20,22 +20,21 @@ main{max-width:1100px;margin:0 auto;padding:16px 18px 48px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
 .card h3{margin:0 0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.3rem;font-weight:700}
+.metric{font-size:1.25rem;font-weight:700}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:14px;padding:4px 10px;font-size:11px;margin:2px;cursor:pointer;background:transparent;color:var(--ink);text-decoration:none}
 .chip.on{border-color:var(--gold);color:var(--gold)}
 .btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .btn.green{background:var(--green);color:#041018}
-input{background:var(--navy);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;width:100%}
-.login{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
-.login label{display:block;font-size:11px;color:var(--mut);margin-bottom:4px}
-.login>div{min-width:160px}
-.term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:240px;overflow:auto;margin-top:10px}
-.kv{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid var(--line);font-size:12px}
-.mut{color:var(--mut)}.live{color:var(--green)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+input,select,textarea{background:var(--navy);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;width:100%;font:inherit}
+.login{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line)}
-th{color:var(--mut)}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+.term{background:#040a14;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;white-space:pre-wrap;max-height:280px;overflow:auto;color:#b8c7e0}
+.mut{color:var(--mut)}.bad{color:var(--bad)}.ok{color:var(--ok)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:800px){.two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -45,19 +44,28 @@ th{color:var(--mut)}
   <span class="tag" id="authTag">auth —</span>
   <span style="flex:1"></span>
   <nav>
-    <a href="/gbs">GBS freeze</a>
+    <a href="/gbs">GBS</a>
     <a href="/divisions">Divisions</a>
+    <a href="/madiba">MADIBA</a>
     <a href="/seths">SETHS</a>
     <a href="/ts">TS</a>
-    <a href="/madiba">MADIBA</a>
     <a href="/Sentinel">Sentinel</a>
-    <a href="/portals">Portals</a>
+    <a href="/udoc-admin">UDOC Admin</a>
     <a href="/admin">GODS Admin</a>
   </nav>
 </header>
 <main>
   <div class="honest">Capstone honesty: EIF nomination is <b>audit-only</b> · no funding · no Diamond grant on free tier · capital not_deployed · parallel to GBS Sovereign-Verified (systems)</div>
-  <div class="banner">Recognition plane (MADIBA): EIF Diamond = individual-side parallel to GBS-UDOC <b>Sovereign-Verified</b>. Staff: <code>madiba@gods.local</code> · <code>staff123</code></div>
+  <div class="banner">Recognition plane (MADIBA): EIF Diamond = individual-side parallel to GBS-UDOC <b>Sovereign-Verified</b>. Staff: <code>madiba@gods.local</code> / <code>staff123</code> · or <code>admin@gods.local</code> / <code>admin123</code></div>
+
+  <div class="login panel" style="margin-top:0">
+    <h3>Staff connect</h3>
+    <input id="email" value="madiba@gods.local" style="max-width:220px" placeholder="email">
+    <input id="pass" type="password" value="staff123" style="max-width:140px" placeholder="password">
+    <button class="btn" type="button" onclick="login()">Connect</button>
+    <button class="btn ghost" type="button" onclick="load()">Refresh framework</button>
+    <span class="mut" id="who">not connected</span>
+  </div>
 
   <div class="panel">
     <h3>Guided path · EIF assurance</h3>
@@ -67,183 +75,239 @@ th{color:var(--mut)}
       <button type="button" class="chip" onclick="nominate()">3 · Nominate (audit)</button>
       <a class="chip" href="/madiba">4 · MADIBA →</a>
       <a class="chip" href="/gbs">5 · GBS freeze →</a>
-      <a class="chip" href="/Sentinel">Sentinel EVA →</a>
       <button type="button" class="chip" onclick="evaSmoke()">EVA fair/biased</button>
+      <button type="button" class="chip" onclick="loadPipeline()">Pipeline</button>
     </div>
   </div>
 
   <div class="grid" style="margin-top:12px">
     <div class="card"><h3>Domains</h3><div class="metric" id="k-domains">—</div></div>
     <div class="card"><h3>Tiers</h3><div class="metric" id="k-tiers">—</div></div>
-    <div class="card"><h3>Auth</h3><div class="metric" id="k-auth" style="font-size:1.05rem">—</div></div>
     <div class="card"><h3>Health</h3><div class="metric" id="k-health" style="font-size:1.05rem">—</div></div>
+    <div class="card"><h3>Auth</h3><div class="metric" id="k-auth" style="font-size:1.05rem">—</div></div>
     <div class="card"><h3>MADIBA cycles</h3><div class="metric" id="k-mad-c">—</div></div>
     <div class="card"><h3>Recycled</h3><div class="metric" id="k-mad-r" style="font-size:1.05rem">—</div></div>
     <div class="card"><h3>Engagements</h3><div class="metric" id="k-mad-e">—</div></div>
+    <div class="card"><h3>Committed</h3><div class="metric" id="k-mad-commit" style="font-size:1.05rem">—</div></div>
   </div>
 
-  <div class="panel login">
-    <div><label>Email</label><input id="email" value="madiba@gods.local"/></div>
-    <div><label>Password</label><input id="pw" type="password" value="staff123"/></div>
-    <button type="button" class="btn green" onclick="login()">Sign in</button>
-    <button type="button" class="btn ghost" onclick="load()">Refresh APIs</button>
-    <span class="mut" id="loginMsg"></span>
+  <div class="two">
+    <div class="panel">
+      <h3>Instrument · philosophy</h3>
+      <div id="fw-meta" class="mut">—</div>
+    </div>
+    <div class="panel">
+      <h3>Safeguards (UDOC pillars)</h3>
+      <div id="safeguards" class="mut">—</div>
+    </div>
   </div>
 
-  <div class="grid" style="margin-top:4px">
-    <div class="panel" style="margin:0">
-      <h3>Parallel recognition</h3>
-      <div class="kv"><span>Individuals</span><span class="live">EIF Diamond</span></div>
-      <div class="kv"><span>Systems</span><span>Sovereign-Verified</span></div>
-      <div class="kv"><span>Baseline</span><span class="mut">SETHS Platinum · GBS-T.S.</span></div>
-      <div class="kv"><span>Authority</span><span class="mut">MADIBA + UDOC audit</span></div>
+  <div class="two">
+    <div class="panel">
+      <h3>Six contribution domains</h3>
+      <div id="domChips" style="margin-bottom:8px"></div>
+      <div id="domains">—</div>
     </div>
-    <div class="panel" style="margin:0">
-      <h3>Health · LIVE</h3>
-      <div id="health" class="mut">—</div>
-    </div>
-    <div class="panel" style="margin:0">
-      <h3>Honesty · LIVE</h3>
-      <div id="honesty" class="mut">—</div>
+    <div class="panel">
+      <h3>Passport tiers → Diamond ceiling</h3>
+      <div id="tiers">—</div>
     </div>
   </div>
 
   <div class="panel">
-    <h3>Six domains · LIVE</h3>
-    <div id="domains">—</div>
-  </div>
-
-  <div class="panel">
-    <h3>Passport tiers (SETHS → Diamond)</h3>
-    <div id="tiers">—</div>
-  </div>
-
-  <div class="panel">
-    <h3>Nominate (audit only)</h3>
-    <p class="mut" style="font-size:12px;margin:0 0 8px">Writes sealed audit event — does not move capital or grant Diamond on Capstone free tier.</p>
-    <div id="domChips" style="margin-bottom:8px"></div>
-    <input type="hidden" id="dom" value="intellectual"/>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <input id="nominee" placeholder="Nominee name / ref"/>
-      <input id="rationale" placeholder="Contribution rationale"/>
+    <h3>Nominate · audit-only (no funding)</h3>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <label class="mut" style="font-size:11px">Nominee label</label>
+        <input id="nominee" placeholder="e.g. Capstone Demo Contributor">
+      </div>
+      <div>
+        <label class="mut" style="font-size:11px">Domain</label>
+        <select id="dom"></select>
+      </div>
+      <div>
+        <label class="mut" style="font-size:11px">Pathway</label>
+        <select id="pathway"><option value="open">open</option><option value="seths_platinum">seths_platinum</option></select>
+      </div>
+      <div>
+        <label class="mut" style="font-size:11px">Evidence note (optional)</label>
+        <input id="evidence" placeholder="link / case ref / verifier">
+      </div>
+      <div style="grid-column:1/-1">
+        <label class="mut" style="font-size:11px">Contribution summary (≥10 chars)</label>
+        <textarea id="summary" rows="3" placeholder="What exceptional contribution is being recognised?"></textarea>
+      </div>
     </div>
-    <button type="button" class="btn green" onclick="nominate()">Log nomination → sealed audit</button>
-    <a class="btn ghost" href="/madiba" style="text-decoration:none;display:inline-block;margin-left:6px">Open MADIBA →</a>
-    <div class="term" id="term">Ready · staff login required for nominate</div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn green" type="button" onclick="nominate()">Log nomination to sealed audit</button>
+      <button class="btn ghost" type="button" onclick="fillDemo()">Fill demo fields</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>MADIBA engage pipeline (recognition capital context)</h3>
+    <div id="pipeline">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>Terminal</h3>
+    <div class="term" id="term">EIF · /eif/* MADIBA Diamond assurance</div>
   </div>
 </main>
 <script>
 const API=location.origin;
-const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
-const fmt=n=>{n=Number(n);if(!isFinite(n))return '—';if(Math.abs(n)>=1e6)return 'R'+(n/1e6).toFixed(2)+'M';if(Math.abs(n)>=1e3)return 'R'+(n/1e3).toFixed(1)+'k';return 'R'+n;};
-function tok(){return localStorage.getItem('udoc_eif_tok')||localStorage.getItem('udoc_sent_tok')||'';}
-function setAuth(ok){document.getElementById('authTag').textContent=ok?'auth OK':'auth —';document.getElementById('authTag').className='tag '+(ok?'ok':''); document.getElementById('k-auth').textContent=ok?'OK':'—';}
+let TOK='';
+const $=id=>document.getElementById(id);
+const esc=s=>{const d=document.createElement('div');d.textContent=String(s==null?'':s);return d.innerHTML;};
+const fmt=n=>{if(n==null||n==='')return '—'; const x=Number(n); if(!isFinite(x)) return esc(n); return x>=1e6?(x/1e6).toFixed(2)+'M':x>=1e3?(x/1e3).toFixed(1)+'k':String(x);};
+
 async function api(path,opts={}){
-  const h=Object.assign({'Content-Type':'application/json'},opts.headers||{});
-  const t=tok(); if(t) h.Authorization='Bearer '+t;
+  const h=Object.assign({},opts.headers||{});
+  if(TOK) h.Authorization='Bearer '+TOK;
+  if(opts.body && !h['Content-Type']) h['Content-Type']='application/json';
   const r=await fetch(API+path,{...opts,headers:h});
-  const b=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(typeof b.detail==='string'?b.detail:JSON.stringify(b.detail||r.status));
-  return b;
+  const t=await r.text(); let j; try{j=JSON.parse(t);}catch{j={raw:t};}
+  if(!r.ok) throw new Error('HTTP '+r.status+' on '+path+' · '+(j.detail?JSON.stringify(j.detail).slice(0,160):t.slice(0,120)));
+  return j;
 }
+
 async function login(){
-  const msg=document.getElementById('loginMsg');
   try{
-    const body=new URLSearchParams({username:document.getElementById('email').value.trim(),password:document.getElementById('pw').value});
+    const body=new URLSearchParams({username:$('email').value.trim(),password:$('pass').value});
     const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body});
-    const d=await r.json().catch(()=>({}));
-    if(!r.ok) throw new Error(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail||r.status));
-    const t=d.access_token||d.token; if(!t) throw new Error('no token');
-    localStorage.setItem('udoc_eif_tok',t); localStorage.setItem('udoc_sent_tok',t);
-    setAuth(true); msg.innerHTML='<span class="live">signed in</span>'; load();
-  }catch(e){ setAuth(false); msg.innerHTML='<span class="bad">'+esc(e.message)+'</span>'; }
+    const d=await r.json();
+    if(!r.ok||!d.access_token) throw new Error(d.detail||('login '+r.status));
+    TOK=d.access_token;
+    $('who').textContent=$('email').value+' · '+(d.role||'?');
+    $('authTag').textContent='auth '+ (d.role||'ok');
+    $('authTag').className='tag ok';
+    $('k-auth').textContent=d.role||'ok';
+    await load();
+  }catch(e){
+    $('who').innerHTML='<span class="bad">'+esc(e.message)+'</span>';
+    $('authTag').textContent='auth fail';
+  }
 }
+
 function pickDom(id,el){
-  document.getElementById('dom').value=id;
+  $('dom').value=id;
   document.querySelectorAll('#domChips .chip').forEach(c=>c.classList.remove('on'));
   if(el) el.classList.add('on');
 }
+
 function fillDemo(){
-  document.getElementById('nominee').value='Capstone Demo Nominee';
-  document.getElementById('rationale').value='Audit-only Capstone nomination · no capital';
+  $('nominee').value='Capstone Demo Contributor';
+  $('summary').value='Demonstrated exceptional intellectual contribution to constitutional deterministic governance (UDOC Capstone audit path).';
+  $('evidence').value='Capstone demo · sealed audit only';
+  $('pathway').value='open';
+  if($('dom').options.length) $('dom').selectedIndex=0;
+  $('term').textContent='Demo fields filled · click Nominate (audit)';
 }
+
 async function load(){
-  setAuth(!!tok());
+  $('term').textContent='Loading framework…';
   try{
-    const [h,fw,doms,tiersResp,sov]=await Promise.all([
-      api('/eif/health').catch(e=>({status:'err',error:e.message})),
-      api('/eif/framework').catch(e=>({error:e.message})),
-      api('/eif/domains').catch(()=>({})),
-      api('/eif/tiers').catch(()=>({})),
-      api('/gis/gbs/sovereign-tier').catch(()=>({})),
+    const [fw, doms, tiers, health]=await Promise.all([
+      api('/eif/framework'),
+      api('/eif/domains'),
+      api('/eif/tiers'),
+      api('/eif/health'),
     ]);
-    document.getElementById('capTag').textContent='capital '+(h.capital||'not_deployed');
-    document.getElementById('k-health').textContent=h.status||'—';
-    document.getElementById('health').innerHTML=
-      '<div class="kv"><span>Surface</span><span class="live">'+esc(h.surface||'eif')+'</span></div>'+
-      '<div class="kv"><span>Status</span><span>'+esc(h.status||'—')+'</span></div>'+
-      '<div class="kv"><span>Assurance</span><span>'+esc(h.assurance||'—')+'</span></div>'+
-      '<div class="kv"><span>Capital</span><span class="warn">'+esc(h.capital||'not_deployed')+'</span></div>';
-    const domains=Array.isArray(doms.domains)?doms.domains:(fw.domains||[]);
-    const tiers=Array.isArray(tiersResp.tiers)?tiersResp.tiers:(fw.passport_tiers||fw.tiers||[]);
-    document.getElementById('k-domains').textContent=domains.length||'—';
-    document.getElementById('k-tiers').textContent=tiers.length||'—';
-    document.getElementById('honesty').innerHTML=
-      '<div class="kv"><span>Instrument</span><span>'+esc(fw.instrument||'EIF')+'</span></div>'+
-      '<div class="kv"><span>Division</span><span>'+esc(fw.division||'M.A.D.I.B.A.')+'</span></div>'+
-      '<div class="kv"><span>Systems parallel</span><span>'+esc(sov.name||'Sovereign-Verified')+'</span></div>'+
-      '<div class="kv"><span>Systems status</span><span class="warn">'+esc(sov.status||'designed_not_built')+'</span></div>'+
-      '<div class="kv"><span>UDOC role</span><span class="mut">'+esc(fw.udoc_role||'')+'</span></div>';
-    document.getElementById('domains').innerHTML=domains.length
-      ?('<table><thead><tr><th>Domain</th><th>Examples</th></tr></thead><tbody>'+
-        domains.map(d=>'<tr><td><b>'+esc(d.label)+'</b><div class="mut" style="font-size:11px">'+esc(d.id)+'</div></td><td class="mut">'+esc(d.examples||'')+'</td></tr>').join('')+
-        '</tbody></table>')
-      :'<span class="bad">'+esc(fw.error||'no domains')+'</span>';
-    document.getElementById('domChips').innerHTML=domains.map((d,i)=>
-      '<span class="chip'+(i===0?' on':'')+'" onclick="pickDom(\''+d.id+'\',this)">'+esc(d.label)+'</span>'
+    const domains=doms.domains||fw.domains||[];
+    const tlist=tiers.tiers||fw.passport_tiers||[];
+    $('k-domains').textContent=domains.length;
+    $('k-tiers').textContent=tlist.length;
+    $('k-health').textContent=health.status||'—';
+    $('capTag').textContent=health.capital||'capital not_deployed';
+
+    $('fw-meta').innerHTML=
+      '<div><b>'+esc(fw.instrument||'EIF')+'</b> · '+esc(fw.division||'')+' · '+esc(fw.version||'')+'</div>'+
+      '<div class="mut" style="margin-top:6px">'+esc(fw.udoc_role||'')+'</div>'+
+      (fw.philosophy?'<div style="margin-top:8px">'+Object.entries(fw.philosophy).map(([k,v])=>'<div class="mut"><b>'+esc(k)+'</b>: '+esc(v)+'</div>').join('')+'</div>':'')+
+      (fw.pathways_proposed?'<div style="margin-top:8px"><b>Pathways</b><ul style="margin:4px 0 0 16px">'+(fw.pathways_proposed||[]).map(p=>'<li class="mut">'+esc(p)+'</li>').join('')+'</ul></div>':'');
+
+    const sg=fw.safeguards||[];
+    $('safeguards').innerHTML=sg.length
+      ? '<table><thead><tr><th>Safeguard</th><th>Pillar</th></tr></thead><tbody>'+
+        sg.map(s=>'<tr><td>'+esc(s.safeguard)+'</td><td class="mut">'+esc(s.pillar)+'</td></tr>').join('')+
+        '</tbody></table>'
+      : '—';
+
+    $('domains').innerHTML=domains.length
+      ? '<table><thead><tr><th>Domain</th><th>Examples</th></tr></thead><tbody>'+
+        domains.map(d=>'<tr><td><b>'+esc(d.label||d.id)+'</b><div class="mut" style="font-size:11px">'+esc(d.id)+'</div></td><td class="mut">'+esc(d.examples||'')+'</td></tr>').join('')+
+        '</tbody></table>'
+      : '<span class="bad">no domains</span>';
+
+    $('domChips').innerHTML=domains.map((d,i)=>
+      '<span class="chip'+(i===0?' on':'')+'" onclick="pickDom(\''+esc(d.id)+'\',this)">'+esc(d.label||d.id)+'</span>'
     ).join('');
-    if(domains[0]) document.getElementById('dom').value=domains[0].id;
-    document.getElementById('tiers').innerHTML=tiers.length
-      ?('<table><thead><tr><th>Tier</th><th>Recognises</th></tr></thead><tbody>'+
-        tiers.map(t=>'<tr><td><b>'+esc(t.tier||t.id||t.name||'')+'</b></td><td class="mut">'+esc(t.recognises||t.label||'')+'</td></tr>').join('')+
-        '</tbody></table>')
-      :'—';
-    try{
-      const [mm,pipe]=await Promise.all([
-        api('/madiba/metrics').catch(()=>({})),
-        api('/madiba/engage/pipeline').catch(()=>({})),
-      ]);
-      document.getElementById('k-mad-c').textContent=mm.cycles??'—';
-      document.getElementById('k-mad-r').textContent=fmt(mm.cumulative_recycled);
-      document.getElementById('k-mad-e').textContent=pipe.engagements??(pipe.list||[]).length??'—';
-    }catch(_){}
-    document.getElementById('term').textContent='Framework loaded · domains='+domains.length+' tiers='+tiers.length;
+    $('dom').innerHTML=domains.map(d=>'<option value="'+esc(d.id)+'">'+esc(d.label||d.id)+'</option>').join('');
+
+    $('tiers').innerHTML=tlist.length
+      ? '<table><thead><tr><th>Tier</th><th>Recognises</th></tr></thead><tbody>'+
+        tlist.map(t=>'<tr><td><b>'+esc(t.tier||t.id||'')+'</b></td><td class="mut">'+esc(t.recognises||'')+'</td></tr>').join('')+
+        '</tbody></table>'
+      : '—';
+
+    await loadPipeline();
+    $('term').textContent='Framework loaded · domains='+domains.length+' · tiers='+tlist.length+' · health='+(health.status||'?');
   }catch(e){
-    document.getElementById('term').textContent='Load error: '+e.message;
+    $('term').textContent='Load error: '+e.message;
   }
 }
+
+async function loadPipeline(){
+  try{
+    const [mm,pipe]=await Promise.all([
+      api('/madiba/metrics').catch(()=>({})),
+      api('/madiba/engage/pipeline').catch(()=>({})),
+    ]);
+    $('k-mad-c').textContent=mm.cycles??'—';
+    $('k-mad-r').textContent=fmt(mm.cumulative_recycled);
+    $('k-mad-e').textContent=pipe.engagements??(pipe.list||[]).length??'—';
+    $('k-mad-commit').textContent=fmt(pipe.committed_total);
+    const list=pipe.list||[];
+    const by=pipe.by_stage||{};
+    $('pipeline').innerHTML=
+      '<div class="mut" style="margin-bottom:8px">by stage: '+Object.entries(by).map(([k,v])=>esc(k)+' '+v).join(' · ')+
+      ' · indicated '+fmt(pipe.indicated_total)+'</div>'+
+      (list.length
+        ? '<table><thead><tr><th>Ref</th><th>Investor</th><th>Type</th><th>Amount</th><th>Stage</th></tr></thead><tbody>'+
+          list.map(e=>'<tr><td class="mut">'+esc(e.ref)+'</td><td>'+esc(e.investor)+'</td><td>'+esc(e.type)+'</td><td>'+fmt(e.amount)+'</td><td><b>'+esc(e.stage)+'</b></td></tr>').join('')+
+          '</tbody></table>'
+        : '<span class="mut">No engagements — honest empty pipeline</span>');
+  }catch(e){
+    $('pipeline').innerHTML='<span class="bad">'+esc(e.message)+'</span>';
+  }
+}
+
 async function nominate(){
-  const term=document.getElementById('term');
-  term.textContent='Nominating…';
+  if(!TOK){ $('term').textContent='Connect staff first (madiba@ or admin@)'; return; }
+  $('term').textContent='Nominating (audit only)…';
   try{
     const body={
-      domain:document.getElementById('dom').value,
-      nominee:document.getElementById('nominee').value.trim()||'anonymous-ref',
-      rationale:document.getElementById('rationale').value.trim()||'Capstone audit nomination'
+      nominee_label: $('nominee').value.trim() || 'Capstone Demo Contributor',
+      domain: $('dom').value || 'intellectual',
+      contribution_summary: $('summary').value.trim() || 'Capstone audit nomination — exceptional contribution demonstration path.',
+      evidence_note: $('evidence').value.trim() || '',
+      pathway: $('pathway').value || 'open',
     };
     const r=await api('/eif/nominate',{method:'POST',body:JSON.stringify(body)});
-    term.textContent='AUDIT LOGGED\n'+JSON.stringify(r,null,2)+'\n\n→ capital not_deployed · open MADIBA for ledger';
+    $('term').textContent='AUDIT LOGGED · capital not_deployed\n'+JSON.stringify(r,null,2);
   }catch(e){
-    term.textContent='Error: '+e.message;
+    $('term').textContent='Nominate error: '+e.message;
   }
 }
+
 async function evaSmoke(){
   try{
     const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
     const j=await r.json();
-    document.getElementById('term').textContent='EVA smoke\n'+JSON.stringify(j,null,2).slice(0,1800);
-  }catch(e){document.getElementById('term').textContent='EVA FAIL '+e.message;}
+    $('term').textContent='EVA smoke\n'+JSON.stringify(j,null,2).slice(0,2000);
+  }catch(e){ $('term').textContent='EVA FAIL '+e.message; }
 }
+
 load();
 </script>
 </body>
