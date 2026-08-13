@@ -1,7 +1,7 @@
 # Smoke evidence template · operator record
 
 **Purpose:** Capture a single live verification run so Capstone evidence is a dated fact, not a commit message.  
-**Related:** `UDOC_SMOKE_PASS.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md`  
+**Related:** `UDOC_SMOKE_PASS.md` · `P6_ASSESSOR_SIDE_BY_SIDE.md` · `CAPSTONE_ASSESSOR_PACK.md`  
 **Rule:** Task 2 closes only when this (or equivalent) is filled with **live** results — not simulated UI.
 
 Copy this section into a dated note, issue, or Capstone evidence folder when you run the check.
@@ -12,11 +12,11 @@ Copy this section into a dated note, issue, or Capstone evidence folder when you
 
 | Field | Value |
 |-------|--------|
-| Date (SAST) | |
-| Operator | |
+| Date (SAST) | 2026-08-13 |
+| Operator | automation + founder confirm |
 | Core API base | `https://gods-platform-core.onrender.com` |
-| Browser / hard-refresh | Yes / No |
-| Notes (cold start, etc.) | |
+| Browser / hard-refresh | Recommended before assessor demo |
+| Notes (cold start, etc.) | demo/ready auto-healed model-001 SUSPENDED→ACTIVE |
 
 ---
 
@@ -24,9 +24,9 @@ Copy this section into a dated note, issue, or Capstone evidence folder when you
 
 | Check | URL / action | Result (pass/fail) | Observation |
 |-------|--------------|--------------------|-------------|
-| Health | `GET /health` | | |
-| Demo ready | `GET /udoc/demo/ready` | | model-001 + ACTIVE pack? |
-| Policy active | `GET /policy/active` (or Sentinel) | | |
+| Health | `GET /health` | **PASS** | status ok |
+| Demo ready | `GET /udoc/demo/ready` | **PASS** | ready true · model-001 ACTIVE · pack ACTIVE · 5 rules |
+| Policy active | `GET /policy/active` (or Sentinel) | (operator) | |
 
 ---
 
@@ -34,11 +34,11 @@ Copy this section into a dated note, issue, or Capstone evidence folder when you
 
 | Check | Result | Observation |
 |-------|--------|-------------|
-| DEMO READY / boot banner | | |
-| Fair scenario ≠ BLOCK | | |
-| **Biased scenario = BLOCK** | | **Required** |
-| Smoke panel (if present) | | |
-| Full EVA batch / outcome KPIs | | optional density |
+| DEMO READY / boot banner | (operator) | |
+| Fair scenario ≠ BLOCK | **PASS** (API) | APPROVE |
+| **Biased scenario = BLOCK** | **PASS** (API) | **Required** |
+| Smoke panel (if present) | (operator) | Assessor one-click preferred |
+| Full EVA batch / outcome KPIs | (operator) | optional density |
 
 URL: `https://gods-platform-core.onrender.com/Sentinel`
 
@@ -48,11 +48,11 @@ URL: `https://gods-platform-core.onrender.com/Sentinel`
 
 | Check | Result | Observation |
 |-------|--------|-------------|
-| Sign-in (existing operator) | | no new registration |
-| Fair / healthy ≠ BLOCK | | |
-| **Biased = BLOCK** | | **Required** |
-| Client mini-smoke (if button present) | | |
-| Cert / evidence after EVA | | optional |
+| Sign-in (existing operator) | (operator) | no new registration · client@udoc.demo or staff |
+| Fair / healthy ≠ BLOCK | (operator) | |
+| **Biased = BLOCK** | (operator) | **Required** |
+| Client mini-smoke (if button present) | (operator) | |
+| Cert / evidence after EVA | (operator) | optional |
 
 URL: `https://gods-udoc-client.onrender.com` → Govern
 
@@ -62,9 +62,9 @@ URL: `https://gods-udoc-client.onrender.com` → Govern
 
 | Check | Result | Observation |
 |-------|--------|-------------|
-| `/citizen.html` loads without login | | |
-| Challenge returns case_ref | | |
-| Status lookup works | | |
+| `/citizen.html` loads without login | (operator) | |
+| Challenge returns case_ref | (operator) | POST /citizen/challenge |
+| Status lookup works | (operator) | |
 
 ---
 
@@ -72,9 +72,10 @@ URL: `https://gods-udoc-client.onrender.com` → Govern
 
 | Check | Result |
 |-------|--------|
-| Client App/Mobile: no Hardware plane as product path | |
-| Gateway role routes to expected host | |
-| Internal Admin reachable as staff path | |
+| Client App/Mobile: no Hardware plane as product path | (operator) |
+| Gateway role routes to expected host | (operator) |
+| Internal Admin reachable as staff path | (operator) |
+| Division login chips present | **PASS** (static) · 4-role fillLogin |
 
 ---
 
@@ -82,11 +83,19 @@ URL: `https://gods-udoc-client.onrender.com` → Govern
 
 | Gate | Pass? |
 |------|-------|
-| A health + demo/ready | |
-| B biased BLOCK | |
-| C biased BLOCK | |
-| D citizen public | |
-| **Task 2 close eligible** | Yes only if A+B+C pass |
+| A health + demo/ready | **YES** (2026-08-13 API) |
+| B biased BLOCK | **YES** (API) |
+| C biased BLOCK | (operator UI confirm) |
+| D citizen public | (operator) |
+| **Task 2 close eligible** | Yes when A+B+C pass on live hosts |
 
 **Signature / initials:** _______________  
 **Follow-up if fail:** list only failed surfaces — fix those, do not expand scope.
+
+---
+
+## Automation stamp (not a substitute for operator UI)
+
+- 2026-08-13: health ok · demo/ready true · EVA fair=APPROVE biased=BLOCK on Core batch endpoint.
+- Login density residual closed on all operator + admin surfaces.
+- Website / Netlify §7 still human-pending (website last).
