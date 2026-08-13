@@ -1,34 +1,34 @@
 # Capstone submission timeline · due **30 October 2026**
 
-**Updated:** 2026-08-12  
+**Updated:** 2026-08-13  
 **Deadline:** **30 October 2026**  
 **Ignore:** March 2027 / Oct 2027 date errors in older notes  
 **Constraint:** Free-tier Render + Neon ≤500 MB · intent documented · no commercial SaaS claim required for grade
 
-Runway from **12 Aug 2026 → 30 Oct 2026 ≈ 11 weeks.**
+Runway from **13 Aug 2026 → 30 Oct 2026 ≈ 11 weeks.**
 
 ---
 
-## Status snapshot (12 Aug 2026)
+## Status snapshot (13 Aug 2026)
 
 | Track | State |
 |-------|--------|
-| Task 2 UDOC smoke path | Closed (operator matrix green) — **re-verify** before any assessor demo |
-| Login density (all surfaces) | **COMPLETE** — seths · ts · madiba · divisions · eif · portals · gbs · sentinel · gateway |
+| Task 2 UDOC smoke path | **Closed + re-verified 2026-08-13** · health ok · ready true · fair=APPROVE · biased=BLOCK |
+| Login density (all surfaces) | **COMPLETE** — seths · ts · madiba · divisions · eif · portals · gbs · sentinel · both admins |
 | GBS four-division freeze | **Live** `/gbs` · symmetry · nodes · pillars · EVA gate tag |
 | Portals control + CITIZEN | **Live** Run control/batch · oversight cases · challenge form |
 | EIF recognition surface | **Live** `/eif-ui` nominate audit-only |
 | Division operator loop | **Live** SETHS → TS → MADIBA |
-| Netlify Holdings paste | **Pending** human paste · `LIVE_SITE_CORRECTION_PACK.md` §7 |
-| Assessor pack | **Refreshed this session** · `CAPSTONE_ASSESSOR_PACK.md` |
+| Netlify Holdings paste | **Pending** human paste · `LIVE_SITE_CORRECTION_PACK.md` §7 · **website last** |
+| Assessor pack | **Refreshed** · `CAPSTONE_ASSESSOR_PACK.md` · stranger-readable path |
 
 ---
 
 ## Priority order (strict)
 
-1. **Re-verify smoke** before any demo to assessors (biased=BLOCK + health + demo/ready)  
+1. ~~**Re-verify smoke**~~ **DONE 2026-08-13** (biased=BLOCK + health + demo/ready)  
 2. **Assessor pack freeze** — stranger can follow without founder present ← *this refresh*  
-3. **Netlify Capstone/Holdings** — paste §7 honesty + four-division text  
+3. **Netlify Capstone/Holdings** — paste §7 honesty + four-division text · **website last**  
 4. **Evidence screenshots** — smoke template filled once  
 5. **No new Render services** · no fabricated scale · no Sovereign-Verified “issued” claims  
 

@@ -1,6 +1,6 @@
 # Production density + Capstone track
 
-**Updated:** 2026-08-13 07:20 SAST
+**Updated:** 2026-08-13 07:55 SAST
 
 ## Density track — residual CLOSED (static logins)
 
@@ -14,6 +14,8 @@ Login parity on all operator surfaces + both admin surfaces:
 
 Staff: `admin@gods.local` / `admin123` · `seths@` / `madiba@` / `ts@` `gods.local` / `staff123`
 
+**Live re-verify 2026-08-13:** `/health` ok · `/udoc/demo/ready` true (model-001 ACTIVE) · EVA batch fair=APPROVE biased=BLOCK · surfaces 200.
+
 ## Capstone assessor track — OPEN
 
 | Doc | Purpose |
@@ -23,9 +25,9 @@ Staff: `admin@gods.local` / `admin123` · `seths@` / `madiba@` / `ts@` `gods.loc
 
 ## Next (strict priority)
 
-1. Re-verify live smoke after Render deploys admin chips
+1. ~~Re-verify live smoke after Render deploys admin chips~~ **DONE 2026-08-13**
 2. Netlify §7 Holdings paste (human) — **website last**
-3. Evidence screenshots once
-4. Optional residual doc polish
+3. Evidence screenshots once (SMOKE_EVIDENCE_TEMPLATE)
+4. Optional residual doc polish · freeze assessor pack for stranger walkthrough
 
 Honesty unchanged: zeros OK · MADIBA ≠ AUM · capital not_deployed · Sovereign-Verified = designed_not_built

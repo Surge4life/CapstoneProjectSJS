@@ -1,10 +1,11 @@
 # Capstone Assessor Pack · G.O.D.S / UDOC
 
-**Entry document for assessors** · updated **2026-08-12**  
+**Entry document for assessors** · updated **2026-08-13**  
 **Submission target:** **30 October 2026**  
 **Live Core:** https://gods-platform-core.onrender.com  
-**Latest density commits:** `a38cbeb` (Sentinel login) · `4d8f4ed` (GBS) · `fc64e15` (Portals control)  
-**Constraints:** Render free (~20 services) · Neon ≤500 MB · no commercial SaaS claim required for grade
+**Latest density commits:** login parity closed · admin chips `12dd5412` / `e095ac6f`  
+**Constraints:** Render free (~20 services) · Neon ≤500 MB · no commercial SaaS claim required for grade  
+**Smoke re-verify:** 2026-08-13 · health ok · demo/ready true · fair=APPROVE · biased=BLOCK
 
 ---
 
