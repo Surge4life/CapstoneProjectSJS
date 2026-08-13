@@ -2,7 +2,8 @@
 
 **SoT for close:** operator completes `SMOKE_EVIDENCE_TEMPLATE.md` against **live** Render hosts.  
 **Detail matrix:** `P6_ASSESSOR_SIDE_BY_SIDE.md`  
-**Constraints:** Neon ≤500MB · existing operator only · no new registration required for pass.
+**Constraints:** Neon ≤500MB · existing operator only · no new registration required for pass.  
+**Last automation re-verify:** 2026-08-13 · health ok · demo/ready true (auto-heal model-001) · fair=APPROVE · biased=BLOCK
 
 ---
 
@@ -31,7 +32,9 @@ Citizen + Gateway + package split are Capstone completeness items; biased BLOCK 
 | Client | https://gods-udoc-client.onrender.com |
 | Citizen | https://gods-udoc-client.onrender.com/citizen.html |
 | Gateway | https://gods-udoc-gateway.onrender.com |
-| Admin | https://gods-udoc-admin.onrender.com |
+| Admin (UDOC) | Core `/udoc-admin` (preferred) or gods-udoc-admin host |
+| GODS Admin | https://gods-platform-core.onrender.com/admin |
+| Divisions / GBS | Core `/divisions` · `/gbs` · `/seths` · `/ts` · `/madiba` · `/eif-ui` · `/portals` |
 
 ---
 
@@ -49,3 +52,5 @@ Citizen + Gateway + package split are Capstone completeness items; biased BLOCK 
 1. File evidence via `SMOKE_EVIDENCE_TEMPLATE.md`  
 2. Mark Task 2 closed in project notes (operator fact)  
 3. Only then prioritise GIS/GBS depth or commercial pilot hardening (`UDOC_SAAS_READINESS_GAP.md`)
+
+**Honesty:** zeros OK · MADIBA ≠ AUM · capital not_deployed · Sovereign-Verified = designed_not_built
