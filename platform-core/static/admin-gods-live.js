@@ -270,6 +270,35 @@
       if(m){ m.textContent='GODS densify: '+e.message; m.style.color='#E8A13A'; }
     }
   }
+  function injectLoginChips(){
+    const login=document.getElementById('gl-login');
+    if(!login || document.getElementById('gl-chip-row')) return;
+    const row=document.createElement('div');
+    row.id='gl-chip-row';
+    row.style.cssText='display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 2px';
+    const roles=[
+      ['admin@','admin@gods.local','admin123'],
+      ['seths@','seths@gods.local','staff123'],
+      ['madiba@','madiba@gods.local','staff123'],
+      ['ts@','ts@gods.local','staff123'],
+    ];
+    roles.forEach(([label,e,pw])=>{
+      const b=document.createElement('button');
+      b.type='button';
+      b.textContent=label;
+      b.style.cssText='flex:1;min-width:60px;margin:0;padding:5px 6px;background:transparent;color:#D4CEBC;border:1px solid #243A5A;border-radius:6px;font:10px system-ui;cursor:pointer';
+      b.onclick=()=>{
+        const em=document.getElementById('gl-email');
+        const ps=document.getElementById('gl-pass');
+        if(em) em.value=e;
+        if(ps) ps.value=pw;
+      };
+      row.appendChild(b);
+    });
+    const connect=document.getElementById('gl-connect');
+    if(connect) login.insertBefore(row, connect);
+    else login.appendChild(row);
+  }
   function arm(){
     const btn=document.getElementById('gl-connect');
     const refresh=document.getElementById('gl-refresh');
@@ -280,6 +309,7 @@
     if(pass && !pass.value) pass.placeholder='admin123';
     const email=document.getElementById('gl-email');
     if(email && !email.value) email.value='admin@gods.local';
+    injectLoginChips();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(arm,300));
   else setTimeout(arm,300);
