@@ -13,21 +13,22 @@ header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-w
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
 .wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
 .banner{background:rgba(0,194,212,.1);border:1px solid rgba(0,194,212,.35);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
 .card h3{margin:0 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.4rem;font-weight:700}
+.metric{font-size:1.35rem;font-weight:700}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
 .panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
 .term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:220px;overflow:auto}
 .btn{background:var(--cyan);color:#041018;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.gold{background:var(--gold);color:#0a1220}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .mut{color:var(--mut)}.warn{color:var(--warn)}
 input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 10px;font-size:13px}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:2px 8px;font-size:11px;cursor:pointer;margin:2px;text-decoration:none;color:var(--ink)}
 .chip:hover{border-color:var(--cyan)}
-.login-box{max-width:360px;margin:40px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
+.login-box{max-width:380px;margin:40px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
 .honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:#E8A13A;font-size:12px}
 .status-bar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 </style>
@@ -45,13 +46,15 @@ input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-ra
   <a class="nav" href="/gbs">GBS</a>
   <a class="nav" href="/eif-ui">EIF</a>
   <a class="nav" href="/Sentinel">Sentinel</a>
+  <a class="nav" href="/portals">Portals</a>
   <a class="nav" href="https://gods-udoc-gateway.onrender.com/" target="_blank" rel="noopener">Gateway</a>
   <a class="nav" href="https://gods-udoc-client.onrender.com/" target="_blank" rel="noopener">Client</a>
 </header>
-<div class="wrap"><div class="honest">Capstone honesty: MADIBA is a ledger · not AUM · capital not_deployed · staff: madiba@gods.local / staff123</div>
+<div class="wrap">
+<div class="honest">Capstone honesty: MADIBA is a <b>ledger</b> · <b>≠ AUM</b> · capital <b>not_deployed</b> · staff: madiba@gods.local / staff123</div>
   <div class="login-box" id="login">
     <h2 style="margin:0 0 8px;color:var(--cyan)">MADIBA staff login</h2>
-    <p class="mut" style="font-size:12px;margin:0 0 12px">madiba@gods.local · staff123 · allocate / engage</p>
+    <p class="mut" style="font-size:12px;margin:0 0 12px">madiba@gods.local · staff123 · allocate / engage · EIF parallel</p>
     <div class="row" style="margin-bottom:8px">
       <input id="email" value="madiba@gods.local" style="flex:1"/>
       <input id="pass" type="password" value="staff123" style="width:110px"/>
@@ -66,7 +69,7 @@ input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-ra
     <p id="li-err" style="color:var(--red);margin-top:8px;font-size:12px"></p>
   </div>
   <div id="ops" style="display:none">
-    <div class="banner"><b>MADIBA recognises</b> capital cycles on a ledger. Honest Capstone: not AUM · zeros OK · EIF parallel audit.</div>
+    <div class="banner"><b>MADIBA recognises</b> capital cycles on a ledger. Honest Capstone: not AUM · zeros OK · EIF nominate is audit-only.</div>
     <div class="panel"><h3>Guided path · MADIBA</h3>
       <div class="status-bar">
         <button type="button" class="chip" onclick="refresh()">1 · Refresh metrics</button>
@@ -75,31 +78,37 @@ input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-ra
         <button type="button" class="chip" onclick="evaSmoke()">EVA fair/biased</button>
         <a class="chip" href="/divisions">Divisions →</a>
         <a class="chip" href="/gbs">GBS →</a>
+        <a class="chip" href="/Sentinel">Sentinel →</a>
         <a class="chip" href="https://gods-udoc-gateway.onrender.com/" target="_blank">Gateway →</a>
       </div>
     </div>
     <div class="grid">
       <div class="card"><h3>Cycles</h3><div class="metric" id="k-c">—</div></div>
       <div class="card"><h3>Recycled</h3><div class="metric" id="k-r">—</div></div>
+      <div class="card"><h3>Engaged</h3><div class="metric" id="k-e">—</div></div>
       <div class="card"><h3>Session</h3><div class="metric" id="k-who" style="font-size:1rem">—</div></div>
       <div class="card"><h3>EVA gate</h3><div class="metric" id="k-eva" style="font-size:1rem">run chip</div></div>
+      <div class="card"><h3>Ledger</h3><div class="metric" style="font-size:0.9rem">≠ AUM</div></div>
     </div>
     <div class="panel">
       <h3>Command path</h3>
       <div class="row">
         <button class="btn" onclick="refresh()">↻ Refresh</button>
+        <button class="btn gold" onclick="loadDetail()">Load ledger detail</button>
         <a class="btn ghost" href="/eif-ui" style="text-decoration:none">→ EIF</a>
         <a class="btn ghost" href="/ts" style="text-decoration:none">← TS</a>
+        <a class="btn ghost" href="/divisions" style="text-decoration:none">Divisions</a>
         <button class="btn ghost" onclick="logout()">Logout</button>
       </div>
     </div>
-    <div class="panel"><h3>Metrics</h3><div id="list" class="mut">—</div></div>
-    <div class="panel"><h3>Ops terminal</h3><div class="term" id="term">MADIBA · live Core probes</div></div>
+    <div class="panel"><h3>Ledger / metrics · LIVE</h3><div id="list" class="mut">Sign in and refresh</div></div>
+    <div class="panel"><h3>Ops terminal</h3><div class="term" id="term">MADIBA · density package · live Core probes</div></div>
   </div>
 </div>
+<script src="/div-density.js" defer></script>
 <script>
 const API=location.origin; let TOK="";
-const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+const log=m=>{const el=document.getElementById('term');if(el)el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
 function fill(e,p){document.getElementById('email').value=e;if(p)document.getElementById('pass').value=p;}
 async function j(path,opts={}){
@@ -142,10 +151,12 @@ async function refresh(){
     const m=await j('/madiba/metrics');
     document.getElementById('k-c').textContent=m.cycles??m.total??'—';
     document.getElementById('k-r').textContent=m.cumulative_recycled??m.recycled??'—';
+    document.getElementById('k-e').textContent=m.engaged??m.engagements??'—';
     document.getElementById('list').innerHTML='<pre class="term">'+esc(JSON.stringify(m,null,2))+'</pre>';
     log('REFRESH ok');
   }catch(e){log('REFRESH FAIL '+e.message); document.getElementById('list').innerHTML='<span class="warn">'+esc(e.message)+'</span>';}
 }
+async function loadDetail(){ await refresh(); }
 (function(){
   const t=localStorage.getItem('madiba_tok');
   if(t){TOK=t;document.getElementById('login').style.display='none';document.getElementById('ops').style.display='block';
