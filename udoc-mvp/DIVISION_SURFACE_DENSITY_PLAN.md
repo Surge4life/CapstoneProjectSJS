@@ -1,25 +1,29 @@
 # Production density + Capstone track
 
-**Updated:** 2026-08-14 07:45 SAST
+**Updated:** 2026-08-14 07:55 SAST
 
-## Density track — REOPENED · in progress (not deferred)
+## Target: ~24k per surface (UDOC Admin parity) — not 185k GODS Admin
 
-| Surface | Status | Notes |
-|---------|--------|-------|
-| `/divisions` | **Densified** `870f25d5` | GBS probes + EIF health · **live ~21k** |
-| `/portals` | **Densified** `fb5490eb` | EVA + rights + cross-nav · **live ~18k** |
-| `/seths` `/ts` `/madiba` `/gbs` `/eif-ui` | **Live has guided path + EVA chip + role chips** | EVA gate KPI card upgrades queued |
-| `/Sentinel` | Keep | Assessor one-click + Fair/Biased |
-| `/admin` GODS | Functional | ~185k + floating chips |
-| `/udoc-admin` | Residual thinner | **next densify target** |
+| Surface | Live now | Prepared densify | Status |
+|---------|----------|------------------|--------|
+| `/udoc-admin` | **~24k** | baseline | reference |
+| `/divisions` | ~21k | **~27k** | pack ready |
+| `/portals` | ~18k | **~24k** | pack ready |
+| `/Sentinel` | ~19k | **~25k** | pack ready |
+| `/seths` | ~16k | **~24k** | pack ready |
+| `/ts` | ~17k | **~24k** | pack ready |
+| `/madiba` | ~17k | **~24k** | pack ready |
+| `/gbs` | ~17k | **~23k** | pack ready |
+| `/eif-ui` | ~16k | **~24k** | pack ready |
+| `/admin` | ~185k | keep | full cockpit |
 
-Staff: `admin@gods.local` / `admin123` · `seths@` / `madiba@` / `ts@` gods.local / `staff123`
+**Pack location:** agent `artifacts/density24/` + `DENSITY_24K_PUSH.md`  
+**Push path:** PC git (preferred) — same integrity rule as LOCAL_UI_PERMANENT_EMBED
 
-## Verify at desk now
-1. Hard-refresh `/divisions` + `/portals` (deploys confirmed live)
-2. `/seths` → EVA fair/biased · enrol/advance · handoff to TS
-3. `/ts` → assign PLACED · `/madiba` allocate · `/eif-ui` nominate
-4. `/admin` + `/udoc-admin` login
-5. Sentinel Assessor + Client Govern biased=BLOCK
+### Added density (real panels, not padding)
+- EVA gate KPI + PASS/BLOCK UI write
+- Assessor strip + Core bridge probes
+- Full surface cross-nav + Capstone help table
+- Staff credential + division honesty panels
 
 Website / Netlify **last**. Honesty: zeros OK · MADIBA ≠ AUM · capital not_deployed · Sovereign-Verified = designed_not_built
