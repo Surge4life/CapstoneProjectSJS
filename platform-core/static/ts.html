@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>G.O.D.S · TS · Division Operator</title>
 <style>
-:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--warn:#E8A13A;--red:#E85D5D}
+:root{--navy:#060E1C;--navy2:#0c1830;--gold:#C9A84C;--cyan:#00C2D4;--ink:#e8edf6;--mut:#8fa0bd;--line:#1c2a45;--warn:#E8A13A;--red:#E85D5D;--ok:#2D9B5A}
 *{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
 header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .brand{font-weight:700}.brand b{color:var(--cyan)}
@@ -13,21 +13,23 @@ header{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;flex-w
 a.nav{color:var(--cyan);text-decoration:none;font-size:12px;border:1px solid rgba(0,194,212,.3);padding:3px 10px;border-radius:6px}
 .wrap{max-width:1100px;margin:0 auto;padding:16px 16px 48px}
 .banner{background:rgba(0,194,212,.1);border:1px solid rgba(0,194,212,.35);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .card{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:12px}
 .card h3{margin:0 0 6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-.metric{font-size:1.4rem;font-weight:700}
+.metric{font-size:1.35rem;font-weight:700}
 .panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px}
 .panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
 .term{font-family:ui-monospace,monospace;font-size:12px;background:#050b16;border:1px solid var(--line);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:220px;overflow:auto}
 .btn{background:var(--cyan);color:#041018;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px;margin:2px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.gold{background:var(--gold);color:#0a1220}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.mut{color:var(--mut)}.warn{color:var(--warn)}
-input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 10px;font-size:13px}
+.mut{color:var(--mut)}.warn{color:var(--warn)}.ok{color:#6ee7b7}
+input,select{background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 10px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}th{color:var(--mut)}
 .chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:2px 8px;font-size:11px;cursor:pointer;margin:2px;text-decoration:none;color:var(--ink)}
 .chip:hover{border-color:var(--cyan)}
-.login-box{max-width:360px;margin:40px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
+.login-box{max-width:380px;margin:40px auto;background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:20px}
 .honest{margin:10px 0;padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:#E8A13A;font-size:12px}
 .status-bar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 </style>
@@ -43,14 +45,17 @@ input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-ra
   <a class="nav" href="/seths">SETHS</a>
   <a class="nav" href="/madiba">MADIBA</a>
   <a class="nav" href="/gbs">GBS</a>
+  <a class="nav" href="/eif-ui">EIF</a>
   <a class="nav" href="/Sentinel">Sentinel</a>
+  <a class="nav" href="/portals">Portals</a>
   <a class="nav" href="https://gods-udoc-gateway.onrender.com/" target="_blank" rel="noopener">Gateway</a>
   <a class="nav" href="https://gods-udoc-client.onrender.com/" target="_blank" rel="noopener">Client</a>
 </header>
-<div class="wrap"><div class="honest">Capstone honesty: TS SPVs are Neon rows · capital not_deployed · not commercial scale · staff: ts@gods.local / staff123</div>
+<div class="wrap">
+<div class="honest">Capstone honesty: TS SPVs are Neon rows · capital <b>not_deployed</b> · not commercial scale · staff: ts@gods.local / staff123 · see ASSESSOR_DEMO_ACCESS</div>
   <div class="login-box" id="login">
     <h2 style="margin:0 0 8px;color:var(--cyan)">TS staff login</h2>
-    <p class="mut" style="font-size:12px;margin:0 0 12px">ts@gods.local · staff123 · deploy SPV / assign workers</p>
+    <p class="mut" style="font-size:12px;margin:0 0 12px">ts@gods.local · staff123 · deploy SPV / assign workers from SETHS PLACED</p>
     <div class="row" style="margin-bottom:8px">
       <input id="email" value="ts@gods.local" style="flex:1"/>
       <input id="pass" type="password" value="staff123" style="width:110px"/>
@@ -65,40 +70,54 @@ input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-ra
     <p id="li-err" style="color:var(--red);margin-top:8px;font-size:12px"></p>
   </div>
   <div id="ops" style="display:none">
-    <div class="banner"><b>TS deploys</b> SPVs and absorbs PLACED SETHS workers. Honest Capstone: demo rows · capital not_deployed.</div>
-    <div class="panel"><h3>Guided path · TS</h3>
+    <div class="banner"><b>TS deploys</b> SPVs and absorbs PLACED SETHS workers. Honest Capstone: demo rows · equity structure documented · capital not_deployed.</div>
+    <div class="panel"><h3>Guided path · SETHS → TS → MADIBA</h3>
       <div class="status-bar">
-        <a class="chip" href="/seths">1 · Ensure PLACED on SETHS →</a>
-        <button type="button" class="chip" onclick="refresh()">2 · Refresh metrics</button>
-        <a class="chip" href="/madiba">3 · MADIBA recycle →</a>
+        <a class="chip" href="/seths">1 · PLACED on SETHS →</a>
+        <button type="button" class="chip" onclick="refresh()">2 · Refresh TS metrics</button>
+        <button type="button" class="chip" onclick="loadProjects()">3 · Load projects</button>
+        <a class="chip" href="/madiba">4 · MADIBA recycle →</a>
         <button type="button" class="chip" onclick="evaSmoke()">EVA fair/biased</button>
         <a class="chip" href="/divisions">Divisions →</a>
         <a class="chip" href="/gbs">GBS →</a>
+        <a class="chip" href="/Sentinel">Sentinel →</a>
         <a class="chip" href="https://gods-udoc-gateway.onrender.com/" target="_blank">Gateway →</a>
       </div>
     </div>
     <div class="grid">
       <div class="card"><h3>Projects</h3><div class="metric" id="k-p">—</div></div>
       <div class="card"><h3>Workers absorbed</h3><div class="metric" id="k-w">—</div></div>
+      <div class="card"><h3>Active SPVs</h3><div class="metric" id="k-s">—</div></div>
       <div class="card"><h3>Session</h3><div class="metric" id="k-who" style="font-size:1rem">—</div></div>
       <div class="card"><h3>EVA gate</h3><div class="metric" id="k-eva" style="font-size:1rem">run chip</div></div>
+      <div class="card"><h3>Honesty</h3><div class="metric" style="font-size:0.9rem">not_deployed</div></div>
     </div>
     <div class="panel">
       <h3>Command path</h3>
       <div class="row">
-        <button class="btn" onclick="refresh()">↻ Refresh</button>
+        <button class="btn" onclick="refresh()">↻ Refresh metrics</button>
+        <button class="btn gold" onclick="loadProjects()">Load projects</button>
         <a class="btn ghost" href="/seths" style="text-decoration:none">← SETHS placed</a>
         <a class="btn ghost" href="/madiba" style="text-decoration:none">→ MADIBA</a>
+        <a class="btn ghost" href="/divisions" style="text-decoration:none">Divisions loop</a>
         <button class="btn ghost" onclick="logout()">Logout</button>
       </div>
     </div>
-    <div class="panel"><h3>Projects / metrics</h3><div id="list" class="mut">—</div></div>
-    <div class="panel"><h3>Ops terminal</h3><div class="term" id="term">TS · live Core probes</div></div>
+    <div class="panel">
+      <h3>Projects / subsidiaries · LIVE</h3>
+      <div id="list" class="mut">Sign in and Load projects</div>
+    </div>
+    <div class="panel">
+      <h3>Handoff notes</h3>
+      <p class="mut" style="font-size:12px;margin:0">PLACED SETHS learners feed assign-worker (FK-backed) when API exposes assign. Metrics from <code>/ts/metrics</code>. Zeros OK on free tier.</p>
+    </div>
+    <div class="panel"><h3>Ops terminal</h3><div class="term" id="term">TS · density package · live Core probes</div></div>
   </div>
 </div>
+<script src="/div-density.js" defer></script>
 <script>
 const API=location.origin; let TOK="";
-const log=m=>{const el=document.getElementById('term');el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
+const log=m=>{const el=document.getElementById('term');if(el)el.textContent=new Date().toLocaleTimeString()+'  '+m+'\n'+el.textContent;};
 const esc=s=>{const d=document.createElement('div');d.textContent=String(s??'');return d.innerHTML;};
 function fill(e,p){document.getElementById('email').value=e;if(p)document.getElementById('pass').value=p;}
 async function j(path,opts={}){
@@ -132,7 +151,7 @@ async function doLogin(){
     document.getElementById('login').style.display='none';
     document.getElementById('ops').style.display='block';
     document.getElementById('k-who').textContent=(localStorage.getItem('ts_who')||'').split('@')[0];
-    log('LOGIN ok'); await refresh();
+    log('LOGIN ok · role='+(d.role||'')); await refresh(); await loadProjects();
   }catch(e){document.getElementById('li-err').textContent=e.message;}
 }
 function logout(){TOK='';localStorage.removeItem('ts_tok');document.getElementById('ops').style.display='none';document.getElementById('login').style.display='block';}
@@ -141,9 +160,32 @@ async function refresh(){
     const m=await j('/ts/metrics');
     document.getElementById('k-p').textContent=m.projects??m.total??'—';
     document.getElementById('k-w').textContent=m.workers_absorbed??m.workers??'—';
-    document.getElementById('list').innerHTML='<pre class="term">'+esc(JSON.stringify(m,null,2))+'</pre>';
-    log('REFRESH ok');
-  }catch(e){log('REFRESH FAIL '+e.message); document.getElementById('list').innerHTML='<span class="warn">'+esc(e.message)+'</span>';}
+    document.getElementById('k-s').textContent=m.active_spvs??m.spvs??m.subsidiaries??'—';
+    log('REFRESH ok '+JSON.stringify(m).slice(0,160));
+  }catch(e){log('REFRESH FAIL '+e.message);}
+}
+async function loadProjects(){
+  try{
+    let data;
+    try{ data=await j('/ts/projects'); }
+    catch(e1){
+      try{ data=await j('/ts/metrics'); }
+      catch(e2){ throw e1; }
+    }
+    const items=Array.isArray(data)?data:(data.items||data.projects||[]);
+    const el=document.getElementById('list');
+    if(items.length){
+      el.innerHTML='<table><thead><tr><th>Ref</th><th>Name</th><th>Status</th></tr></thead><tbody>'+
+        items.slice(0,20).map(x=>'<tr><td>'+esc(x.ref||x.id||'—')+'</td><td>'+esc(x.name||x.title||'—')+'</td><td>'+esc(x.status||'—')+'</td></tr>').join('')+
+        '</tbody></table>';
+    } else {
+      el.innerHTML='<pre class="term">'+esc(JSON.stringify(data,null,2))+'</pre>';
+    }
+    log('PROJECTS ok · n='+(items.length||0));
+  }catch(e){
+    document.getElementById('list').innerHTML='<span class="warn">'+esc(e.message)+'</span><p class="mut">Metrics-only mode OK on Capstone free tier.</p>';
+    log('PROJECTS '+e.message);
+  }
 }
 (function(){
   const t=localStorage.getItem('ts_tok');
