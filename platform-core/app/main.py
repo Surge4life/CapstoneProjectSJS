@@ -317,12 +317,28 @@ def div_density_js():
     return FileResponse(_static("div-density.js"), media_type="application/javascript")
 
 
+@app.get("/udoc-admin-density.js", tags=["root"], include_in_schema=False)
+def udoc_admin_density_js():
+    """Additive UDOC Admin density strip (assessor + division KPIs)."""
+    return FileResponse(_static("udoc-admin-density.js"), media_type="application/javascript")
+
+
 @app.get("/udoc-admin", tags=["root"], include_in_schema=False)
 @app.get("/udoc-admin/", tags=["root"], include_in_schema=False)
 @app.get("/udoc_admin", tags=["root"], include_in_schema=False)
 @app.get("/udoc_admin/", tags=["root"], include_in_schema=False)
 def udoc_admin_console():
-    return FileResponse(_static("udoc_admin_v93.html"))
+    """UDOC internal controller — inject additive density script."""
+    path = _static("udoc_admin_v93.html")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            html = f.read()
+    except Exception:
+        return FileResponse(path)
+    tag = '<script src="/udoc-admin-density.js" defer></script>'
+    if "udoc-admin-density.js" not in html:
+        html = html.replace("</body>", tag + "\n</body>") if "</body>" in html else html + tag
+    return HTMLResponse(html, media_type="text/html")
 
 
 @app.get("/portals", tags=["root"], include_in_schema=False)
