@@ -1,7 +1,7 @@
 """GODS Platform Core — FastAPI application entry point. Wires all division + UDOC routers."""
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 from app.division_surfaces import register_division_surfaces
 import os
 from app.core.config import settings
@@ -277,10 +277,22 @@ def _static(name: str) -> str:
     return os.path.join(os.path.dirname(__file__), "..", "static", name)
 
 
+def _html_with_density(path: str):
+    """Serve HTML and inject shared div-density.js (same pattern as admin-gods-live)."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            html = f.read()
+    except Exception:
+        return FileResponse(path)
+    tag = '<script src="/div-density.js" defer></script>'
+    if "div-density.js" not in html:
+        html = html.replace("</body>", tag + "\n</body>") if "</body>" in html else html + tag
+    return HTMLResponse(html, media_type="text/html")
+
+
 @app.get("/admin", tags=["root"], include_in_schema=False)
 def admin_console():
     """GODS constitutional admin cockpit — inject live density script."""
-    from fastapi.responses import HTMLResponse
     path = _static("admin.html")
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -299,6 +311,12 @@ def admin_gods_live_js():
     return FileResponse(_static("admin-gods-live.js"), media_type="application/javascript")
 
 
+@app.get("/div-density.js", tags=["root"], include_in_schema=False)
+def div_density_js():
+    """Shared operator density: assessor strip, EVA gate, cross-nav, core probes."""
+    return FileResponse(_static("div-density.js"), media_type="application/javascript")
+
+
 @app.get("/udoc-admin", tags=["root"], include_in_schema=False)
 @app.get("/udoc-admin/", tags=["root"], include_in_schema=False)
 @app.get("/udoc_admin", tags=["root"], include_in_schema=False)
@@ -309,7 +327,7 @@ def udoc_admin_console():
 
 @app.get("/portals", tags=["root"], include_in_schema=False)
 def portals_console():
-    return FileResponse(_static("portals.html"))
+    return _html_with_density(_static("portals.html"))
 
 
 @app.get("/gbs", tags=["root"], include_in_schema=False)
@@ -317,13 +335,13 @@ def portals_console():
 @app.get("/holdings", tags=["root"], include_in_schema=False)
 def gbs_freeze_console():
     """Capstone GBS four-division freeze page (GBS-UDOC v1.0)."""
-    return FileResponse(_static("gbs.html"))
+    return _html_with_density(_static("gbs.html"))
 
 
 @app.get("/divisions", tags=["root"], include_in_schema=False)
 @app.get("/divisions/", tags=["root"], include_in_schema=False)
 def divisions_console():
-    return FileResponse(_static("divisions.html"))
+    return _html_with_density(_static("divisions.html"))
 
 
 # Dedicated division operator surfaces (TS / MADIBA / SETHS)
@@ -332,13 +350,13 @@ register_division_surfaces(app, _static)
 
 @app.get("/eif-ui", tags=["root"], include_in_schema=False)
 def eif_ui():
-    return FileResponse(_static("eif.html"))
+    return _html_with_density(_static("eif.html"))
 
 
 @app.get("/Sentinel", tags=["root"], include_in_schema=False)
 @app.get("/sentinel", tags=["root"], include_in_schema=False)
 def sentinel_console():
-    return FileResponse(_static("sentinel.html"))
+    return _html_with_density(_static("sentinel.html"))
 
 
 @app.get("/", tags=["root"])
