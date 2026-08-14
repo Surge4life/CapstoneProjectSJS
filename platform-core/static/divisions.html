@@ -92,6 +92,8 @@ th{color:var(--mut)}
       <button class="btn ghost" id="m-all">MADIBA allocate</button>
       <button class="btn ghost" id="m-eng">MADIBA engage</button>
       <button class="btn ghost" id="u-batch">EVA fair/biased</button>
+      <button class="btn ghost" id="e-health">EIF health</button>
+      <a class="btn ghost" href="/portals" style="text-decoration:none">Portals →</a>
     </div>
   </div>
 
@@ -109,6 +111,18 @@ th{color:var(--mut)}
   <div class="panel">
     <h3>MADIBA series · LIVE</h3>
     <div id="m-series" class="mut">—</div>
+  </div>
+
+  <div class="panel">
+    <h3>GBS · four-division freeze · LIVE</h3>
+    <div class="row" style="margin-bottom:8px">
+      <button class="btn ghost" type="button" id="g-arch">Architecture</button>
+      <button class="btn ghost" type="button" id="g-ov">Overview</button>
+      <button class="btn ghost" type="button" id="g-nodes">Nodes</button>
+      <button class="btn ghost" type="button" id="g-sov">Sovereign tier</button>
+      <a class="btn ghost" href="/gbs" style="text-decoration:none">Open GBS →</a>
+    </div>
+    <div id="g-out" class="term mut">GBS probes · designed_not_built for Sovereign-Verified</div>
   </div>
 
   <div class="tabs">
@@ -250,7 +264,7 @@ async function refresh(){
     $('m-pipe').innerHTML=eng.length
       ?('<table><thead><tr><th>Ref</th><th>Investor</th><th>Stage</th></tr></thead><tbody>'+
         eng.slice(0,10).map(x=>'<tr><td>'+esc(x.ref)+'</td><td>'+esc(x.investor)+'</td><td>'+esc(x.stage||x.state)+'</td></tr>').join('')+
-        '</tbody></table>')
+          '</tbody></table>')
       :'<span class="mut">No engagements</span>';
 
     log('REFRESH ok · seths='+(sm.total||0)+' ts='+(tm.projects||0)+' madiba='+(mm.cycles||0));
@@ -345,6 +359,18 @@ async function loop(){
 ['u-batch','u-batch-2'].forEach(id=>$(id).onclick=batch);
 $('run-loop').onclick=loop; $('run-loop-2').onclick=loop;
 $('u-ready').onclick=async()=>{try{const r=await fetch('/udoc/demo/ready').then(x=>x.json());$('u-out').textContent=JSON.stringify(r,null,2);log('demo/ready '+r.ready);}catch(e){log('ready '+e.message);}};
+async function gbs(path){
+  try{
+    const r=await fetch(path); const j=await r.json().catch(async()=>({raw:await r.text()}));
+    $('g-out').textContent=JSON.stringify(j,null,2).slice(0,2200);
+    log('GBS '+path+' '+r.status);
+  }catch(e){ $('g-out').textContent=e.message; log('GBS FAIL '+e.message); }
+}
+$('g-arch')&&($('g-arch').onclick=()=>gbs('/gis/gbs/architecture'));
+$('g-ov')&&($('g-ov').onclick=()=>gbs('/gis/gbs/overview'));
+$('g-nodes')&&($('g-nodes').onclick=()=>gbs('/gis/gbs/nodes'));
+$('g-sov')&&($('g-sov').onclick=()=>gbs('/gis/gbs/sovereign-tier'));
+$('e-health')&&($('e-health').onclick=async()=>{try{const r=await fetch('/eif/health');$('g-out').textContent=JSON.stringify(await r.json(),null,2);log('EIF health');}catch(e){log('EIF '+e.message);}});
 (async()=>{
   if(TOK){$('who').textContent='token restored'; try{await refresh();}catch(e){TOK='';localStorage.removeItem('gods_div_tok');$('who').textContent='preload expired';}}
   else {fetch('/udoc/demo/ready').then(r=>r.json()).then(j=>{$('k-demo').textContent=String(j.ready);$('ready').textContent=j.ready?'DEMO READY':'CHECK SEED';$('ready').className='tag '+(j.ready?'ok':'');}).catch(()=>{});}
