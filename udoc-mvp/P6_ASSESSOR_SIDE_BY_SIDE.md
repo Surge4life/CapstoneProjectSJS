@@ -2,8 +2,9 @@
 
 **Demo SoT:** https://capstoneprojectsjs.netlify.app/#demo=<slug>  
 **Live SoT:** Render services below · Core Neon ≤500MB · no new registration required  
-**Smoke checklist:** `UDOC_SMOKE_PASS.md`  
-**Density wave:** 2026-07-30 — Full EVA batch on Client / Sentinel / Admin / Sector
+**Smoke checklist:** `UDOC_SMOKE_PASS.md` · `SMOKE_EVIDENCE_TEMPLATE.md`  
+**Density residual:** CLOSED 2026-08-13 (login parity all operator + admin surfaces)  
+**Last API re-verify:** 2026-08-14 · health ok · demo/ready true · fair=APPROVE · biased=BLOCK
 
 ## Minimum pass rule
 Each live surface must return **≥4 live function results** (API-backed, not mock) matching the demo interaction pattern.
@@ -17,8 +18,9 @@ Each live surface must return **≥4 live function results** (API-backed, not mo
 | Live Evaluation chips | Live Evaluation | Fair ≠ BLOCK · **Biased = BLOCK** (auto-run) |
 | 6-D bars + certificate | after Evaluate | dimensions + cert id |
 | Full EVA matrix | EVA Command | fair/biased/high/sov on model-001 + KPIs |
-| Smoke Pass | top-bar Smoke | health · demo/ready · policy · fair · biased |
+| Smoke Pass | top-bar Smoke / Assessor one-click | health · demo/ready · policy · fair · biased |
 | 12 Pillars | Pillars tab | ENFORCED count |
+| Staff login chips | header / login | 4-role fillLogin |
 
 ### 2. Client · `#demo=udoc-mvp-1` / `mvp-2`
 | Demo feature | Live | Verify |
@@ -40,12 +42,13 @@ Each live surface must return **≥4 live function results** (API-backed, not mo
 | Know Your Rights | Rights | 6 rights cards |
 | Core health pill | top bar | citizen live / online |
 
-### 4. Admin · `#demo=udoc-v7-platform`
+### 4. Admin · Core `/udoc-admin` (preferred) + GODS `/admin`
 | Demo feature | Live | Verify |
 |---|---|---|
-| Command Centre + boot + outcome strip | Admin host (hard-refresh ×2 for SW **v4**) | DEMO READY + APPROVE/BLOCK counts |
+| Command Centre + boot + outcome strip | `/udoc-admin` or Admin host | DEMO READY + APPROVE/BLOCK counts |
 | EVA chips + **Full EVA batch** | EVA Command | Biased BLOCK + batch terminal |
 | HITL Queue + Portals dual-path | Oversight | link opens `/portals` |
+| Staff login chips | login / floating #gods-live | 4-role fillLogin |
 | Infra links | nav footer | Sentinel / Health / Jobs / Portals / Citizen |
 
 ### 5. Sector · Public/Private console
@@ -57,13 +60,14 @@ Each live surface must return **≥4 live function results** (API-backed, not mo
 | Switch PUBLIC/PRIVATE | Switch sector | profile reload |
 | Oversight → Portals | Oversight | dual-path link |
 
-### 6. 24 Portals (Core `/portals`)
+### 6. 24 Portals (Core `/portals`) + Division surfaces
 | Feature | Live | Verify |
 |---|---|---|
-| Catalog select | `/portals` | open workspace |
+| Catalog select | `/portals` | open workspace · role chips |
 | CITIZEN card | full AI-Rights UI | challenge/status |
 | Control + Target | POST `/portal/{key}/control` | `live.oversight` or audit |
 | Resolve | Target=`COB-…` + Close/Override | state RESOLVED/OVERRIDDEN |
+| SETHS / TS / MADIBA / GBS / EIF | `/seths` `/ts` `/madiba` `/gbs` `/eif-ui` | login chips · guided path · live metrics |
 
 ---
 
@@ -75,4 +79,7 @@ Each live surface must return **≥4 live function results** (API-backed, not mo
 - SPA swallows `/citizen.html`
 
 ## Task 2 close criteria
-Surfaces **1–5** pass under hard-refresh on **live** Render. Then Task 1 (docs/ Engineering Canon volume commits) may start.
+Surfaces **1–5** pass under hard-refresh on **live** Render (operator files `SMOKE_EVIDENCE_TEMPLATE.md`).  
+API gates A+B verified green 2026-08-13 and 2026-08-14. Client Govern biased=BLOCK still needs one operator UI tick.
+
+**Honesty:** zeros OK · MADIBA ≠ AUM · capital not_deployed · Sovereign-Verified = designed_not_built · website/Netlify last
