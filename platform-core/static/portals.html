@@ -74,11 +74,16 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
         <button class="chip" onclick="openPortal('COB')">5 · COB</button>
         <button class="chip" onclick="openPortal('HITL_REVIEW')">6 · HITL</button>
         <button class="chip" onclick="openPortal('AI_OWNER')">7 · AI Owner</button>
-        <a class="chip" href="/seths" style="text-decoration:none">SETHS operator →</a>
+        <button class="chip" onclick="evaSmoke()">EVA fair/biased</button>
+        <a class="chip" href="/seths" style="text-decoration:none">SETHS →</a>
+        <a class="chip" href="/ts" style="text-decoration:none">TS →</a>
+        <a class="chip" href="/madiba" style="text-decoration:none">MADIBA →</a>
         <a class="chip" href="/Sentinel" style="text-decoration:none">Sentinel →</a>
         <a class="chip" href="/eif-ui" style="text-decoration:none">EIF →</a>
         <a class="chip" href="/gbs" style="text-decoration:none">GBS →</a>
+        <a class="chip" href="/divisions" style="text-decoration:none">Divisions →</a>
       </div>
+      <p class="mut" style="font-size:11px;margin:8px 0 0">CITIZEN uses public /citizen/challenge · other keys POST /portal/{key}/control → OversightCase on Neon when dual-path live</p>
     </div>
 
     <div class="kpi">
@@ -87,6 +92,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
       <div class="c"><div class="l">Open cases</div><div class="v" id="k-cases">—</div></div>
       <div class="c"><div class="l">Active</div><div class="v" id="k-act" style="font-size:1rem">—</div></div>
       <div class="c"><div class="l">Session</div><div class="v" id="k-who" style="font-size:1rem">—</div></div>
+      <div class="c"><div class="l">EVA gate</div><div class="v" id="k-eva" style="font-size:0.95rem">—</div></div>
     </div>
 
     <div class="panel">
@@ -113,6 +119,11 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
         <textarea id="cit-desc" rows="3" style="width:100%;margin-bottom:8px">I challenge an automated decision that may affect my rights.</textarea>
         <div class="row">
           <button class="btn" onclick="citizenChallenge()">Submit challenge</button>
+          <button class="btn ghost" onclick="fillCitDemo()">Fill demo challenge</button>
+        </div>
+        <div id="cit-rights" style="margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:8px">
+          <div class="mut" style="font-size:11px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Know your rights (SA · Capstone)</div>
+          <div class="row" id="rights-chips"></div>
         </div>
       </div>
       <div id="control-ui" class="hide">
@@ -208,6 +219,36 @@ function renderCatalog(){
     return '<button class="chip" style="text-align:left;width:100%" onclick="openPortal(\''+key.replace(/'/g,"\\'")+'\')"><b>'+label+'</b><br/><span class="mut">'+(p.group||'')+'</span></button>';
   }).join('') || '<span class="mut">No portals match</span>';
 }
+function fillCitDemo(){
+  const s=document.getElementById('cit-service'); const d=document.getElementById('cit-desc');
+  if(s) s.value='Capstone demo automated decision';
+  if(d) d.value='I challenge an automated decision that may affect my rights under POPIA and constitutional fairness. Request human review.';
+  log('CITIZEN demo fields filled');
+}
+function renderRights(){
+  const el=document.getElementById('rights-chips');
+  if(!el) return;
+  const rights=[
+    ['Explanation','Why a decision was made'],
+    ['Human review','HITL before final high-impact'],
+    ['Challenge','Submit oversight case'],
+    ['Correction','Request data/process fix'],
+    ['Non-discrimination','Fairness / DI gate'],
+    ['Access','Know AI is in use'],
+  ];
+  el.innerHTML=rights.map(([t,p])=>'<span class="chip" title="'+p+'"><b>'+t+'</b></span>').join(' ');
+}
+async function evaSmoke(){
+  try{
+    const r=await fetch(API+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})});
+    const j=await r.json();
+    const outs=j.outcomes||{};
+    const gate=(outs.BLOCK>=1)?'PASS':'CHECK';
+    const ke=document.getElementById('k-eva'); if(ke) ke.textContent=gate+' · B'+(outs.BLOCK||0)+'/A'+(outs.APPROVE||0);
+    log('EVA smoke '+JSON.stringify(outs)+' · '+gate);
+    const term=document.getElementById('term'); if(term) term.textContent=JSON.stringify(j,null,2).slice(0,1800);
+  }catch(e){ log('EVA FAIL '+e.message); }
+}
 async function openPortal(key){
   ACTIVE=key;
   document.getElementById('ws-title').textContent=key;
@@ -215,7 +256,7 @@ async function openPortal(key){
   const isCit=key==='CITIZEN';
   document.getElementById('citizen-ui').classList.toggle('hide',!isCit);
   document.getElementById('control-ui').classList.toggle('hide',isCit);
-  if(isCit){ log('OPEN CITIZEN'); return; }
+  if(isCit){ log('OPEN CITIZEN'); renderRights(); return; }
   try{
     const d=await j('/portal/'+encodeURIComponent(key));
     const portal=d.portal||d;
