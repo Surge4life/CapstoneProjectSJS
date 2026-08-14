@@ -1,33 +1,34 @@
 # Production density + Capstone track
 
-**Updated:** 2026-08-13 07:55 SAST
+**Updated:** 2026-08-14 07:20 SAST
 
-## Density track — residual CLOSED (static logins)
+## Density track — REOPENED (panel density)
 
-Login parity on all operator surfaces + both admin surfaces:
+Login parity remains in place on all operator + admin surfaces.
+**Panel/KPI density residual NOT closed** — live surfaces were thinner than denser local builds:
 
-| Surface | Chips |
-|---------|-------|
-| `/seths` · `/ts` · `/madiba` · `/divisions` · `/eif-ui` · `/portals` · `/gbs` · `/Sentinel` | 4-role fillLogin |
-| `/udoc-admin` (`udoc_admin_v93.html`) | 4-role chips — commit `12dd5412` |
-| `/admin` (GODS Admin floating `#gods-live`) | 4-role chips via `admin-gods-live.js` inject — commit `e095ac6f` |
+| Surface | Live size | Denser local | Action |
+|---------|-----------|--------------|--------|
+| `/divisions` | ~20k | ~49k PROD | **pushing denser now** |
+| `/Sentinel` | ~19k | ~39k RESTORE (older APIs) | keep live (has Assessor + chips) |
+| `/portals` | ~16k | ~27k RESTORE | next session |
+| `/seths` `/ts` `/madiba` `/gbs` `/eif-ui` | ~15–17k | incremental | next |
+| `/udoc-admin` | ~24k | enhance via JS | residual |
+| `/admin` GODS | ~185k | floating #gods-live + chips | functional |
 
-Staff: `admin@gods.local` / `admin123` · `seths@` / `madiba@` / `ts@` `gods.local` / `staff123`
+Staff: `admin@gods.local` / `admin123` · `seths@` / `madiba@` / `ts@` gods.local / `staff123`
 
-**Live re-verify 2026-08-13:** `/health` ok · `/udoc/demo/ready` true (model-001 ACTIVE) · EVA batch fair=APPROVE biased=BLOCK · surfaces 200.
+## Admin live status (2026-08-14)
 
-## Capstone assessor track — OPEN
+| Surface | HTTP | Notes |
+|---------|------|-------|
+| `/admin` | 200 | large console + admin-gods-live.js inject |
+| `/udoc-admin` | 200 | thinner; chips present |
+| Protected APIs without token | 401 | expected (routes exist) |
+| `constitutional/pillars` | 404 | residual alias gap |
 
-| Doc | Purpose |
-|-----|---------|
-| `udoc-mvp/CAPSTONE_ASSESSOR_PACK.md` | 20-min live path · honesty |
-| `udoc-mvp/SUBMISSION_TIMELINE.md` | runway to **30 Oct 2026** |
+## Capstone assessor track — OPEN in parallel
 
-## Next (strict priority)
-
-1. ~~Re-verify live smoke after Render deploys admin chips~~ **DONE 2026-08-13**
-2. Netlify §7 Holdings paste (human) — **website last**
-3. Evidence screenshots once (SMOKE_EVIDENCE_TEMPLATE)
-4. Optional residual doc polish · freeze assessor pack for stranger walkthrough
+Website / Netlify §7 still **last**. Density first until operator surfaces match denser builds.
 
 Honesty unchanged: zeros OK · MADIBA ≠ AUM · capital not_deployed · Sovereign-Verified = designed_not_built
