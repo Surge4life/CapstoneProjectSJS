@@ -8,149 +8,94 @@ import { TSOps } from "./consoles/TSOps";
 import { UDOCGov } from "./consoles/UDOCGov";
 import { Intelligence } from "./consoles/Intelligence";
 
-interface Sys { key: string; title: string; path: string; }
-interface Profile { email: string; role: string; division: string; systems: Sys[]; is_admin: boolean; }
-const isInternal = (p: Profile) => p.is_admin || ["admin", "operator", "gov"].includes(p.role);
+/** Capstone profile — /auth/me may omit systems[] and is_admin */
+type Profile = {
+  sub?: string;
+  email?: string;
+  role?: string;
+  division?: string;
+  is_admin?: boolean;
+  systems?: { key: string; label?: string }[];
+  [k: string]: unknown;
+};
 
 function Login({ onAuth }: { onAuth: () => void }) {
   const [email, setEmail] = useState("admin@gods.local");
   const [pw, setPw] = useState("admin123");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const staff = [
-    { email: "admin@gods.local", pw: "admin123", label: "Admin" },
-    { email: "seths@gods.local", pw: "staff123", label: "SETHS" },
-    { email: "madiba@gods.local", pw: "staff123", label: "MADIBA" },
-    { email: "ts@gods.local", pw: "staff123", label: "TS" },
-  ];
-  async function go(e?: string, p?: string) {
-    setBusy(true); setErr("");
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setErr("");
     try {
-      await api.login(e ?? email, p ?? pw);
+      await api.login(email.trim().toLowerCase(), pw);
       onAuth();
     } catch (ex: any) {
-      setErr(ex.message);
+      setErr(ex?.message || "Login failed");
     } finally {
       setBusy(false);
     }
   }
+  function fill(e: string, p: string) {
+    setEmail(e);
+    setPw(p);
+  }
   return (
     <div className="login">
-      <h1>G.O.D.S Internal</h1>
-      <span className="lock">🔒 Network-locked · role-based access</span>
-      <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff email" />
-      <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="password" />
-      <button className="btn" disabled={busy} onClick={() => go()}>
-        Sign in
-      </button>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12, justifyContent: "center" }}>
-        {staff.map((s) => (
-          <button
-            key={s.email}
-            className="btn"
-            disabled={busy}
-            style={{ fontSize: ".72rem", opacity: 0.9 }}
-            onClick={() => {
-              setEmail(s.email);
-              setPw(s.pw);
-              go(s.email, s.pw);
-            }}
-          >
-            {s.label}
-          </button>
-        ))}
+      <div className="login-card">
+        <h1>G.O.D.S Internal</h1>
+        <p className="muted">Staff work environment · Holdings core · four divisions · UDOC across</p>
+        <form onSubmit={submit}>
+          <label>Email</label>
+          <input value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" />
+          <label>Password</label>
+          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="current-password" />
+          <button type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
+        </form>
+        <div className="chips">
+          <button type="button" onClick={() => fill("admin@gods.local", "admin123")}>admin@</button>
+          <button type="button" onClick={() => fill("seths@gods.local", "staff123")}>seths@</button>
+          <button type="button" onClick={() => fill("madiba@gods.local", "staff123")}>madiba@</button>
+          <button type="button" onClick={() => fill("ts@gods.local", "staff123")}>ts@</button>
+        </div>
+        {err && <p className="err">{err}</p>}
+        <p className="muted small">Not Client SaaS. Intelligence is one console — not the whole internal product.</p>
       </div>
-      {err && <div className="err">{err}</div>}
-      <p style={{ fontSize: ".68rem", color: "var(--rule)", marginTop: 14 }}>
-        Division staff · staff123 · admin · admin123
-      </p>
     </div>
   );
 }
 
 function Launcher({ profile }: { profile: Profile }) {
   const nav = useNavigate();
-  const accent: Record<string, string> = {
-    "seths-ops": "var(--seths)",
-    "madiba-ops": "var(--madiba)",
-    "ts-ops": "var(--ts)",
-    "udoc-gov": "var(--udoc)",
-    "holdings-overview": "var(--gold)",
-  };
-  const systems = profile.systems || [];
+  const cards = [
+    { to: "/overview", title: "Holdings Overview", blurb: "GODS core · division loop" },
+    { to: "/seths", title: "SETHS", blurb: "Develops · learners · placement" },
+    { to: "/ts", title: "TS Industries", blurb: "Deploys · SPVs · workforce" },
+    { to: "/madiba", title: "MADIBA", blurb: "Ledger · ≠ AUM · not_deployed" },
+    { to: "/udoc", title: "UDOC Governance", blurb: "Across divisions · policy · EVA" },
+    { to: "/intelligence", title: "Intelligence", blurb: "Corpus ask · one console" },
+  ];
   return (
-    <div style={{ maxWidth: 820, margin: "0 auto", padding: "28px 20px" }}>
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <h1 style={{ color: "var(--gold)", letterSpacing: ".1em" }}>G.O.D.S</h1>
-        <p style={{ fontSize: ".7rem", letterSpacing: ".2em", textTransform: "uppercase", color: "var(--text)" }}>
-          Internal Operating Core
-        </p>
-        <p style={{ fontSize: ".82rem", marginTop: 10 }}>
-          Signed in as <b>{profile.email}</b> · {profile.role} / {profile.division}
-        </p>
-        <p style={{ fontSize: ".7rem", color: "var(--warn)" }}>🔒 Systems scoped to your access · Capstone pre-registration forecast</p>
+    <div className="main">
+      <div className="top">
+        <h2>G.O.D.S Internal · Launcher</h2>
+        <span className="badge">{profile.role || "staff"} · {profile.division || "GODS"}</span>
       </div>
-
-      <div className="guide">
-        <h3>Production-grade demo path (honest zeros OK)</h3>
-        <ol>
-          <li>
-            <b>SETHS</b> — Enrol cohort → Advance → <b>PLACED</b>
-          </li>
-          <li>
-            <b>TS</b> — Deploy SPV (equity 0.20–0.60) → Assign PLACED learner
-          </li>
-          <li>
-            <b>MADIBA</b> — Create engagement → Advance stages · Allocate demo recycle
-          </li>
-          <li>
-            <b>UDOC</b> — Run Full EVA batch (fair ≠ BLOCK · biased = BLOCK)
-          </li>
-          <li>
-            <b>Overview</b> — Confirm division KPIs · open EIF / GBS / Sentinel links
-          </li>
-        </ol>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>
-        {systems.map((s) => (
-          <div
-            key={s.key}
-            onClick={() => nav(s.path)}
-            className="card"
-            style={{
-              cursor: "pointer",
-              borderTop: `3px solid ${accent[s.key] || "var(--gold)"}`,
-              textAlign: "center",
-              padding: "24px 16px",
-            }}
-          >
-            <h3
-              style={{
-                color: accent[s.key] || "var(--gold)",
-                fontSize: ".95rem",
-                marginBottom: 6,
-                textTransform: "none",
-                letterSpacing: 0,
-              }}
-            >
-              {s.title}
-            </h3>
-            <p style={{ fontSize: ".72rem" }}>Open →</p>
-          </div>
+      <p className="muted">Four divisions under Holdings. UDOC is governance across them — not a fifth division and not the Holdings core.</p>
+      <div className="launcher-grid">
+        {cards.map((c) => (
+          <button key={c.to} type="button" className="launch-card" onClick={() => nav(c.to)}>
+            <strong>{c.title}</strong>
+            <span>{c.blurb}</span>
+          </button>
         ))}
-        {isInternal(profile) && (
-          <div
-            onClick={() => nav("/intelligence")}
-            className="card"
-            style={{ cursor: "pointer", borderTop: "3px solid #7C5CBF", textAlign: "center", padding: "24px 16px" }}
-          >
-            <h3 style={{ color: "#7C5CBF", fontSize: ".95rem", marginBottom: 6, textTransform: "none", letterSpacing: 0 }}>
-              G.O.D.S Intelligence
-            </h3>
-            <p style={{ fontSize: ".72rem" }}>Internal · Open →</p>
-          </div>
-        )}
+      </div>
+      <div className="launcher-grid" style={{ marginTop: 12 }}>
+        <a className="launch-card" href="https://gods-platform-core.onrender.com/portals" target="_blank" rel="noreferrer">Portals · 24</a>
+        <a className="launch-card" href="https://gods-platform-core.onrender.com/gbs" target="_blank" rel="noreferrer">GBS · Holdings freeze</a>
+        <a className="launch-card" href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noreferrer">Sentinel · EVA</a>
+        <a className="launch-card" href="https://gods-platform-core.onrender.com/admin" target="_blank" rel="noreferrer">GODS Admin mainframe</a>
       </div>
     </div>
   );
@@ -158,7 +103,20 @@ function Launcher({ profile }: { profile: Profile }) {
 
 function Guarded({ profile, sysKey, children }: { profile: Profile; sysKey: string; children: ReactNode }) {
   const systems = profile.systems || [];
-  if (!systems.some((s) => s.key === sysKey) && !profile.is_admin) {
+  const role = (profile.role || "").toLowerCase();
+  const isAdmin = !!profile.is_admin || role === "admin" || role === "superadmin";
+  const openStaff = systems.length === 0 && (isAdmin || role === "staff" || !!profile.division);
+  if (sysKey && systems.length > 0 && !systems.some((s) => s.key === sysKey) && !isAdmin) {
+    return (
+      <div className="main">
+        <div className="top">
+          <h2>Access denied</h2>
+          <span className="badge">🔒 403</span>
+        </div>
+      </div>
+    );
+  }
+  if (sysKey && systems.length === 0 && !openStaff && !isAdmin) {
     return (
       <div className="main">
         <div className="top">
@@ -173,27 +131,36 @@ function Guarded({ profile, sysKey, children }: { profile: Profile; sysKey: stri
 
 function Shell({ profile, children }: { profile: Profile; children: ReactNode }) {
   const nav = useNavigate();
-  const systems = profile.systems || [];
+  const rawSystems = profile.systems || [];
+  const DEFAULT_GODS_SYSTEMS = [
+    { key: "holdings-overview", label: "Holdings Overview" },
+    { key: "seths-ops", label: "SETHS Ops" },
+    { key: "madiba-ops", label: "MADIBA Ops" },
+    { key: "ts-ops", label: "TS Ops" },
+    { key: "udoc-gov", label: "UDOC Governance" },
+    { key: "intelligence", label: "Intelligence" },
+  ];
+  let systems = rawSystems.length ? rawSystems : DEFAULT_GODS_SYSTEMS;
+  const role = (profile.role || "").toLowerCase();
+  const div = (profile.division || "").toLowerCase();
+  if (!rawSystems.length && role !== "admin" && role !== "superadmin") {
+    if (div.includes("seths") || role.includes("seths"))
+      systems = DEFAULT_GODS_SYSTEMS.filter((s) => ["holdings-overview", "seths-ops", "udoc-gov", "intelligence"].includes(s.key));
+    else if (div.includes("madiba") || role.includes("madiba"))
+      systems = DEFAULT_GODS_SYSTEMS.filter((s) => ["holdings-overview", "madiba-ops", "udoc-gov", "intelligence"].includes(s.key));
+    else if (div.includes("ts") || role.includes("ts"))
+      systems = DEFAULT_GODS_SYSTEMS.filter((s) => ["holdings-overview", "ts-ops", "udoc-gov", "intelligence"].includes(s.key));
+  }
   return (
     <div className="shell">
       <aside className="side">
-        <div className="logo">G.O.D.S</div>
-        <div className="sub">INTERNAL OPERATING CORE</div>
-        <div className="who">
-          {profile.email}
-          <br />
-          {profile.role}/{profile.division}
-        </div>
-        <NavLink to="/launcher" className={({ isActive }) => (isActive ? "active" : "")}>
-          Launcher
-        </NavLink>
+        <div className="brand">G.O.D.S <b>Internal</b></div>
+        <div className="who">{profile.sub || profile.email || "staff"}</div>
+        <div className="sec">Holdings · divisions</div>
         {systems.some((s) => s.key === "holdings-overview") && (
           <NavLink to="/overview" className={({ isActive }) => (isActive ? "active" : "")}>
             Holdings Overview
           </NavLink>
-        )}
-        {systems.some((s) => ["seths-ops", "madiba-ops", "ts-ops"].includes(s.key)) && (
-          <div className="sec">Division Operations</div>
         )}
         {systems.some((s) => s.key === "seths-ops") && (
           <NavLink to="/seths" className={({ isActive }) => (isActive ? "active" : "")}>
@@ -218,17 +185,19 @@ function Shell({ profile, children }: { profile: Profile; children: ReactNode })
             </NavLink>
           </>
         )}
-        {isInternal(profile) && (
-          <>
-            <div className="sec">Intelligence</div>
-            <NavLink to="/intelligence" className={({ isActive }) => (isActive ? "active" : "")}>
-              G.O.D.S Intelligence
-            </NavLink>
-          </>
-        )}
+        <div className="sec">Intelligence</div>
+        <NavLink to="/intelligence" className={({ isActive }) => (isActive ? "active" : "")}>
+          Intelligence · corpus
+        </NavLink>
+        <div className="sec">Core operators (live)</div>
+        <a className="nav" href="https://gods-platform-core.onrender.com/portals" target="_blank" rel="noreferrer">Portals · 24</a>
+        <a className="nav" href="https://gods-platform-core.onrender.com/gbs" target="_blank" rel="noreferrer">GBS · Holdings</a>
+        <a className="nav" href="https://gods-platform-core.onrender.com/Sentinel" target="_blank" rel="noreferrer">Sentinel · EVA</a>
+        <a className="nav" href="https://gods-platform-core.onrender.com/divisions" target="_blank" rel="noreferrer">Divisions loop</a>
+        <a className="nav" href="https://gods-platform-core.onrender.com/admin" target="_blank" rel="noreferrer">GODS Admin mainframe</a>
         <button
-          className="btn"
-          style={{ marginTop: 24, marginLeft: 18, marginRight: 18 }}
+          type="button"
+          className="signout"
           onClick={() => {
             setToken(null);
             nav("/");
@@ -238,7 +207,7 @@ function Shell({ profile, children }: { profile: Profile; children: ReactNode })
           Sign out
         </button>
       </aside>
-      <div className="main">{children}</div>
+      <div className="main-wrap">{children}</div>
     </div>
   );
 }
@@ -253,22 +222,24 @@ export function App() {
     }
     try {
       const me = await api.get("/auth/me");
-      setProfile(me);
+      const role = (me.role || "").toLowerCase();
+      setProfile({
+        ...me,
+        is_admin: !!(me as any).is_admin || role === "admin" || role === "superadmin",
+        systems: (me as any).systems || [],
+      });
     } catch {
       setToken(null);
+      setProfile(null);
+    } finally {
+      setBooting(false);
     }
-    setBooting(false);
   }
   useEffect(() => {
     boot();
   }, []);
-  if (booting)
-    return (
-      <div className="login">
-        <p>Loading…</p>
-      </div>
-    );
-  if (!profile) return <Login onAuth={() => boot()} />;
+  if (booting) return <div className="login"><p className="muted">Booting G.O.D.S Internal…</p></div>;
+  if (!getToken() || !profile) return <Login onAuth={() => { setBooting(true); boot(); }} />;
   return (
     <BrowserRouter>
       <Shell profile={profile}>
@@ -279,21 +250,8 @@ export function App() {
           <Route path="/madiba" element={<Guarded profile={profile} sysKey="madiba-ops"><MadibaOps /></Guarded>} />
           <Route path="/ts" element={<Guarded profile={profile} sysKey="ts-ops"><TSOps /></Guarded>} />
           <Route path="/udoc" element={<Guarded profile={profile} sysKey="udoc-gov"><UDOCGov /></Guarded>} />
-          <Route
-            path="/intelligence"
-            element={
-              isInternal(profile) ? (
-                <Intelligence />
-              ) : (
-                <div className="main">
-                  <div className="top">
-                    <h2>Access denied</h2>
-                    <span className="badge">🔒 403</span>
-                  </div>
-                </div>
-              )
-            }
-          />
+          <Route path="/intelligence" element={<Intelligence />} />
+          <Route path="/" element={<Navigate to="/launcher" />} />
           <Route path="*" element={<Navigate to="/launcher" />} />
         </Routes>
       </Shell>
