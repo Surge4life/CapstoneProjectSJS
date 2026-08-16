@@ -3,141 +3,185 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>UDOC · Operator</title>
+<title>G.O.D.S · Internal Environment</title>
 <meta name="theme-color" content="#0A1628">
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" href="/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#0A1628;--navy2:#0D1F3C;--gold:#C9A84C;--cyan:#00C2D4;--txt:#EDE7D6;--muted:#8A9BB0;--bd:rgba(201,168,76,.22)}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(900px 400px at 40% -10%,#10224a,var(--navy));color:var(--txt);font-family:Barlow,sans-serif}
-header{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.brand{font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;color:var(--gold);font-weight:700}
-.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 40px}
-.card{background:linear-gradient(180deg,var(--navy2),var(--navy));border:1px solid var(--bd);border-radius:12px;padding:14px;margin-top:12px}
-.chip{display:inline-block;border:1px solid var(--bd);border-radius:16px;padding:4px 10px;font-size:11px;cursor:pointer;background:transparent;color:var(--txt);text-decoration:none;margin:2px}
-.chip:hover{border-color:var(--cyan)}
+:root{--navy:#0A1628;--navy2:#0D1F3C;--gold:#C9A84C;--cyan:#00C2D4;--ink:#EDE7DF;--mut:#8fa0bd;--line:#1c2a45;--ok:#2D9B5A}
+*{box-sizing:border-box}body{margin:0;background:var(--navy);color:var(--ink);font:14px/1.5 system-ui,sans-serif}
+header{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.brand{font-weight:700;font-size:1.05rem}.brand b{color:var(--gold)}
+.tag{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;color:var(--mut)}
+.tag.ok{border-color:var(--ok);color:#7fe3ab}
+.wrap{max-width:960px;margin:0 auto;padding:20px 18px 48px}
+.honest{padding:10px 12px;border:1px solid #5a3a12;background:#1a1208;border-radius:8px;color:#E8A13A;font-size:12px;margin-bottom:14px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.panel h2{margin:0 0 8px;color:var(--gold);font-size:15px}
+.panel h3{margin:0 0 10px;color:var(--gold);font-size:13px}
+.btn{background:var(--gold);color:#0a1220;border:none;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;font-size:13px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.btn{background:var(--cyan);color:#041018;border:none;border-radius:8px;padding:8px 12px;font-weight:600;cursor:pointer;font-size:12px}
-.mut{color:var(--muted);font-size:12px}
-.term{font-family:'IBM Plex Mono',monospace;font-size:11px;background:#050b16;border:1px solid var(--bd);border-radius:8px;padding:10px;white-space:pre-wrap;max-height:160px;overflow:auto}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.kpi{background:#091022;border:1px solid var(--bd);border-radius:10px;padding:10px}
-.kpi h4{margin:0 0 4px;font-size:10px;color:var(--gold);text-transform:uppercase}
-.kpi .m{font-weight:700}
-input{background:#091022;border:1px solid var(--bd);color:var(--txt);border-radius:6px;padding:7px 10px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:16px;padding:5px 12px;font-size:12px;cursor:pointer;background:#091022;color:var(--ink);text-decoration:none}
+.chip.primary{background:var(--cyan);color:#041018;font-weight:700;border:none}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:12px 0}
+.kpi .c{background:#091022;border:1px solid var(--line);border-radius:10px;padding:10px}
+.kpi .l{font-size:10px;text-transform:uppercase;color:var(--mut)}
+.kpi .v{font-size:1.15rem;font-weight:700;margin-top:4px}
+input{background:#050b16;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:8px 10px;font-size:13px}
+.mut{color:var(--mut);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.card{background:#091022;border:1px solid var(--line);border-radius:10px;padding:12px}
+.card a{color:var(--cyan);text-decoration:none;font-weight:600}
+.card p{margin:6px 0 0;font-size:11px;color:var(--mut)}
+.hide{display:none}
+.err{color:#E85D5D;font-size:12px;margin-top:8px}
 </style>
 </head>
 <body>
 <header>
-  <span class="brand">UDOC · OPERATOR</span>
-  <span class="mut">workspace · Core API</span>
+  <span class="brand">G.O.D.S · <b>Internal Environment</b></span>
+  <span class="tag" id="ready-tag">—</span>
   <span style="flex:1"></span>
-  <a class="chip" href="https://gods-udoc-gateway.onrender.com/" target="_blank">Gateway</a>
-  <a class="chip" href="https://gods-platform-core.onrender.com/Sentinel" target="_blank">Sentinel</a>
-  <a class="chip" href="https://gods-platform-core.onrender.com/udoc-admin" target="_blank">UDOC Admin</a>
+  <a class="chip" href="https://gods-platform-core.onrender.com/admin">GODS Admin</a>
+  <a class="chip" href="https://gods-platform-core.onrender.com/portals">Portals</a>
+  <a class="chip" href="https://gods-udoc-gateway.onrender.com/" target="_blank" rel="noopener">Gateway</a>
 </header>
 <div class="wrap">
-  <div class="card">
-    <b style="color:var(--gold)">Operator login · Core</b>
-    <p class="mut">Routes to Core division surfaces. Staff: seths@ / madiba@ / ts@ · staff123 · admin@gods.local / admin123</p>
+  <div class="honest">
+    <b>Internal staff environment</b> — not Client SaaS, not intelligence-only.
+    After login: GODS Admin Command · Portals · Divisions · SETHS/TS/MADIBA · Sentinel · GBS.
+    Corpus ask is one Capstone path; agent intelligence method under UDOC is not cancelled.
+  </div>
+
+  <div class="panel" id="login">
+    <h2>Staff login · Internal</h2>
+    <p class="mut">admin@gods.local / admin123 · seths@ · madiba@ · ts@ / staff123</p>
+    <div class="row" style="margin-bottom:8px">
+      <input id="email" value="admin@gods.local" style="flex:1;min-width:180px"/>
+      <input id="pass" type="password" value="admin123" style="width:120px"/>
+    </div>
     <div class="row">
-      <input id="email" value="seths@gods.local" style="flex:1;min-width:160px"/>
-      <input id="pass" type="password" value="staff123" style="width:120px"/>
-      <button class="btn" type="button" onclick="doLogin()">Sign in</button>
-      <button class="chip" type="button" onclick="fill('seths@gods.local','staff123')">seths@</button>
-      <button class="chip" type="button" onclick="fill('madiba@gods.local','staff123')">madiba@</button>
-      <button class="chip" type="button" onclick="fill('ts@gods.local','staff123')">ts@</button>
-      <button class="chip" type="button" onclick="fill('admin@gods.local','admin123')">admin@</button>
+      <button class="btn" onclick="doLogin()">Sign in to Internal</button>
+      <button class="btn ghost" type="button" onclick="fill('admin@gods.local','admin123')">admin@</button>
+      <button class="btn ghost" type="button" onclick="fill('seths@gods.local','staff123')">seths@</button>
+      <button class="btn ghost" type="button" onclick="fill('madiba@gods.local','staff123')">madiba@</button>
+      <button class="btn ghost" type="button" onclick="fill('ts@gods.local','staff123')">ts@</button>
     </div>
+    <p class="err" id="err"></p>
   </div>
 
-  <div class="card">
-    <b style="color:var(--gold)">Assessor · Core probes</b>
-    <div class="row" style="margin-top:8px">
-      <button class="chip" type="button" onclick="probe('health')">/health</button>
-      <button class="chip" type="button" onclick="probe('ready')">demo/ready</button>
-      <button class="chip" type="button" onclick="probe('eva')">EVA fair/biased</button>
+  <div id="ops" class="hide">
+    <div class="panel">
+      <h2>Signed in · <span id="who">—</span></h2>
+      <p class="mut">Primary internal surfaces (Command / Portals / Divisions — not Intelligence alone)</p>
+      <div class="kpi">
+        <div class="c"><div class="l">Health</div><div class="v" id="k-h">—</div></div>
+        <div class="c"><div class="l">Ready</div><div class="v" id="k-r">—</div></div>
+        <div class="c"><div class="l">EVA</div><div class="v" id="k-e">—</div></div>
+        <div class="c"><div class="l">Role</div><div class="v" id="k-role" style="font-size:1rem">—</div></div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <a class="chip primary" id="go-admin" href="https://gods-platform-core.onrender.com/admin">Open GODS Admin · Command</a>
+        <a class="chip primary" href="https://gods-platform-core.onrender.com/portals">Open Portals · 24</a>
+        <a class="chip primary" href="https://gods-platform-core.onrender.com/divisions">Open Divisions</a>
+        <button class="btn ghost" type="button" onclick="evaSmoke()">Run EVA fair/biased</button>
+        <button class="btn ghost" type="button" onclick="logout()">Logout</button>
+      </div>
     </div>
-    <div class="grid" style="margin-top:10px">
-      <div class="kpi"><h4>Health</h4><div class="m" id="k-h">—</div></div>
-      <div class="kpi"><h4>Ready</h4><div class="m" id="k-r">—</div></div>
-      <div class="kpi"><h4>EVA</h4><div class="m" id="k-e">—</div></div>
-      <div class="kpi"><h4>Honesty</h4><div class="m" style="font-size:0.85rem">not_deployed</div></div>
-    </div>
-    <div class="term" id="term">Operator · probes Core</div>
-  </div>
 
-  <div class="card">
-    <b style="color:var(--gold)">Core division operators</b>
-    <div class="row" style="margin-top:8px">
-      <a class="chip" href="https://gods-platform-core.onrender.com/seths" target="_blank">SETHS</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/ts" target="_blank">TS</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/madiba" target="_blank">MADIBA</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/divisions" target="_blank">Divisions</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/gbs" target="_blank">GBS</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/eif-ui" target="_blank">EIF</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/Sentinel" target="_blank">Sentinel</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/portals" target="_blank">Core Portals</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/udoc-admin" target="_blank">UDOC Admin</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/admin" target="_blank">GODS Admin</a>
+    <div class="panel">
+      <h3>Division operators</h3>
+      <div class="grid">
+        <div class="card"><a href="https://gods-platform-core.onrender.com/seths">SETHS</a><p>Develops · learners · placement</p></div>
+        <div class="card"><a href="https://gods-platform-core.onrender.com/ts">TS</a><p>Deploys · SPVs · absorb workers</p></div>
+        <div class="card"><a href="https://gods-platform-core.onrender.com/madiba">MADIBA</a><p>Ledger · ≠ AUM · capital not_deployed</p></div>
+        <div class="card"><a href="https://gods-platform-core.onrender.com/gbs">GBS / Holdings</a><p>Four-division · pillars</p></div>
+        <div class="card"><a href="https://gods-platform-core.onrender.com/eif-ui">EIF</a><p>Nominate audit-only</p></div>
+        <div class="card"><a href="https://gods-platform-core.onrender.com/Sentinel">Sentinel</a><p>EVA Command · smoke</p></div>
+      </div>
     </div>
-  </div>
 
-  <div class="card">
-    <b style="color:var(--gold)">Environments · full stack</b>
-    <div class="row" style="margin-top:8px">
-      <a class="chip" href="https://gods-udoc-gateway.onrender.com/" target="_blank">Gateway</a>
-      <a class="chip" href="https://gods-platform-core.onrender.com/" target="_blank">Core API</a>
-      <a class="chip" href="https://gods-udoc-admin.onrender.com/" target="_blank">Admin host</a>
-      <a class="chip" href="https://gods-udoc-client.onrender.com/" target="_blank">Client Web</a>
-      <a class="chip" href="https://gods-udoc-client.onrender.com/citizen.html" target="_blank">Citizen</a>
-      <a class="chip" href="https://gods-udoc-sector.onrender.com/" target="_blank">Sector</a>
-      <a class="chip" href="https://gods-udoc-portals.onrender.com/" target="_blank">SaaS Portals</a>
-      <a class="chip" href="https://gods-udoc-web.onrender.com/" target="_blank">UDOC App</a>
+    <div class="panel">
+      <h3>Governance (separate from Intelligence page)</h3>
+      <div class="grid">
+        <div class="card"><a href="https://gods-platform-core.onrender.com/admin">GODS Admin</a><p>Constitutional mainframe · 40+ pages · default Command Centre</p></div>
+        <div class="card"><a href="https://gods-platform-core.onrender.com/udoc-admin">UDOC Admin</a><p>UDOC controller · Layers · Control · Evidence</p></div>
+        <div class="card"><a href="https://gods-platform-core.onrender.com/portals">Portals</a><p>24 keys · OversightCase · CITIZEN</p></div>
+        <div class="card"><a href="https://gods-udoc-gateway.onrender.com/" target="_blank" rel="noopener">Gateway</a><p>All environments map</p></div>
+      </div>
     </div>
-    <p class="mut" style="margin-top:8px">Operators live on Core · Client/Citizen/Sector on separate hosts · shared Neon · capital not_deployed</p>
+
+    <div class="panel">
+      <h3>Intelligence note (honest)</h3>
+      <p class="mut" style="margin:0">Grounded corpus ask on Admin is Capstone retrieval (citeable). It is <b>one page</b> inside GODS Admin — not the whole internal product. Richer agent intelligence remains the method layer under UDOC (Research → Red-Team → Verify) and is not disabled by this launcher.</p>
+    </div>
   </div>
 </div>
 <script>
-const CORE="https://gods-platform-core.onrender.com";
+const CORE='https://gods-platform-core.onrender.com';
+let TOK='';
 function fill(e,p){document.getElementById('email').value=e;document.getElementById('pass').value=p;}
-function log(m){const t=document.getElementById('term');t.textContent=new Date().toLocaleTimeString()+' '+m+'\n'+t.textContent.slice(0,1200);}
-async function probe(kind){
+function setK(id,v){const n=document.getElementById(id);if(n)n.textContent=v;}
+async function probe(){
   try{
-    if(kind==='health'){
-      const j=await(await fetch(CORE+'/health')).json();
-      document.getElementById('k-h').textContent=j.status||'ok'; log('HEALTH '+JSON.stringify(j));
-    } else if(kind==='ready'){
-      const j=await(await fetch(CORE+'/udoc/demo/ready')).json();
-      document.getElementById('k-r').textContent=j.ready?'READY':'NO'; log('READY '+JSON.stringify({ready:j.ready}));
-    } else if(kind==='eva'){
-      const j=await(await fetch(CORE+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})})).json();
-      const o=j.outcomes||{};
-      const gate=(Number(o.BLOCK||0)>=1)?'PASS':'CHECK';
-      document.getElementById('k-e').textContent=gate+' B'+(o.BLOCK||0)+'/A'+(o.APPROVE||0);
-      log('EVA '+gate+' '+JSON.stringify(o));
-    }
-  }catch(e){log('FAIL '+e.message);}
+    const h=await(await fetch(CORE+'/health')).json();
+    setK('k-h', h.status||'ok');
+  }catch(e){setK('k-h','FAIL');}
+  try{
+    const r=await(await fetch(CORE+'/udoc/demo/ready')).json();
+    setK('k-r', r.ready?'READY':'NO');
+    const tag=document.getElementById('ready-tag');
+    if(tag){tag.textContent=r.ready?'DEMO READY':'NOT READY';tag.className='tag'+(r.ready?' ok':'');}
+  }catch(e){setK('k-r','FAIL');}
+}
+async function evaSmoke(){
+  try{
+    const j=await(await fetch(CORE+'/decisions/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({scenarios:['fair','biased']})})).json();
+    const o=j.outcomes||{};
+    const gate=Number(o.BLOCK||0)>=1?'PASS':'CHECK';
+    setK('k-e', gate+' · B'+(o.BLOCK||0)+'/A'+(o.APPROVE||0));
+  }catch(e){setK('k-e','FAIL');}
 }
 async function doLogin(){
-  const email=document.getElementById('email').value.trim().toLowerCase();
-  const pass=document.getElementById('pass').value;
+  document.getElementById('err').textContent='';
   try{
-    const f=new URLSearchParams({username:email,password:pass});
+    const f=new URLSearchParams({username:document.getElementById('email').value.trim().toLowerCase(),password:document.getElementById('pass').value});
     const r=await fetch(CORE+'/auth/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:f});
-    if(!r.ok) throw new Error('Login failed');
-    const d=await r.json();
-    let dest=CORE+'/divisions';
-    if(email.startsWith('seths')) dest=CORE+'/seths';
-    else if(email.startsWith('madiba')) dest=CORE+'/madiba';
-    else if(email.startsWith('ts')) dest=CORE+'/ts';
-    else if((d.role||'')==='admin') dest=CORE+'/udoc-admin';
-    location.href=dest;
-  }catch(e){alert(e.message||e);}
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.detail||'Login failed');
+    TOK=d.access_token||'';
+    const email=document.getElementById('email').value.trim().toLowerCase();
+    localStorage.setItem('internal_tok',TOK);
+    localStorage.setItem('internal_who',email);
+    localStorage.setItem('internal_role',d.role||'');
+    showOps(email, d.role||'');
+  }catch(e){document.getElementById('err').textContent=e.message||String(e);}
 }
-setTimeout(function(){probe('health');probe('ready');},400);
+function showOps(email, role){
+  document.getElementById('login').classList.add('hide');
+  document.getElementById('ops').classList.remove('hide');
+  document.getElementById('who').textContent=(email.split('@')[0]||email)+' · '+(role||'staff');
+  setK('k-role', role||'staff');
+  const go=document.getElementById('go-admin');
+  if(go){
+    if(email.startsWith('seths')) go.href=CORE+'/seths';
+    else if(email.startsWith('ts')) go.href=CORE+'/ts';
+    else if(email.startsWith('madiba')) go.href=CORE+'/madiba';
+    else go.href=CORE+'/admin';
+  }
+  probe(); evaSmoke();
+}
+function logout(){
+  TOK='';localStorage.removeItem('internal_tok');
+  document.getElementById('ops').classList.add('hide');
+  document.getElementById('login').classList.remove('hide');
+}
+(function(){
+  const t=localStorage.getItem('internal_tok');
+  const who=localStorage.getItem('internal_who')||'';
+  const role=localStorage.getItem('internal_role')||'';
+  if(t){TOK=t;showOps(who,role);}
+  else probe();
+})();
 </script>
 </body>
 </html>
