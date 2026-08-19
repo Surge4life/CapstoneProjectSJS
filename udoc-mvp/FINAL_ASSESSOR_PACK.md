@@ -36,7 +36,7 @@
 - **Closed loop:** **S.E.T.H.S → T.S Industries → UDOC → M.A.D.I.B.A**  
 - Live, inspectable governance + division operator surfaces on free-tier infrastructure  
 - Deterministic **UDOC** decision path (EVA · policy · audit) — LLM is **not** the controller  
-- **GLM** = Deterministic Human-In-The-Loop Governance Model (corpus + rules); optional LLM is Layer A only — see [CAPSTONE_BOOK_CORPUS_GLM_NARRATIVE.md](./CAPSTONE_BOOK_CORPUS_GLM_NARRATIVE.md) · pilot [GLM_CAPSTONE_PILOT_SLICE.md](./GLM_CAPSTONE_PILOT_SLICE.md) · seed [glm/](./glm/)
+- **GLM** = Deterministic Human-In-The-Loop Governance Model (corpus + rules); optional LLM is Layer A only — see [CAPSTONE_BOOK_CORPUS_GLM_NARRATIVE.md](./CAPSTONE_BOOK_CORPUS_GLM_NARRATIVE.md) · pilot [GLM_CAPSTONE_PILOT_SLICE.md](./GLM_CAPSTONE_PILOT_SLICE.md) · seed [glm/](./glm/)  
 
 ### Is not
 
@@ -119,6 +119,24 @@ Detail: [ASSESSOR_ENVIRONMENTAL_PROCEDURES.md](./ASSESSOR_ENVIRONMENTAL_PROCEDUR
 
 ---
 
+## 6b. Procedure E — GLM intel seed (optional · 5 min)
+
+**Proof that Layer C integrity core is live under UDOC (not an LLM product).**
+
+| Step | Action | Pass |
+|------|--------|------|
+| E1 | Login Core as `admin@gods.local` / `admin123` | token issued |
+| E2 | `GET /intel/state` | `corpus_docs` ≥ 12 · categories include GOVERNANCE, UDOC, GBS |
+| E3 | `POST /intel/ask` `{"query":"What is GLM Deterministic Human In The Loop Governance Model?"}` | Answer cites **GLM Definition — Deterministic HITL Governance Model** |
+| E4 | Hard-refresh Admin / Internal **Intelligence** panel | 12 startup_glm_seed docs visible |
+
+**Live verified 2026-08-19:** 13 docs (12 GLM + prior EIF) · ~23k chars · ask cites GLM Definition.  
+**Honesty:** Neon holds integrity core only; full ~10GB GIS corpus remains on Drive. GLM ≠ LLM.
+
+Catalog: [glm/GLM_INTEL_SEED_CHUNKS.md](./glm/GLM_INTEL_SEED_CHUNKS.md) · Narrative: [CAPSTONE_BOOK_CORPUS_GLM_NARRATIVE.md](./CAPSTONE_BOOK_CORPUS_GLM_NARRATIVE.md)
+
+---
+
 ## 7. Honesty checklist (visible on live UI)
 
 - [ ] Capital **not_deployed**  
@@ -127,6 +145,7 @@ Detail: [ASSESSOR_ENVIRONMENTAL_PROCEDURES.md](./ASSESSOR_ENVIRONMENTAL_PROCEDUR
 - [ ] UDOC **deterministic** controller  
 - [ ] Free-tier / demo scale · zeros OK  
 - [ ] Pre-registration · planning estimates not trading history  
+- [ ] GLM = deterministic HITL governance model · **not** LLM product · Neon core only  
 
 ---
 
@@ -146,7 +165,7 @@ Detail: [ASSESSOR_ENVIRONMENTAL_PROCEDURES.md](./ASSESSOR_ENVIRONMENTAL_PROCEDUR
 | 10 | GODS_INTELLIGENCE_OPERATING_METHOD.md | Method layer under UDOC |
 | 11 | LIMITATIONS_REGISTER.md | Explicit non-claims |
 | 12 | CAPSTONE_BOOK_CORPUS_GLM_NARRATIVE.md | Book → corpus → GLM |
-| 13 | glm/GLM_INTEL_SEED_CHUNKS.md | Neon-safe intel seed |
+| 13 | glm/GLM_INTEL_SEED_CHUNKS.md | Neon-safe intel seed (12 chunks live) |
 
 ---
 
