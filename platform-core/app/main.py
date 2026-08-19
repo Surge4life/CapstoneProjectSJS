@@ -61,6 +61,10 @@ def _startup():
     except Exception as e:
         print(f"[startup] division staff seed skipped: {e}")
     try:
+        _ensure_glm_intel_seed()
+    except Exception as e:
+        print(f"[startup] GLM intel seed skipped: {e}")
+    try:
         from app.services.conformance_scanner import start_scheduler
         start_scheduler()
     except Exception as e:
@@ -68,7 +72,6 @@ def _startup():
 
 
 def _heal_seths_learners():
-    """Ensure Capstone Learner columns exist on Neon (enrol 500 if missing)."""
     from sqlalchemy import text
     from app.db.session import engine
     cols = [
@@ -106,7 +109,6 @@ def _static(name: str) -> str:
 
 
 def _html_with_density(path: str):
-    """Serve HTML and inject shared div-density.js."""
     try:
         with open(path, "r", encoding="utf-8") as f:
             html = f.read()
@@ -135,7 +137,6 @@ def udoc_admin_density_js():
 
 @app.get("/verify-redteam-panel.js", tags=["root"], include_in_schema=False)
 def verify_redteam_panel_js():
-    """Capstone Verify · Red-Team operator panel (probes Core only)."""
     return FileResponse(_static("verify-redteam-panel.js"), media_type="application/javascript")
 
 
@@ -219,13 +220,11 @@ def sentinel_console():
     return _html_with_density(_static("sentinel.html"))
 
 
-# Register division surface helpers if present
 try:
     register_division_surfaces(app, _static)
 except Exception as e:
     print(f"[wire] division_surfaces: {e}")
 
-# Include all routers
 for r in (
     health.router, auth.router, registry.router, decisions.router, audit.router,
     oversight.router, seths.router, ts.router, madiba.router, compliance.router,
@@ -242,7 +241,7 @@ for r in (
 
 
 def _heal_schema():
-    pass  # retained from production main; detailed heal in services if present
+    pass
 
 
 def _ensure_bootstrap_admin():
@@ -253,21 +252,30 @@ def _ensure_udoc_demo_seed():
     try:
         from app.startup_seed import ensure_udoc_demo_seed
         ensure_udoc_demo_seed()
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[startup] udoc demo seed skipped: {e}")
 
 
 def _ensure_client_kb_demo_seed():
     try:
         from app.startup_seed import ensure_client_kb_demo_seed
         ensure_client_kb_demo_seed()
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[startup] client kb demo seed skipped: {e}")
 
 
 def _ensure_division_staff_seed():
     try:
         from app.startup_seed import ensure_division_staff_seed
         ensure_division_staff_seed()
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[startup] division staff seed skipped: {e}")
+
+
+def _ensure_glm_intel_seed():
+    """Capstone GLM Layer C — 12 Neon-light docs into GODS intel archive."""
+    try:
+        from app.startup_seed import ensure_glm_intel_seed
+        ensure_glm_intel_seed()
+    except Exception as e:
+        print(f"[startup] GLM intel seed skipped: {e}")
