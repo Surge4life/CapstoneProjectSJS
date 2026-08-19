@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "date": "2026-08-19",
+  "purpose": "Neon-safe GODS intel seed from GLM Capstone pilot — Layer C substrate under Layer B UDOC primacy",
+  "neon_note": "Extracts only; full corpus remains on Drive 10_GIS_INTELLIGENCE_CORPUS",
+  "chunk_count": 12,
+  "full_bodies": "Drive folder 15 + artifacts/glm_intel_seed/",
+  "chunks": [
+    {"title": "GLM Definition — Deterministic HITL Governance Model", "category": "GOVERNANCE", "division": "GODS", "tags": ["glm", "udoc", "not-llm", "layer-b"], "source": "00_INTEGRITY_MANIFEST_AND_STORY.md"},
+    {"title": "GODS Intelligence Operating Method — Principle", "category": "INTELLIGENCE_METHOD", "division": "GODS", "tags": ["method", "pipeline", "verify", "hitl"], "source": "GODS_INTELLIGENCE_OPERATING_METHOD.md"},
+    {"title": "Doctrine — Human Primacy, AI Governance, Sovereign Control", "category": "GOVERNANCE", "division": "GODS", "tags": ["doctrine", "human-primacy", "sovereignty", "01"], "source": "a-01_doctrine.txt"},
+    {"title": "Founder Doctrine — Process of Thought", "category": "GOVERNANCE", "division": "GODS", "tags": ["founder", "doctrine", "01"], "source": "a-03_founder_doctrine.txt"},
+    {"title": "GODS Constitutional Governance Charter", "category": "GOVERNANCE", "division": "GODS", "tags": ["constitution", "charter", "01"], "source": "a-02_constitutional_charter.txt"},
+    {"title": "UDOC EVA Whitepaper — Evaluation Control Plane", "category": "UDOC", "division": "UDOC", "tags": ["eva", "udoc", "fail-closed", "05"], "source": "e-10_eva_whitepaper.txt"},
+    {"title": "UDOC Technical Whitepaper — Control Architecture", "category": "UDOC", "division": "UDOC", "tags": ["udoc", "technical", "architecture", "05"], "source": "e-15_udoc_technical_whitepaper.txt"},
+    {"title": "GBS-SETHS Consolidated Super Framework", "category": "GBS", "division": "SETHS", "tags": ["gbs", "seths", "framework", "07"], "source": "gbs_seths_00_super_framework.txt"},
+    {"title": "GBS-SETHS GIS Architecture Specification", "category": "GBS", "division": "SETHS", "tags": ["gis", "architecture", "gbs", "07"], "source": "gbs_seths_06_gis_architecture.txt"},
+    {"title": "GBS-SETHS Institutional Constitution", "category": "GBS", "division": "SETHS", "tags": ["gbs", "constitution", "07"], "source": "gbs_seths_01_constitution.txt"},
+    {"title": "Smoke Evidence 2026-08-16 — EVA Gate PASS", "category": "CAPSTONE_EVIDENCE", "division": "GODS", "tags": ["smoke", "eva", "fair", "biased", "12"], "source": "SMOKE_EVIDENCE_2026-08-16.md"},
+    {"title": "Limitations Register — Capstone Honesty Bounds", "category": "CAPSTONE_EVIDENCE", "division": "GODS", "tags": ["limitations", "honesty", "neon", "12"], "source": "LIMITATIONS_REGISTER.md"}
+  ]
+}
