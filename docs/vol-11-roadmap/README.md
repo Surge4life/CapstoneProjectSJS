@@ -1,7 +1,7 @@
 # Volume XI — Roadmap
 ## Current Repository → 250-Year Governance
 
-> This volume documents the complete roadmap for the G.O.D.S ecosystem — from its current state as a fully-built prototype to its long-term vision as a sovereign governance infrastructure serving South Africa and beyond.
+> This volume documents the complete roadmap for the G.O.D.S ecosystem — from its current state as a **Capstone live slice** (Render free + Neon ≤500MB) to its long-term vision as sovereign governance infrastructure. Long-horizon chapters are **intent**, not Capstone delivery claims.
 
 ---
 
@@ -11,10 +11,10 @@
 |---------|-------|
 | [01](01-current-state.md) | Current State |
 | [02](02-production-path.md) | Path to Production |
-| [03](03-pilot.md) | Pilot Phase |
-| [04](04-regional.md) | Regional Expansion |
-| [05](05-national.md) | National Deployment |
-| [06](06-international.md) | International Expansion |
+| [03](03-pilot-phase.md) | Pilot Phase |
+| [04](04-regional-expansion.md) | Regional Expansion |
+| [05](05-national-deployment.md) | National Deployment |
+| [06](06-international-expansion.md) | International Expansion |
 | [07](07-250-year-governance.md) | 250-Year Governance Roadmap |
 
 ---
@@ -22,7 +22,7 @@
 ## The Trajectory
 
 ```
-Current Repository (built, tested, deployed to Render)
+Current Repository (Capstone live on Render + Neon)
   ↓
 Production (CIPC registration, entity formalisation, first client)
   ↓

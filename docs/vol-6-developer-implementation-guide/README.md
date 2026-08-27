@@ -1,28 +1,30 @@
 # Volume VI — Developer Implementation Guide
 ## Every Commit. In Order.
 
-> This volume is the step-by-step build guide. A developer who follows this guide from Commit 001 to the final commit will have built the complete G.O.D.S ecosystem. Every commit is atomic, testable, and meaningful.
+> This volume is the step-by-step build guide. A developer who follows this guide from Commit 001 to the final commit will have built the complete G.O.D.S ecosystem **as specified**. Every commit is atomic, testable, and meaningful.
+
+**Folder merge (2026-08-27):** chapters previously split under `docs/vol-6-developer-implementation/` now live here. Links below match **actual filenames**.
 
 ---
 
 ## Contents
 
-| Chapter | Title |
-|---------|-------|
-| [01](01-environment-setup.md) | Environment Setup |
-| [02](02-commit-philosophy.md) | Commit Philosophy & Standards |
-| [03](03-commits-001-010.md) | Commits 001–010: Core Intelligence Foundation |
-| [04](04-commits-011-020.md) | Commits 011–020: Governance Runtime |
-| [05](05-commits-021-030.md) | Commits 021–030: SETHS Division |
-| [06](06-commits-031-040.md) | Commits 031–040: MADIBA Division |
-| [07](07-commits-041-050.md) | Commits 041–050: TS Industries Division |
-| [08](08-commits-051-060.md) | Commits 051–060: UDOC Control Division |
-| [09](09-commits-061-070.md) | Commits 061–070: Edge & Gateway Layer |
-| [10](10-commits-071-080.md) | Commits 071–080: Analytics & Reporting |
-| [11](11-commits-081-090.md) | Commits 081–090: Infrastructure & Deployment |
-| [12](12-commits-091-100.md) | Commits 091–100: Production Readiness |
-| [13](13-testing-strategy.md) | Testing Strategy |
-| [14](14-ci-cd-pipeline.md) | CI/CD Pipeline |
+| Chapter | Title | File |
+|---------|-------|------|
+| [01](01-environment-setup.md) | Environment Setup | `01-environment-setup.md` |
+| [02](02-commit-philosophy.md) | Commit Philosophy & Standards | `02-commit-philosophy.md` |
+| [03](03-commits-001-010.md) | Commits 001–010: Core Intelligence Foundation | `03-commits-001-010.md` |
+| [04](04-commits-011-020.md) | Commits 011–020: Governance Runtime | `04-commits-011-020.md` |
+| [05](05-commits-021-030-seths.md) | Commits 021–030: SETHS Division | `05-commits-021-030-seths.md` |
+| [06](06-commits-031-040-madiba.md) | Commits 031–040: MADIBA Division | `06-commits-031-040-madiba.md` |
+| [07](07-commits-041-050-ts.md) | Commits 041–050: TS Industries Division | `07-commits-041-050-ts.md` |
+| [08](08-commits-051-060-udoc.md) | Commits 051–060: UDOC Control Division | `08-commits-051-060-udoc.md` |
+| [09](09-commits-061-070-analytics.md) | Commits 061–070: Analytics & Reporting | `09-commits-061-070-analytics.md` |
+| [10](10-commits-071-080-infra.md) | Commits 071–080: Infrastructure & Deployment | `10-commits-071-080-infra.md` |
+| [11](11-commits-081-090-production.md) | Commits 081–090: Production Readiness | `11-commits-081-090-production.md` |
+| [12](12-testing-strategy.md) | Testing Strategy | `12-testing-strategy.md` |
+| [13](13-ci-cd-pipeline.md) | CI/CD Pipeline | `13-ci-cd-pipeline.md` |
+| [14](14-commits-091-100-final.md) | Commits 091–100: Final / close-out | `14-commits-091-100-final.md` |
 
 ---
 

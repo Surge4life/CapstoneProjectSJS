@@ -3,6 +3,10 @@
 
 > This volume documents the complete user interface and experience design for the G.O.D.S ecosystem. It covers the design language, component library, and every portal across all seven user roles.
 
+**Folder merge (2026-08-27):** chapters previously split under `docs/vol-9-ui-ux-design/` now live here.
+
+**Capstone honesty:** live consoles are the Render UDOC surfaces (Admin / Client / Sector / Operator / Gateway). Portal chapters below mix **live** operator/client shells with **designed** franchise/government/corporate depth. Do not treat every portal chapter as a separate live host.
+
 ---
 
 ## Contents

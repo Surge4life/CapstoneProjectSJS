@@ -1,7 +1,11 @@
 # Volume V — GBS Constitutional Runtime
 ## Every Rule. Every Decision Tree. Every Policy.
 
-> The GBS (Governance and Behavioural Standards) Constitutional Runtime is the deterministic core of the G.O.D.S ecosystem. Unlike probabilistic AI systems, the GBS Runtime produces the same output for the same input — always. It is the non-bypassable governance layer.
+> The GBS (Governance and Behavioural Standards) Constitutional Runtime is the **designed** deterministic core of the G.O.D.S ecosystem. Unlike probabilistic AI systems, the GBS Runtime is specified to produce the same output for the same input — always. It is the non-bypassable governance layer **in design**.
+
+**Capstone honesty:** live UDOC on Render + Neon proves EVA fair≠BLOCK / biased=BLOCK on `model-001`. Kafka, Cassandra/WORM, HSM, and Dilithium seals in the path below are **target architecture**, not Capstone live facts. See [`udoc-mvp/LIMITATIONS_REGISTER.md`](../../udoc-mvp/LIMITATIONS_REGISTER.md) and [Vol X Ch 13](../vol-10-infrastructure/13-render-deployment.md).
+
+**Folder merge (2026-08-27):** chapters previously split under `docs/vol-5-gbs-runtime/` now live here.
 
 ---
 
@@ -24,7 +28,7 @@
 
 ## The Governance Path
 
-Every AI request that enters the G.O.D.S ecosystem must traverse the governance path. There are no exceptions, no overrides, no bypass routes. The path is:
+Every AI request that enters the G.O.D.S ecosystem must traverse the governance path. There are no exceptions, no overrides, no bypass routes **in the constitutional design**. The path is:
 
 ```
 AI Request
@@ -33,12 +37,14 @@ AI Request
     → EVA 6-D risk score
     → UDOC Orchestrator: sovereignty(SVS) → FSM → enforce
   → Decision: {APPROVE | REVIEW | ESCALATE | BLOCK}
-    → HMAC / Dilithium-reference seal
-  → Kafka event_bus
+    → HMAC / Dilithium-reference seal          [designed]
+  → Kafka event_bus                            [designed]
     → audit_writer
-    → Cassandra/WORM hash-chain + Merkle root
+    → Cassandra/WORM hash-chain + Merkle root  [designed]
   → Response to caller
   → FAIL-CLOSED if engine/HSM unreachable for CRITICAL class
 ```
 
-This path is documented in full in this volume. Every step, every decision point, every failure mode.
+**Live Capstone subset:** `POST /decisions` and `POST /decisions/batch` on platform-core, demo pack `model-001`, Neon-backed audit rows. Designed path remains the law; live path is the proven slice.
+
+This volume documents every step, every decision point, every failure mode.

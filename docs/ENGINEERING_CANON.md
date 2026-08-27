@@ -14,6 +14,8 @@ This Canon is the **long-form design law** for the G.O.D.S ecosystem (Plane B). 
 
 When a developer joins, they understand Plane A Capstone bar and free-tier honesty before treating every Canon aspiration as live-deployed fact.
 
+**Volume tree status:** [`VOLUME_COMPLETION.md`](VOLUME_COMPLETION.md) — 11 volumes complete on disk; split folders merged 2026-08-27.
+
 ---
 
 ## Documentation planes (read this first)
@@ -80,6 +82,7 @@ UDOC is the Capstone showcase. Live deployment is **Render free + Neon ≤500MB*
 | 1.0 | 2025 | Initial Engineering Canon |
 | 1.0-capstone-live | 2026-07-30 | Live UDOC pointers |
 | 1.0-doc-structure | 2026-07-31 | Plane A/B split · category index · freeze notice |
+| 1.0-volume-merge | 2026-08-27 | Split vol-5/6/9 folders merged; README links fixed; completion index |
 
 ---
 
