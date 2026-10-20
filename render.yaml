@@ -12,6 +12,7 @@
 # gods-udoc-web          = PWA / mobile OTA (udoc-app)
 # gods-platform-internal = staff internal
 # gods-portals           = division portals-web (student/employer/employee)
+# gods-public-intelligence = Public Q&A advisor (NOT UDOC control plane)
 
 services:
   - type: web
@@ -167,6 +168,20 @@ services:
     branch: main
     autoDeploy: true
     buildCommand: "echo static-no-build"
+    staticPublishPath: .
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # Public Intelligence Q&A — independent of UDOC governance control plane
+  - type: web
+    name: gods-public-intelligence
+    runtime: static
+    rootDir: public-intelligence
+    branch: main
+    autoDeploy: true
+    buildCommand: "echo public-intelligence-static"
     staticPublishPath: .
     routes:
       - type: rewrite
