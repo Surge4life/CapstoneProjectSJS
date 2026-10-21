@@ -33,7 +33,7 @@ button{background:var(--gold);color:#060E1C;border:0;padding:12px 18px;border-ra
 <header>
   <div class="logo">G.O.D.S</div>
   <div class="badge">Public Intelligence · Patent + GBS full package</div>
-  <div class="badge" id="docCount">45 docs</div>
+  <div class="badge" id="docCount">…</div>
 </header>
 <main>
   <div id="msgs">
@@ -59,8 +59,14 @@ button{background:var(--gold);color:#060E1C;border:0;padding:12px 18px;border-ra
     <button type="submit">Ask</button>
   </form>
 </main>
-<script src="corpus.js"></script>
+<script src="cpart0.js"></script>
+<script src="cpart1.js"></script>
+<script src="cpart2.js"></script>
 <script>
+(function(){
+  const src = (window.__C0||'') + (window.__C1||'') + (window.__C2||'');
+  try { eval(src); } catch(e) { console.error(e); window.CORPUS = []; }
+})();
 const CORPUS = window.CORPUS || [];
 document.getElementById('docCount').textContent = CORPUS.length + ' docs';
 function score(q, e) {
