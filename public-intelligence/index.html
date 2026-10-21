@@ -32,41 +32,34 @@ button{background:var(--gold);color:#060E1C;border:0;padding:12px 18px;border-ra
 <body>
 <header>
   <div class="logo">G.O.D.S</div>
-  <div class="badge">Public Intelligence · Patent + GBS full package</div>
+  <div class="badge">Public Intelligence · Patent + GBS package</div>
   <div class="badge" id="docCount">…</div>
 </header>
 <main>
   <div id="msgs">
     <div class="w">
       <h1>Public Intelligence Advisor</h1>
-      <p>Full outstanding-work GBS package (SETHS 00–10 · MADIBA · TS · UDOC) + patent/IP + hardware/infra notes from Drive. Independent of UDOC control plane. Offline after load.</p>
+      <p>GBS outstanding-work package (SETHS · MADIBA · TS · UDOC) + patent/IP + hardware notes from Drive. Independent of UDOC control plane.</p>
       <div class="chips">
         <span class="chip" onclick="ask('What is GBS and the four divisions?')">Four divisions</span>
         <span class="chip" onclick="ask('What is SETHS institutional constitution?')">SETHS</span>
-        <span class="chip" onclick="ask('What is MADIBA and EIF nomination?')">MADIBA / EIF</span>
-        <span class="chip" onclick="ask('What is T.S. Industries charter?')">T.S.</span>
-        <span class="chip" onclick="ask('What is UDOC authorised to do under GBS charter?')">UDOC mandate</span>
-        <span class="chip" onclick="ask('What is the Sovereign Verified Technical Standard?')">Sovereign Verified</span>
-        <span class="chip" onclick="ask('What is the FTO status of UDOC patents?')">FTO / patents</span>
-        <span class="chip" onclick="ask('Carnarvon Tri-Tunnel and physical quorum')">Carnarvon</span>
-        <span class="chip" onclick="ask('GIS architecture under SETHS')">GIS architecture</span>
+        <span class="chip" onclick="ask('What is MADIBA and EIF?')">MADIBA / EIF</span>
+        <span class="chip" onclick="ask('What is T.S. Industries?')">T.S.</span>
+        <span class="chip" onclick="ask('What is UDOC authorised to do?')">UDOC mandate</span>
+        <span class="chip" onclick="ask('Sovereign Verified Technical Standard')">Sovereign Verified</span>
+        <span class="chip" onclick="ask('FTO status of UDOC patents')">FTO / patents</span>
+        <span class="chip" onclick="ask('Carnarvon Tri-Tunnel')">Carnarvon</span>
         <span class="chip" onclick="ask('Capstone honesty and smoke path')">Capstone honesty</span>
       </div>
     </div>
   </div>
   <form onsubmit="return send(event)">
-    <input id="q" placeholder="Ask about GBS, SETHS, MADIBA, TS, UDOC, patents, EVA, GIS…" autocomplete="off"/>
+    <input id="q" placeholder="Ask about GBS, SETHS, MADIBA, TS, UDOC, patents…" autocomplete="off"/>
     <button type="submit">Ask</button>
   </form>
 </main>
-<script src="cpart0.js"></script>
-<script src="cpart1.js"></script>
-<script src="cpart2.js"></script>
+<script src="corpus.js"></script>
 <script>
-(function(){
-  const src = (window.__C0||'') + (window.__C1||'') + (window.__C2||'');
-  try { eval(src); } catch(e) { console.error(e); window.CORPUS = []; }
-})();
 const CORPUS = window.CORPUS || [];
 document.getElementById('docCount').textContent = CORPUS.length + ' docs';
 function score(q, e) {
@@ -76,20 +69,16 @@ function score(q, e) {
   t.split(/\W+/).filter(w=>w.length>2).forEach(w=>{ if(blob.includes(w)) s+=3; });
   if (t.includes('four division') || t.includes('gbs')) s += 6;
   const boosts = [
-    [['fto','freedom','patent','embodiment','prior art'],10],
-    [['eva','spd','disparate','jensen','whitepaper'],10],
-    [['aeeef','fabric','attachment','enforcement'],6],
-    [['carnarvon','tri-tunnel','tunnel','quorum'],10],
-    [['seth','seths','skills passport','franchise'],12],
-    [['madiba','eif','exceptional individual','nomination','fsca'],12],
-    [['t.s','ts industries','trusted systems','ohs'],10],
-    [['udoc','sovereign-verified','mandate','licensing','security risk'],10],
-    [['gbs','four division','holdings','constitutional'],8],
-    [['capstone','smoke','honesty','assessor'],6],
-    [['hq-os','hybrid','quantum'],8],
-    [['gis','architecture','ecosystem'],8],
-    [['infrastructure','hardware','bom','rack'],6],
-    [['national submission','idc','dbsa','dcdt'],8],
+    [['fto','freedom','patent','embodiment'],10],
+    [['eva','spd','disparate','jensen'],10],
+    [['carnarvon','tri-tunnel','quorum'],10],
+    [['seth','seths'],12],
+    [['madiba','eif','exceptional'],12],
+    [['t.s','ts industries','trusted'],10],
+    [['udoc','sovereign-verified','mandate'],10],
+    [['gbs','four division','holdings'],8],
+    [['capstone','smoke','honesty'],6],
+    [['hq-os','quantum','gis'],8],
   ];
   for (const [keys,b] of boosts) if (keys.some(k=>t.includes(k))) s+=b;
   return s;
@@ -109,18 +98,13 @@ function send(ev) {
   const ranked = CORPUS.map(e=>({e,s:score(q,e)})).filter(x=>x.s>=8).sort((a,b)=>b.s-a.s);
   let html;
   if(!ranked.length) {
-    html = '<div class="msg bot"><div class="t">NO HIT</div>No strong match. Try: four divisions, SETHS constitution, MADIBA/EIF, T.S. charter, UDOC mandate, Sovereign Verified, FTO/patents, Carnarvon, GIS, Capstone honesty.</div>';
+    html = '<div class="msg bot"><div class="t">NO HIT</div>No strong match. Try: four divisions, SETHS, MADIBA/EIF, T.S., UDOC mandate, FTO, Carnarvon, Capstone honesty.</div>';
   } else {
     html = ranked.slice(0,4).map(({e,s})=>'<div class="msg bot"><div class="t">'+e.title+' · score '+s+'</div>'+e.body.replace(/</g,'&lt;')+'<div class="src">'+e.source+' · '+e.category+' / '+e.division+'</div></div>').join('');
   }
   box.insertAdjacentHTML('beforeend', html);
   box.scrollTop = box.scrollHeight;
   document.getElementById('q').value = '';
-  try {
-    const log = JSON.parse(localStorage.getItem('gods_pi_train')||'[]');
-    log.push({q, hits: ranked.slice(0,3).map(x=>x.e.title), t: Date.now()});
-    localStorage.setItem('gods_pi_train', JSON.stringify(log.slice(-80)));
-  } catch(_){}
   return false;
 }
 </script>
