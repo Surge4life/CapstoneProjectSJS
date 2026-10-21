@@ -9,12 +9,12 @@
 :root{--ink:#060E1C;--gold:#C9A84C;--muted:#8BA3B8;--panel:#0D1E35;}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Barlow,system-ui,sans-serif;background:var(--ink);color:#E8F0F8;min-height:100vh;display:flex;flex-direction:column}
-header{padding:16px 20px;border-bottom:1px solid #1a3048;display:flex;align-items:center;gap:12px}
+header{padding:16px 20px;border-bottom:1px solid #1a3048;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .logo{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--gold);letter-spacing:.04em}
 .badge{font-size:11px;color:var(--muted);border:1px solid #2a4058;padding:2px 8px;border-radius:99px}
-main{flex:1;display:flex;flex-direction:column;max-width:820px;width:100%;margin:0 auto;padding:20px}
+main{flex:1;display:flex;flex-direction:column;max-width:860px;width:100%;margin:0 auto;padding:20px}
 #msgs{flex:1;overflow-y:auto;padding-bottom:16px}
-.msg{margin:12px 0;padding:14px 16px;border-radius:10px;line-height:1.5;font-size:14px}
+.msg{margin:12px 0;padding:14px 16px;border-radius:10px;line-height:1.55;font-size:14px}
 .msg.user{background:#12253a;border:1px solid #1e3a55}
 .msg.bot{background:var(--panel);border:1px solid #1a3550}
 .msg .t{font-size:11px;color:var(--gold);margin-bottom:6px;font-family:'IBM Plex Mono',monospace}
@@ -25,50 +25,67 @@ button{background:var(--gold);color:#060E1C;border:0;padding:12px 18px;border-ra
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
 .chip{background:#12253a;border:1px solid #2a4058;color:var(--muted);padding:6px 12px;border-radius:99px;font-size:12px;cursor:pointer}
 .chip:hover{border-color:var(--gold);color:var(--gold)}
-.w{text-align:center;padding:40px 20px;color:var(--muted)}
-.w h1{font-family:'Barlow Condensed',sans-serif;color:var(--gold);font-size:28px;margin-bottom:8px}
+.w{text-align:center;padding:32px 16px;color:var(--muted)}
+.w h1{font-family:'Barlow Condensed',sans-serif;color:var(--gold);font-size:26px;margin-bottom:8px}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">G.O.D.S</div>
-  <div class="badge">Public Intelligence · Patent/IP corpus live</div>
+  <div class="badge">Public Intelligence · Patent + GBS full package</div>
+  <div class="badge" id="docCount">45 docs</div>
 </header>
 <main>
   <div id="msgs">
     <div class="w">
       <h1>Public Intelligence Advisor</h1>
-      <p>Curated answers + Drive patent/IP corpus (FTO, UDOC tech, legal comparison, 19 embodiments). Independent of UDOC control plane. Works offline after load.</p>
+      <p>Full outstanding-work GBS package (SETHS 00–10 · MADIBA · TS · UDOC) + patent/IP + hardware/infra notes from Drive. Independent of UDOC control plane. Offline after load.</p>
       <div class="chips">
-        <span class="chip" onclick="ask('What is the FTO status of UDOC?')">FTO status</span>
-        <span class="chip" onclick="ask('Explain EVA SPD DI and Jensen-Shannon')">EVA metrics</span>
-        <span class="chip" onclick="ask('What is the AEEF five-point fabric?')">AEEF fabric</span>
-        <span class="chip" onclick="ask('Carnarvon Tri-Tunnel physical quorum')">Carnarvon</span>
-        <span class="chip" onclick="ask('Capstone honesty bounds and live smoke')">Capstone honesty</span>
-        <span class="chip" onclick="ask('HQ-OS hybrid classical quantum')">HQ-OS</span>
+        <span class="chip" onclick="ask('What is GBS and the four divisions?')">Four divisions</span>
+        <span class="chip" onclick="ask('What is SETHS institutional constitution?')">SETHS</span>
+        <span class="chip" onclick="ask('What is MADIBA and EIF nomination?')">MADIBA / EIF</span>
+        <span class="chip" onclick="ask('What is T.S. Industries charter?')">T.S.</span>
+        <span class="chip" onclick="ask('What is UDOC authorised to do under GBS charter?')">UDOC mandate</span>
+        <span class="chip" onclick="ask('What is the Sovereign Verified Technical Standard?')">Sovereign Verified</span>
+        <span class="chip" onclick="ask('What is the FTO status of UDOC patents?')">FTO / patents</span>
+        <span class="chip" onclick="ask('Carnarvon Tri-Tunnel and physical quorum')">Carnarvon</span>
+        <span class="chip" onclick="ask('GIS architecture under SETHS')">GIS architecture</span>
+        <span class="chip" onclick="ask('Capstone honesty and smoke path')">Capstone honesty</span>
       </div>
     </div>
   </div>
   <form onsubmit="return send(event)">
-    <input id="q" placeholder="Ask about UDOC, patent, EVA, GBS, divisions…" autocomplete="off"/>
+    <input id="q" placeholder="Ask about GBS, SETHS, MADIBA, TS, UDOC, patents, EVA, GIS…" autocomplete="off"/>
     <button type="submit">Ask</button>
   </form>
 </main>
+<script src="corpus.js"></script>
 <script>
-const CORPUS = [{"title": "FTO Audit — UDOC Sovereign AI Framework (Drive v1–v3)", "category": "PATENT", "division": "UDOC", "source": "Drive patent folder · FTO Audit v1/v2/v3", "body": "Freedom-to-Operate Audit of UDOC, EVA, HQ-OS and PQC infrastructure confirms UDOC occupies a distinct IP space versus IBM, Google, Microsoft, Palantir and Nova X Quantum. Competitors focus on general-purpose quantum, self-supervised alignment, memory isolation or data ontology — none claim constitutional law enforced at code and silicon layer of a hybrid OS. Four core patent areas with 19 alternative embodiments: (1) UDOC Sovereign AI Governance Platform — tactical edge mesh, bio-synthetic DNA WORM storage, cross-sovereign digital embassy, Sovereign Continuity Ledger, collective recursive stability engine; (2) EVA Decision Evaluation Engine — clinical/robotic superego, EEG/BCI cognitive state gating, high-frequency FPGA finality gate, hafnium memristive threshold, embodied gestural synthesis; (3) HQ-OS Hybrid Classical-Quantum OS — 128-bit silicon governance firmware, cryogenic control OS, Proof-of-Quantum-Work, QCCD ion-trap modular, 3D-AIMC analog fusion; (4) Sovereign Key Distribution & PQC — photonic MZI intercept, multimodal biometric quorum HSM, substrate resonance authentication, rare-isotope DNA watermarking. Recommendation: provisional filing for original + 19 embodiments."}, {"title": "UDOC Technical Specification — Sovereign AI Governance Infrastructure (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive patent folder · UDOC technical spec v1–v3", "body": "UDOC is non-bypassable technical execution enforcement architecture. Resolves the logic monopoly by trifurcating AI lifecycle into legislation (policy-as-code), execution (TEE-attested compute), and oversight (immutable audit). Deterministic Execution Enforcement Fabric (AEEF) attaches at five points: SDK Gateways, Sidecar Containers, Host Agents, Gateway Appliances, Edge/Satellite Nodes. Ingestion uses mTLS + Kafka-compatible event streaming with idempotent producers as mandatory admission controller. EVA engine formalises SPD, Disparate Impact (80% rule triggers BLOCK), Jensen-Shannon drift detection. Hardware: FPGA governance coprocessors; RISC-V PMP digital bunkers with custom opcodes G_ATTEST, G_AUDIT, G_SOV_VERIFY. CMAG multi-agent arbitration with Ethical Cooperation Score and 1050 ms SLA fallback to human oversight. Eight modular patent families."}, {"title": "Legal Comparison Report — UDOC vs Prior Art (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive patent folder · Legal Comparison Report", "body": "Evaluates patentability under South Africa Patents Act 57 of 1978 Section 25. UDOC transcends schemes/rules/programs exclusion by establishing Technical Effect through hardware-enforced constraints. Differentiates from IBM watsonx.governance and Google Model Armor via Separation of Powers model and five-point AEEF attachment. EVA uses irreversible hardware BLOCK on DI < 0.8 or JS threshold or HSM telemetry loss — fail-closed state machine. Hardware novelty: RISC-V custom opcodes + PMP for jurisdiction locking; FPGA line-rate gating. CMAG provides Byzantine Fault Tolerance + Deterministic Finality. Carnarvon Tri-Tunnel physical quorum with 2-of-3 South African officer split-custody for Master keys. zk-SOV uses zk-SNARKs to prove compliance without revealing model weights or PII."}, {"title": "IP Strategy for Sovereign Quantum Infrastructure (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive patent folder · IP Strategy", "body": "Portfolio of trade secrets and patentable innovations at sovereign infrastructure and quantum-ready governance intersection. Core differentiators: Embedded Governance Fabric (five attachment points + fail-closed logic); HQ-OS Quantum-Classical Interface middleware as Constitutional Compliance Router; Code-level Constitutional Pillars (founder_override=false, mandatory HITL); Carnarvon Tri-Tunnel geotechnical design with direct geothermal cooling; EVA 6-dimensional scoring producing real-time APPROVE/BLOCK. Trade secrets: Carnarvon geotechnical model; Compounding Loop logic. Action: provisional patent for Sovereign-First Hybrid OS Kernel Architecture."}, {"title": "Patent Enhancement & Embodiment Research (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive patent folder · Patent Enhancement Research", "body": "Aligns UDOC with South Africa Draft National AI Policy (GG 54477) and POPIA. Risk tiers: Unacceptable = permanent BLOCK + SAHRC/DCDT; High Risk = mandatory HITL 48h SLA; Medium = 5% human sampling; Low = automated weekly audit. Multi-stage kill-switch with authorize_restart + Peer-Attested Identity Rotation. W3C PROV-ML lineage. Federated Sovereign AI Exchange via MPC. Carnarvon Tri-Tunnel PUE 1.12, immersion 85 kW/rack."}, {"title": "EVA Mathematical Formalisation (SPD · DI · JS) — Drive", "category": "PATENT", "division": "UDOC", "source": "Drive · UDOC technical + Legal Comparison", "body": "EVA produces deterministic APPROVE / REVIEW / BLOCK. SPD = P(Y=1|A=0) - P(Y=1|A=1); target 0.0. DI = P(Y=1|A=0)/P(Y=1|A=1); 80% rule — DI < 0.8 triggers automatic non-bypassable BLOCK + SAHRC escalation. Jensen-Shannon for drift; exceeding threshold triggers irreversible hardware interrupt. Capstone live software on Render demonstrates fair=APPROVE, biased=BLOCK on model-001. Six dimensions: Validity, Confidence, Risk, Compliance, Stability, Impact."}, {"title": "AEEF Five-Point Enforcement Fabric (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive · UDOC technical specification", "body": "AEEF non-bypassable constraint layer. Attachment points: (1) SDK Gateways — event capture + identity attestation; (2) Sidecar Containers — real-time policy intercept; (3) Host Agents — kernel monitoring + PMP; (4) Gateway Appliances — jurisdiction-locked egress + mTLS; (5) Edge/Satellite Nodes — disconnected enforcement + local audit. Mandatory admission controller via mTLS + Kafka idempotent producers. Solves Logic Monopoly of prior art."}, {"title": "Carnarvon Tri-Tunnel & Physical Quorum (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive · IP Strategy + Technical Spec + Legal Comparison", "body": "Physical deployment in stable Precambrian dolerite (Kaapvaal Craton, Carnarvon, Northern Cape). Tri-Tunnel: Surface Campus, Service Cavern (-15 m), Data Caverns (-38 to -45 m). PUE 1.12 via geothermal + immersion cooling 85 kW/rack. Solar >2500 kWh/m2/yr. Three-tier keys (Master/KEK/DEK) with 2-of-3 South African officer split-custody. Master key never exported."}, {"title": "HQ-OS Hybrid Classical-Quantum OS (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive · FTO + Technical Spec", "body": "HQ-OS governance-specific quantum workload routing with deterministic fallback. QCI middleware as Constitutional Compliance Router (not generic HPC scheduler). Embodiments: 128-bit silicon governance firmware; cryogenic control OS at 10-20 mK; Proof-of-Quantum-Work; QCCD ion-trap; 3D-AIMC for MoE governance. Graceful degradation keeps Sovereign Continuity Ledger available."}, {"title": "CMAG Constitutional Multi-Agent Governance (Drive)", "category": "PATENT", "division": "UDOC", "source": "Drive · Technical Spec + Legal Comparison", "body": "CMAG interposes Supervisor Arbitration Layer. Ethical Cooperation Score ECS = Cooperation x Autonomy x Integrity x Fairness. Byzantine Fault Tolerance for Deterministic Finality. 1050 ms SLA fallback to Human Oversight satisfies Meaningful Human Control. Differentiates from Palantir Ontology and generic agentic frameworks."}, {"title": "G.O.D.S Capstone Honesty Bounds (Live Platform)", "category": "CAPSTONE", "division": "HOLDINGS", "source": "Live UDOC + Assessor packs", "body": "Capstone demonstrates live software control plane on Render + Neon: UDOC demo/ready, EVA fair=APPROVE biased=BLOCK, citizen challenge, EIF, 24 portals, four-division surfaces, staff role chips, intelligence dual-path. Full hardware embodiments (FPGA, silicon ISA, Carnarvon, photonic PQC) are designed and documented in the patent corpus but not built. Neon <=500 MB, Render free-tier limits. GBS is constitutional standard, not a fifth division. Loop: SETHS -> TS -> UDOC -> MADIBA."}, {"title": "Assessor Smoke Path & Evidence (Live)", "category": "CAPSTONE", "division": "UDOC", "source": "FINAL_ASSESSOR_PACK + SMOKE evidence", "body": "Minimum pass: GET /health ok; GET /udoc/demo/ready true; batch fair != BLOCK and biased = BLOCK. Surfaces: Core, Client, Admin, Sector, Operator, Sentinel, Portals, Citizen. Staff: admin@gods.local / admin123; seths@ / madiba@ / ts@ / staff123. Capstone deadline 30 October 2026."}];
+const CORPUS = window.CORPUS || [];
+document.getElementById('docCount').textContent = CORPUS.length + ' docs';
 function score(q, e) {
   const t = (q||'').toLowerCase();
   const blob = (e.title+' '+e.body+' '+(e.category||'')+' '+(e.division||'')).toLowerCase();
   let s = 0;
   t.split(/\W+/).filter(w=>w.length>2).forEach(w=>{ if(blob.includes(w)) s+=3; });
-  if(t.includes('fto')||t.includes('freedom')) s+=8;
-  if(t.includes('eva')||t.includes('spd')||t.includes('disparate')) s+=8;
-  if(t.includes('aeeef')||t.includes('fabric')||t.includes('attachment')) s+=6;
-  if(t.includes('carnarvon')||t.includes('tri-tunnel')||t.includes('tunnel')) s+=8;
-  if(t.includes('hq-os')||t.includes('hybrid')||t.includes('quantum')) s+=6;
-  if(t.includes('cmag')||t.includes('agent')) s+=5;
-  if(t.includes('patent')||t.includes('embodiment')||t.includes('prior art')) s+=5;
-  if(t.includes('capstone')||t.includes('smoke')||t.includes('honesty')) s+=6;
+  if (t.includes('four division') || t.includes('gbs')) s += 6;
+  const boosts = [
+    [['fto','freedom','patent','embodiment','prior art'],10],
+    [['eva','spd','disparate','jensen','whitepaper'],10],
+    [['aeeef','fabric','attachment','enforcement'],6],
+    [['carnarvon','tri-tunnel','tunnel','quorum'],10],
+    [['seth','seths','skills passport','franchise'],12],
+    [['madiba','eif','exceptional individual','nomination','fsca'],12],
+    [['t.s','ts industries','trusted systems','ohs'],10],
+    [['udoc','sovereign-verified','mandate','licensing','security risk'],10],
+    [['gbs','four division','holdings','constitutional'],8],
+    [['capstone','smoke','honesty','assessor'],6],
+    [['hq-os','hybrid','quantum'],8],
+    [['gis','architecture','ecosystem'],8],
+    [['infrastructure','hardware','bom','rack'],6],
+    [['national submission','idc','dbsa','dcdt'],8],
+  ];
+  for (const [keys,b] of boosts) if (keys.some(k=>t.includes(k))) s+=b;
   return s;
 }
 function ask(text) {
@@ -83,17 +100,21 @@ function send(ev) {
   const welcome = box.querySelector('.w');
   if(welcome) welcome.remove();
   box.insertAdjacentHTML('beforeend', '<div class="msg user"><div class="t">You</div>'+q.replace(/</g,'&lt;')+'</div>');
-  const ranked = CORPUS.map(e=>({e,s:score(q,e)})).filter(x=>x.s>=6).sort((a,b)=>b.s-a.s);
+  const ranked = CORPUS.map(e=>({e,s:score(q,e)})).filter(x=>x.s>=8).sort((a,b)=>b.s-a.s);
   let html;
   if(!ranked.length) {
-    html = '<div class="msg bot"><div class="t">NO HIT</div>No strong match in the patent/IP corpus. Try: FTO status, EVA metrics, AEEF, Carnarvon, HQ-OS, Capstone honesty, CMAG, or a specific patent family.</div>';
+    html = '<div class="msg bot"><div class="t">NO HIT</div>No strong match. Try: four divisions, SETHS constitution, MADIBA/EIF, T.S. charter, UDOC mandate, Sovereign Verified, FTO/patents, Carnarvon, GIS, Capstone honesty.</div>';
   } else {
-    const top = ranked.slice(0,3);
-    html = top.map(({e,s})=>'<div class="msg bot"><div class="t">'+e.title+' · score '+s+'</div>'+e.body+'<div class="src">'+e.source+' · '+e.category+' / '+e.division+'</div></div>').join('');
+    html = ranked.slice(0,4).map(({e,s})=>'<div class="msg bot"><div class="t">'+e.title+' · score '+s+'</div>'+e.body.replace(/</g,'&lt;')+'<div class="src">'+e.source+' · '+e.category+' / '+e.division+'</div></div>').join('');
   }
   box.insertAdjacentHTML('beforeend', html);
   box.scrollTop = box.scrollHeight;
   document.getElementById('q').value = '';
+  try {
+    const log = JSON.parse(localStorage.getItem('gods_pi_train')||'[]');
+    log.push({q, hits: ranked.slice(0,3).map(x=>x.e.title), t: Date.now()});
+    localStorage.setItem('gods_pi_train', JSON.stringify(log.slice(-80)));
+  } catch(_){}
   return false;
 }
 </script>
