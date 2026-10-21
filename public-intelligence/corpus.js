@@ -1,1 +1,1 @@
-PLACEHOLDER
+window.CORPUS = [];
